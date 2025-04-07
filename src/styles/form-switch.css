@@ -1,0 +1,47 @@
+.form-switch {
+  position: relative;
+}
+
+.form-switch-checkbox {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+  position: absolute;
+}
+
+.form-switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  width: 56px;
+  height: 32px;
+  background: #e5e7eb;
+  border-radius: 100px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.form-switch-label .form-switch-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  background: #ffffff;
+  border-radius: 100%;
+  transition: 0.2s;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.form-switch-checkbox:checked + .form-switch-label {
+  background: #3b82f6;
+}
+
+.form-switch-checkbox:checked + .form-switch-label .form-switch-indicator {
+  left: calc(100% - 28px);
+}
+
+.form-switch-label:active .form-switch-indicator {
+  width: 30px;
+}
