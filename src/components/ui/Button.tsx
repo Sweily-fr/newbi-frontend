@@ -21,8 +21,8 @@ export const Button: React.FC<ButtonProps> = ({
   
   // Classes spécifiques à la variante
   const variantClasses = {
-    primary: 'border border-transparent bg-blue-500 text-white hover:bg-blue-600',
-    secondary: 'border border-transparent bg-blue-100 text-blue-700 hover:bg-blue-200',
+    primary: 'border border-transparent bg-[#5b50ff] text-white hover:bg-[#4a41d0]',
+    secondary: 'border border-transparent bg-[#eeecff] text-[#5b50ff] hover:bg-[#e0ddff]',
     outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100',
     danger: 'border border-transparent bg-red-600 text-white hover:bg-red-700',
   };

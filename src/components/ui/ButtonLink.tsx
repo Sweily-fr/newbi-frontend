@@ -27,8 +27,8 @@ export const ButtonLink: React.FC<ButtonLinkProps> = ({
   
   // Classes spécifiques à la variante
   const variantClasses = {
-    primary: 'border border-transparent bg-blue-500 text-white hover:bg-blue-600 shadow-md transform hover:translate-y-[-2px]',
-    secondary: 'border border-transparent bg-blue-100 text-blue-700 hover:bg-blue-200 shadow-sm transform hover:translate-y-[-2px]',
+    primary: 'border border-transparent bg-[#5b50ff] text-white hover:bg-[#4a41d0] shadow-md transform hover:translate-y-[-2px]',
+    secondary: 'border border-transparent bg-[#eeecff] text-[#5b50ff] hover:bg-[#e0ddff] shadow-sm transform hover:translate-y-[-2px]',
     outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 shadow-sm transform hover:translate-y-[-2px]',
     danger: 'border border-transparent bg-red-600 text-white hover:bg-red-700 shadow-md transform hover:translate-y-[-2px]',
   };

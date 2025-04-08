@@ -182,7 +182,7 @@ export const Navbar = () => {
                 {!isAuthenticated && (
                   <ButtonLink
                     to="/auth"
-                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="bg-[#5b50ff] text-white hover:bg-[#4a41d0] px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
                   >
                     Inscription/Connexion
                   </ButtonLink>

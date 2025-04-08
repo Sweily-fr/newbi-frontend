@@ -143,7 +143,7 @@ export const HomePage = () => {
                   </div>
                   <p className="text-sm text-gray-500 font-medium">
                     Utilisé par plus de{" "}
-                    <span className="text-blue-600 font-bold">1000+</span>{" "}
+                    <span className="text-[#5b50ff] font-bold">1000+</span>{" "}
                     clients satisfaits en France
                   </p>
                 </div>
@@ -428,7 +428,7 @@ export const HomePage = () => {
         <div className="bg-blue-50/50 py-24" id="benefits-section">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12 px-4 sm:px-6 lg:px-8">
-              <h2 className="text-sm font-semibold text-blue-600 tracking-wide uppercase">
+              <h2 className="text-sm font-semibold text-[#5b50ff] tracking-wide uppercase">
                 POURQUOI NOUS CHOISIR ?
               </h2>
               <p className="mt-3 text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -635,7 +635,7 @@ export const HomePage = () => {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-16 px-4 sm:px-6 lg:px-8">
-              <h2 className="text-sm font-semibold text-blue-500 tracking-wide uppercase">
+              <h2 className="text-sm font-semibold text-[#5b50ff] tracking-wide uppercase">
                 RÉINVENTION D'ENTREPRISE
               </h2>
               <h3 className="mt-3 text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight">
@@ -656,7 +656,7 @@ export const HomePage = () => {
                   size="lg"
                   className="inline-flex items-center"
                 >
-                  Découvrir Generation Business GRATUITEMENT{" "}
+                  Découvrir NEWBI GRATUITEMENT{" "}
                   <span className="ml-2">&rarr;</span>
                 </ButtonLink>
               </div>
@@ -666,7 +666,7 @@ export const HomePage = () => {
               <div className="md:w-1/4">
                 <div className="flex flex-col space-y-12">
                   <div className="flex items-start">
-                    <div className="w-1 h-12 bg-blue-500 mr-4"></div>
+                    <div className="w-1 h-12 bg-[#5b50ff] mr-4"></div>
                     <div>
                       <div className="text-5xl font-bold text-gray-900">
                         100%
@@ -676,7 +676,7 @@ export const HomePage = () => {
                   </div>
 
                   <div className="flex items-start">
-                    <div className="w-1 h-12 bg-blue-500 mr-4"></div>
+                    <div className="w-1 h-12 bg-[#5b50ff] mr-4"></div>
                     <div>
                       <div className="text-5xl font-bold text-gray-900">
                         100%
@@ -851,7 +851,7 @@ export const HomePage = () => {
         <div className="bg-blue-50/50 py-16 sm:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center px-4 sm:px-6 lg:px-8">
-              <h2 className="text-base font-semibold text-blue-600 tracking-wide uppercase">
+              <h2 className="text-base font-semibold text-[#5b50ff] tracking-wide uppercase">
                 TÉMOIGNAGES
               </h2>
               <p className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -955,7 +955,7 @@ export const HomePage = () => {
             </div>
 
             {/* CTA en dessous des avis */}
-            <div className="mt-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl mx-4 sm:mx-6 lg:mx-8 overflow-hidden">
+            <div className="mt-16 bg-[#5b50ff] rounded-lg shadow-xl mx-4 sm:mx-6 lg:mx-8 overflow-hidden">
               <div className="px-6 py-12 sm:px-12 lg:px-16 flex flex-col md:flex-row items-center justify-between">
                 <div className="text-center md:text-left mb-8 md:mb-0">
                   <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
@@ -987,7 +987,7 @@ export const HomePage = () => {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-base font-semibold text-blue-600 tracking-wide uppercase">
+              <p className="text-base font-semibold text-[#5b50ff] tracking-wide uppercase">
                 TARIFS
               </p>
               <h2 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
@@ -1024,7 +1024,7 @@ export const HomePage = () => {
                   <p className="text-center text-gray-700 mb-6 max-w-2xl mx-auto">
                     Inscrivez-vous gratuitement à Generation Business avant de
                     prendre un plan payant.
-                    <span className="font-medium text-blue-700">
+                    <span className="font-medium text-[#5b50ff]">
                       1 mois d'essai offert
                     </span>{" "}
                     et possibilité de résilier à tout moment sans condition.
@@ -1052,7 +1052,7 @@ export const HomePage = () => {
                         } px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 relative`}
                       >
                         Annuel
-                        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                        <span className="absolute -top-2 -right-2 bg-[#5b50ff] text-white text-xs px-1.5 py-0.5 rounded-full">
                           -20%
                         </span>
                       </button>
@@ -1105,7 +1105,7 @@ export const HomePage = () => {
                         <li className="flex items-start">
                           <div className="flex-shrink-0">
                             <svg
-                              className="h-5 w-5 text-blue-500"
+                              className="h-5 w-5 text-[#5b50ff]"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -1123,7 +1123,7 @@ export const HomePage = () => {
                         <li className="flex items-start">
                           <div className="flex-shrink-0">
                             <svg
-                              className="h-5 w-5 text-blue-500"
+                              className="h-5 w-5 text-[#5b50ff]"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -1141,7 +1141,7 @@ export const HomePage = () => {
                         <li className="flex items-start">
                           <div className="flex-shrink-0">
                             <svg
-                              className="h-5 w-5 text-blue-500"
+                              className="h-5 w-5 text-[#5b50ff]"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -1159,7 +1159,7 @@ export const HomePage = () => {
                         <li className="flex items-start">
                           <div className="flex-shrink-0">
                             <svg
-                              className="h-5 w-5 text-blue-500"
+                              className="h-5 w-5 text-[#5b50ff]"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -1190,7 +1190,7 @@ export const HomePage = () => {
                         <li className="flex items-start bg-blue-50 p-2 rounded-lg mb-2">
                           <div className="flex-shrink-0">
                             <svg
-                              className="h-5 w-5 text-blue-600"
+                              className="h-5 w-5 text-[#5b50ff]"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -1201,7 +1201,7 @@ export const HomePage = () => {
                               />
                             </svg>
                           </div>
-                          <span className="ml-3 text-blue-700 font-medium">
+                          <span className="ml-3 text-[#5b50ff] font-medium">
                             1 mois d'essai gratuit
                           </span>
                         </li>
@@ -1237,7 +1237,7 @@ export const HomePage = () => {
         <div id="faq-section" className="bg-blue-50/50 py-16 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center px-4 sm:px-6 lg:px-8">
-              <h2 className="text-base font-semibold text-blue-600 tracking-wide uppercase">
+              <h2 className="text-base font-semibold text-[#5b50ff] tracking-wide uppercase">
                 FAQ
               </h2>
               <p className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
