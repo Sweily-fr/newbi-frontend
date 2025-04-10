@@ -55,7 +55,7 @@ export const useCompanyForm = ({ initialLogo = '', onLogoChange }: UseCompanyLog
     if (!file.type.match('image.*')) {
       Notification.warning('Veuillez sélectionner une image', {
         duration: 5000,
-        position: 'top-right'
+        position: 'bottom-left'
       });
       return;
     }
@@ -64,7 +64,7 @@ export const useCompanyForm = ({ initialLogo = '', onLogoChange }: UseCompanyLog
     if (file.size > 2 * 1024 * 1024) {
       Notification.warning('L\'image ne doit pas dépasser 2MB', {
         duration: 5000,
-        position: 'top-right'
+        position: 'bottom-left'
       });
       return;
     }

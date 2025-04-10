@@ -215,6 +215,8 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             fileInputRef={fileInputRef}
             maxSizeMB={2}
             acceptedFileTypes="image/*"
+            objectFit='adaptive'
+            imageSize={128}
           />
         </div>
 

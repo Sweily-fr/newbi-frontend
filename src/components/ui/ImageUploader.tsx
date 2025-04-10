@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export interface ImageUploaderProps {
   /**
@@ -49,6 +49,22 @@ export interface ImageUploaderProps {
    * Texte d'aide
    */
   helpText?: string;
+  /**
+   * Style de bordure arrondie ('full' pour cercle complet, 'rounded' pour coins arrondis, 'square' pour coins carrés)
+   */
+  roundedStyle?: 'full' | 'rounded' | 'square';
+  /**
+   * Taille de l'image en pixels (largeur et hauteur)
+   */
+  imageSize?: number;
+  /**
+   * Mode d'ajustement de l'image:
+   * - cover: remplit tout l'espace (peut recadrer l'image)
+   * - contain: montre l'image entière (peut laisser des espaces vides)
+   * - adaptive: s'adapte automatiquement selon les proportions de l'image
+   * - fill: étire l'image pour remplir tout l'espace (peut déformer l'image)
+   */
+  objectFit?: 'cover' | 'contain' | 'adaptive' | 'fill';
 }
 
 /**
@@ -67,6 +83,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   acceptedFileTypes = "image/*",
   className = '',
   helpText = `Format recommandé : PNG ou JPG, max ${maxSizeMB}MB`,
+  roundedStyle = 'full',
+  imageSize = 128,
+  objectFit = 'adaptive',
 }) => {
   // Utiliser la référence externe ou créer une référence locale
   const internalFileInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +97,64 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   
   // Déterminer si une image est disponible pour affichage
   const hasImage = Boolean(previewImage || fullImageUrl);
+  
+  // Référence pour l'image
+  const imageRef = useRef<HTMLImageElement>(null);
+  
+  // État pour stocker les dimensions de l'image
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  
+  // Fonction pour déterminer le mode d'ajustement optimal
+  const getOptimalObjectFit = () => {
+    if (objectFit !== 'adaptive' || !imageDimensions) return objectFit;
+    
+    // Calculer le ratio d'aspect de l'image
+    const imageRatio = imageDimensions.width / imageDimensions.height;
+    
+    // Si l'image est beaucoup plus large que haute (logo panoramique)
+    if (imageRatio > 2) {
+      return 'contain';
+    }
+    // Si l'image est beaucoup plus haute que large (logo vertical)
+    else if (imageRatio < 0.5) {
+      return 'contain';
+    }
+    // Pour les images avec des proportions plus équilibrées
+    else {
+      return 'cover';
+    }
+  };
+  
+  // Effet pour charger les dimensions de l'image
+  useEffect(() => {
+    if (hasImage && imageRef.current) {
+      const img = imageRef.current;
+      
+      // Si l'image est déjà chargée
+      if (img.complete) {
+        setImageDimensions({
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+      } else {
+        // Sinon, attendre que l'image soit chargée
+        const handleLoad = () => {
+          setImageDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          });
+        };
+        
+        img.addEventListener('load', handleLoad);
+        return () => {
+          img.removeEventListener('load', handleLoad);
+        };
+      }
+    }
+  }, [hasImage, previewImage, fullImageUrl]);
+  
+  // Déterminer le mode d'ajustement final
+  const finalObjectFit = getOptimalObjectFit();
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -87,13 +164,22 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             <img
               src={previewImage || fullImageUrl}
               alt="Avatar"
-              className="w-32 h-32 rounded-full object-contain bg-white border border-gray-200 shadow-sm"
+              ref={imageRef}
+              className={`${roundedStyle === 'full' ? 'rounded-full' : roundedStyle === 'rounded' ? 'rounded-lg' : 'rounded-none'} bg-white border border-gray-200 shadow-sm`}
+              style={{ 
+                width: `${imageSize}px`, 
+                height: `${imageSize}px`,
+                objectFit: finalObjectFit === 'fill' ? 'fill' : finalObjectFit === 'contain' ? 'contain' : 'cover'
+              }}
             />
           </div>
         )}
         {!hasImage && (
           <div className="relative">
-            <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm">
+            <div 
+              className={`${roundedStyle === 'full' ? 'rounded-full' : roundedStyle === 'rounded' ? 'rounded-lg' : 'rounded-none'} bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm`}
+              style={{ width: `${imageSize}px`, height: `${imageSize}px` }}>
+
               <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
