@@ -68,3 +68,30 @@ export const DELETE_CLIENT = gql`
     deleteClient(id: $id)
   }
 `;
+
+// Requêtes pour la recherche d'entreprises françaises
+export const SEARCH_COMPANY_BY_SIRET = gql`
+  query SearchCompanyBySiret($siret: String!) {
+    searchCompanyBySiret(siret: $siret) {
+      name
+      siret
+      vatNumber
+      address {
+        street
+        city
+        postalCode
+        country
+      }
+    }
+  }
+`;
+
+export const SEARCH_COMPANIES_BY_NAME = gql`
+  query SearchCompaniesByName($name: String!) {
+    searchCompaniesByName(name: $name) {
+      name
+      siret
+      siren
+    }
+  }
+`;
