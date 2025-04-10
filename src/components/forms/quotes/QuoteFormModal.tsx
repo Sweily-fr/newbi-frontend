@@ -166,7 +166,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         !item.description ||
         !item.quantity ||
         !item.unitPrice ||
-        !item.vatRate ||
+        item.vatRate === undefined || item.vatRate === null ||
         !item.unit;
       if (hasError) {
         console.log(`Erreur dans l'article ${index + 1}:`, item);

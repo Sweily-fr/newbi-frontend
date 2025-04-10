@@ -5,6 +5,7 @@ import { Modal } from '../../feedback/Modal';
 import { ConfirmationModal } from '../../feedback/ConfirmationModal';
 import { Button, TextField, TextArea, Select } from '../../ui';
 import { Product } from '../../business/products/ProductsTable';
+import { Notification } from '../../feedback/Notification';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -182,15 +183,43 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     }
     
     try {
-      const productInput = {
+      // Créer l'objet avec les champs obligatoires
+      const productInput: {
+        name: string;
+        unitPrice: number;
+        vatRate: number;
+        unit: string;
+        description?: string;
+        category?: string;
+        reference?: string;
+      } = {
         name: formData.name,
-        description: formData.description,
         unitPrice: parseFloat(formData.unitPrice),
         vatRate: parseFloat(formData.vatRate),
         unit: formData.unit,
-        category: formData.category || null,
-        reference: formData.reference || null
       };
+      
+      // Traitement différent des champs optionnels selon le mode (création ou édition)
+      if (isEditMode && product) {
+        // En mode édition, on inclut toujours les champs optionnels, même vides
+        // pour permettre d'effacer une valeur existante
+        productInput.description = formData.description;
+        productInput.category = formData.category || '';
+        productInput.reference = formData.reference || '';
+      } else {
+        // En mode création, on n'ajoute les champs optionnels que s'ils ont une valeur
+        if (formData.description && formData.description.trim() !== '') {
+          productInput.description = formData.description;
+        }
+        
+        if (formData.category && formData.category.trim() !== '') {
+          productInput.category = formData.category;
+        }
+        
+        if (formData.reference && formData.reference.trim() !== '') {
+          productInput.reference = formData.reference;
+        }
+      }
       
       if (isEditMode && product) {
         await updateProduct({
@@ -198,6 +227,12 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             id: product.id,
             input: productInput
           }
+        });
+        
+        // Afficher une notification de succès en bas à gauche
+        Notification.success(`Produit ${formData.name} modifié avec succès`, {
+          position: 'bottom-left',
+          duration: 3000
         });
       } else {
         await createProduct({
