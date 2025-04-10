@@ -421,8 +421,8 @@ export const useInvoiceForm = ({
       ...newItems[index],
       description: product.name,
       details: product.description || '',
-      unitPrice: product.unitPrice || 0,
-      vatRate: product.vatRate || 20,
+      unitPrice: product.unitPrice !== undefined && product.unitPrice !== null ? product.unitPrice : 0,
+      vatRate: product.vatRate !== undefined && product.vatRate !== null ? product.vatRate : 20,
       unit: product.unit || 'unité',
       // Conserver la quantité existante ou initialiser à 1
       quantity: newItems[index].quantity || 1
