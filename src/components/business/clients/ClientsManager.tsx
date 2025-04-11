@@ -1,15 +1,16 @@
 import { Modal } from '../../feedback/Modal';
 import { ConfirmationModal } from '../../feedback/ConfirmationModal';
 import { ClientForm } from '../../forms/clients/ClientForm';
-import { TrashIcon, PencilIcon, UserGroupIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon, UserGroupIcon, ExclamationTriangleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { Table, Column } from '../../../components/data-display/Table';
 import { Button } from '../../../components/ui/Button';
 import { useClientsManager } from '../../../hooks/useClientsManager';
-import { ClientFormData, Client } from '../../../types/client';
+import { Client } from '../../../types/client';
 import { useState } from 'react';
 
 export const ClientsManager = () => {
   const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
   const {
     clients,
     loading,
@@ -17,7 +18,7 @@ export const ClientsManager = () => {
     isModalOpen,
     isDeleteModalOpen,
     selectedClient,
-    clientToDelete,
+    // clientToDelete non utilisé mais conservé pour la structure
     handleCreateClient,
     handleUpdateClient,
     openDeleteModal,
@@ -25,7 +26,15 @@ export const ClientsManager = () => {
     confirmDeleteClient,
     openCreateModal,
     openEditModal,
-    closeModal
+    closeModal,
+    // Données et fonctions de pagination
+    currentPage,
+    totalItems,
+    itemsPerPage,
+    handlePageChange,
+    handleItemsPerPageChange,
+    // Fonction de recherche
+    handleSearch
   } = useClientsManager();
 
   if (loading) return <div>Chargement...</div>;
@@ -76,11 +85,50 @@ export const ClientsManager = () => {
         </Button>
       </div>
 
+      {/* Barre de recherche */}
+      <div className="relative">
+        <div className="flex items-center">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Rechercher un client..."
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                // Délai avant de déclencher la recherche pour éviter trop de requêtes
+                const timeoutId = setTimeout(() => {
+                  handleSearch(e.target.value);
+                }, 300);
+                return () => clearTimeout(timeoutId);
+              }}
+            />
+          </div>
+          {searchInput && (
+            <button
+              className="ml-2 p-1 rounded-full hover:bg-gray-200"
+              onClick={() => {
+                setSearchInput("");
+                handleSearch("");
+              }}
+            >
+              <span className="sr-only">Effacer la recherche</span>
+              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
       <Table
         columns={columns}
         data={clients as Client[]}
         keyExtractor={(client) => client.id}
-        onRowClick={(client) => {
+        onRowClick={() => {
           // Action optionnelle lors du clic sur une ligne
         }}
         emptyState={{
@@ -95,6 +143,22 @@ export const ClientsManager = () => {
               Ajouter un client
             </Button>
           )
+        }}
+        pagination={{
+          currentPage,
+          totalItems,
+          itemsPerPage,
+          onPageChange: handlePageChange,
+          onItemsPerPageChange: handleItemsPerPageChange,
+          itemsPerPageOptions: [5, 10, 25, 50]
+        }}
+        pagination={{
+          currentPage,
+          totalItems,
+          itemsPerPage,
+          onPageChange: handlePageChange,
+          rowsPerPageOptions: [5, 10, 25, 50],
+          onItemsPerPageChange: handleItemsPerPageChange
         }}
       />
 

@@ -554,6 +554,9 @@ export const useInvoiceForm = ({
               input: {
                 name: newClient.name,
                 email: newClient.email,
+                type: newClient.type, // Ajout du type de client
+                firstName: newClient.firstName, // Ajout du prénom pour les particuliers
+                lastName: newClient.lastName, // Ajout du nom pour les particuliers
                 address: {
                   street: newClient.street,
                   city: newClient.city,

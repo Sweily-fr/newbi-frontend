@@ -15,3 +15,4 @@ export { TermsPage } from './TermsPage';
 export { ContactPage } from './ContactPage';
 export { CookiePreferencesPage } from './CookiePreferencesPage';
 export { default as MobileRedirectPage } from './MobileRedirectPage';
+export { default as LegalNoticeGeneratorPage } from './LegalNoticeGeneratorPage';

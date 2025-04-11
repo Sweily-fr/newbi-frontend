@@ -1,22 +1,27 @@
 import { gql } from '@apollo/client';
 
 export const GET_CLIENTS = gql`
-  query GetClients {
-    clients {
-      id
-      name
-      email
-      type
-      firstName
-      lastName
-      address {
-        street
-        city
-        postalCode
-        country
+  query GetClients($page: Int, $limit: Int, $search: String) {
+    clients(page: $page, limit: $limit, search: $search) {
+      items {
+        id
+        name
+        email
+        type
+        firstName
+        lastName
+        address {
+          street
+          city
+          postalCode
+          country
+        }
+        siret
+        vatNumber
       }
-      siret
-      vatNumber
+      totalItems
+      currentPage
+      totalPages
     }
   }
 `;

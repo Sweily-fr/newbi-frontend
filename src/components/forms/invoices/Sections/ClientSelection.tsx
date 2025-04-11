@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Client } from '../../../../types';
 import { ClientType } from '../../../../types/client';
 import { TabNavigation } from '../../../navigation';
-import { Select, TextField, FieldGroup } from '../../../ui';
+import { Select, TextField, FieldGroup, Button } from '../../../ui';
+import useCompanySearch, { CompanySearchResult, CompanyNameResult } from '../../../../hooks/useCompanySearch';
+import { PlusCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import {
   EMAIL_PATTERN,
   SIRET_PATTERN,
@@ -79,15 +81,99 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   // État pour gérer les erreurs de validation
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
+  // États pour la recherche d'entreprise
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  
+  // Hook personnalisé pour la recherche d'entreprises
+  const { 
+    isLoading, 
+    errorMessage,
+    companyData, 
+    companiesList, 
+    searchCompany, 
+    resetSearch
+  } = useCompanySearch();
+  
+  // Fonction pour remplir le formulaire avec les données de l'entreprise trouvée
+  const fillFormWithCompanyData = React.useCallback((company: CompanySearchResult) => {
+    setNewClient({
+      ...newClient,
+      name: company.name,
+      siret: company.siret,
+      vatNumber: company.vatNumber || "",
+      street: company.address.street,
+      city: company.address.city,
+      postalCode: company.address.postalCode,
+      country: company.address.country,
+      type: ClientType.COMPANY // S'assurer que le type est bien défini comme entreprise
+    });
+    resetSearch();
+    setSearchTerm("");
+    setShowResults(false);
+    setShowManualEntry(true); // Afficher le formulaire pour compléter les informations
+  }, [newClient, resetSearch, setNewClient, setSearchTerm, setShowResults, setShowManualEntry]);
+
+  // Fonction pour rechercher une entreprise
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      searchCompany(searchTerm.trim());
+      setShowResults(true);
+    }
+  };
+
+  // Fonction pour gérer les changements dans le champ de recherche
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    // Si l'utilisateur efface le champ, on cache les résultats
+    if (!e.target.value.trim()) {
+      setShowResults(false);
+      resetSearch();
+    }
+  };
+
+  // Fonction pour sélectionner une entreprise à partir des résultats de recherche
+  const handleSelectCompany = (company: CompanyNameResult) => {
+    // Définir explicitement le type comme entreprise avant de rechercher les détails
+    setNewClient({
+      ...newClient,
+      type: ClientType.COMPANY
+    });
+    
+    // Rechercher les détails complets de l'entreprise par SIRET
+    searchCompany(company.siret);
+    setShowResults(false);
+  };
+  
   // Initialiser le type de client par défaut si non défini
   useEffect(() => {
-    if (isNewClient && (!newClient.type || newClient.type === '' as unknown as ClientType)) {
-      setNewClient({
-        ...newClient,
-        type: ClientType.COMPANY // Valeur par défaut: entreprise
-      });
+    if (isNewClient) {
+      // Vérifier si le type est défini et valide
+      if (!newClient.type || newClient.type === '' as unknown as ClientType || 
+          (newClient.type !== ClientType.COMPANY && newClient.type !== ClientType.INDIVIDUAL)) {
+        setNewClient({
+          ...newClient,
+          type: ClientType.COMPANY // Valeur par défaut: entreprise
+        });
+      }
+    }
+    
+    // Réinitialiser l'affichage du formulaire manuel quand on change de type
+    if (newClient.type === ClientType.INDIVIDUAL) {
+      setShowManualEntry(true);
+    } else {
+      // Pour les entreprises, on garde l'état actuel
+      // Le formulaire ne s'affiche que si showManualEntry est true
     }
   }, [isNewClient, newClient, setNewClient]);
+  
+  // Effet pour remplir le formulaire quand les données de l'entreprise sont disponibles
+  useEffect(() => {
+    if (companyData) {
+      fillFormWithCompanyData(companyData);
+    }
+  }, [companyData, fillFormWithCompanyData]);
   
   // Effet qui s'exécute au montage ET lorsque invoice ou selectedClientData change
   useEffect(() => {    
@@ -169,7 +255,12 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       });
       setSelectedClient(invoice.client.id);
     }
-  }, [invoice, isNewClient, selectedClient, setSelectedClient]);
+    
+    // Initialiser showManualEntry en fonction du type de client
+    if (isNewClient) {
+      setShowManualEntry(newClient.type === ClientType.INDIVIDUAL);
+    }
+  }, [invoice, isNewClient, selectedClient, setSelectedClient, newClient.type]);
   
   // Générer les options de clients
   const clientOptions = React.useMemo(() => {
@@ -317,7 +408,22 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
               name="type"
               value={newClient.type || ClientType.COMPANY}
               onChange={(e) => {
-                setNewClient({ ...newClient, type: e.target.value as ClientType });
+                const newType = e.target.value as ClientType;
+                // S'assurer que le type est correctement défini
+                const validType = newType === ClientType.INDIVIDUAL ? ClientType.INDIVIDUAL : ClientType.COMPANY;
+                
+                setNewClient({ ...newClient, type: validType });
+                
+                // Réinitialiser les champs spécifiques au type de client
+                if (validType === ClientType.INDIVIDUAL) {
+                  setShowManualEntry(true); // Afficher le formulaire pour les particuliers
+                } else {
+                  setShowManualEntry(false); // Masquer le formulaire pour les entreprises
+                  resetSearch();
+                  setSearchTerm("");
+                }
+                
+                console.log('Type de client mis à jour:', validType);
               }}
               required={isNewClient}
               options={[
@@ -327,7 +433,100 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
             />
           </div>
 
-          {newClient.type === ClientType.INDIVIDUAL ? (
+          {/* Recherche d'entreprise - Uniquement pour les entreprises */}
+          {newClient.type === ClientType.COMPANY && !showManualEntry && (
+            <div className="mb-4">
+              <div className="relative">
+                <div className="flex space-x-2">
+                  <div className="flex-grow">
+                    <TextField
+                      id="company-search"
+                      name="companySearch"
+                      label="Rechercher une entreprise"
+                      value={searchTerm}
+                      onChange={handleSearchInputChange}
+                      placeholder="Nom, SIRET ou SIREN"
+                      helpText="Saisissez le nom, SIRET ou SIREN de l'entreprise"
+                      className="w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSearch();
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-end pb-2 mb-4">
+                    <Button
+                      variant="secondary"
+                      onClick={handleSearch}
+                      disabled={!searchTerm.trim() || isLoading}
+                      className="h-[50px]"
+                    >
+                      <MagnifyingGlassIcon className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Résultats de recherche */}
+                {showResults && companiesList.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                    <ul className="py-1">
+                      {companiesList.map((company, index) => (
+                        <li
+                          key={index}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => handleSelectCompany(company)}
+                        >
+                          <div className="font-medium">{company.name}</div>
+                          <div className="text-sm text-gray-500">
+                            SIRET: {company.siret}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Message d'erreur */}
+                {errorMessage && (
+                  <div className="mt-2 text-red-500 text-sm">{errorMessage}</div>
+                )}
+                
+                {/* État de chargement */}
+                {isLoading && (
+                  <div className="mt-2 text-gray-500 text-sm">Recherche en cours...</div>
+                )}
+              </div>
+              
+              {/* Bouton pour ajouter manuellement */}
+              <button
+                type="button"
+                className="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+                onClick={() => setShowManualEntry(true)}
+              >
+                <PlusCircleIcon className="h-5 w-5 mr-1" />
+                Ajouter un client manuellement
+              </button>
+            </div>
+          )}
+          
+          {/* Formulaire manuel - Affiché uniquement si showManualEntry est true ou si c'est un particulier */}
+          {(showManualEntry || newClient.type === ClientType.INDIVIDUAL) && (
+            <>
+              {/* Bouton pour revenir à la recherche - Uniquement visible pour les entreprises en mode manuel */}
+              {newClient.type === ClientType.COMPANY && (
+                <Button
+                  variant="secondary"
+                  className="mb-4"
+                  onClick={() => setShowManualEntry(false)}
+                >
+                  <MagnifyingGlassIcon className="h-5 w-5 mr-1" />
+                  Revenir à la recherche d'entreprise
+                </Button>
+              )}
+              
+              {newClient.type === ClientType.INDIVIDUAL ? (
             <div className="grid grid-cols-2 gap-4 mb-4">
               <TextField
                 id="client-firstName"
@@ -653,6 +852,8 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
             className="w-full"
             error={validationErrors.country}
           />
+            </>
+          )}
         </FieldGroup>
       )}
     </div>

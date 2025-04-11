@@ -41,18 +41,36 @@ export const useClientsManager = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<string | null>(null);
   
-  const { data, loading, error } = useQuery(GET_CLIENTS);
+  // États pour la pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const { data, loading, error, refetch } = useQuery(GET_CLIENTS, {
+    variables: {
+      page: currentPage,
+      limit: itemsPerPage,
+      search: searchTerm || undefined
+    },
+    fetchPolicy: "network-only"
+  });
   
   const [createClient] = useMutation(CREATE_CLIENT, {
-    refetchQueries: [{ query: GET_CLIENTS }],
+    onCompleted: () => {
+      refetch(); // Utiliser refetch au lieu de refetchQueries pour prendre en compte les variables
+    }
   });
   
   const [updateClient] = useMutation(UPDATE_CLIENT, {
-    refetchQueries: [{ query: GET_CLIENTS }],
+    onCompleted: () => {
+      refetch();
+    }
   });
   
   const [deleteClient] = useMutation(DELETE_CLIENT, {
-    refetchQueries: [{ query: GET_CLIENTS }],
+    onCompleted: () => {
+      refetch();
+    }
   });
 
   const handleCreateClient = async (formData: ClientFormData) => {
@@ -151,8 +169,24 @@ export const useClientsManager = () => {
     setSelectedClient(null);
   };
 
+  // Fonctions de gestion de la pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Réinitialiser à la première page lors du changement de nombre d'éléments par page
+  };
+  
+  // Fonction pour gérer la recherche
+  const handleSearch = (search: string) => {
+    setSearchTerm(search);
+    setCurrentPage(1); // Réinitialiser à la première page lors d'une nouvelle recherche
+  };
+
   return {
-    clients: data?.clients || [],
+    clients: data?.clients?.items || [],
     loading,
     error,
     isModalOpen,
@@ -166,6 +200,15 @@ export const useClientsManager = () => {
     confirmDeleteClient,
     openCreateModal,
     openEditModal,
-    closeModal
+    closeModal,
+    // Données et fonctions de pagination
+    currentPage,
+    totalItems: data?.clients?.totalItems || 0,
+    itemsPerPage,
+    handlePageChange,
+    handleItemsPerPageChange,
+    // Fonction de recherche
+    handleSearch,
+    searchTerm
   };
 };

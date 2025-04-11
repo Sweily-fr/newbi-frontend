@@ -46,10 +46,14 @@ export const ClientForm: React.FC<ClientFormProps> = ({
     initialData?.type || ClientType.COMPANY
   );
 
+  // Déterminer si nous sommes en mode édition (initialData présent)
+  const isEditMode = !!initialData;
+
   // État pour la recherche d'entreprises
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [showManualEntry, setShowManualEntry] = useState(false);
+  // En mode édition, on affiche directement le formulaire sans la recherche
+  const [showManualEntry, setShowManualEntry] = useState(isEditMode);
   
   // Hook personnalisé pour la recherche d'entreprises
   const { 
@@ -127,10 +131,10 @@ export const ClientForm: React.FC<ClientFormProps> = ({
       spacing="loose"
       className="px-4"
     >
-      {/* Recherche d'entreprises - Uniquement pour les entreprises */}
+      {/* Recherche d'entreprises - Uniquement pour les entreprises et en mode création */}
       {clientType === ClientType.COMPANY && (
         <>
-          {!showManualEntry ? (
+          {!showManualEntry && !isEditMode ? (
             <FieldGroup spacing="normal">
               <div className="mb-6 relative">
                 <div className="mb-6">
@@ -328,15 +332,17 @@ export const ClientForm: React.FC<ClientFormProps> = ({
             <div className="mb-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">
-                  Saisie manuelle des informations
+                  {isEditMode ? "Informations du client" : "Saisie manuelle des informations"}
                 </h3>
-                <Button
-                  onClick={() => setShowManualEntry(false)}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Revenir à la recherche
-                </Button>
+                {!isEditMode && (
+                  <Button
+                    onClick={() => setShowManualEntry(false)}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Revenir à la recherche
+                  </Button>
+                )}
               </div>
             </div>
           )}

@@ -14,6 +14,7 @@ export const ROUTES = {
   CLIENTS: '/clients',
   NEW_CLIENT: '/clients/new',
   LEGAL_NOTICE: '/mentions-legales',
+  LEGAL_NOTICE_GENERATOR: '/generator-mentions-legales',
   PRIVACY_POLICY: '/politique-de-confidentialite',
   TERMS: '/conditions-generales-de-vente',
   CONTACT: '/contact',

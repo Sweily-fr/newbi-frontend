@@ -15,7 +15,8 @@ import {
   TermsPage,
   ContactPage,
   CookiePreferencesPage,
-  MobileRedirectPage
+  MobileRedirectPage,
+  LegalNoticeGeneratorPage
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -79,6 +80,13 @@ export const AppRoutes = () => {
 
         {/* Pages légales */}
         <Route path={ROUTES.LEGAL_NOTICE} element={<PublicRoute><LegalNoticePage /></PublicRoute>} />
+        <Route path={ROUTES.LEGAL_NOTICE_GENERATOR} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <LegalNoticeGeneratorPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
         <Route path={ROUTES.PRIVACY_POLICY} element={<PublicRoute><PrivacyPolicyPage /></PublicRoute>} />
         <Route path={ROUTES.TERMS} element={<PublicRoute><TermsPage /></PublicRoute>} />
         <Route path={ROUTES.CONTACT} element={<PublicRoute><ContactPage /></PublicRoute>} />
