@@ -17,3 +17,4 @@ export { CookiePreferencesPage } from './CookiePreferencesPage';
 export { default as MobileRedirectPage } from './MobileRedirectPage';
 export { default as LegalNoticeGeneratorPage } from './LegalNoticeGeneratorPage';
 export { default as PrivacyPolicyGeneratorPage } from './PrivacyPolicyGeneratorPage';
+export { default as BlogSeoOptimizerPage } from './BlogSeoOptimizerPage';

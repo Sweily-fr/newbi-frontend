@@ -17,7 +17,8 @@ import {
   CookiePreferencesPage,
   MobileRedirectPage,
   LegalNoticeGeneratorPage,
-  PrivacyPolicyGeneratorPage
+  PrivacyPolicyGeneratorPage,
+  BlogSeoOptimizerPage
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -92,6 +93,13 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <PrivacyPolicyGeneratorPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+        <Route path={ROUTES.BLOG_SEO_OPTIMIZER} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <BlogSeoOptimizerPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
