@@ -52,7 +52,7 @@ interface ClientSelectionProps {
     firstName?: string;
     lastName?: string;
   }>) => void;
-  clientsData?: { clients: Client[] };
+  clientsData?: { clients: { items: Client[], totalItems: number, currentPage: number, totalPages: number } };
   invoice?: {
     client?: {
       id: string;
@@ -285,9 +285,9 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     }
     
     // Si on a des clients dans les données
-    if (clientsData?.clients) {
+    if (clientsData?.clients?.items) {
       // Ajouter tous les clients sauf celui de la facture (déjà ajouté)
-      clientsData.clients.forEach((client: Client) => {
+      clientsData.clients.items.forEach((client: Client) => {
         // Ne pas ajouter le client de la facture (déjà ajouté plus haut)
         if (client.id !== invoice?.client?.id) {
           options.push({
@@ -309,8 +309,8 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         });
       }
       // Si le client sélectionné n'est toujours pas dans les options, chercher dans clientsData
-      else if (clientsData?.clients) {
-        const client = clientsData.clients.find(c => c.id === selectedClient);
+      else if (clientsData?.clients?.items) {
+        const client = clientsData.clients.items.find(c => c.id === selectedClient);
         if (client) {
           options.push({
             value: client.id,

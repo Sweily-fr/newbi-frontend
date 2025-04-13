@@ -339,7 +339,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                 setNewClient={setNewClient}
                 clientsData={clientsData}
                 invoice={invoice}
-                selectedClientData={clientsData?.clients?.find(c => c.id === selectedClient)}
+                selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
               />
             </Collapse>
 
@@ -421,7 +421,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
         <div className="w-3/5 overflow-y-auto bg-gray-50">
           <InvoicePreview
             invoice={invoice}
-            selectedClient={clientsData?.clients?.find(
+            selectedClient={clientsData?.clients?.items?.find(
               (c) => c.id === selectedClient
             )}
             isNewClient={isNewClient}

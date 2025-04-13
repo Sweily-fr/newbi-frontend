@@ -187,7 +187,14 @@ export const useInvoiceForm = ({
   const [bankDetailsReadOnly, setBankDetailsReadOnly] = useState(false);
 
   // Requêtes GraphQL
-  const { data: clientsData } = useQuery(GET_CLIENTS);
+  // Utiliser une limite élevée pour récupérer tous les clients d'un coup
+  const { data: clientsData } = useQuery(GET_CLIENTS, {
+    variables: {
+      page: 1,
+      limit: 1000, // Limite élevée pour récupérer tous les clients
+      search: ""
+    }
+  });
   const { data: userData } = useQuery(GET_USER_INFO);
   const { data: invoicesData, refetch: refetchInvoices } = useQuery(GET_INVOICES);
   const { data: nextInvoiceNumberData, refetch: refetchNextInvoiceNumber } = useQuery(GET_NEXT_INVOICE_NUMBER, {

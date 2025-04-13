@@ -16,7 +16,8 @@ import {
   ContactPage,
   CookiePreferencesPage,
   MobileRedirectPage,
-  LegalNoticeGeneratorPage
+  LegalNoticeGeneratorPage,
+  PrivacyPolicyGeneratorPage
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -84,6 +85,13 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <LegalNoticeGeneratorPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+        <Route path={ROUTES.PRIVACY_POLICY_GENERATOR} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <PrivacyPolicyGeneratorPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />

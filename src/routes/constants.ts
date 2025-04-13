@@ -16,6 +16,7 @@ export const ROUTES = {
   LEGAL_NOTICE: '/mentions-legales',
   LEGAL_NOTICE_GENERATOR: '/generator-mentions-legales',
   PRIVACY_POLICY: '/politique-de-confidentialite',
+  PRIVACY_POLICY_GENERATOR: '/generator-politique-confidentialite',
   TERMS: '/conditions-generales-de-vente',
   CONTACT: '/contact',
   COOKIE_PREFERENCES: '/preferences-cookies',
