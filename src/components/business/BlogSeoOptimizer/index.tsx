@@ -1,31 +1,34 @@
 import React from 'react';
 import { BlogSeoProvider } from './context';
-import RichTextEditor from './components/RichTextEditor';
-import SeoScorePanel from './components/SeoScorePanel';
-import KeywordsMetaForm from './components/KeywordsMetaForm';
-import ExportPanel from './components/ExportPanel';
+import RichTextEditor from './sections/RichTextEditor';
+import SeoScorePanel from './sections/SeoScorePanel';
+import KeywordsMetaForm from './sections/KeywordsMetaForm';
+import ExportPanel from './sections/ExportPanel';
 
 const BlogSeoOptimizer: React.FC = () => {
   return (
     <BlogSeoProvider>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Colonne principale - Éditeur de texte */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold mb-4">Éditeur de contenu</h2>
-              <RichTextEditor />
-            </div>
-          </div>
-          
-          <ExportPanel />
+      {/* Section du haut avec formulaire de mots-clés et score SEO côte à côte */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Formulaire de mots-clés et méta-données */}
+        <div className="lg:col-span-2">
+          <KeywordsMetaForm />
         </div>
         
-        {/* Colonne latérale - Score SEO et recommandations */}
-        <div className="space-y-6">
-          <KeywordsMetaForm />
+        {/* Score SEO */}
+        <div>
           <SeoScorePanel />
         </div>
+      </div>
+      
+      {/* Éditeur de contenu avec recommandations */}
+      <div className="mb-6">
+        <RichTextEditor />
+      </div>
+      
+      {/* Panneau d'exportation */}
+      <div>
+        <ExportPanel />
       </div>
     </BlogSeoProvider>
   );
