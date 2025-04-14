@@ -24,9 +24,22 @@ export const formatPercent = (value: number): string => {
 /**
  * Formate une date au format français (JJ/MM/AAAA)
  * @param dateString - La date à formater (chaîne ISO)
- * @returns La date formatée (ex: 01/01/2023)
+ * @returns La date formatée (ex: 01/01/2023) ou '-' si la date est invalide
  */
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('fr-FR').format(date);
+export const formatDate = (dateString?: string | null): string => {
+  if (!dateString) return '-';
+  
+  try {
+    const date = new Date(dateString);
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+      return '-';
+    }
+    
+    return new Intl.DateTimeFormat('fr-FR').format(date);
+  } catch (error) {
+    console.error('Erreur lors du formatage de la date:', error);
+    return '-';
+  }
 };

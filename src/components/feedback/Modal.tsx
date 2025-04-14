@@ -31,6 +31,7 @@ export const Modal: React.FC<ModalProps> = ({
   maxHeight,
   footer,
 }) => {
+
   // Mapping des classes de largeur maximale
   const maxWidthClasses = {
     sm: 'max-w-sm',

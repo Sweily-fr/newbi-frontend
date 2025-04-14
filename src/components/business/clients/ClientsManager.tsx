@@ -150,15 +150,7 @@ export const ClientsManager = () => {
           itemsPerPage,
           onPageChange: handlePageChange,
           onItemsPerPageChange: handleItemsPerPageChange,
-          itemsPerPageOptions: [5, 10, 25, 50]
-        }}
-        pagination={{
-          currentPage,
-          totalItems,
-          itemsPerPage,
-          onPageChange: handlePageChange,
-          rowsPerPageOptions: [5, 10, 25, 50],
-          onItemsPerPageChange: handleItemsPerPageChange
+          rowsPerPageOptions: [5, 10, 25, 50]
         }}
       />
 

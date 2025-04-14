@@ -18,7 +18,8 @@ import {
   MobileRedirectPage,
   LegalNoticeGeneratorPage,
   PrivacyPolicyGeneratorPage,
-  BlogSeoOptimizerPage
+  BlogSeoOptimizerPage,
+  EmailSignaturesPage
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -76,6 +77,14 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <QuotesPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.EMAIL_SIGNATURES} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <EmailSignaturesPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />

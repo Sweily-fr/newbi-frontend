@@ -9,6 +9,7 @@ export const ROUTES = {
   TOOLS: '/outils',
   INVOICES: '/factures',
   QUOTES: '/devis',
+  EMAIL_SIGNATURES: '/signatures-email',
   VERIFY_EMAIL: '/verify-email/:token',
   RESEND_VERIFICATION: '/resend-verification',
   CLIENTS: '/clients',
