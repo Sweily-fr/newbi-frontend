@@ -434,9 +434,11 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               validUntil,
               client: isNewClient
                 ? newClient
-                : clientsData?.clients.find(
-                    (c: { id: string }) => c.id === selectedClient
-                  ),
+                : (Array.isArray(clientsData?.clients) 
+                    ? clientsData?.clients.find(
+                        (c: { id: string }) => c.id === selectedClient
+                      )
+                    : null),
               companyInfo,
               items,
               discount,
