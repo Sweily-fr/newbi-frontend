@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { ConfirmationModal } from '../../../feedback/ConfirmationModal';
 import { EmailSignatureForm } from './EmailSignatureForm';
@@ -19,9 +19,34 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   onClose,
   signature
 }) => {
-  console.log('EmailSignatureFormModal - isOpen:', isOpen);
+  // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
+  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
+
+  // Fonction pour préfixer l'URL du logo avec l'URL de l'API si nécessaire
+  // Utiliser useCallback pour éviter que la fonction ne change à chaque rendu
+  const getFullLogoUrl = useCallback((logoPath: string | undefined) => {
+    if (!logoPath) return '';
+    if (logoPath.startsWith('http')) return logoPath; // Déjà une URL complète
+    return `${apiUrl}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`;
+  }, [apiUrl]);
+  
   // État pour la signature en cours d'édition (pour la prévisualisation)
-  const [formData, setFormData] = useState<Partial<EmailSignature>>(signature || {});
+  const [formData, setFormData] = useState<Partial<EmailSignature>>(signature ? {
+    ...signature,
+    logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : ''
+  } : {});
+  
+  // Initialiser les données du formulaire lorsque la signature change
+  useEffect(() => {
+    if (signature) {
+      setFormData({
+        ...signature,
+        logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : ''
+      });
+    } else {
+      setFormData({});
+    }
+  }, [signature, getFullLogoUrl]);
   
   // État pour la modal de confirmation
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -96,9 +121,25 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   };
 
   // Gestionnaire pour la mise à jour des données du formulaire (pour la prévisualisation)
-  const handleFormChange = (data: Partial<EmailSignature>) => {
-    setFormData(data);
-  };
+  // Utiliser useCallback avec un délai pour éviter les boucles infinies
+  const handleFormChange = useCallback((data: Partial<EmailSignature>) => {
+    // Utiliser une fonction de mise à jour pour éviter les problèmes de fermeture
+    setFormData(prevData => {
+      // Vérifier si les données ont réellement changé pour éviter les rendus inutiles
+      if (JSON.stringify(prevData) === JSON.stringify(data)) {
+        return prevData; // Retourner les données précédentes si aucun changement
+      }
+      
+      // S'assurer que l'URL du logo est correctement préfixée
+      const updatedData = { ...data };
+      if (updatedData.logoUrl) {
+        updatedData.logoUrl = getFullLogoUrl(updatedData.logoUrl);
+      }
+      
+      console.log('Mise à jour des données de prévisualisation:', updatedData);
+      return updatedData;
+    });
+  }, [getFullLogoUrl]);
 
   // Gestionnaire pour demander confirmation avant de fermer
   const handleCloseRequest = () => {
@@ -156,8 +197,11 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
           </div>
           
           {/* Prévisualisation à droite */}
-          <div className="w-3/5 overflow-y-auto bg-gray-50">
-            <EmailSignaturePreview signature={formData} />
+          <div className="w-3/5 overflow-y-auto bg-gray-50 p-6">
+            <h3 className="text-lg font-medium mb-4">Prévisualisation de la signature</h3>
+            <div className="bg-white p-6 border rounded-md shadow-sm">
+              <EmailSignaturePreview signature={formData} />
+            </div>
           </div>
         </div>
       </div>

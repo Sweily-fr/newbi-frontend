@@ -6,6 +6,46 @@ interface EmailSignaturePreviewProps {
 }
 
 export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ signature }) => {
+  // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
+  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
+  
+  console.log('API URL from env:', apiUrl);
+  console.log('All env variables:', import.meta.env);
+  console.log('Logo URL original:', signature.logoUrl);
+
+  // Fonction pour préfixer l'URL du logo avec l'URL de l'API si nécessaire
+  const getFullLogoUrl = (logoPath: string | undefined) => {
+    if (!logoPath) {
+      console.log('Logo path is empty');
+      return '';
+    }
+    
+    // Vérifier si l'URL est déjà complète
+    if (logoPath.startsWith('http')) {
+      console.log('Logo URL already starts with http:', logoPath);
+      return logoPath;
+    }
+    
+    // Vérifier si l'URL contient déjà l'URL de l'API (pour éviter les doubles préfixes)
+    if (logoPath.includes(apiUrl)) {
+      console.log('Logo URL already contains API URL:', logoPath);
+      return logoPath;
+    }
+    
+    // Pour le débogage, utiliser une image de test en ligne si nous avons un chemin relatif
+    // Cela nous permettra de vérifier si le problème vient des variables d'environnement
+    if (!logoPath.startsWith('http')) {
+      console.log('Using placeholder image for testing');
+      return 'https://via.placeholder.com/150';
+    }
+    
+    // Ajouter le préfixe de l'API
+    const fullUrl = `${apiUrl}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`;
+    console.log('Full logo URL with prefix:', fullUrl);
+    return fullUrl;
+  };
+  
+  // Déstructuration avec valeurs par défaut
   const {
     fullName,
     jobTitle,
@@ -19,8 +59,15 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     template,
     primaryColor,
     secondaryColor,
-    logoUrl
+    logoUrl,
+    showLogo
   } = signature;
+  
+  // Définir explicitement showLogo avec une valeur par défaut à true
+  const displayLogo = showLogo !== false; // Si showLogo est undefined ou null, on affiche le logo
+  
+  console.log('showLogo value:', showLogo);
+  console.log('displayLogo calculated:', displayLogo);
 
   // Fonction pour rendre le template de signature approprié
   const renderSignatureTemplate = () => {
@@ -42,6 +89,19 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     return (
       <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#333' }}>
         <div style={{ marginBottom: '10px' }}>
+          {logoUrl && displayLogo && (
+            <div style={{ marginBottom: '10px' }}>
+              <img 
+                src={getFullLogoUrl(logoUrl)} 
+                alt="Logo" 
+                style={{ maxWidth: '100px' }} 
+                onError={(e) => {
+                  console.error('Error loading logo image:', e);
+                  console.log('Failed URL:', e.currentTarget.src);
+                }}
+              />
+            </div>
+          )}
           <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
           <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
           {companyName && <div>{companyName}</div>}
@@ -79,12 +139,26 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const renderProfessionalTemplate = () => {
     return (
       <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#333', borderLeft: `4px solid ${primaryColor || '#0066cc'}`, paddingLeft: '15px' }}>
-        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse' }}>
+        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
           <tbody>
             <tr>
-              <td style={{ verticalAlign: 'top', paddingRight: '20px' }}>
-                {logoUrl && (
-                  <img src={logoUrl} alt="Logo" style={{ maxWidth: '100px', marginBottom: '10px' }} />
+              <td style={{ verticalAlign: 'top', width: '150px', paddingRight: '20px' }}>
+                {logoUrl && displayLogo && (
+                  <>
+                    <img 
+                      src={getFullLogoUrl(logoUrl)} 
+                      alt="Logo" 
+                      style={{ maxWidth: '150px', marginBottom: '10px' }} 
+                      onError={(e) => {
+                        console.error('Error loading logo image (Professional):', e);
+                        console.log('Failed URL:', e.currentTarget.src);
+                      }}
+                    />
+                    {/* Affichage de débogage de l'URL */}
+                    <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
+                      URL: {getFullLogoUrl(logoUrl)}
+                    </div>
+                  </>
                 )}
                 <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
                 <div style={{ color: primaryColor || '#0066cc', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>
@@ -126,8 +200,22 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     return (
       <div style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontSize: '14px', color: '#333', backgroundColor: secondaryColor || '#f5f5f5', padding: '15px', borderRadius: '5px' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '15px' }}>
-          {logoUrl && (
-            <img src={logoUrl} alt="Logo" style={{ maxWidth: '80px', marginRight: '15px' }} />
+          {logoUrl && displayLogo && (
+            <>
+              <img 
+                src={getFullLogoUrl(logoUrl)} 
+                alt="Logo" 
+                style={{ maxWidth: '80px', marginRight: '15px' }} 
+                onError={(e) => {
+                  console.error('Error loading logo image (Modern):', e);
+                  console.log('Failed URL:', e.currentTarget.src);
+                }}
+              />
+              {/* Affichage de débogage de l'URL */}
+              <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
+                URL: {getFullLogoUrl(logoUrl)}
+              </div>
+            </>
           )}
           <div>
             <div style={{ fontWeight: 'bold', fontSize: '18px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>
@@ -189,11 +277,30 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Template Créatif
   const renderCreativeTemplate = () => {
     return (
-      <div style={{ fontFamily: 'Verdana, Geneva, sans-serif', fontSize: '14px', color: '#333', background: `linear-gradient(135deg, ${primaryColor || '#0066cc'} 0%, ${secondaryColor || '#f5f5f5'} 100%)`, padding: '20px', borderRadius: '10px' }}>
-        <div style={{ backgroundColor: 'white', padding: '15px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-            {logoUrl && (
-              <img src={logoUrl} alt="Logo" style={{ maxWidth: '120px', marginBottom: '10px' }} />
+      <div style={{ fontFamily: 'Verdana, Geneva, sans-serif', fontSize: '14px', color: '#333', position: 'relative', padding: '30px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+        {/* Fond avec dégradé */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100px', background: `linear-gradient(135deg, ${primaryColor || '#0066cc'} 0%, ${secondaryColor || '#f5f5f5'} 100%)` }}></div>
+        
+        {/* Contenu */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {/* Logo et nom */}
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            {logoUrl && displayLogo && (
+              <div style={{ marginRight: '15px', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                <img 
+                  src={getFullLogoUrl(logoUrl)} 
+                  alt="Logo" 
+                  style={{ maxWidth: '80px', maxHeight: '80px' }} 
+                  onError={(e) => {
+                    console.error('Error loading logo image (Creative):', e);
+                    console.log('Failed URL:', e.currentTarget.src);
+                  }}
+                />
+                {/* Affichage de débogage de l'URL */}
+                <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
+                  URL: {getFullLogoUrl(logoUrl)}
+                </div>
+              </div>
             )}
             <div style={{ fontWeight: 'bold', fontSize: '20px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>
             <div style={{ fontSize: '16px', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>

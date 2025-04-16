@@ -29,6 +29,7 @@ export interface EmailSignature {
   primaryColor: string;
   secondaryColor: string;
   logoUrl?: string;
+  showLogo?: boolean;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
