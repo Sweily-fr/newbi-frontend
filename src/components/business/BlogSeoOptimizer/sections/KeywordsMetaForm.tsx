@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useBlogSeo } from '../context';
 
 const KeywordsMetaForm: React.FC = () => {
   const { state, setKeywords, setMetaTags } = useBlogSeo();
   const [secondaryKeyword, setSecondaryKeyword] = useState('');
+  const [longTailKeyword, setLongTailKeyword] = useState('');
 
-  // Gestion du mot-clé principal
-  const handleMainKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeywords({
-      ...state.keywords,
-      main: e.target.value
-    });
-  };
+  // Référence pour suivre si un champ est en cours de modification
+  const isUpdatingRef = useRef(false);
+  
+  // Gestion du mot-clé principal avec debounce pour éviter la perte de focus
+  const handleMainKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    
+    // Mettre à jour immédiatement pour l'interface utilisateur
+    if (!isUpdatingRef.current) {
+      isUpdatingRef.current = true;
+      
+      // Utiliser setTimeout pour retarder la mise à jour de l'état global
+      setTimeout(() => {
+        setKeywords({
+          ...state.keywords,
+          main: newValue
+        });
+        isUpdatingRef.current = false;
+      }, 0);
+    }
+  }, [state.keywords, setKeywords]);
 
   // Gestion des mots-clés secondaires
   const handleAddSecondaryKeyword = () => {
-    if (secondaryKeyword.trim() && !state.keywords.secondary.includes(secondaryKeyword.trim())) {
+    if (secondaryKeyword.trim() && 
+        !state.keywords.secondary.includes(secondaryKeyword.trim()) && 
+        state.keywords.secondary.length < 5) {
       setKeywords({
         ...state.keywords,
         secondary: [...state.keywords.secondary, secondaryKeyword.trim()]
@@ -30,15 +47,45 @@ const KeywordsMetaForm: React.FC = () => {
       secondary: state.keywords.secondary.filter(k => k !== keyword)
     });
   };
+  
+  // Gestion des mots-clés de longue traîne
+  const handleAddLongTailKeyword = () => {
+    if (longTailKeyword.trim() && 
+        !state.keywords.longTail.includes(longTailKeyword.trim()) && 
+        state.keywords.longTail.length < 5) {
+      setKeywords({
+        ...state.keywords,
+        longTail: [...state.keywords.longTail, longTailKeyword.trim()]
+      });
+      setLongTailKeyword('');
+    }
+  };
 
-  // Gestion des méta-tags
-  const handleMetaTagChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setMetaTags({
-      ...state.metaTags,
-      [name]: value
+  const handleRemoveLongTailKeyword = (keyword: string) => {
+    setKeywords({
+      ...state.keywords,
+      longTail: state.keywords.longTail.filter(k => k !== keyword)
     });
   };
+
+  // Gestion des méta-tags avec debounce pour éviter la perte de focus
+  const handleMetaTagChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
+    // Mettre à jour immédiatement pour l'interface utilisateur
+    if (!isUpdatingRef.current) {
+      isUpdatingRef.current = true;
+      
+      // Utiliser setTimeout pour retarder la mise à jour de l'état global
+      setTimeout(() => {
+        setMetaTags({
+          ...state.metaTags,
+          [name]: value
+        });
+        isUpdatingRef.current = false;
+      }, 0);
+    }
+  }, [state.metaTags, setMetaTags]);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -48,7 +95,7 @@ const KeywordsMetaForm: React.FC = () => {
         {/* Mot-clé principal */}
         <div className="mb-4">
           <label htmlFor="main-keyword" className="block text-sm font-medium text-gray-700 mb-1">
-            Mot-clé principal
+            Mot-clé principal <span className="text-xs text-gray-500">(1 maximum)</span>
           </label>
           <input
             type="text"
@@ -64,9 +111,9 @@ const KeywordsMetaForm: React.FC = () => {
         </div>
         
         {/* Mots-clés secondaires */}
-        <div>
+        <div className="mb-4">
           <label htmlFor="secondary-keyword" className="block text-sm font-medium text-gray-700 mb-1">
-            Mots-clés secondaires
+            Mots-clés secondaires <span className="text-xs text-gray-500">(5 maximum)</span>
           </label>
           <div className="flex">
             <input
@@ -76,6 +123,7 @@ const KeywordsMetaForm: React.FC = () => {
               onChange={(e) => setSecondaryKeyword(e.target.value)}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Ajouter un mot-clé secondaire"
+              disabled={state.keywords.secondary.length >= 5}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -86,7 +134,8 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddSecondaryKeyword}
-              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={state.keywords.secondary.length >= 5}
             >
               Ajouter
             </button>
@@ -115,6 +164,63 @@ const KeywordsMetaForm: React.FC = () => {
           
           <p className="mt-1 text-sm text-gray-500">
             Ces mots-clés complémentaires aideront à enrichir votre contenu.
+          </p>
+        </div>
+        
+        {/* Mots-clés de longue traîne */}
+        <div>
+          <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700 mb-1">
+            Mots-clés de longue traîne <span className="text-xs text-gray-500">(5 maximum)</span>
+          </label>
+          <div className="flex">
+            <input
+              type="text"
+              id="long-tail-keyword"
+              value={longTailKeyword}
+              onChange={(e) => setLongTailKeyword(e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Ajouter un mot-clé de longue traîne"
+              disabled={state.keywords.longTail.length >= 5}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddLongTailKeyword();
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleAddLongTailKeyword}
+              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={state.keywords.longTail.length >= 5}
+            >
+              Ajouter
+            </button>
+          </div>
+          
+          {/* Liste des mots-clés de longue traîne */}
+          {state.keywords.longTail.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {state.keywords.longTail.map((keyword, index) => (
+                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  {keyword}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLongTailKeyword(keyword)}
+                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-green-200 text-green-500 hover:bg-green-300 focus:outline-none"
+                  >
+                    <span className="sr-only">Supprimer</span>
+                    <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
+                      <path d="M6.5 1.5l-5 5M1.5 1.5l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <p className="mt-1 text-sm text-gray-500">
+            Ces expressions plus longues ciblent des requêtes spécifiques et peuvent attirer un trafic qualifié.
           </p>
         </div>
       </div>

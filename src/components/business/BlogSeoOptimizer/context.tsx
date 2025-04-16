@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { 
   BlogSeoContextType, 
   BlogSeoState, 
@@ -29,7 +29,8 @@ const initialContentStats: ContentStats = {
   fleschScore: 0,
   keywordDensity: {
     main: 0,
-    secondary: {}
+    secondary: {},
+    longTail: {}
   },
   headingCount: {
     h1: 0,
@@ -42,7 +43,8 @@ const initialContentStats: ContentStats = {
     external: 0
   },
   imagesCount: 0,
-  imagesWithAlt: 0
+  imagesWithAlt: 0,
+  imagesWithKeywordInAlt: 0
 };
 
 const initialState: BlogSeoState = {
@@ -128,16 +130,17 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
     setState(initialState);
   };
   
-  // Analyse automatique du contenu lorsque celui-ci change
-  useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      if (state.content.trim() && (state.keywords.main || state.metaTags.title)) {
-        analyzeContentHandler();
-      }
-    }, 1000);
-    
-    return () => clearTimeout(debounceTimeout);
-  }, [state.content, state.keywords, state.metaTags]);
+  // Analyse automatique désactivée - remplacée par un bouton d'analyse manuel
+  // L'analyse sera déclenchée via le bouton "Analyser mon article"
+  // useEffect(() => {
+  //   const debounceTimeout = setTimeout(() => {
+  //     if (state.content.trim() && (state.keywords.main || state.metaTags.title)) {
+  //       analyzeContentHandler();
+  //     }
+  //   }, 1000);
+  //   
+  //   return () => clearTimeout(debounceTimeout);
+  // }, [state.content, state.keywords, state.metaTags]);
   
   const contextValue: BlogSeoContextType = {
     state,

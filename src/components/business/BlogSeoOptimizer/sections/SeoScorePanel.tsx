@@ -6,16 +6,35 @@ const SeoScorePanel: React.FC = () => {
   const { overallScore } = state;
 
   // Fonction pour obtenir la couleur de fond en fonction du score
-  const getScoreBackgroundColor = (color: 'red' | 'orange' | 'green') => {
+  const getScoreBackgroundColor = (color: 'red' | 'orange' | 'yellow' | 'green') => {
     switch (color) {
       case 'red':
         return 'bg-red-100 text-red-800';
       case 'orange':
         return 'bg-orange-100 text-orange-800';
+      case 'yellow':
+        return 'bg-yellow-100 text-yellow-800';
       case 'green':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Fonction pour obtenir l'évaluation du nombre de mots
+  const getWordCountRating = (wordCount: number): { label: string; color: string } => {
+    if (wordCount > 2500) {
+      return { label: 'Excellent', color: 'bg-green-100 text-green-800' };
+    } else if (wordCount >= 2000 && wordCount <= 2500) {
+      return { label: 'Très bien', color: 'bg-green-100 text-green-800' };
+    } else if (wordCount >= 1500 && wordCount < 2000) {
+      return { label: 'Bien', color: 'bg-blue-100 text-blue-800' };
+    } else if (wordCount >= 1000 && wordCount < 1500) {
+      return { label: 'À améliorer', color: 'bg-yellow-100 text-yellow-800' };
+    } else if (wordCount >= 600 && wordCount < 1000) {
+      return { label: 'Insuffisant', color: 'bg-orange-100 text-orange-800' };
+    } else {
+      return { label: 'Médiocre', color: 'bg-red-100 text-red-800' };
     }
   };
 
@@ -48,7 +67,14 @@ const SeoScorePanel: React.FC = () => {
         <h2 className="text-xl font-semibold mb-4">Statistiques du contenu</h2>
         <div className="space-y-3">
           <div className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
-            <p className="text-sm text-gray-500">Nombre de mots</p>
+            <div className="flex flex-col">
+              <p className="text-sm text-gray-500">Nombre de mots</p>
+              <div className="flex items-center mt-1">
+                <span className={`text-xs px-2 py-0.5 rounded-full ${getWordCountRating(state.contentStats.wordCount).color}`}>
+                  {getWordCountRating(state.contentStats.wordCount).label}
+                </span>
+              </div>
+            </div>
             <p className="text-xl font-semibold">{state.contentStats.wordCount}</p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">

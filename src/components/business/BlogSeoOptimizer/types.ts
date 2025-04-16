@@ -3,12 +3,13 @@
 export interface SeoScore {
   value: number;
   label: string;
-  color: 'red' | 'orange' | 'green';
+  color: 'red' | 'orange' | 'yellow' | 'green';
 }
 
 export interface KeywordData {
   main: string;
   secondary: string[];
+  longTail: string[];
 }
 
 export interface MetaTagsData {
@@ -37,6 +38,7 @@ export interface ContentStats {
   keywordDensity: {
     main: number;
     secondary: Record<string, number>;
+    longTail: Record<string, number>;
   };
   headingCount: {
     h1: number;
@@ -50,6 +52,7 @@ export interface ContentStats {
   };
   imagesCount: number;
   imagesWithAlt: number;
+  imagesWithKeywordInAlt: number;
 }
 
 export interface BlogSeoState {

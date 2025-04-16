@@ -16,19 +16,23 @@ const BlogSeoOptimizer: React.FC = () => {
         </div>
         
         {/* Score SEO */}
-        <div>
+        <div className="lg:col-span-1">
           <SeoScorePanel />
         </div>
       </div>
       
       {/* Éditeur de contenu avec recommandations */}
-      <div className="mb-6">
-        <RichTextEditor />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-3">
+          <RichTextEditor />
+        </div>
       </div>
       
       {/* Panneau d'exportation */}
-      <div>
-        <ExportPanel />
+      <div className="grid grid-cols-1 mb-6">
+        <div className="col-span-1">
+          <ExportPanel />
+        </div>
       </div>
     </BlogSeoProvider>
   );
