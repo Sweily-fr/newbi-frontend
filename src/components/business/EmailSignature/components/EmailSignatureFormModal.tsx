@@ -33,7 +33,8 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   // État pour la signature en cours d'édition (pour la prévisualisation)
   const [formData, setFormData] = useState<Partial<EmailSignature>>(signature ? {
     ...signature,
-    logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : ''
+    logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : '',
+    profilePhotoUrl: signature.profilePhotoUrl ? getFullLogoUrl(signature.profilePhotoUrl) : ''
   } : {});
   
   // Initialiser les données du formulaire lorsque la signature change
@@ -41,7 +42,8 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
     if (signature) {
       setFormData({
         ...signature,
-        logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : ''
+        logoUrl: signature.logoUrl ? getFullLogoUrl(signature.logoUrl) : '',
+        profilePhotoUrl: signature.profilePhotoUrl ? getFullLogoUrl(signature.profilePhotoUrl) : ''
       });
     } else {
       setFormData({});
@@ -77,6 +79,22 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
 
   // Gestionnaire pour la soumission du formulaire
   const handleSubmit = (data: Partial<EmailSignature>) => {
+    console.log('Données reçues du formulaire:', data);
+    
+    // Fonction pour extraire le chemin relatif d'une URL
+    const extractRelativePath = (url: string | undefined): string | undefined => {
+      if (!url) return undefined;
+      if (url.startsWith('data:')) return url; // Base64, ne pas modifier
+      
+      // Si l'URL contient l'URL de base de l'API, l'extraire
+      if (url.startsWith(apiUrl)) {
+        return url.replace(apiUrl, '').replace(/^\/+/, ''); // Supprimer l'URL de base et les slashes au début
+      }
+      
+      // Si c'est déjà un chemin relatif ou une autre URL, la retourner telle quelle
+      return url;
+    };
+    
     // Nettoyer les données avant de les envoyer au serveur
     const cleanedData = {
       name: data.name,
@@ -98,8 +116,25 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
       template: data.template,
       primaryColor: data.primaryColor,
       secondaryColor: data.secondaryColor,
-      logoUrl: data.logoUrl,
-      isDefault: data.isDefault
+      logoUrl: extractRelativePath(data.logoUrl), // Extraire le chemin relatif du logo
+      showLogo: data.showLogo,
+      isDefault: data.isDefault,
+      // Ajouter les propriétés liées à la photo de profil
+      profilePhotoUrl: extractRelativePath(data.profilePhotoUrl), // Extraire le chemin relatif de la photo
+      profilePhotoBase64: data.profilePhotoBase64,
+      profilePhotoToDelete: data.profilePhotoToDelete,
+      profilePhotoSize: data.profilePhotoSize,
+      // Ajouter les propriétés liées aux réseaux sociaux
+      socialLinksDisplayMode: data.socialLinksDisplayMode,
+      socialLinksIconStyle: data.socialLinksIconStyle,
+      socialLinksIconBgColor: data.socialLinksIconBgColor,
+      socialLinksIconColor: data.socialLinksIconColor,
+      // Ajouter les propriétés liées à la police
+      fontFamily: data.fontFamily,
+      fontSize: data.fontSize,
+      // Ajouter les propriétés liées à la disposition
+      layout: data.layout,
+      horizontalSpacing: data.horizontalSpacing
     };
 
     if (signature) {
@@ -130,10 +165,17 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
         return prevData; // Retourner les données précédentes si aucun changement
       }
       
-      // S'assurer que l'URL du logo est correctement préfixée
+      // S'assurer que les URLs sont correctement préfixées
       const updatedData = { ...data };
+      
+      // Traiter l'URL du logo
       if (updatedData.logoUrl) {
         updatedData.logoUrl = getFullLogoUrl(updatedData.logoUrl);
+      }
+      
+      // Traiter l'URL de la photo de profil
+      if (updatedData.profilePhotoUrl && !updatedData.profilePhotoUrl.startsWith('data:')) {
+        updatedData.profilePhotoUrl = getFullLogoUrl(updatedData.profilePhotoUrl);
       }
       
       console.log('Mise à jour des données de prévisualisation:', updatedData);

@@ -13,36 +13,46 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   console.log('All env variables:', import.meta.env);
   console.log('Logo URL original:', signature.logoUrl);
 
-  // Fonction pour préfixer l'URL du logo avec l'URL de l'API si nécessaire
-  const getFullLogoUrl = (logoPath: string | undefined) => {
-    if (!logoPath) {
-      console.log('Logo path is empty');
+  // Fonction pour préfixer l'URL du logo ou de la photo de profil avec l'URL de l'API si nécessaire
+  const getFullImageUrl = (imagePath: string | undefined) => {
+    if (!imagePath) {
       return '';
     }
     
     // Vérifier si l'URL est déjà complète
-    if (logoPath.startsWith('http')) {
-      console.log('Logo URL already starts with http:', logoPath);
-      return logoPath;
+    if (imagePath.startsWith('http')) {
+      return imagePath;
     }
     
     // Vérifier si l'URL contient déjà l'URL de l'API (pour éviter les doubles préfixes)
-    if (logoPath.includes(apiUrl)) {
-      console.log('Logo URL already contains API URL:', logoPath);
-      return logoPath;
+    if (imagePath.includes(apiUrl)) {
+      return imagePath;
     }
     
     // Pour le débogage, utiliser une image de test en ligne si nous avons un chemin relatif
     // Cela nous permettra de vérifier si le problème vient des variables d'environnement
-    if (!logoPath.startsWith('http')) {
-      console.log('Using placeholder image for testing');
-      return 'https://via.placeholder.com/150';
+    if (!imagePath.startsWith('http')) {
+      // Utiliser l'image réelle avec le préfixe de l'API
+      const fullUrl = `${apiUrl}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+      return fullUrl;
     }
     
-    // Ajouter le préfixe de l'API
-    const fullUrl = `${apiUrl}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`;
-    console.log('Full logo URL with prefix:', fullUrl);
-    return fullUrl;
+    return imagePath;
+  };
+  
+  // Fonction spécifique pour l'URL du logo
+  const getFullLogoUrl = (logoPath: string | undefined) => {
+    return getFullImageUrl(logoPath);
+  };
+  
+  // Fonction spécifique pour l'URL de la photo de profil
+  const getFullProfilePhotoUrl = (photoPath: string | undefined) => {
+    // Si c'est une image en base64 (prévisualisation), la retourner directement
+    if (photoPath && photoPath.startsWith('data:image')) {
+      return photoPath;
+    }
+    // Sinon, utiliser la fonction standard pour les URLs
+    return getFullImageUrl(photoPath);
   };
   
   // Déstructuration avec valeurs par défaut
@@ -60,11 +70,58 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     primaryColor,
     secondaryColor,
     logoUrl,
-    showLogo
+    showLogo,
+    profilePhotoUrl,
+    profilePhotoSize,
+    socialLinksDisplayMode,
+    socialLinksIconStyle,
+    socialLinksIconBgColor,
+    socialLinksIconColor,
+    layout,
+    fontFamily,
+    fontSize
   } = signature;
   
   // Définir explicitement showLogo avec une valeur par défaut à true
   const displayLogo = showLogo !== false; // Si showLogo est undefined ou null, on affiche le logo
+  
+  // Définir la taille de la photo de profil avec une valeur par défaut
+  const photoSize = profilePhotoSize || 80; // Taille par défaut: 80px
+  
+  // Définir la police de caractères avec une valeur par défaut
+  const signatureFontFamily = fontFamily || 'Arial, sans-serif'; // Police par défaut: Arial
+  
+  // Définir la taille de police avec une valeur par défaut
+  const signatureFontSize = fontSize || 14; // Taille par défaut: 14px
+  
+  // Log pour déboguer
+  console.log('Police sélectionnée:', fontFamily);
+  console.log('Police utilisée:', signatureFontFamily);
+  console.log('Taille de police sélectionnée:', fontSize);
+  console.log('Taille de police utilisée:', signatureFontSize);
+  
+  // Style de base pour la signature
+  const baseStyle = {
+    fontFamily: signatureFontFamily,
+    fontSize: `${signatureFontSize}px`,
+    color: '#333'
+  };
+  
+  // Définir le mode d'affichage des réseaux sociaux avec une valeur par défaut
+  const displayMode = socialLinksDisplayMode || 'text'; // Mode par défaut: texte
+  
+  // Définir la disposition de la signature avec une valeur par défaut
+  const signatureLayout = layout || 'vertical'; // Disposition par défaut: verticale
+  
+  // Définir l'espacement horizontal entre les colonnes avec une valeur par défaut
+  const horizontalSpacing = signature.horizontalSpacing !== undefined ? signature.horizontalSpacing : 20; // Espacement par défaut: 20px
+  
+  // Définir le style des icônes des réseaux sociaux avec une valeur par défaut
+  const iconStyle = socialLinksIconStyle || 'plain'; // Style par défaut: sans fond
+  
+  // Définir les couleurs des icônes des réseaux sociaux avec des valeurs par défaut
+  const iconBgColor = socialLinksIconBgColor || primaryColor; // Couleur de fond par défaut: couleur primaire
+  const iconColor = socialLinksIconColor || (iconStyle === 'plain' ? primaryColor : '#FFFFFF'); // Couleur du texte par défaut
   
   console.log('showLogo value:', showLogo);
   console.log('displayLogo calculated:', displayLogo);
@@ -86,48 +143,198 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
 
   // Template Simple
   const renderSimpleTemplate = () => {
-    return (
-      <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#333' }}>
-        <div style={{ marginBottom: '10px' }}>
-          {logoUrl && displayLogo && (
-            <div style={{ marginBottom: '10px' }}>
-              <img 
-                src={getFullLogoUrl(logoUrl)} 
-                alt="Logo" 
-                style={{ maxWidth: '100px' }} 
-                onError={(e) => {
-                  console.error('Error loading logo image:', e);
-                  console.log('Failed URL:', e.currentTarget.src);
-                }}
-              />
+    // Si la disposition est verticale, on utilise la mise en page originale
+    if (signatureLayout === 'vertical') {
+      return (
+        <div style={baseStyle}>
+          <div style={{ 
+            marginBottom: '10px', 
+            display: 'flex', 
+            alignItems: 'flex-start', 
+            gap: '15px',
+            flexDirection: 'column'
+          }}>
+            {profilePhotoUrl && (
+              <div>
+                <img 
+                  src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                  alt="Photo de profil" 
+                  style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover' }} 
+                  onError={(e) => {
+                    console.error('Error loading profile photo:', e);
+                  }}
+                />
+              </div>
+            )}
+            <div>
+              {logoUrl && displayLogo && (
+                <div style={{ marginBottom: '10px' }}>
+                  <img 
+                    src={getFullLogoUrl(logoUrl)} 
+                    alt="Logo" 
+                    style={{ maxWidth: '100px' }} 
+                    onError={(e) => {
+                      console.error('Error loading logo image:', e);
+                    }}
+                  />
+                </div>
+              )}
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
+              <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
+              {companyName && <div>{companyName}</div>}
             </div>
-          )}
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
-          <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
-          {companyName && <div>{companyName}</div>}
+          </div>
+          
+          <div style={{ marginBottom: '10px' }}>
+            {email && <div>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
+            {phone && <div>Tél: {phone}</div>}
+            {mobilePhone && <div>Mobile: {mobilePhone}</div>}
+            {website && <div>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
+            {address && <div>Adresse: {address}</div>}
+          </div>
         </div>
+      );
+    }
+    
+    // Si la disposition est horizontale, on utilise la nouvelle mise en page
+    // Déterminer si nous avons des images à afficher (photo de profil et/ou logo)
+    const hasProfilePhoto = !!profilePhotoUrl;
+    const hasLogo = !!(logoUrl && displayLogo);
+    const hasAnyImage = hasProfilePhoto || hasLogo;
+    
+    // Ajuster l'espacement en fonction de la présence d'images
+    const effectiveSpacing = hasAnyImage ? horizontalSpacing : Math.max(5, horizontalSpacing / 2);
+    
+    return (
+      <div style={baseStyle}>
+        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <tbody>
+            <tr>
+              {/* Colonne de gauche: photos et informations personnelles */}
+              <td style={{ verticalAlign: 'top', width: 'auto', paddingRight: `${effectiveSpacing}px` }}>
+                {/* Photos alignées horizontalement */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: hasAnyImage ? '10px' : '0' }}>
+                  {profilePhotoUrl && (
+                    <div style={{ width: `${photoSize}px`, height: `${photoSize}px` }}>
+                      <img 
+                        src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                        alt="Photo de profil" 
+                        style={{ width: `100%`, height: `100%`, borderRadius: '50%', objectFit: 'cover' }} 
+                        onError={(e) => {
+                          console.error('Error loading profile photo:', e);
+                        }}
+                      />
+                    </div>
+                  )}
+                  {logoUrl && displayLogo && (
+                    <div>
+                      <img 
+                        src={getFullLogoUrl(logoUrl)} 
+                        alt="Logo" 
+                        style={{ maxWidth: '100px' }} 
+                        onError={(e) => {
+                          console.error('Error loading logo image:', e);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Nom, poste et entreprise en dessous des photos */}
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
+                  <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
+                  {companyName && <div>{companyName}</div>}
+                </div>
+              </td>
+              
+              {/* Colonne de droite: informations de contact */}
+              <td style={{ verticalAlign: 'top', width: 'auto', paddingLeft: `${effectiveSpacing}px`, borderLeft: `1px solid ${secondaryColor || '#f5f5f5'}` }}>
+                {email && <div style={{ marginBottom: '5px' }}>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
+                {phone && <div style={{ marginBottom: '5px' }}>Tél: {phone}</div>}
+                {mobilePhone && <div style={{ marginBottom: '5px' }}>Mobile: {mobilePhone}</div>}
+                {website && <div style={{ marginBottom: '5px' }}>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
+                {address && <div style={{ marginBottom: '5px' }}>Adresse: {address}</div>}
+              </td>
+            </tr>
+          </tbody>
+        </table>
         
-        <div style={{ marginBottom: '10px' }}>
-          {email && <div>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
-          {phone && <div>Tél: {phone}</div>}
-          {mobilePhone && <div>Mobile: {mobilePhone}</div>}
-          {website && <div>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
-          {address && <div>Adresse: {address}</div>}
-        </div>
-        
+        {/* Réseaux sociaux en bas */}
         {socialLinks && Object.values(socialLinks).some(link => link) && (
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ 
+            marginTop: '15px', 
+            paddingTop: '10px', 
+            borderTop: `1px solid ${secondaryColor || '#f5f5f5'}`,
+            textAlign: 'left'
+          }}>
             {socialLinks.linkedin && (
-              <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                {displayMode === 'icons' ? (
+                  <span style={{
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                    width: '24px',
+                    height: '24px',
+                    textAlign: 'center',
+                    lineHeight: '24px',
+                    backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                    color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                    borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                  }}>in</span>
+                ) : 'LinkedIn'}
+              </a>
             )}
             {socialLinks.twitter && (
-              <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                {displayMode === 'icons' ? (
+                  <span style={{
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                    width: '24px',
+                    height: '24px',
+                    textAlign: 'center',
+                    lineHeight: '24px',
+                    backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                    color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                    borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                  }}>tw</span>
+                ) : 'Twitter'}
+              </a>
             )}
             {socialLinks.facebook && (
-              <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                {displayMode === 'icons' ? (
+                  <span style={{
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                    width: '24px',
+                    height: '24px',
+                    textAlign: 'center',
+                    lineHeight: '24px',
+                    backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                    color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                    borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                  }}>fb</span>
+                ) : 'Facebook'}
+              </a>
             )}
             {socialLinks.instagram && (
-              <a href={socialLinks.instagram} style={{ color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href={socialLinks.instagram} style={{ color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                {displayMode === 'icons' ? (
+                  <span style={{
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                    width: '24px',
+                    height: '24px',
+                    textAlign: 'center',
+                    lineHeight: '24px',
+                    backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                    color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                    borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                  }}>ig</span>
+                ) : 'Instagram'}
+              </a>
             )}
           </div>
         )}
@@ -137,28 +344,39 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
 
   // Template Professionnel
   const renderProfessionalTemplate = () => {
+    // Si la disposition est horizontale, on utilise une table avec une seule ligne et deux colonnes
+    // Si la disposition est verticale, on utilise une table avec deux lignes et une colonne
     return (
       <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#333', borderLeft: `4px solid ${primaryColor || '#0066cc'}`, paddingLeft: '15px' }}>
         <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
           <tbody>
-            <tr>
-              <td style={{ verticalAlign: 'top', width: '150px', paddingRight: '20px' }}>
+            {signatureLayout === 'horizontal' ? (
+              <tr>
+                <td style={{ verticalAlign: 'top', width: '150px', paddingRight: '20px' }}>
+                {profilePhotoUrl && (
+                  <div style={{ marginBottom: '15px' }}>
+                    <img 
+                      src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                      alt="Photo de profil" 
+                      style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover', marginBottom: '10px' }} 
+                      onError={(e) => {
+                        console.error('Error loading profile photo:', e);
+                      }}
+                    />
+                  </div>
+                )}
                 {logoUrl && displayLogo && (
-                  <>
+                  <div style={{ marginBottom: '15px' }}>
                     <img 
                       src={getFullLogoUrl(logoUrl)} 
                       alt="Logo" 
-                      style={{ maxWidth: '150px', marginBottom: '10px' }} 
+                      style={{ maxWidth: '150px' }} 
                       onError={(e) => {
                         console.error('Error loading logo image (Professional):', e);
                         console.log('Failed URL:', e.currentTarget.src);
                       }}
                     />
-                    {/* Affichage de débogage de l'URL */}
-                    <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
-                      URL: {getFullLogoUrl(logoUrl)}
-                    </div>
-                  </>
+                  </div>
                 )}
                 <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
                 <div style={{ color: primaryColor || '#0066cc', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>
@@ -189,6 +407,68 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 )}
               </td>
             </tr>
+            ) : (
+            <>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingBottom: '20px' }}>
+                  {profilePhotoUrl && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <img 
+                        src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                        alt="Photo de profil" 
+                        style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover', marginBottom: '10px' }} 
+                        onError={(e) => {
+                          console.error('Error loading profile photo:', e);
+                        }}
+                      />
+                    </div>
+                  )}
+                  {logoUrl && displayLogo && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <img 
+                        src={getFullLogoUrl(logoUrl)} 
+                        alt="Logo" 
+                        style={{ maxWidth: '150px' }} 
+                        onError={(e) => {
+                          console.error('Error loading logo image (Professional):', e);
+                          console.log('Failed URL:', e.currentTarget.src);
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
+                  <div style={{ color: primaryColor || '#0066cc', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>
+                  {companyName && <div style={{ marginBottom: '10px' }}>{companyName}</div>}
+                </td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', borderTop: `1px solid ${secondaryColor || '#f5f5f5'}`, paddingTop: '20px' }}>
+                  {email && <div style={{ marginBottom: '5px' }}>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
+                  {phone && <div style={{ marginBottom: '5px' }}>Tél: {phone}</div>}
+                  {mobilePhone && <div style={{ marginBottom: '5px' }}>Mobile: {mobilePhone}</div>}
+                  {website && <div style={{ marginBottom: '5px' }}>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
+                  {address && <div style={{ marginBottom: '5px' }}>Adresse: {address}</div>}
+                  
+                  {socialLinks && Object.values(socialLinks).some(link => link) && (
+                    <div style={{ marginTop: '10px' }}>
+                      {socialLinks.linkedin && (
+                        <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                      )}
+                      {socialLinks.twitter && (
+                        <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Twitter</a>
+                      )}
+                      {socialLinks.facebook && (
+                        <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Facebook</a>
+                      )}
+                      {socialLinks.instagram && (
+                        <a href={socialLinks.instagram} style={{ color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Instagram</a>
+                      )}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            </>
+            )}
           </tbody>
         </table>
       </div>
@@ -199,23 +479,36 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const renderModernTemplate = () => {
     return (
       <div style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontSize: '14px', color: '#333', backgroundColor: secondaryColor || '#f5f5f5', padding: '15px', borderRadius: '5px' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '15px' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: signatureLayout === 'horizontal' ? 'row' : 'column', 
+          alignItems: signatureLayout === 'horizontal' ? 'center' : 'flex-start', 
+          marginBottom: '15px' 
+        }}>
+          {profilePhotoUrl && (
+            <div style={{ marginRight: '15px' }}>
+              <img 
+                src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                alt="Photo de profil" 
+                style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover' }} 
+                onError={(e) => {
+                  console.error('Error loading profile photo:', e);
+                }}
+              />
+            </div>
+          )}
           {logoUrl && displayLogo && (
-            <>
+            <div style={{ marginRight: '15px' }}>
               <img 
                 src={getFullLogoUrl(logoUrl)} 
                 alt="Logo" 
-                style={{ maxWidth: '80px', marginRight: '15px' }} 
+                style={{ maxWidth: '80px' }} 
                 onError={(e) => {
                   console.error('Error loading logo image (Modern):', e);
                   console.log('Failed URL:', e.currentTarget.src);
                 }}
               />
-              {/* Affichage de débogage de l'URL */}
-              <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
-                URL: {getFullLogoUrl(logoUrl)}
-              </div>
-            </>
+            </div>
           )}
           <div>
             <div style={{ fontWeight: 'bold', fontSize: '18px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>
@@ -283,8 +576,20 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
         
         {/* Contenu */}
         <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Logo et nom */}
+          {/* Photo de profil, Logo et nom */}
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            {profilePhotoUrl && (
+              <div style={{ marginRight: '15px' }}>
+                <img 
+                  src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                  alt="Photo de profil" 
+                  style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover', border: '3px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} 
+                  onError={(e) => {
+                    console.error('Error loading profile photo:', e);
+                  }}
+                />
+              </div>
+            )}
             {logoUrl && displayLogo && (
               <div style={{ marginRight: '15px', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                 <img 
@@ -293,13 +598,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                   style={{ maxWidth: '80px', maxHeight: '80px' }} 
                   onError={(e) => {
                     console.error('Error loading logo image (Creative):', e);
-                    console.log('Failed URL:', e.currentTarget.src);
                   }}
                 />
-                {/* Affichage de débogage de l'URL */}
-                <div style={{ fontSize: '10px', color: '#999', marginTop: '5px', wordBreak: 'break-all' }}>
-                  URL: {getFullLogoUrl(logoUrl)}
-                </div>
               </div>
             )}
             <div style={{ fontWeight: 'bold', fontSize: '20px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>

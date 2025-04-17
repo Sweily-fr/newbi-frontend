@@ -30,6 +30,18 @@ export interface EmailSignature {
   secondaryColor: string;
   logoUrl?: string;
   showLogo?: boolean;
+  profilePhotoUrl?: string;
+  profilePhotoBase64?: string | null;
+  profilePhotoToDelete?: boolean;
+  profilePhotoSize?: number;
+  socialLinksDisplayMode?: 'icons' | 'text';
+  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
+  socialLinksIconBgColor?: string;
+  socialLinksIconColor?: string;
+  layout?: 'horizontal' | 'vertical';
+  horizontalSpacing?: number;
+  fontFamily?: string;
+  fontSize?: number;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;

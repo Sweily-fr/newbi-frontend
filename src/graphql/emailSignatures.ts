@@ -24,6 +24,13 @@ export const GET_EMAIL_SIGNATURES = gql`
         primaryColor
         secondaryColor
         logoUrl
+        showLogo
+        profilePhotoUrl
+        profilePhotoSize
+        socialLinksDisplayMode
+        socialLinksIconStyle
+        socialLinksIconBgColor
+        socialLinksIconColor
         isDefault
         createdAt
         updatedAt
@@ -57,6 +64,13 @@ export const GET_EMAIL_SIGNATURE = gql`
       primaryColor
       secondaryColor
       logoUrl
+      showLogo
+      profilePhotoUrl
+      profilePhotoSize
+      socialLinksDisplayMode
+      socialLinksIconStyle
+      socialLinksIconBgColor
+      socialLinksIconColor
       isDefault
       createdAt
       updatedAt
@@ -87,6 +101,13 @@ export const GET_DEFAULT_EMAIL_SIGNATURE = gql`
       primaryColor
       secondaryColor
       logoUrl
+      showLogo
+      profilePhotoUrl
+      profilePhotoSize
+      socialLinksDisplayMode
+      socialLinksIconStyle
+      socialLinksIconBgColor
+      socialLinksIconColor
       isDefault
       createdAt
       updatedAt
@@ -117,6 +138,13 @@ export const CREATE_EMAIL_SIGNATURE = gql`
       primaryColor
       secondaryColor
       logoUrl
+      showLogo
+      profilePhotoUrl
+      profilePhotoSize
+      socialLinksDisplayMode
+      socialLinksIconStyle
+      socialLinksIconBgColor
+      socialLinksIconColor
       isDefault
       createdAt
       updatedAt
@@ -147,6 +175,13 @@ export const UPDATE_EMAIL_SIGNATURE = gql`
       primaryColor
       secondaryColor
       logoUrl
+      showLogo
+      profilePhotoUrl
+      profilePhotoSize
+      socialLinksDisplayMode
+      socialLinksIconStyle
+      socialLinksIconBgColor
+      socialLinksIconColor
       isDefault
       createdAt
       updatedAt
