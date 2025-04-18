@@ -31,6 +31,14 @@ export const GET_EMAIL_SIGNATURES = gql`
         socialLinksIconStyle
         socialLinksIconBgColor
         socialLinksIconColor
+        socialLinksPosition
+        layout
+        horizontalSpacing
+        verticalSpacing
+        verticalAlignment
+        imagesLayout
+        fontFamily
+        fontSize
         isDefault
         createdAt
         updatedAt
@@ -71,6 +79,14 @@ export const GET_EMAIL_SIGNATURE = gql`
       socialLinksIconStyle
       socialLinksIconBgColor
       socialLinksIconColor
+      socialLinksPosition
+      layout
+      horizontalSpacing
+      verticalSpacing
+      verticalAlignment
+      imagesLayout
+      fontFamily
+      fontSize
       isDefault
       createdAt
       updatedAt
@@ -108,6 +124,14 @@ export const GET_DEFAULT_EMAIL_SIGNATURE = gql`
       socialLinksIconStyle
       socialLinksIconBgColor
       socialLinksIconColor
+      socialLinksPosition
+      layout
+      horizontalSpacing
+      verticalSpacing
+      verticalAlignment
+      imagesLayout
+      fontFamily
+      fontSize
       isDefault
       createdAt
       updatedAt
@@ -145,6 +169,14 @@ export const CREATE_EMAIL_SIGNATURE = gql`
       socialLinksIconStyle
       socialLinksIconBgColor
       socialLinksIconColor
+      socialLinksPosition
+      layout
+      horizontalSpacing
+      verticalSpacing
+      verticalAlignment
+      imagesLayout
+      fontFamily
+      fontSize
       isDefault
       createdAt
       updatedAt
@@ -182,6 +214,14 @@ export const UPDATE_EMAIL_SIGNATURE = gql`
       socialLinksIconStyle
       socialLinksIconBgColor
       socialLinksIconColor
+      socialLinksPosition
+      layout
+      horizontalSpacing
+      verticalSpacing
+      verticalAlignment
+      imagesLayout
+      fontFamily
+      fontSize
       isDefault
       createdAt
       updatedAt
@@ -199,7 +239,43 @@ export const SET_DEFAULT_EMAIL_SIGNATURE = gql`
   mutation SetDefaultEmailSignature($id: ID!) {
     setDefaultEmailSignature(id: $id) {
       id
+      name
+      fullName
+      jobTitle
+      email
+      phone
+      mobilePhone
+      website
+      address
+      companyName
+      socialLinks {
+        linkedin
+        twitter
+        facebook
+        instagram
+      }
+      template
+      primaryColor
+      secondaryColor
+      logoUrl
+      showLogo
+      profilePhotoUrl
+      profilePhotoSize
+      socialLinksDisplayMode
+      socialLinksIconStyle
+      socialLinksIconBgColor
+      socialLinksIconColor
+      socialLinksPosition
+      layout
+      horizontalSpacing
+      verticalSpacing
+      verticalAlignment
+      imagesLayout
+      fontFamily
+      fontSize
       isDefault
+      createdAt
+      updatedAt
     }
   }
 `;

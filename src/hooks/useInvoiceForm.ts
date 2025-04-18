@@ -549,9 +549,144 @@ export const useInvoiceForm = ({
       // S'assurer que le client sélectionné est bien défini, sinon utiliser celui de la facture existante
       const effectiveSelectedClient = selectedClient || (invoice?.client?.id || '');
       
-      const selectedClientData = !isNewClient ? clientsData?.clients?.find((c: Client) => c.id === effectiveSelectedClient) : null;
+      // Vérifier que clients est un tableau avant d'utiliser find()
+      const clients = clientsData?.clients || [];
+      const selectedClientData = !isNewClient ? (Array.isArray(clients) ? clients.find((c: Client) => c.id === effectiveSelectedClient) : null) : null;
+      
+      // Fonction pour récupérer les données complètes du client
+      const getClientData = () => {
+        if (isNewClient) {
+          // Déterminer le type de client en fonction des champs remplis
+          let clientType = newClient.type || 'COMPANY';
+          // Si firstName et lastName sont remplis, c'est un particulier
+          if (newClient.firstName && newClient.lastName) {
+            clientType = 'INDIVIDUAL';
+          }
+          
+          // Si c'est un nouveau client, on utilise les données saisies
+          return {
+            type: clientType,
+            name: newClient.name,
+            email: newClient.email || "client@example.com", // Email obligatoire
+            address: {
+              street: newClient.street || "Adresse non spécifiée",
+              city: newClient.city || "Ville non spécifiée",
+              postalCode: newClient.postalCode || "00000",
+              country: newClient.country || "France",
+            },
+            // Champs spécifiques aux entreprises
+            siret: clientType === 'COMPANY' ? (newClient.siret || "12345678901234") : "",
+            vatNumber: clientType === 'COMPANY' ? (newClient.vatNumber || "FR12345678901") : "",
+            // Champs spécifiques aux particuliers
+            firstName: newClient.firstName || "",
+            lastName: newClient.lastName || ""
+          };
+        } else {
+          // Si on modifie une facture existante et que le client est déjà dans la facture
+          if (invoice && invoice.client) {
+            return {
+              id: invoice.client.id,
+              type: invoice.client.type || 'COMPANY',
+              name: invoice.client.name,
+              email: invoice.client.email || "client@example.com",
+              address: {
+                street: invoice.client.address?.street || "Adresse non spécifiée",
+                city: invoice.client.address?.city || "Ville non spécifiée",
+                postalCode: invoice.client.address?.postalCode || "00000",
+                country: invoice.client.address?.country || "France",
+              },
+              siret: invoice.client.type === 'COMPANY' ? (invoice.client.siret || "12345678901234") : "",
+              vatNumber: invoice.client.type === 'COMPANY' ? (invoice.client.vatNumber || "FR12345678901") : "",
+              firstName: invoice.client.firstName || "",
+              lastName: invoice.client.lastName || ""
+            };
+          }
+          
+          // Vérifier que selectedClientData existe
+          if (!selectedClientData) {
+            console.error("Aucun client sélectionné trouvé et aucun client par défaut disponible");
+            
+            // Vérifier si nous avons des données utilisateur pour pré-remplir les champs
+            const userCompany = userData?.me?.company || {};
+            
+            // Si nous avons des données de l'utilisateur avec firstName et lastName, créer un client de type INDIVIDUAL
+            // sinon créer un client de type COMPANY avec les données de l'entreprise
+            const isIndividual = userData?.me?.firstName && userData?.me?.lastName;
+            
+            if (isIndividual) {
+              // Créer un client de type particulier avec les données de l'utilisateur
+              return {
+                id: "", // ID vide, sera géré côté serveur
+                type: 'INDIVIDUAL',
+                name: `${userData.me.firstName} ${userData.me.lastName}`,
+                email: userData.me.email || "client@example.com", // Email obligatoire
+                address: {
+                  street: userCompany.address?.street || "Adresse non spécifiée",
+                  city: userCompany.address?.city || "Ville non spécifiée",
+                  postalCode: userCompany.address?.postalCode || "00000",
+                  country: userCompany.address?.country || "France",
+                },
+                siret: "", // Pas obligatoire pour un particulier
+                vatNumber: "", // Pas obligatoire pour un particulier
+                firstName: userData.me.firstName || "Prénom",
+                lastName: userData.me.lastName || "Nom"
+              };
+            } else {
+              // Créer un client de type entreprise avec les données de l'entreprise de l'utilisateur
+              return {
+                id: "", // ID vide, sera géré côté serveur
+                type: 'COMPANY',
+                name: userCompany.name || "Entreprise par défaut",
+                email: userCompany.email || "entreprise@example.com", // Email obligatoire
+                address: {
+                  street: userCompany.address?.street || "Adresse non spécifiée",
+                  city: userCompany.address?.city || "Ville non spécifiée",
+                  postalCode: userCompany.address?.postalCode || "00000",
+                  country: userCompany.address?.country || "France",
+                },
+                siret: userCompany.siret || "12345678901234", // SIRET obligatoire pour une entreprise
+                vatNumber: userCompany.vatNumber || "FR12345678901", // TVA obligatoire pour une entreprise
+                firstName: "",
+                lastName: ""
+              };
+            }
+          }
+          
+          // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
+          let clientType = selectedClientData.type || 'COMPANY';
+          // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
+          if (!selectedClientData.type && selectedClientData.firstName && selectedClientData.lastName) {
+            clientType = 'INDIVIDUAL';
+          }
+          
+          // Si le type est COMPANY, vérifier que nous avons les champs obligatoires
+          const needsSiretAndVat = clientType === 'COMPANY';
+          const siret = selectedClientData.siret || (needsSiretAndVat ? "12345678901234" : "");
+          const vatNumber = selectedClientData.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
+          
+          return {
+            id: selectedClientData.id,
+            type: clientType,
+            name: selectedClientData.name,
+            email: selectedClientData.email || "client@example.com", // Email obligatoire
+            address: {
+              street: selectedClientData.address?.street || "Adresse non spécifiée",
+              city: selectedClientData.address?.city || "Ville non spécifiée",
+              postalCode: selectedClientData.address?.postalCode || "00000",
+              country: selectedClientData.address?.country || "France",
+            },
+            siret: siret,
+            vatNumber: vatNumber,
+            firstName: selectedClientData.firstName || "",
+            lastName: selectedClientData.lastName || ""
+          };
+        }
+      };
+      
+      // Récupérer les données complètes du client
+      const clientData = getClientData();
 
-      let clientId = effectiveSelectedClient;
+      let clientId = clientData.id || effectiveSelectedClient;
 
       // If it's a new client, create it first
       if (isNewClient) {
@@ -608,22 +743,22 @@ export const useInvoiceForm = ({
 
       const invoiceData = {
         client: {
-          id: isNewClient ? clientId : effectiveSelectedClient,
-          type: isNewClient ? newClient.type : (selectedClientData?.type || invoice?.client?.type || 'COMPANY'),
-          name: isNewClient ? newClient.name : (selectedClientData?.name || invoice?.client?.name),
-          email: isNewClient ? newClient.email : (selectedClientData?.email || invoice?.client?.email),
+          id: isNewClient ? clientId : (clientData.id || effectiveSelectedClient),
+          type: clientData.type,
+          name: clientData.name,
+          email: clientData.email,
           address: {
-            street: isNewClient ? newClient.street : (selectedClientData?.address?.street || invoice?.client?.address?.street),
-            city: isNewClient ? newClient.city : (selectedClientData?.address?.city || invoice?.client?.address?.city),
-            postalCode: isNewClient ? newClient.postalCode : (selectedClientData?.address?.postalCode || invoice?.client?.address?.postalCode),
-            country: isNewClient ? newClient.country : (selectedClientData?.address?.country || invoice?.client?.address?.country)
+            street: clientData.address.street,
+            city: clientData.address.city,
+            postalCode: clientData.address.postalCode,
+            country: clientData.address.country
           },
           // Champs spécifiques aux entreprises
-          siret: isNewClient ? newClient.siret : (selectedClientData?.siret || invoice?.client?.siret),
-          vatNumber: isNewClient ? newClient.vatNumber : (selectedClientData?.vatNumber || invoice?.client?.vatNumber),
+          siret: clientData.siret,
+          vatNumber: clientData.vatNumber,
           // Champs spécifiques aux particuliers
-          firstName: isNewClient ? newClient.firstName : (selectedClientData?.firstName || invoice?.client?.firstName),
-          lastName: isNewClient ? newClient.lastName : (selectedClientData?.lastName || invoice?.client?.lastName)
+          firstName: clientData.firstName,
+          lastName: clientData.lastName
         },
         items: items.map(({ id, ...item }) => ({
           description: item.description,

@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { EmailSignature } from './EmailSignaturesTable';
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 interface EmailSignaturePreviewProps {
   signature: Partial<EmailSignature>;
 }
 
 export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ signature }) => {
+  // État pour afficher un message de confirmation après la copie
+  const [copySuccess, setCopySuccess] = useState(false);
+  
+  // Référence au conteneur de la signature
+  const signatureRef = useRef<HTMLDivElement>(null);
   // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
   const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
   
@@ -77,9 +83,12 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     socialLinksIconStyle,
     socialLinksIconBgColor,
     socialLinksIconColor,
+    socialLinksPosition,
     layout,
     fontFamily,
-    fontSize
+    fontSize,
+    verticalAlignment,
+    imagesLayout
   } = signature;
   
   // Définir explicitement showLogo avec une valeur par défaut à true
@@ -110,11 +119,21 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir le mode d'affichage des réseaux sociaux avec une valeur par défaut
   const displayMode = socialLinksDisplayMode || 'text'; // Mode par défaut: texte
   
+  // Définir la position des réseaux sociaux avec une valeur par défaut
+  const socialPosition = socialLinksPosition || 'bottom'; // Position par défaut: en bas
+  
+  // Définir l'alignement du texte en mode vertical avec une valeur par défaut
+  const textAlignment = verticalAlignment || 'left'; // Alignement par défaut: gauche
+  
+  // Définir la disposition des images en mode vertical avec une valeur par défaut
+  const imageLayout = imagesLayout || 'vertical'; // Disposition par défaut: verticale
+  
   // Définir la disposition de la signature avec une valeur par défaut
   const signatureLayout = layout || 'vertical'; // Disposition par défaut: verticale
   
-  // Définir l'espacement horizontal entre les colonnes avec une valeur par défaut
-  const horizontalSpacing = signature.horizontalSpacing !== undefined ? signature.horizontalSpacing : 20; // Espacement par défaut: 20px
+  // Calcul des espacements effectifs
+  const effectiveHorizontalSpacing = signature.horizontalSpacing || 20; // Espacement horizontal par défaut: 20px
+  const effectiveVerticalSpacing = signature.verticalSpacing || 10; // Espacement vertical par défaut: 10px
   
   // Définir le style des icônes des réseaux sociaux avec une valeur par défaut
   const iconStyle = socialLinksIconStyle || 'plain'; // Style par défaut: sans fond
@@ -143,57 +162,310 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
 
   // Template Simple
   const renderSimpleTemplate = () => {
-    // Si la disposition est verticale, on utilise la mise en page originale
+    // Si la disposition est verticale, on utilise la mise en page améliorée
     if (signatureLayout === 'vertical') {
-      return (
-        <div style={baseStyle}>
-          <div style={{ 
-            marginBottom: '10px', 
-            display: 'flex', 
-            alignItems: 'flex-start', 
-            gap: '15px',
-            flexDirection: 'column'
-          }}>
-            {profilePhotoUrl && (
-              <div>
-                <img 
-                  src={getFullProfilePhotoUrl(profilePhotoUrl)} 
-                  alt="Photo de profil" 
-                  style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '50%', objectFit: 'cover' }} 
-                  onError={(e) => {
-                    console.error('Error loading profile photo:', e);
-                  }}
-                />
-              </div>
-            )}
-            <div>
-              {logoUrl && displayLogo && (
-                <div style={{ marginBottom: '10px' }}>
-                  <img 
-                    src={getFullLogoUrl(logoUrl)} 
-                    alt="Logo" 
-                    style={{ maxWidth: '100px' }} 
-                    onError={(e) => {
-                      console.error('Error loading logo image:', e);
-                    }}
-                  />
-                </div>
-              )}
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
-              <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
-              {companyName && <div>{companyName}</div>}
-            </div>
-          </div>
-          
-          <div style={{ marginBottom: '10px' }}>
-            {email && <div>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
-            {phone && <div>Tél: {phone}</div>}
-            {mobilePhone && <div>Mobile: {mobilePhone}</div>}
-            {website && <div>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
-            {address && <div>Adresse: {address}</div>}
-          </div>
+      // Déterminer l'alignement du texte
+      const textAlignStyle = textAlignment === 'center' ? 'center' : (textAlignment === 'right' ? 'right' : 'left');
+      
+      // Déterminer si nous avons des images à afficher (photo de profil et/ou logo)
+      const hasProfilePhoto = !!profilePhotoUrl;
+      const hasLogo = !!(logoUrl && displayLogo);
+      const hasAnyImage = hasProfilePhoto || hasLogo;
+      
+      // Les conteneurs sont maintenant gérés directement dans le rendu principal pour utiliser des tableaux HTML
+      
+      // Créer le conteneur des réseaux sociaux (si en position bottom)
+      const socialLinksContainer = socialLinks && Object.values(socialLinks).some(link => link) && socialPosition === 'bottom' ? (
+        <div style={{
+          textAlign: textAlignStyle as 'left' | 'center' | 'right',
+          marginTop: `${effectiveVerticalSpacing}px`,
+          paddingTop: `${effectiveVerticalSpacing}px`,
+          borderTop: `1px solid ${secondaryColor || '#f5f5f5'}`
+        }}>
+          {socialLinks.linkedin && (
+            <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>in</span>
+              ) : 'LinkedIn'}
+            </a>
+          )}
+          {socialLinks.twitter && (
+            <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>X</span>
+              ) : 'X'}
+            </a>
+          )}
+          {socialLinks.facebook && (
+            <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>fb</span>
+              ) : 'Facebook'}
+            </a>
+          )}
+          {socialLinks.instagram && (
+            <a href={socialLinks.instagram} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>ig</span>
+              ) : 'Instagram'}
+            </a>
+          )}
         </div>
-      );
+      ) : null;
+      
+      // Créer le conteneur des réseaux sociaux (si en position right)
+      const socialLinksInlineContainer = socialLinks && Object.values(socialLinks).some(link => link) && socialPosition === 'right' ? (
+        <div style={{
+          textAlign: textAlignStyle as 'left' | 'center' | 'right',
+          marginTop: `${effectiveVerticalSpacing}px`
+        }}>
+          {socialLinks.linkedin && (
+            <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>in</span>
+              ) : 'LinkedIn'}
+            </a>
+          )}
+          {socialLinks.twitter && (
+            <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>X</span>
+              ) : 'X'}
+            </a>
+          )}
+          {socialLinks.facebook && (
+            <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>fb</span>
+              ) : 'Facebook'}
+            </a>
+          )}
+          {socialLinks.instagram && (
+            <a href={socialLinks.instagram} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+              {displayMode === 'icons' ? (
+                <span style={{
+                  fontWeight: 'bold',
+                  display: 'inline-block',
+                  width: '24px',
+                  height: '24px',
+                  textAlign: 'center',
+                  lineHeight: '24px',
+                  backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                  color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                  borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                }}>ig</span>
+              ) : 'Instagram'}
+            </a>
+          )}
+        </div>
+      ) : null;
+      
+      // Assembler la signature complète en utilisant des tableaux HTML pour la compatibilité avec Gmail
+      return (
+        <table cellPadding={0} cellSpacing={0} border={0} style={{ ...baseStyle, width: '100%', maxWidth: '500px' }}>
+          <tbody>
+            {/* Conteneur principal */}
+            <tr>
+              <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                {/* Images (photo de profil et/ou logo) */}
+                {hasAnyImage && (
+                  <table cellPadding={0} cellSpacing={0} border={0} style={{ width: '100%', marginBottom: `${effectiveVerticalSpacing}px` }}>
+                    <tbody>
+                      <tr>
+                        <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                          {imageLayout === 'horizontal' ? (
+                            // Disposition horizontale des images
+                            <table cellPadding={0} cellSpacing={0} border={0} style={{ display: 'inline-table' }}>
+                              <tbody>
+                                <tr>
+                                  {profilePhotoUrl && (
+                                    <td style={{ paddingRight: '15px' }}>
+                                      <img 
+                                        src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                                        alt="Photo de profil" 
+                                        width={photoSize} 
+                                        height={photoSize} 
+                                        style={{ borderRadius: '50%', display: 'block' }} 
+                                      />
+                                    </td>
+                                  )}
+                                  {logoUrl && displayLogo && (
+                                    <td>
+                                      <img 
+                                        src={getFullLogoUrl(logoUrl)} 
+                                        alt="Logo" 
+                                        style={{ maxWidth: '100px', display: 'block' }} 
+                                      />
+                                    </td>
+                                  )}
+                                </tr>
+                              </tbody>
+                            </table>
+                          ) : (
+                            // Disposition verticale des images
+                            <table cellPadding={0} cellSpacing={0} border={0} style={{ display: 'inline-table' }}>
+                              <tbody>
+                                {profilePhotoUrl && (
+                                  <tr>
+                                    <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right', paddingBottom: '15px' }}>
+                                      <img 
+                                        src={getFullProfilePhotoUrl(profilePhotoUrl)} 
+                                        alt="Photo de profil" 
+                                        width={photoSize} 
+                                        height={photoSize} 
+                                        style={{ borderRadius: '50%', display: 'block', margin: textAlignment === 'center' ? '0 auto' : (textAlignment === 'right' ? '0 0 0 auto' : '0 auto 0 0') }} 
+                                      />
+                                    </td>
+                                  </tr>
+                                )}
+                                {logoUrl && displayLogo && (
+                                  <tr>
+                                    <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                                      <img 
+                                        src={getFullLogoUrl(logoUrl)} 
+                                        alt="Logo" 
+                                        style={{ maxWidth: '100px', display: 'block', margin: textAlignment === 'center' ? '0 auto' : (textAlignment === 'right' ? '0 0 0 auto' : '0 auto 0 0') }} 
+                                      />
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+                
+                {/* Informations personnelles */}
+                <table cellPadding={0} cellSpacing={0} border={0} style={{ width: '100%', marginBottom: `${effectiveVerticalSpacing}px` }}>
+                  <tbody>
+                    <tr>
+                      <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
+                        <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
+                        {companyName && <div>{companyName}</div>}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                {/* Informations de contact */}
+                <table cellPadding={0} cellSpacing={0} border={0} style={{ width: '100%', marginBottom: `${effectiveVerticalSpacing}px` }}>
+                  <tbody>
+                    <tr>
+                      <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                        {email && <div>Email: <a href={`mailto:${email}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }}>{email}</a></div>}
+                        {phone && <div>Tél: {phone}</div>}
+                        {mobilePhone && <div>Mobile: {mobilePhone}</div>}
+                        {website && <div>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
+                        {address && <div>Adresse: {address}</div>}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                {/* Réseaux sociaux en ligne (si position = right) */}
+                {socialLinksInlineContainer && (
+                  <table cellPadding={0} cellSpacing={0} border={0} style={{ width: '100%', marginBottom: `${effectiveVerticalSpacing}px` }}>
+                    <tbody>
+                      <tr>
+                        <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                          {socialLinksInlineContainer}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+                
+                {/* Réseaux sociaux en bas (si position = bottom) */}
+                {socialLinksContainer && (
+                  <table cellPadding={0} cellSpacing={0} border={0} style={{ width: '100%', paddingTop: `${effectiveVerticalSpacing}px` }}>
+                    <tbody>
+                      <tr>
+                        <td align={textAlignment} style={{ textAlign: textAlignment as 'left' | 'center' | 'right' }}>
+                          {socialLinksContainer}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      );  
     }
     
     // Si la disposition est horizontale, on utilise la nouvelle mise en page
@@ -203,17 +475,17 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     const hasAnyImage = hasProfilePhoto || hasLogo;
     
     // Ajuster l'espacement en fonction de la présence d'images
-    const effectiveSpacing = hasAnyImage ? horizontalSpacing : Math.max(5, horizontalSpacing / 2);
+    const effectiveSpacing = hasAnyImage ? effectiveHorizontalSpacing : Math.max(5, effectiveHorizontalSpacing / 2);
     
     return (
       <div style={baseStyle}>
-        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse', width: '100%' }}>
           <tbody>
             <tr>
               {/* Colonne de gauche: photos et informations personnelles */}
               <td style={{ verticalAlign: 'top', width: 'auto', paddingRight: `${effectiveSpacing}px` }}>
                 {/* Photos alignées horizontalement */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: hasAnyImage ? '10px' : '0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: hasAnyImage ? `${effectiveVerticalSpacing}px` : '0' }}>
                   {profilePhotoUrl && (
                     <div style={{ width: `${photoSize}px`, height: `${photoSize}px` }}>
                       <img 
@@ -241,7 +513,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 </div>
                 
                 {/* Nom, poste et entreprise en dessous des photos */}
-                <div>
+                <div style={{ marginBottom: `${effectiveVerticalSpacing}px` }}>
                   <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{fullName || 'Votre Nom'}</div>
                   <div style={{ color: primaryColor || '#0066cc' }}>{jobTitle || 'Votre Poste'}</div>
                   {companyName && <div>{companyName}</div>}
@@ -255,13 +527,91 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 {mobilePhone && <div style={{ marginBottom: '5px' }}>Mobile: {mobilePhone}</div>}
                 {website && <div style={{ marginBottom: '5px' }}>Site web: <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: primaryColor || '#0066cc', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{website}</a></div>}
                 {address && <div style={{ marginBottom: '5px' }}>Adresse: {address}</div>}
+                
+                {/* Réseaux sociaux à droite (uniquement si la position est 'right') */}
+                {socialLinks && Object.values(socialLinks).some(link => link) && socialPosition === 'right' && (
+                  <div style={{ 
+                    marginTop: '10px',
+                    paddingTop: '10px', 
+                    borderTop: `1px solid ${secondaryColor || '#f5f5f5'}`,
+                  }}>
+                    {socialLinks.linkedin && (
+                      <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                        {displayMode === 'icons' ? (
+                          <span style={{
+                            fontWeight: 'bold',
+                            display: 'inline-block',
+                            width: '24px',
+                            height: '24px',
+                            textAlign: 'center',
+                            lineHeight: '24px',
+                            backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                            color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                            borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                          }}>in</span>
+                        ) : 'LinkedIn'}
+                      </a>
+                    )}
+                    {socialLinks.twitter && (
+                      <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                        {displayMode === 'icons' ? (
+                          <span style={{
+                            fontWeight: 'bold',
+                            display: 'inline-block',
+                            width: '24px',
+                            height: '24px',
+                            textAlign: 'center',
+                            lineHeight: '24px',
+                            backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                            color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                            borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                          }}>X</span>
+                        ) : 'X'}
+                      </a>
+                    )}
+                    {socialLinks.facebook && (
+                      <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                        {displayMode === 'icons' ? (
+                          <span style={{
+                            fontWeight: 'bold',
+                            display: 'inline-block',
+                            width: '24px',
+                            height: '24px',
+                            textAlign: 'center',
+                            lineHeight: '24px',
+                            backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                            color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                            borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                          }}>fb</span>
+                        ) : 'Facebook'}
+                      </a>
+                    )}
+                    {socialLinks.instagram && (
+                      <a href={socialLinks.instagram} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">
+                        {displayMode === 'icons' ? (
+                          <span style={{
+                            fontWeight: 'bold',
+                            display: 'inline-block',
+                            width: '24px',
+                            height: '24px',
+                            textAlign: 'center',
+                            lineHeight: '24px',
+                            backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
+                            color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
+                            borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
+                          }}>ig</span>
+                        ) : 'Instagram'}
+                      </a>
+                    )}
+                  </div>
+                )}
               </td>
             </tr>
           </tbody>
         </table>
         
-        {/* Réseaux sociaux en bas */}
-        {socialLinks && Object.values(socialLinks).some(link => link) && (
+        {/* Réseaux sociaux en bas (uniquement si la position est 'bottom') */}
+        {socialLinks && Object.values(socialLinks).some(link => link) && socialPosition === 'bottom' && (
           <div style={{ 
             marginTop: '15px', 
             paddingTop: '10px', 
@@ -298,8 +648,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                     backgroundColor: iconStyle !== 'plain' ? (iconBgColor || primaryColor || '#0066cc') : 'transparent',
                     color: iconStyle !== 'plain' ? (iconColor || 'white') : (iconColor || primaryColor || '#0066cc'),
                     borderRadius: iconStyle === 'circle' ? '50%' : (iconStyle === 'rounded' ? '4px' : '0')
-                  }}>tw</span>
-                ) : 'Twitter'}
+                  }}>X</span>
+                ) : 'X'}
               </a>
             )}
             {socialLinks.facebook && (
@@ -348,7 +698,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     // Si la disposition est verticale, on utilise une table avec deux lignes et une colonne
     return (
       <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#333', borderLeft: `4px solid ${primaryColor || '#0066cc'}`, paddingLeft: '15px' }}>
-        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <table cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse', width: '100%' }}>
           <tbody>
             {signatureLayout === 'horizontal' ? (
               <tr>
@@ -395,7 +745,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                       <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">LinkedIn</a>
                     )}
                     {socialLinks.twitter && (
-                      <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Twitter</a>
+                      <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">X</a>
                     )}
                     {socialLinks.facebook && (
                       <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Facebook</a>
@@ -455,7 +805,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                         <a href={socialLinks.linkedin} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">LinkedIn</a>
                       )}
                       {socialLinks.twitter && (
-                        <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Twitter</a>
+                        <a href={socialLinks.twitter} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">X</a>
                       )}
                       {socialLinks.facebook && (
                         <a href={socialLinks.facebook} style={{ marginRight: '10px', color: primaryColor || '#0066cc' }} target="_blank" rel="noopener noreferrer">Facebook</a>
@@ -553,7 +903,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
               <a href={socialLinks.linkedin} style={{ color: primaryColor || '#0066cc', backgroundColor: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold' }} target="_blank" rel="noopener noreferrer">Li</a>
             )}
             {socialLinks.twitter && (
-              <a href={socialLinks.twitter} style={{ color: primaryColor || '#0066cc', backgroundColor: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold' }} target="_blank" rel="noopener noreferrer">Tw</a>
+              <a href={socialLinks.twitter} style={{ color: primaryColor || '#0066cc', backgroundColor: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold' }} target="_blank" rel="noopener noreferrer">X</a>
             )}
             {socialLinks.facebook && (
               <a href={socialLinks.facebook} style={{ color: primaryColor || '#0066cc', backgroundColor: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold' }} target="_blank" rel="noopener noreferrer">Fb</a>
@@ -631,7 +981,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 <a href={socialLinks.linkedin} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Li</a>
               )}
               {socialLinks.twitter && (
-                <a href={socialLinks.twitter} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Tw</a>
+                <a href={socialLinks.twitter} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">X</a>
               )}
               {socialLinks.facebook && (
                 <a href={socialLinks.facebook} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Fb</a>
@@ -646,10 +996,64 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     );
   };
 
+  // Fonction pour copier la signature dans le presse-papiers
+  const copySignatureToClipboard = () => {
+    if (signatureRef.current) {
+      // Créer un élément temporaire pour contenir le HTML de la signature
+      const tempElem = document.createElement('div');
+      tempElem.innerHTML = signatureRef.current.innerHTML;
+      
+      // Nettoyer le HTML en supprimant les attributs de style React
+      const elementsWithDataReactAttr = tempElem.querySelectorAll('[data-reactroot], [data-react-checksum]');
+      elementsWithDataReactAttr.forEach(el => {
+        el.removeAttribute('data-reactroot');
+        el.removeAttribute('data-react-checksum');
+      });
+      
+      // Créer un blob avec le HTML nettoyé
+      const htmlContent = tempElem.innerHTML;
+      
+      // Utiliser l'API Clipboard pour copier le HTML
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([htmlContent], { type: 'text/html' }),
+        'text/plain': new Blob([htmlContent], { type: 'text/plain' })
+      });
+      
+      navigator.clipboard.write([clipboardItem])
+        .then(() => {
+          // Afficher un message de confirmation
+          setCopySuccess(true);
+          // Masquer le message après 3 secondes
+          setTimeout(() => setCopySuccess(false), 3000);
+        })
+        .catch(err => {
+          console.error('Erreur lors de la copie de la signature :', err);
+          alert('Impossible de copier la signature. Veuillez réessayer.');
+        });
+    }
+  };
+
   return (
     <div className="bg-white overflow-hidden h-full flex flex-col">
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-medium">Aperçu de la signature</h2>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={copySignatureToClipboard}
+            className="flex items-center space-x-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm transition-colors"
+            title="Copier la signature"
+          >
+            <ClipboardDocumentIcon className="h-4 w-4" />
+            <span>Copier la signature</span>
+          </button>
+          
+          {/* Message de confirmation */}
+          {copySuccess && (
+            <span className="text-green-600 text-sm font-medium">
+              Signature copiée !
+            </span>
+          )}
+        </div>
       </div>
       <div className="flex-grow bg-gray-50 p-8 overflow-auto">
         <div className="max-w-2xl mx-auto bg-white p-8 shadow-md rounded-md">
@@ -667,7 +1071,9 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
           <div>
             <h3 className="text-lg font-medium text-gray-700 mb-2">Signature seule</h3>
             <div className="bg-gray-50 p-4 rounded-md">
-              {renderSignatureTemplate()}
+              <div ref={signatureRef}>
+                {renderSignatureTemplate()}
+              </div>
             </div>
           </div>
         </div>

@@ -134,7 +134,10 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
       fontSize: data.fontSize,
       // Ajouter les propriétés liées à la disposition
       layout: data.layout,
-      horizontalSpacing: data.horizontalSpacing
+      horizontalSpacing: data.horizontalSpacing,
+      verticalSpacing: data.verticalSpacing,
+      verticalAlignment: data.verticalAlignment,
+      imagesLayout: data.imagesLayout
     };
 
     if (signature) {

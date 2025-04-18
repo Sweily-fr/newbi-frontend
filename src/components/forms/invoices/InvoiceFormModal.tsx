@@ -19,6 +19,7 @@ import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
 import { GET_QUOTE } from "../../../graphql/quotes";
 import { ConfirmationModal } from "../../feedback/ConfirmationModal";
+import { Notification } from "../../feedback";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,
@@ -26,6 +27,17 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   onSubmit,
   quoteId
 }) => {
+  // Vérifier si la facture est en statut PENDING, dans ce cas empêcher l'édition
+  if (invoice && invoice.status === 'PENDING') {
+    // Utiliser setTimeout pour permettre au composant de se monter avant de fermer
+    setTimeout(() => {
+      Notification.error("Les factures en statut 'À encaisser' ne peuvent pas être modifiées", {
+        position: 'bottom-left',
+        duration: 5000
+      });
+      onClose();
+    }, 100);
+  }
   // État pour la popup de confirmation
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<"close" | "configureInfo" | "configureBankDetails" | null>(null);

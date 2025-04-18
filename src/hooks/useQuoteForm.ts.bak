@@ -502,125 +502,55 @@ export const useQuoteForm = ({
               vatNumber: quote.client.vatNumber || "",
               // Champs spécifiques aux particuliers
               firstName: quote.client.firstName || "",
-              lastName: quote.client.lastName || ""
-            };
-          }
-
-          // Rechercher le client par ID
-          // Vérifier que clientsData et clients existent et que clients est un tableau
-          const clients = clientsData?.clients || [];
-          const selectedClientData = Array.isArray(clients) 
-            ? clients.find((c) => c.id === selectedClient)
-            : undefined;
-          if (!selectedClientData) {
-            console.warn("Client non trouvé", {
-              selectedClient,
-              clients: Array.isArray(clients) ? clients.map((c) => ({
-                id: c.id,
-                name: c.name,
-                type: c.type
-              })) : [],
-            });
-
-            // Si aucun client n'est trouvé mais qu'il y a des clients disponibles, utiliser le premier
-            if (Array.isArray(clients) && clients.length > 0) {
-              return {
-                id: clients[0].id,
-                type: clients[0].type, // Utiliser le type exact du client sans valeur par défaut
-                name: clients[0].name,
-                email: clients[0].email,
-                address: {
-                  street: clients[0].address.street,
-                  city: clients[0].address.city,
-                  postalCode: clients[0].address.postalCode,
-                  country: clients[0].address.country,
-                },
-                // Champs spécifiques aux entreprises
-                siret: clients[0].siret || "",
-                vatNumber: clients[0].vatNumber || "",
-                // Champs spécifiques aux particuliers
-                firstName: clients[0].firstName || "",
-                lastName: clients[0].lastName || ""
-              };
             }
-          }
-          // Vérifier que selectedClientData existe
-          if (!selectedClientData) {
-            console.error("Aucun client sélectionné trouvé et aucun client par défaut disponible");
-            
-            // Vérifier si nous avons des données utilisateur pour pré-remplir les champs
-            const userCompany = userData?.me?.company || {};
-            
-            // Si nous avons des données de l'utilisateur avec firstName et lastName, créer un client de type INDIVIDUAL
-            // sinon créer un client de type COMPANY avec les données de l'entreprise
-            const isIndividual = userData?.me?.firstName && userData?.me?.lastName;
-            
-            if (isIndividual) {
-              // Créer un client de type particulier avec les données de l'utilisateur
-              return {
-                id: "", // ID vide, sera géré côté serveur
-                type: 'INDIVIDUAL',
-                name: `${userData.me.firstName} ${userData.me.lastName}`,
-                email: userData.me.email || "client@example.com", // Email obligatoire
-                address: {
-                  street: userCompany.address?.street || "Adresse non spécifiée",
-                  city: userCompany.address?.city || "Ville non spécifiée",
-                  postalCode: userCompany.address?.postalCode || "00000",
-                  country: userCompany.address?.country || "France",
-                },
-                siret: "", // Pas obligatoire pour un particulier
-                vatNumber: "", // Pas obligatoire pour un particulier
-                firstName: userData.me.firstName || "Prénom",
-                lastName: userData.me.lastName || "Nom"
-              };
-            } else {
-              // Créer un client de type entreprise avec les données de l'entreprise de l'utilisateur
-              return {
-                id: "", // ID vide, sera géré côté serveur
-                type: 'COMPANY',
-                name: userCompany.name || "Entreprise par défaut",
-                email: userCompany.email || "entreprise@example.com", // Email obligatoire
-                address: {
-                  street: userCompany.address?.street || "Adresse non spécifiée",
-                  city: userCompany.address?.city || "Ville non spécifiée",
-                  postalCode: userCompany.address?.postalCode || "00000",
-                  country: userCompany.address?.country || "France",
-                },
-                siret: userCompany.siret || "12345678901234", // SIRET obligatoire pour une entreprise
-                vatNumber: userCompany.vatNumber || "FR12345678901", // TVA obligatoire pour une entreprise
-                firstName: "",
-                lastName: ""
-              };
-            }
-          }
-          
-          // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
-          let clientType = selectedClientData.type || 'COMPANY';
+          : null,
+      },
+      items: items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        vatRate: item.vatRate,
+        unit: item.unit,
+        discount: item.discount,
+        discountType: item.discountType,
+        details: item.details,
+      })),
+      discount,
+      discountType,
+      headerNotes,
+      footerNotes,
+      termsAndConditions,
+      termsAndConditionsLinkTitle,
+      termsAndConditionsLink,
+      customFields: customFields
+        .filter((field) => field.key && field.value)
+        .map(({ key, value }) => ({ key, value })),
+      client: {
+        ...getClientData(),
+        // S'assurer que le type est toujours défini, même pour les clients existants
+        type: getClientData().type || 'COMPANY'
+      },
+    };
           // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
           if (!selectedClientData.type && selectedClientData.firstName && selectedClientData.lastName) {
             clientType = 'INDIVIDUAL';
           }
-          
-          // Si le type est COMPANY, vérifier que nous avons les champs obligatoires
-          const needsSiretAndVat = clientType === 'COMPANY';
-          const siret = selectedClientData.siret || (needsSiretAndVat ? "12345678901234" : "");
-          const vatNumber = selectedClientData.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
           console.log("jojo ", selectedClientData);
           
           return {
             id: selectedClientData.id,
             type: clientType, // Utiliser le type calculé ou par défaut
             name: selectedClientData.name,
-            email: selectedClientData.email || "client@example.com", // Email obligatoire
+            email: selectedClientData.email,
             address: {
-              street: selectedClientData.address?.street || "",
-              city: selectedClientData.address?.city || "",
-              postalCode: selectedClientData.address?.postalCode || "",
-              country: selectedClientData.address?.country || "",
+              street: selectedClientData.address.street,
+              city: selectedClientData.address.city,
+              postalCode: selectedClientData.address.postalCode,
+              country: selectedClientData.address.country,
             },
             // Champs spécifiques aux entreprises
-            siret: siret,
-            vatNumber: vatNumber,
+            siret: selectedClientData.siret || "",
+            vatNumber: selectedClientData.vatNumber || "",
             // Champs spécifiques aux particuliers
             firstName: selectedClientData.firstName || "",
             lastName: selectedClientData.lastName || ""

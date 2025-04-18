@@ -336,7 +336,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
           )}
         </div>
       </div>
-      {invoice.status !== 'COMPLETED' && (
+      {invoice.status === 'DRAFT' && (
         <Button
           variant="outline"
           onClick={onEdit}

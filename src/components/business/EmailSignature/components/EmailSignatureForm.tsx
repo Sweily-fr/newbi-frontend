@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, TextField, TextArea, ImageUploader } from '../../../ui';
 import Collapse from '../../../ui/Collapse';
 import { EmailSignature } from './EmailSignaturesTable';
@@ -60,6 +60,15 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   // Espacement entre les parties gauche et droite en disposition horizontale (en pixels)
   const [horizontalSpacing, setHorizontalSpacing] = useState(initialData?.horizontalSpacing || 20); // Valeur par défaut: 20px
   
+  // Espacement vertical en disposition horizontale (en pixels)
+  const [verticalSpacing, setVerticalSpacing] = useState(initialData?.verticalSpacing || 10); // Valeur par défaut: 10px
+  
+  // Alignement du texte en disposition verticale (gauche, centre, droite)
+  const [verticalAlignment, setVerticalAlignment] = useState(initialData?.verticalAlignment || 'left'); // Valeur par défaut: gauche
+  
+  // Disposition des images (photo de profil et logo) en mode vertical (horizontale ou verticale)
+  const [imagesLayout, setImagesLayout] = useState(initialData?.imagesLayout || 'vertical'); // Valeur par défaut: verticale
+  
   // Police de caractères pour la signature
   const [fontFamily, setFontFamily] = useState(initialData?.fontFamily || 'Arial, sans-serif'); // Valeur par défaut: Arial
   
@@ -68,6 +77,9 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   
   // Mode d'affichage des réseaux sociaux (icons ou text)
   const [socialLinksDisplayMode, setSocialLinksDisplayMode] = useState(initialData?.socialLinksDisplayMode || 'text'); // Valeurs possibles: 'icons' ou 'text'
+  
+  // Position des réseaux sociaux (bottom ou right)
+  const [socialLinksPosition, setSocialLinksPosition] = useState(initialData?.socialLinksPosition || 'bottom'); // Valeurs possibles: 'bottom' ou 'right'
   
   // Style des icônes des réseaux sociaux (plain, rounded ou circle)
   const [socialLinksIconStyle, setSocialLinksIconStyle] = useState(initialData?.socialLinksIconStyle || 'plain'); // Valeurs possibles: 'plain', 'rounded' ou 'circle'
@@ -167,7 +179,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
 
   // Fonction pour mettre à jour les données en direct
   // Accepte un objet de valeurs à jour en option pour contourner l'asynchronicité de setState
-  const handleFormChange = (updatedValues?: Partial<EmailSignature>) => {
+  const handleFormChange = useCallback((changes: Partial<EmailSignature> = {}) => {
     if (onChange) {
       // Créer l'objet de base avec les valeurs actuelles
       const formData: Partial<EmailSignature> = {
@@ -194,17 +206,21 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         profilePhotoSize,
         layout,
         horizontalSpacing,
+        verticalSpacing,
+        verticalAlignment,
+        imagesLayout,
         fontFamily,
         fontSize,
         socialLinksDisplayMode,
         socialLinksIconStyle,
         socialLinksIconBgColor,
-        socialLinksIconColor
+        socialLinksIconColor,
+        socialLinksPosition
       };
       
       // Fusionner avec les valeurs mises à jour si elles sont fournies
-      if (updatedValues) {
-        Object.assign(formData, updatedValues);
+      if (changes) {
+        Object.assign(formData, changes);
       }
 
       // Pour la prévisualisation de la photo de profil
@@ -216,7 +232,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
 
       onChange(formData);
     }
-  };
+  }, [name, fullName, jobTitle, email, phone, mobilePhone, website, companyName, address, template, primaryColor, secondaryColor, socialLinks, logoUrl, showLogo, isDefault, layout, horizontalSpacing, verticalSpacing, verticalAlignment, imagesLayout, profilePhotoUrl, previewProfilePhoto, profilePhotoSize, fontFamily, fontSize, socialLinksDisplayMode, socialLinksIconStyle, socialLinksIconBgColor, socialLinksIconColor, socialLinksPosition, onChange, id, profilePhotoBase64, profilePhotoToDelete]);
 
   // Fonction de soumission du formulaire
   const handleSubmit = (e: React.FormEvent) => {
@@ -254,20 +270,24 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
       profilePhotoSize,
       layout,
       horizontalSpacing,
+      verticalSpacing,
+      verticalAlignment,
+      imagesLayout,
       fontFamily,
       fontSize,
       socialLinksDisplayMode,
       socialLinksIconStyle,
       socialLinksIconBgColor,
-      socialLinksIconColor
+      socialLinksIconColor,
+      socialLinksPosition,
     };
-
+    
     console.log('Soumission du formulaire avec les données:', signatureData);
     
     // Appel de la fonction de soumission passée en props
     onSubmit(signatureData as EmailSignature);
   };
-
+  
   // Fonction de validation du formulaire
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
@@ -311,6 +331,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
     profilePhotoUrl,
     previewProfilePhoto,
     profilePhotoSize,
+    handleFormChange,
     // Ajouter les dépendances pour les réseaux sociaux
     socialLinksDisplayMode,
     socialLinksIconStyle,
@@ -583,8 +604,8 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
               <TextField
                 id="twitter"
                 name="twitter"
-                label="Twitter"
-                placeholder="Ex: https://twitter.com/jeandupont"
+                label="X (anciennement Twitter)"
+                placeholder="Ex: https://x.com/jeandupont"
                 value={socialLinks.twitter}
                 onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
                 error={errors.socialLinks?.twitter}
@@ -627,7 +648,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                     />
                     <label htmlFor="socialLinksText" className="ml-2 block text-sm text-gray-700">
-                      Noms (LinkedIn, Twitter, etc.)
+                      Noms (LinkedIn, X, etc.)
                     </label>
                   </div>
                   <div className="flex items-center">
@@ -663,7 +684,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                     >
                       <div className="flex space-x-2 mb-2">
                         <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>in</span>
-                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>tw</span>
+                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>X</span>
                       </div>
                       <div className="text-xs text-gray-500">Sans fond</div>
                     </div>
@@ -690,7 +711,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             backgroundColor: socialLinksIconBgColor,
                             color: socialLinksIconColor
                           }}
-                        >tw</span>
+                        >X</span>
                       </div>
                       <div className="text-xs text-gray-500">Carré arrondi</div>
                     </div>
@@ -717,7 +738,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             backgroundColor: socialLinksIconBgColor,
                             color: socialLinksIconColor
                           }}
-                        >tw</span>
+                        >X</span>
                       </div>
                       <div className="text-xs text-gray-500">Rond</div>
                     </div>
@@ -874,6 +895,208 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   </div>
                 </div>
               )}
+              
+              {/* Options spécifiques à la disposition verticale */}
+              {layout === 'vertical' && (
+                <>
+                  {/* Alignement du texte */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Alignement du texte
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="alignLeft"
+                          name="verticalAlignment"
+                          value="left"
+                          checked={verticalAlignment === 'left'}
+                          onChange={() => {
+                            setVerticalAlignment('left');
+                            handleFormChange({ verticalAlignment: 'left' });
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <label htmlFor="alignLeft" className="ml-2 block text-sm text-gray-700">
+                          Gauche
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="alignCenter"
+                          name="verticalAlignment"
+                          value="center"
+                          checked={verticalAlignment === 'center'}
+                          onChange={() => {
+                            setVerticalAlignment('center');
+                            handleFormChange({ verticalAlignment: 'center' });
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <label htmlFor="alignCenter" className="ml-2 block text-sm text-gray-700">
+                          Centre
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="alignRight"
+                          name="verticalAlignment"
+                          value="right"
+                          checked={verticalAlignment === 'right'}
+                          onChange={() => {
+                            setVerticalAlignment('right');
+                            handleFormChange({ verticalAlignment: 'right' });
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <label htmlFor="alignRight" className="ml-2 block text-sm text-gray-700">
+                          Droite
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Disposition des images */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Disposition des images
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="imagesVertical"
+                          name="imagesLayout"
+                          value="vertical"
+                          checked={imagesLayout === 'vertical'}
+                          onChange={() => {
+                            setImagesLayout('vertical');
+                            handleFormChange({ imagesLayout: 'vertical' });
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <label htmlFor="imagesVertical" className="ml-2 block text-sm text-gray-700">
+                          Verticale
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="imagesHorizontal"
+                          name="imagesLayout"
+                          value="horizontal"
+                          checked={imagesLayout === 'horizontal'}
+                          onChange={() => {
+                            setImagesLayout('horizontal');
+                            handleFormChange({ imagesLayout: 'horizontal' });
+                          }}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        />
+                        <label htmlFor="imagesHorizontal" className="ml-2 block text-sm text-gray-700">
+                          Horizontale
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Espacement vertical */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Espacement vertical ({verticalSpacing}px)
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="40"
+                        step="5"
+                        value={verticalSpacing}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setVerticalSpacing(value);
+                          handleFormChange({ verticalSpacing: value });
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <div className="flex space-x-2 items-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newValue = Math.max(0, verticalSpacing - 5);
+                            setVerticalSpacing(newValue);
+                            handleFormChange({ verticalSpacing: newValue });
+                          }}
+                          className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newValue = Math.min(40, verticalSpacing + 5);
+                            setVerticalSpacing(newValue);
+                            handleFormChange({ verticalSpacing: newValue });
+                          }}
+                          className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Contrôle de l'espacement horizontal (visible uniquement si la disposition est horizontale) */}
+              {layout === 'horizontal' && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Espacement vertical ({verticalSpacing}px)
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="40"
+                      step="5"
+                      value={verticalSpacing}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        setVerticalSpacing(value);
+                        handleFormChange({ verticalSpacing: value });
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex space-x-2 items-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newValue = Math.max(0, verticalSpacing - 5);
+                          setVerticalSpacing(newValue);
+                          handleFormChange({ verticalSpacing: newValue });
+                        }}
+                        className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                      >
+                        -
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newValue = Math.min(40, verticalSpacing + 5);
+                          setVerticalSpacing(newValue);
+                          handleFormChange({ verticalSpacing: newValue });
+                        }}
+                        className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Sélecteur de police */}
               <div className="mb-4">
@@ -998,6 +1221,26 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   />
                 </div>
               </div>
+              
+              {/* Position des réseaux sociaux (visible uniquement si la disposition est horizontale) */}
+              {layout === 'horizontal' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Position des réseaux sociaux</label>
+                  <div className="flex items-center space-x-2">
+                    <select
+                      value={socialLinksPosition}
+                      onChange={(e) => {
+                        setSocialLinksPosition(e.target.value as 'bottom' | 'right');
+                        handleFormChange({ socialLinksPosition: e.target.value as 'bottom' | 'right' });
+                      }}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
+                    >
+                      <option value="bottom">En bas de la signature</option>
+                      <option value="right">À droite avec les informations de contact</option>
+                    </select>
+                  </div>
+                </div>
+              )}
             </div>
           </Collapse>
         </form>

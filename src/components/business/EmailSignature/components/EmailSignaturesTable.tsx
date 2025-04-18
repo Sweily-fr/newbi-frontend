@@ -38,8 +38,12 @@ export interface EmailSignature {
   socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
   socialLinksIconBgColor?: string;
   socialLinksIconColor?: string;
+  socialLinksPosition?: 'bottom' | 'right';
   layout?: 'horizontal' | 'vertical';
   horizontalSpacing?: number;
+  verticalSpacing?: number;
+  verticalAlignment?: 'left' | 'center' | 'right';
+  imagesLayout?: 'horizontal' | 'vertical';
   fontFamily?: string;
   fontSize?: number;
   isDefault: boolean;

@@ -174,8 +174,16 @@ export const InvoicesPage = () => {
           isOpen={isSidebarOpen && selectedInvoice !== null}
           onClose={() => setIsSidebarOpen(false)}
           onEdit={() => {
-            setIsEditModalOpen(true);
-            setIsSidebarOpen(false);
+            // Vérifier que la facture n'est pas en statut PENDING avant d'autoriser l'édition
+            if (selectedInvoice && selectedInvoice.status !== 'PENDING') {
+              setIsEditModalOpen(true);
+              setIsSidebarOpen(false);
+            } else {
+              Notification.error("Les factures en statut 'À encaisser' ne peuvent pas être modifiées", {
+                position: 'bottom-left',
+                duration: 5000
+              });
+            }
           }}
           onDelete={() => {
             handleDeleteInvoice(selectedInvoice.id);
