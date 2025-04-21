@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond violet -->
+  <rect width="1200" height="630" fill="#5b50ff"/>
+  
+  <!-- Emplacement pour le logo (sera remplacé par une image) -->
+  <foreignObject x="200" y="115" width="800" height="400">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+      <img src="/images/logo_newbi/PNG/Logo_Texte_White.png" style="max-width: 100%; max-height: 100%;" />
+    </div>
+  </foreignObject>
+</svg>

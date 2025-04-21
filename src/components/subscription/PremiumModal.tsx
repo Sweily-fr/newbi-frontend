@@ -8,9 +8,10 @@ import {
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubscribe?: () => void;
 }
 
-export const PremiumModal = ({ isOpen, onClose }: PremiumModalProps) => {
+export const PremiumModal = ({ isOpen, onClose, onSubscribe }: PremiumModalProps) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -51,6 +52,18 @@ export const PremiumModal = ({ isOpen, onClose }: PremiumModalProps) => {
           
           {/* Tableau de prix Stripe */}
           <div className="md:w-2/3 border border-gray-200 rounded-lg p-6 bg-gray-900">
+            {/* Bouton pour s'abonner directement */}
+            {onSubscribe && (
+              <button
+                onClick={onSubscribe}
+                className="mb-4 w-full py-2 px-4 bg-[#5b50ff] hover:bg-[#4a41cc] text-white font-medium rounded-md shadow-sm transition-colors duration-200"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <CreditCardIcon className="h-5 w-5" />
+                  Souscrire maintenant
+                </div>
+              </button>
+            )}
             <script
               async
               src="https://js.stripe.com/v3/pricing-table.js"

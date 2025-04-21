@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonLink } from "../components/ui/ButtonLink";
@@ -43,7 +44,69 @@ export const HomePage = () => {
   const [billingPeriod, setBillingPeriod] = useState("annual");
 
   return (
-    <div className="bg-white">
+    <>
+      <Helmet>
+        <title>Facturation, Devis & Outils Pros | Newbi</title>
+        <meta name="description" content="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français. Essai gratuit, sans engagement." />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://newbi.fr/" />
+        <meta property="og:title" content="Facturation, Devis & Outils Pros | Newbi" />
+        <meta property="og:description" content="Gérez vos factures, devis et clients facilement. Outils pros, sécurité RGPD, support français, essai gratuit !" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://newbi.fr/" />
+        <meta property="og:image" content="https://newbi.fr/logo-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Facturation, Devis & Outils Pros | Newbi" />
+        <meta name="twitter:description" content="Gérez vos factures, devis et clients facilement. Outils pros, sécurité RGPD, support français, essai gratuit !" />
+        <meta name="twitter:image" content="https://newbi.fr/logo-og.png" />
+        {/* Données structurées Organization */}
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Newbi",
+            "url": "https://newbi.fr/",
+            "logo": "https://newbi.fr/logo-og.png",
+            "contactPoint": [{
+              "@type": "ContactPoint",
+              "telephone": "+33-1-23-45-67-89",
+              "contactType": "customer support",
+              "areaServed": "FR",
+              "availableLanguage": ["French"]
+            }],
+            "sameAs": [
+              "https://www.linkedin.com/company/generation-business/"
+            ]
+          }
+        `}</script>
+        {/* Données structurées FAQ */}
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Comment créer une facture avec Newbi ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Créez un compte gratuit, accédez à l'outil de facturation, remplissez les informations requises et générez votre facture en PDF ou envoyez-la par email en 1 clic."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Est-ce conforme aux obligations légales françaises ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui, notre solution respecte la réglementation française (mentions obligatoires, numérotation, archivage, sécurité RGPD, etc.)."
+                }
+              }
+            ]
+          }
+        `}</script>
+      </Helmet>
+      <div className="bg-white" role="main">
+
       {/* Grid background with 6 columns - Fixed to viewport */}
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -591,17 +654,17 @@ export const HomePage = () => {
                         <p className="font-bold text-gray-900">Jean Dupont</p>
                         <p className="text-gray-700">Directeur Commercial</p>
                         <p className="text-gray-700 text-xs mt-1">
-                          Generation Business
+                          Newbi
                         </p>
                         <div className="mt-2 pt-2 border-t border-gray-200">
                           <p className="text-xs text-gray-600">
                             +33 6 12 34 56 78
                           </p>
                           <p className="text-xs text-indigo-600">
-                            jean.dupont@generation-business.com
+                            jean.dupont@newbi.fr
                           </p>
                           <p className="text-xs text-gray-600">
-                            www.generation-business.com
+                            www.newbi.fr
                           </p>
                         </div>
                       </div>
@@ -643,7 +706,7 @@ export const HomePage = () => {
                 <br className="hidden md:block" /> à votre entreprise
               </h3>
               <p className="mt-6 max-w-3xl text-lg md:text-xl text-gray-500 leading-relaxed">
-                Chez Generation Business, nous simplifions la gestion de votre
+                Chez Newbi, nous simplifions la gestion de votre
                 entreprise en vous permettant de créer rapidement des
                 expériences de facturation exceptionnelles, d'améliorer vos
                 performances et de vous développer sur de nouveaux marchés
@@ -786,16 +849,16 @@ export const HomePage = () => {
                         Offre
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold">1ER MOIS GRATUIT</h3>
+                    <h3 className="text-xl font-bold">TOUT à 1€.</h3>
                   </div>
                   <h2 className="text-2xl font-bold mb-4">
-                    Profitez dès maintenant d'un mois d'essai gratuit pour
+                    Profitez dès maintenant de 6 mois à 1€/mois pour
                     explorer nos solutions innovantes. Inscrivez-vous avant le
-                    01 septembre 2025 pour bénéficier de cette offre exclusive.
+                    31 Août 2025 pour bénéficier de cette offre exclusive.
                   </h2>
                   <p className="text-white/80 mb-6">
-                    Optimisation des factures, des devis et signatures
-                    professionnelles pour une image de marque cohérente.
+                    Optimisation des factures, des devis et signatures email
+                    professionnelles pour une image de marque cohérente et bien plus encore.
                   </p>
                   <a
                     href="/auth"
@@ -1022,10 +1085,10 @@ export const HomePage = () => {
                   </h2>
 
                   <p className="text-center text-gray-700 mb-6 max-w-2xl mx-auto">
-                    Inscrivez-vous gratuitement à Generation Business avant de
+                    Inscrivez-vous gratuitement à Newbi avant de
                     prendre un plan payant.
                     <span className="font-medium text-[#5b50ff]">
-                      1 mois d'essai offert
+                      14 jours d'essais offerts
                     </span>{" "}
                     et possibilité de résilier à tout moment sans condition.
                   </p>
@@ -1053,7 +1116,7 @@ export const HomePage = () => {
                       >
                         Annuel
                         <span className="absolute -top-2 -right-2 bg-[#5b50ff] text-white text-xs px-1.5 py-0.5 rounded-full">
-                          -20%
+                          -10% 
                         </span>
                       </button>
                     </div>
@@ -1066,40 +1129,66 @@ export const HomePage = () => {
                         Premium
                       </h3>
                       <p className="text-gray-600 mb-6 h-24">
-                        Accédez à tous les outils de Generation Business avec
+                        Accédez à tous les outils de Newbi avec
                         une tarification simple et transparente. Sans frais
                         cachés.
                       </p>
 
-                      {billingPeriod === "monthly" ? (
-                        <div className="flex items-baseline mb-2">
-                          <span className="text-4xl font-extrabold text-gray-900">
-                            14,99€
-                          </span>
-                          <span className="text-gray-500 ml-2">/mois</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-baseline mb-2">
-                          <span className="text-4xl font-extrabold text-gray-900">
-                            11,99€
-                          </span>
-                          <span className="text-gray-500 ml-2">/mois</span>
-                          <span className="text-gray-500 ml-2">
-                            (143,90€/an)
-                          </span>
-                        </div>
-                      )}
+                      {(() => {
+                        const monthlyPrice = 14.99;
+                        const discountRate = 0.10;
+                        const discountedMonthly = monthlyPrice * (1 - discountRate);
+                        const monthsInYear = 12;
+                        const annualTotal = discountedMonthly * monthsInYear;
+                        const monthlyTotal = monthlyPrice * monthsInYear;
+                        const savings = monthlyTotal - annualTotal;
+                        if (billingPeriod === "monthly") {
+                          return (
+                            <div className="flex items-baseline mb-2">
+                              <span className="text-4xl font-extrabold text-gray-900">
+                                {monthlyPrice.toFixed(2).replace('.', ',')}€
+                              </span>
+                              <span className="text-gray-500 ml-2">/mois</span>
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="flex items-baseline mb-2">
+                              <span className="text-4xl font-extrabold text-gray-900">
+                                {discountedMonthly.toFixed(2).replace('.', ',')}€
+                              </span>
+                              <span className="text-gray-500 ml-2">/mois</span>
+                              <span className="text-gray-500 ml-2">
+                                ({annualTotal.toFixed(2).replace('.', ',')}€/an)
+                              </span>
+                            </div>
+                          );
+                        }
+                      })()}
 
-                      {billingPeriod === "monthly" ? (
-                        <div className="text-sm text-gray-500 mb-6">
-                          Passez à l'annuel et économisez 20%
-                        </div>
-                      ) : (
-                        <div className="text-sm text-green-500 mb-6">
-                          <span className="line-through mr-1">179,88€</span>
-                          Économisez 35,98€ par an
-                        </div>
-                      )}
+                      {(() => {
+                        const monthlyPrice = 14.99;
+                        const discountRate = 0.10;
+                        const discountedMonthly = monthlyPrice * (1 - discountRate);
+                        const monthsInYear = 12;
+                        const annualTotal = discountedMonthly * monthsInYear;
+                        const monthlyTotal = monthlyPrice * monthsInYear;
+                        const savings = monthlyTotal - annualTotal;
+                        if (billingPeriod === "monthly") {
+                          return (
+                            <div className="text-sm text-gray-500 mb-6">
+                              Passez à l'annuel et économisez 10%
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="text-sm text-green-500 mb-6">
+                              <span className="line-through mr-1">{monthlyPrice.toFixed(2).replace('.', ',')}€</span>
+                              Économisez {savings.toFixed(2).replace('.', ',')}€ par an
+                            </div>
+                          );
+                        }
+                      })()}
 
                       <ul className="space-y-3 mb-8">
                         <li className="flex items-start">
@@ -1202,7 +1291,7 @@ export const HomePage = () => {
                             </svg>
                           </div>
                           <span className="ml-3 text-[#5b50ff] font-medium">
-                            1 mois d'essai gratuit
+                            14 jours d'essais gratuits
                           </span>
                         </li>
                         {/* Mise en avant du sans engagement */}
@@ -1499,5 +1588,6 @@ export const HomePage = () => {
         </div>
       </div>
     </div>
+  </>
   );
 };

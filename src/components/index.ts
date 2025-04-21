@@ -7,6 +7,7 @@ export * from './ui/FieldGroup';
 export * from './ui/Select';
 export * from './ui/Checkbox';
 export * from './ui/TextArea';
+export * from './ui/CommunityButton';
 // export * from './ui/Input';
 
 // Export des composants de mise en page
@@ -14,6 +15,7 @@ export * from './ui/TextArea';
 export * from './layout/MainLayout';
 export * from './layout/Footer';
 export * from './layout/Navbar';
+export * from './layout/ToolLayout';
 
 // Export des composants de formulaires
 // export * from './forms/FormField';

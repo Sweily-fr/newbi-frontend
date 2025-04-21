@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, TextField, TextArea, ImageUploader } from '../../../ui';
+import { Button, TextField, TextArea, ImageUploader, Checkbox } from '../../../ui';
 import Collapse from '../../../ui/Collapse';
 import { EmailSignature } from './EmailSignaturesTable';
-import { EMAIL_PATTERN } from '../../../../constants/formValidations';
+import { EMAIL_PATTERN, NAME_REGEX } from '../../../../constants/formValidations';
 import { useCompany } from '../../../../hooks/useCompany';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { Notification } from '../../../feedback/Notification';
@@ -90,8 +90,13 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   // Couleur des icônes des réseaux sociaux
   const [socialLinksIconColor, setSocialLinksIconColor] = useState(initialData?.socialLinksIconColor || (socialLinksIconStyle === 'plain' ? primaryColor : '#FFFFFF'));
   
-  // États pour les erreurs de validation
+  // Taille des icônes des réseaux sociaux
+  const [socialLinksIconSize, setSocialLinksIconSize] = useState(initialData?.socialLinksIconSize || 24); // Valeur par défaut: 24px
+  
+  // États pour les erreurs de validation et l'état de soumission
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Récupérer les informations de l'entreprise
   const { company, loading: companyLoading } = useCompany();
@@ -179,7 +184,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
 
   // Fonction pour mettre à jour les données en direct
   // Accepte un objet de valeurs à jour en option pour contourner l'asynchronicité de setState
-  const handleFormChange = useCallback((changes: Partial<EmailSignature> = {}) => {
+  const handleFormChange = useCallback((changes: Partial<EmailSignature>) => {
     if (onChange) {
       // Créer l'objet de base avec les valeurs actuelles
       const formData: Partial<EmailSignature> = {
@@ -197,7 +202,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         primaryColor,
         secondaryColor,
         socialLinks,
-        logoUrl,
+        logoUrl, // Envoyer uniquement le chemin relatif du logo, sans l'URL de base
         showLogo,
         isDefault,
         profilePhotoUrl,
@@ -215,7 +220,8 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         socialLinksIconStyle,
         socialLinksIconBgColor,
         socialLinksIconColor,
-        socialLinksPosition
+        socialLinksIconSize,
+        socialLinksPosition,
       };
       
       // Fusionner avec les valeurs mises à jour si elles sont fournies
@@ -232,60 +238,214 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
 
       onChange(formData);
     }
-  }, [name, fullName, jobTitle, email, phone, mobilePhone, website, companyName, address, template, primaryColor, secondaryColor, socialLinks, logoUrl, showLogo, isDefault, layout, horizontalSpacing, verticalSpacing, verticalAlignment, imagesLayout, profilePhotoUrl, previewProfilePhoto, profilePhotoSize, fontFamily, fontSize, socialLinksDisplayMode, socialLinksIconStyle, socialLinksIconBgColor, socialLinksIconColor, socialLinksPosition, onChange, id, profilePhotoBase64, profilePhotoToDelete]);
+    
+    // Validation en temps réel pour certains champs
+    if (changes && typeof changes === 'object') {
+      // Validation de l'email
+      if ('email' in changes && changes.email !== undefined) {
+        if (!changes.email) {
+          setErrors(prev => ({ ...prev, email: 'L\'email est requis' }));
+        } else if (!EMAIL_PATTERN.test(changes.email)) {
+          setErrors(prev => ({ ...prev, email: 'Format d\'email invalide' }));
+        } else {
+          setErrors(prev => ({ ...prev, email: '' }));
+        }
+      }
+      
+      // Validation du site web
+      if ('website' in changes && changes.website !== undefined) {
+        const websitePattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+        if (changes.website && !websitePattern.test(changes.website)) {
+          setErrors(prev => ({ ...prev, website: 'Format d\'URL invalide' }));
+        } else {
+          setErrors(prev => ({ ...prev, website: '' }));
+        }
+      }
+      
+      // Validation du téléphone fixe
+      if ('phone' in changes && changes.phone !== undefined) {
+        const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
+        if (changes.phone && !phonePattern.test(changes.phone)) {
+          setErrors(prev => ({ ...prev, phone: 'Format de numéro de téléphone invalide' }));
+        } else {
+          setErrors(prev => ({ ...prev, phone: '' }));
+        }
+      }
+      
+      // Validation du téléphone mobile
+      if ('mobilePhone' in changes && changes.mobilePhone !== undefined) {
+        const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
+        if (changes.mobilePhone && !phonePattern.test(changes.mobilePhone)) {
+          setErrors(prev => ({ ...prev, mobilePhone: 'Format de numéro de mobile invalide' }));
+        } else {
+          setErrors(prev => ({ ...prev, mobilePhone: '' }));
+        }
+      }
+    }
+  }, [id, name, fullName, jobTitle, email, phone, mobilePhone, website, address, companyName, socialLinks, template, primaryColor, secondaryColor, logoUrl, showLogo, isDefault, previewProfilePhoto, profilePhotoUrl, profilePhotoSize, layout, horizontalSpacing, verticalSpacing, verticalAlignment, imagesLayout, socialLinksDisplayMode, socialLinksIconStyle, socialLinksIconBgColor, socialLinksIconColor, socialLinksIconSize, socialLinksPosition, onChange]);
 
   // Fonction de soumission du formulaire
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Réinitialiser les erreurs précédentes
+    setSubmitError(null);
     
     // Validation du formulaire
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      
+      // Faire défiler jusqu'à la première erreur
+      const firstErrorField = document.querySelector('[aria-invalid="true"]');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // Afficher une notification d'erreur
+      Notification.error('Veuillez corriger les erreurs dans le formulaire', {
+        duration: 5000,
+        position: 'bottom-left'
+      });
+      
       return;
     }
     
-    // Préparation des données à envoyer
-    const signatureData: Partial<EmailSignature> = {
-      id: id || undefined,
-      name,
-      fullName,
-      jobTitle,
-      email,
-      phone,
-      mobilePhone,
-      website,
-      companyName,
-      address,
-      template,
-      primaryColor,
-      secondaryColor,
-      socialLinks,
-      logoUrl, // Envoyer uniquement le chemin relatif du logo, sans l'URL de base
-      showLogo,
-      isDefault,
-      profilePhotoUrl,
-      profilePhotoBase64,
-      profilePhotoToDelete,
-      profilePhotoSize,
-      layout,
-      horizontalSpacing,
-      verticalSpacing,
-      verticalAlignment,
-      imagesLayout,
-      fontFamily,
-      fontSize,
-      socialLinksDisplayMode,
-      socialLinksIconStyle,
-      socialLinksIconBgColor,
-      socialLinksIconColor,
-      socialLinksPosition,
-    };
+    // Indiquer que la soumission est en cours
+    setIsSubmitting(true);
     
-    console.log('Soumission du formulaire avec les données:', signatureData);
-    
-    // Appel de la fonction de soumission passée en props
-    onSubmit(signatureData as EmailSignature);
+    try {
+      // Préparation des données à envoyer
+      const signatureData: Partial<EmailSignature> = {
+        id: id || undefined,
+        name,
+        fullName,
+        jobTitle,
+        email,
+        phone,
+        mobilePhone,
+        website,
+        companyName,
+        address,
+        template,
+        primaryColor,
+        secondaryColor,
+        socialLinks,
+        logoUrl, // Envoyer uniquement le chemin relatif du logo, sans l'URL de base
+        showLogo,
+        isDefault,
+        profilePhotoUrl,
+        profilePhotoBase64,
+        profilePhotoToDelete,
+        profilePhotoSize,
+        layout,
+        horizontalSpacing,
+        verticalSpacing,
+        verticalAlignment,
+        imagesLayout,
+        fontFamily,
+        fontSize,
+        socialLinksDisplayMode,
+        socialLinksIconStyle,
+        socialLinksIconBgColor,
+        socialLinksIconColor,
+        socialLinksIconSize,
+        socialLinksPosition,
+      };
+      
+      console.log('Soumission du formulaire avec les données:', signatureData);
+      
+      // Appel de la fonction de soumission passée en props
+      await onSubmit(signatureData as EmailSignature);
+      
+      // Afficher une notification de succès seulement si aucune erreur n'est détectée
+      // et si la soumission a réussi
+      if (Object.keys(errors).length === 0) {
+        Notification.success('Signature email enregistrée avec succès', {
+          duration: 3000,
+          position: 'bottom-left'
+        });
+      }
+    } catch (error) {
+      // Gérer les erreurs de soumission
+      console.error('Erreur lors de la soumission du formulaire:', error);
+      
+      // Définir le type d'erreur GraphQL
+      interface GraphQLError {
+        message: string;
+        extensions?: {
+          code?: string;
+          details?: Record<string, string>;
+        };
+      }
+      
+      interface ApolloError extends Error {
+        graphQLErrors?: GraphQLError[];
+      }
+      
+      // Vérifier si c'est une erreur GraphQL avec des erreurs de validation
+      const apolloError = error as ApolloError;
+      if (apolloError.graphQLErrors && apolloError.graphQLErrors.length > 0) {
+        const graphQLError = apolloError.graphQLErrors[0];
+        
+        // Vérifier si c'est une erreur de validation avec des détails
+        if (graphQLError.extensions?.code === 'VALIDATION_ERROR' && graphQLError.extensions?.details) {
+          const validationErrors = graphQLError.extensions.details;
+          console.log('Erreurs de validation brutes:', validationErrors);
+          
+          // Mappage des noms de champs entre le backend et le frontend
+          const mappedErrors: Record<string, string> = {};
+          
+          // Parcourir toutes les erreurs retournées par le backend
+          Object.entries(validationErrors).forEach(([key, value]) => {
+            // Mapper les noms de champs si nécessaire
+            if (key === 'name') mappedErrors.name = value as string;
+            else if (key === 'fullName') mappedErrors.fullName = value as string;
+            else if (key === 'jobTitle') mappedErrors.jobTitle = value as string;
+            else if (key === 'email') mappedErrors.email = value as string;
+            else if (key === 'phone') mappedErrors.phone = value as string;
+            else if (key === 'mobilePhone') mappedErrors.mobilePhone = value as string;
+            else if (key === 'website') mappedErrors.website = value as string;
+            else if (key.startsWith('socialLinks.')) mappedErrors[key] = value as string;
+            else mappedErrors[key] = value as string; // Conserver les autres erreurs telles quelles
+          });
+          
+          console.log('Erreurs de validation mappées:', mappedErrors);
+          
+          // Mettre à jour l'état des erreurs avec les erreurs de validation mappées
+          setErrors(prev => ({
+            ...prev,
+            ...mappedErrors
+          }));
+          
+          // Faire défiler jusqu'à la première erreur
+          setTimeout(() => {
+            const firstErrorField = document.querySelector('[aria-invalid="true"]');
+            if (firstErrorField) {
+              firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          
+          // Message d'erreur général
+          setSubmitError('Veuillez corriger les erreurs dans le formulaire');
+        } else {
+          // Erreur GraphQL générale
+          setSubmitError(graphQLError.message || 'Une erreur est survenue lors de l\'enregistrement de la signature');
+        }
+      } else {
+        // Erreur non-GraphQL
+        setSubmitError(error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'enregistrement de la signature');
+      }
+      
+      // Afficher une notification d'erreur
+      Notification.error('Échec de l\'enregistrement de la signature', {
+        duration: 5000,
+        position: 'bottom-left'
+      });
+    } finally {
+      // Réinitialiser l'état de soumission
+      setIsSubmitting(false);
+    }
   };
   
   // Fonction de validation du formulaire
@@ -293,18 +453,70 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
     const newErrors: Record<string, string> = {};
     
     // Validation des champs obligatoires
-    if (!name) newErrors.name = 'Le nom de la signature est requis';
-    if (!fullName) newErrors.fullName = 'Le nom complet est requis';
+    if (!name) {
+      newErrors.name = 'Le nom de la signature est requis';
+    } else if (!NAME_REGEX.test(name)) {
+      newErrors.name = 'Le nom contient des caractères non autorisés (<, > non autorisés)';
+    }
+    
+    if (!fullName) {
+      newErrors.fullName = 'Le nom complet est requis';
+    } else if (!NAME_REGEX.test(fullName)) {
+      newErrors.fullName = 'Le nom complet contient des caractères non autorisés (<, > non autorisés)';
+    }
+    
+    if (jobTitle && !NAME_REGEX.test(jobTitle)) {
+      newErrors.jobTitle = 'La fonction contient des caractères non autorisés (<, > non autorisés)';
+    }
     if (!email) {
       newErrors.email = 'L\'email est requis';
     } else if (!EMAIL_PATTERN.test(email)) {
       newErrors.email = 'Format d\'email invalide';
     }
     
+    // Validation des URLs
+    if (website && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(website)) {
+      newErrors.website = 'Format d\'URL invalide';
+    }
+    
+    // Validation des URLs des réseaux sociaux
+    const socialLinkPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    
+    if (socialLinks.linkedin && !socialLinkPattern.test(socialLinks.linkedin)) {
+      newErrors['socialLinks.linkedin'] = 'Format d\'URL LinkedIn invalide';
+    }
+    
+    if (socialLinks.twitter && !socialLinkPattern.test(socialLinks.twitter)) {
+      newErrors['socialLinks.twitter'] = 'Format d\'URL Twitter invalide';
+    }
+    
+    if (socialLinks.facebook && !socialLinkPattern.test(socialLinks.facebook)) {
+      newErrors['socialLinks.facebook'] = 'Format d\'URL Facebook invalide';
+    }
+    
+    if (socialLinks.instagram && !socialLinkPattern.test(socialLinks.instagram)) {
+      newErrors['socialLinks.instagram'] = 'Format d\'URL Instagram invalide';
+    }
+    
+    // Validation des numéros de téléphone
+    const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
+    
+    if (phone && !phonePattern.test(phone)) {
+      newErrors.phone = 'Format de numéro de téléphone invalide';
+    }
+    
+    if (mobilePhone && !phonePattern.test(mobilePhone)) {
+      newErrors.mobilePhone = 'Format de numéro de mobile invalide';
+    }
+    
     return newErrors;
   };
 
   // Mise à jour des données pour la prévisualisation en temps réel
+  useEffect(() => {
+    console.log('Erreurs actuelles:', errors);
+  }, [errors]);
+
   useEffect(() => {
     // Pas besoin de passer des valeurs mises à jour ici car les états sont déjà à jour
     handleFormChange();
@@ -327,16 +539,21 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
     isDefault,
     layout,
     horizontalSpacing,
-    // Ajouter les dépendances liées à la photo de profil
+    verticalSpacing,
+    verticalAlignment,
+    imagesLayout,
     profilePhotoUrl,
     previewProfilePhoto,
     profilePhotoSize,
-    handleFormChange,
-    // Ajouter les dépendances pour les réseaux sociaux
+    fontFamily,
+    fontSize,
     socialLinksDisplayMode,
     socialLinksIconStyle,
     socialLinksIconBgColor,
     socialLinksIconColor,
+    socialLinksIconSize,
+    socialLinksPosition,
+    handleFormChange,
     onChange
   ]);
 
@@ -351,28 +568,47 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         <form id="signatureForm" onSubmit={handleSubmit} className="space-y-6">
           <Collapse title="Informations générales" defaultOpen={true}>
             <div className="grid grid-cols-1 gap-4 mb-4">
+              {/* Affichage de débogage pour vérifier l'erreur */}
+              {errors.name && (
+                <div className="p-2 mb-2 bg-red-100 text-red-800 rounded">
+                  Erreur détectée pour le champ nom: {errors.name}
+                </div>
+              )}
               <TextField
                 id="name"
                 name="name"
                 label="Nom de la signature"
                 placeholder="Ex: Signature professionnelle"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setName(value);
+                  handleFormChange({ name: value });
+                  
+                  // Validation en temps réel
+                  if (!value) {
+                    setErrors(prev => ({ ...prev, name: 'Le nom de la signature est requis' }));
+                  } else if (!NAME_REGEX.test(value)) {
+                    setErrors(prev => ({ ...prev, name: 'Le nom contient des caractères non autorisés (<, > non autorisés)' }));
+                    console.log('Erreur de format détectée pour le nom:', value);
+                  } else {
+                    setErrors(prev => ({ ...prev, name: '' }));
+                  }
+                }}
                 error={errors.name}
                 required
+                helpText="Donnez un nom à votre signature pour la retrouver facilement"
               />
 
-              <div className="flex items-center mt-2">
-                <input
-                  type="checkbox"
+              <div className="mt-2">
+                <Checkbox
                   id="isDefault"
+                  name="isDefault"
+                  label="Définir comme signature par défaut"
                   checked={isDefault}
                   onChange={(e) => setIsDefault(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  variant="blue"
                 />
-                <label htmlFor="isDefault" className="ml-2 block text-sm text-gray-900">
-                  Définir comme signature par défaut
-                </label>
               </div>
             </div>
           </Collapse>
@@ -398,25 +634,57 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 
                 {/* Contrôle pour la taille de la photo */}
                 {(profilePhotoUrl || previewProfilePhoto) && (
-                  <div className="mt-4 w-full max-w-xs mx-auto text-center">
-                    <label htmlFor="profilePhotoSize" className="block text-sm font-medium text-gray-700 mb-1">
-                      Taille de la photo dans la signature: {profilePhotoSize}px
-                    </label>
-                    <input
-                      type="range"
-                      id="profilePhotoSize"
-                      name="profilePhotoSize"
-                      min="40"
-                      max="120"
-                      step="5"
-                      value={profilePhotoSize}
-                      onChange={(e) => setProfilePhotoSize(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Petite</span>
-                      <span>Moyenne</span>
-                      <span>Grande</span>
+                  <div className="mt-6 w-full max-w-xs mx-auto text-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <label htmlFor="profilePhotoSize" className="text-sm font-medium text-gray-700">
+                        Taille de la photo
+                      </label>
+                      <span className="text-sm font-semibold text-[#5b50ff] bg-[#f5f3ff] px-2 py-1 rounded-lg">
+                        {profilePhotoSize}px
+                      </span>
+                    </div>
+                    
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div className="w-full h-1 bg-gray-200 rounded"></div>
+                      </div>
+                      <input
+                        type="range"
+                        id="profilePhotoSize"
+                        name="profilePhotoSize"
+                        min="40"
+                        max="120"
+                        step="5"
+                        value={profilePhotoSize}
+                        onChange={(e) => setProfilePhotoSize(parseInt(e.target.value))}
+                        className="relative w-full h-2 appearance-none cursor-pointer bg-transparent z-10"
+                        style={{ WebkitAppearance: 'none' }}
+                      />
+                      <style dangerouslySetInnerHTML={{ __html: `
+                        input[type=range]::-webkit-slider-thumb {
+                          -webkit-appearance: none;
+                          height: 16px;
+                          width: 16px;
+                          border-radius: 50%;
+                          background: #5b50ff;
+                          cursor: pointer;
+                          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        }
+                        input[type=range]::-moz-range-thumb {
+                          height: 16px;
+                          width: 16px;
+                          border-radius: 50%;
+                          background: #5b50ff;
+                          cursor: pointer;
+                          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        }
+                      `}} />
+                    </div>
+                    
+                    <div className="flex justify-between text-xs font-medium">
+                      <span className="text-gray-500">Petite</span>
+                      <span className="text-[#5b50ff]">Moyenne</span>
+                      <span className="text-gray-500">Grande</span>
                     </div>
                   </div>
                 )}
@@ -429,18 +697,45 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Nom complet"
                 placeholder="Ex: Jean Dupont"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFullName(value);
+                  handleFormChange({ fullName: value });
+                  
+                  // Validation en temps réel
+                  if (!value) {
+                    setErrors(prev => ({ ...prev, fullName: 'Le nom complet est requis' }));
+                  } else if (!NAME_REGEX.test(value)) {
+                    setErrors(prev => ({ ...prev, fullName: 'Le nom complet contient des caractères non autorisés (<, > non autorisés)' }));
+                    console.log('Erreur de format détectée pour le nom complet:', value);
+                  } else {
+                    setErrors(prev => ({ ...prev, fullName: '' }));
+                  }
+                }}
                 error={errors.fullName}
                 required
+                helpText="Votre nom et prénom tels qu'ils apparaîtront dans la signature"
               />
 
               <TextField
                 id="jobTitle"
                 name="jobTitle"
-                label="Titre du poste"
-                placeholder="Ex: Directeur Marketing"
+                label="Fonction"
+                placeholder="Ex: Directeur Commercial"
                 value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setJobTitle(value);
+                  handleFormChange({ jobTitle: value });
+                  
+                  // Validation en temps réel
+                  if (value && !NAME_REGEX.test(value)) {
+                    setErrors(prev => ({ ...prev, jobTitle: 'La fonction contient des caractères non autorisés (<, > non autorisés)' }));
+                    console.log('Erreur de format détectée pour la fonction:', value);
+                  } else {
+                    setErrors(prev => ({ ...prev, jobTitle: '' }));
+                  }
+                }}
                 error={errors.jobTitle}
                 required
               />
@@ -449,11 +744,17 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 id="email"
                 name="email"
                 label="Email"
+                type="email"
                 placeholder="Ex: jean.dupont@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setEmail(value);
+                  handleFormChange({ email: value });
+                }}
                 error={errors.email}
                 required
+                helpText="Format attendu : exemple@domaine.com"
               />
 
               <TextField
@@ -462,8 +763,13 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Téléphone fixe"
                 placeholder="Ex: 01 23 45 67 89"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPhone(value);
+                  handleFormChange({ phone: value });
+                }}
                 error={errors.phone}
+                helpText="Format attendu : +33 1 23 45 67 89"
               />
 
               <TextField
@@ -472,8 +778,13 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Téléphone mobile"
                 placeholder="Ex: 06 12 34 56 78"
                 value={mobilePhone}
-                onChange={(e) => setMobilePhone(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setMobilePhone(value);
+                  handleFormChange({ mobilePhone: value });
+                }}
                 error={errors.mobilePhone}
+                helpText="Format attendu : +33 6 12 34 56 78"
               />
 
               <TextField
@@ -482,8 +793,13 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Site web"
                 placeholder="Ex: www.example.com"
                 value={website}
-                onChange={(e) => setWebsite(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setWebsite(value);
+                  handleFormChange({ website: value });
+                }}
                 error={errors.website}
+                helpText="Format attendu : https://www.exemple.com"
               />
             </div>
           </Collapse>
@@ -506,7 +822,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 id="companyName"
                 name="companyName"
                 label="Nom de l'entreprise"
-                placeholder="Ex: Entreprise SAS"
+                placeholder="Ex: Acme Inc."
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 error={errors.companyName}
@@ -553,17 +869,15 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                           
                           {/* Option pour afficher ou masquer le logo */}
                           <div className="mt-3">
-                            <div className="flex items-center">
-                              <input
-                                type="checkbox"
+                            <div>
+                              <Checkbox
                                 id="showLogo"
+                                name="showLogo"
+                                label="Afficher le logo dans ma signature"
                                 checked={showLogo}
                                 onChange={(e) => setShowLogo(e.target.checked)}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                variant="blue"
                               />
-                              <label htmlFor="showLogo" className="ml-2 block text-sm text-gray-700">
-                                Afficher le logo dans ma signature
-                              </label>
                             </div>
                           </div>
                         </div>
@@ -597,8 +911,22 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="LinkedIn"
                 placeholder="Ex: https://linkedin.com/in/jeandupont"
                 value={socialLinks.linkedin}
-                onChange={(e) => setSocialLinks({...socialLinks, linkedin: e.target.value})}
-                error={errors.socialLinks?.linkedin}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const newSocialLinks = { ...socialLinks, linkedin: value };
+                  setSocialLinks(newSocialLinks);
+                  handleFormChange({ socialLinks: newSocialLinks });
+                  
+                  // Validation en temps réel
+                  const socialLinkPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+                  if (value && !socialLinkPattern.test(value)) {
+                    setErrors(prev => ({ ...prev, 'socialLinks.linkedin': 'Format d\'URL LinkedIn invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, 'socialLinks.linkedin': '' }));
+                  }
+                }}
+                error={errors['socialLinks.linkedin']}
+                helpText="Format attendu : https://www.linkedin.com/in/username"
               />
 
               <TextField
@@ -607,8 +935,22 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="X (anciennement Twitter)"
                 placeholder="Ex: https://x.com/jeandupont"
                 value={socialLinks.twitter}
-                onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
-                error={errors.socialLinks?.twitter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const newSocialLinks = { ...socialLinks, twitter: value };
+                  setSocialLinks(newSocialLinks);
+                  handleFormChange({ socialLinks: newSocialLinks });
+                  
+                  // Validation en temps réel
+                  const socialLinkPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+                  if (value && !socialLinkPattern.test(value)) {
+                    setErrors(prev => ({ ...prev, 'socialLinks.twitter': 'Format d\'URL Twitter invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, 'socialLinks.twitter': '' }));
+                  }
+                }}
+                error={errors['socialLinks.twitter']}
+                helpText="Format attendu : https://twitter.com/username ou https://x.com/username"
               />
 
               <TextField
@@ -617,8 +959,22 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Facebook"
                 placeholder="Ex: https://facebook.com/jeandupont"
                 value={socialLinks.facebook}
-                onChange={(e) => setSocialLinks({...socialLinks, facebook: e.target.value})}
-                error={errors.socialLinks?.facebook}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const newSocialLinks = { ...socialLinks, facebook: value };
+                  setSocialLinks(newSocialLinks);
+                  handleFormChange({ socialLinks: newSocialLinks });
+                  
+                  // Validation en temps réel
+                  const socialLinkPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+                  if (value && !socialLinkPattern.test(value)) {
+                    setErrors(prev => ({ ...prev, 'socialLinks.facebook': 'Format d\'URL Facebook invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, 'socialLinks.facebook': '' }));
+                  }
+                }}
+                error={errors['socialLinks.facebook']}
+                helpText="Format attendu : https://www.facebook.com/username"
               />
 
               <TextField
@@ -627,8 +983,22 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Instagram"
                 placeholder="Ex: https://instagram.com/jeandupont"
                 value={socialLinks.instagram}
-                onChange={(e) => setSocialLinks({...socialLinks, instagram: e.target.value})}
-                error={errors.socialLinks?.instagram}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const newSocialLinks = { ...socialLinks, instagram: value };
+                  setSocialLinks(newSocialLinks);
+                  handleFormChange({ socialLinks: newSocialLinks });
+                  
+                  // Validation en temps réel
+                  const socialLinkPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+                  if (value && !socialLinkPattern.test(value)) {
+                    setErrors(prev => ({ ...prev, 'socialLinks.instagram': 'Format d\'URL Instagram invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, 'socialLinks.instagram': '' }));
+                  }
+                }}
+                error={errors['socialLinks.instagram']}
+                helpText="Format attendu : https://www.instagram.com/username"
               />
               
               {/* Sélecteur pour le mode d'affichage des réseaux sociaux */}
@@ -645,7 +1015,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       value="text"
                       checked={socialLinksDisplayMode === 'text'}
                       onChange={() => setSocialLinksDisplayMode('text')}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                     />
                     <label htmlFor="socialLinksText" className="ml-2 block text-sm text-gray-700">
                       Noms (LinkedIn, X, etc.)
@@ -659,7 +1029,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       value="icons"
                       checked={socialLinksDisplayMode === 'icons'}
                       onChange={() => setSocialLinksDisplayMode('icons')}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                     />
                     <label htmlFor="socialLinksIcons" className="ml-2 block text-sm text-gray-700">
                       Icônes
@@ -683,8 +1053,16 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       }}
                     >
                       <div className="flex space-x-2 mb-2">
-                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>in</span>
-                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>X</span>
+                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: 'currentColor' }}>
+                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.68 1.68 0 0 0-1.68 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                          </svg>
+                        </span>
+                        <span className="text-sm font-medium w-6 h-6 flex items-center justify-center" style={{ color: socialLinksIconColor }}>
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: 'currentColor' }}>
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                        </span>
                       </div>
                       <div className="text-xs text-gray-500">Sans fond</div>
                     </div>
@@ -701,17 +1079,23 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                         <span 
                           className="text-sm font-medium w-6 h-6 flex items-center justify-center rounded-md" 
                           style={{ 
-                            backgroundColor: socialLinksIconBgColor,
-                            color: socialLinksIconColor
+                            backgroundColor: socialLinksIconBgColor
                           }}
-                        >in</span>
+                        >
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: socialLinksIconColor }}>
+                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                          </svg>
+                        </span>
                         <span 
                           className="text-sm font-medium w-6 h-6 flex items-center justify-center rounded-md" 
                           style={{ 
-                            backgroundColor: socialLinksIconBgColor,
-                            color: socialLinksIconColor
+                            backgroundColor: socialLinksIconBgColor
                           }}
-                        >X</span>
+                        >
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: socialLinksIconColor }}>
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                        </span>
                       </div>
                       <div className="text-xs text-gray-500">Carré arrondi</div>
                     </div>
@@ -728,75 +1112,221 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                         <span 
                           className="text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full" 
                           style={{ 
-                            backgroundColor: socialLinksIconBgColor,
-                            color: socialLinksIconColor
+                            backgroundColor: socialLinksIconBgColor
                           }}
-                        >in</span>
+                        >
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: socialLinksIconColor }}>
+                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                          </svg>
+                        </span>
                         <span 
                           className="text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full" 
                           style={{ 
-                            backgroundColor: socialLinksIconBgColor,
-                            color: socialLinksIconColor
+                            backgroundColor: socialLinksIconBgColor
                           }}
-                        >X</span>
+                        >
+                          <svg viewBox="0 0 24 24" style={{ width: '60%', height: '60%', fill: socialLinksIconColor }}>
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                        </span>
                       </div>
                       <div className="text-xs text-gray-500">Rond</div>
                     </div>
                   </div>
                   
-                  {/* Sélecteurs de couleur pour les icônes (visibles uniquement si le mode d'affichage est "icons") */}
-                  {socialLinksIconStyle !== 'plain' && (
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div>
+                  {/* Options spécifiques au style sélectionné */}
+                  {socialLinksIconStyle === 'plain' ? (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Options pour le mode "Sans fond"</h3>
+                      
+                      {/* Couleur des icônes */}
+                      <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Couleur de fond
+                          Couleur des icônes
                         </label>
                         <div className="flex items-center">
-                          <input
-                            type="color"
-                            value={socialLinksIconBgColor}
-                            onChange={(e) => setSocialLinksIconBgColor(e.target.value)}
-                            className="h-8 w-8 rounded border border-gray-300 cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={socialLinksIconBgColor}
-                            onChange={(e) => setSocialLinksIconBgColor(e.target.value)}
-                            className="ml-2 w-24 px-2 py-1 text-sm border border-gray-300 rounded"
-                          />
+                          <div className="relative h-8 w-8 rounded-md border border-gray-300 cursor-pointer shadow-sm hover:shadow-md transition-shadow">
+                            <input
+                              type="color"
+                              value={socialLinksIconColor}
+                              onChange={(e) => setSocialLinksIconColor(e.target.value)}
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              style={{ width: '100%', height: '100%' }}
+                            />
+                            <div 
+                              className="absolute inset-0 pointer-events-none" 
+                              style={{ backgroundColor: socialLinksIconColor }}
+                            />
+                          </div>
+                          <div className="relative ml-2">
+                            <input
+                              type="text"
+                              value={socialLinksIconColor}
+                              onChange={(e) => setSocialLinksIconColor(e.target.value)}
+                              className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                            />
+                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5b50ff' }} onClick={() => setSocialLinksIconColor('#5b50ff')} title="Violet" />
+                            </div>
+                          </div>
                           <button
                             type="button"
-                            onClick={() => setSocialLinksIconBgColor(primaryColor)}
-                            className="ml-2 px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
+                            onClick={() => setSocialLinksIconColor('#5b50ff')}
+                            className="ml-2 px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-colors"
                           >
-                            Couleur primaire
+                            Violet
                           </button>
                         </div>
                       </div>
+                      
+                      {/* Taille des icônes */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Couleur du texte
+                          Taille des icônes ({socialLinksIconSize}px)
                         </label>
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-2">
                           <input
-                            type="color"
-                            value={socialLinksIconColor}
-                            onChange={(e) => setSocialLinksIconColor(e.target.value)}
-                            className="h-8 w-8 rounded border border-gray-300 cursor-pointer"
+                            type="range"
+                            min="16"
+                            max="48"
+                            step="2"
+                            value={socialLinksIconSize}
+                            onChange={(e) => setSocialLinksIconSize(parseInt(e.target.value))}
+                            className="w-full max-w-xs accent-[#5b50ff]"
                           />
+                          <div className="flex space-x-2">
+                            <button 
+                              type="button" 
+                              onClick={() => setSocialLinksIconSize(Math.max(16, socialLinksIconSize - 2))}
+                              className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+                            >
+                              -
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => setSocialLinksIconSize(Math.min(48, socialLinksIconSize + 2))}
+                              className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Options pour le mode "{socialLinksIconStyle === 'rounded' ? 'Carré arrondi' : 'Rond'}"</h3>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Couleur de fond
+                          </label>
+                          <div className="flex items-center">
+                            <div className="relative h-8 w-8 rounded-md border border-gray-300 cursor-pointer shadow-sm hover:shadow-md transition-shadow">
+                              <input
+                                type="color"
+                                value={socialLinksIconBgColor}
+                                onChange={(e) => setSocialLinksIconBgColor(e.target.value)}
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                style={{ width: '100%', height: '100%' }}
+                              />
+                              <div 
+                                className="absolute inset-0 pointer-events-none" 
+                                style={{ backgroundColor: socialLinksIconBgColor }}
+                              />
+                            </div>
+                            <div className="relative ml-2">
+                              <input
+                                type="text"
+                                value={socialLinksIconBgColor}
+                                onChange={(e) => setSocialLinksIconBgColor(e.target.value)}
+                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                              />
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5b50ff' }} onClick={() => setSocialLinksIconBgColor('#5b50ff')} title="Violet" />
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSocialLinksIconBgColor('#5b50ff')}
+                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-colors"
+                            >
+                              Violet
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Couleur du texte
+                          </label>
+                          <div className="flex items-center">
+                            <div className="relative h-8 w-8 rounded-md border border-gray-300 cursor-pointer shadow-sm hover:shadow-md transition-shadow">
+                              <input
+                                type="color"
+                                value={socialLinksIconColor}
+                                onChange={(e) => setSocialLinksIconColor(e.target.value)}
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                style={{ width: '100%', height: '100%' }}
+                              />
+                              <div 
+                                className="absolute inset-0 pointer-events-none" 
+                                style={{ backgroundColor: socialLinksIconColor }}
+                              />
+                            </div>
+                            <div className="relative ml-2">
+                              <input
+                                type="text"
+                                value={socialLinksIconColor}
+                                onChange={(e) => setSocialLinksIconColor(e.target.value)}
+                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                              />
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                                <div className="w-3 h-3 rounded-full bg-white border border-gray-300" onClick={() => setSocialLinksIconColor('#FFFFFF')} title="Blanc" />
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSocialLinksIconColor('#FFFFFF')}
+                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
+                            >
+                              Blanc
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Taille des icônes */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Taille des icônes ({socialLinksIconSize}px)
+                        </label>
+                        <div className="flex items-center space-x-2">
                           <input
-                            type="text"
-                            value={socialLinksIconColor}
-                            onChange={(e) => setSocialLinksIconColor(e.target.value)}
-                            className="ml-2 w-24 px-2 py-1 text-sm border border-gray-300 rounded"
+                            type="range"
+                            min="16"
+                            max="48"
+                            step="2"
+                            value={socialLinksIconSize}
+                            onChange={(e) => setSocialLinksIconSize(parseInt(e.target.value))}
+                            className="w-full max-w-xs accent-[#5b50ff]"
                           />
-                          <button
-                            type="button"
-                            onClick={() => setSocialLinksIconColor('#FFFFFF')}
-                            className="ml-2 px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
-                          >
-                            Blanc
-                          </button>
+                          <div className="flex space-x-2">
+                            <button 
+                              type="button" 
+                              onClick={() => setSocialLinksIconSize(Math.max(16, socialLinksIconSize - 2))}
+                              className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+                            >
+                              -
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => setSocialLinksIconSize(Math.min(48, socialLinksIconSize + 2))}
+                              className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1245,20 +1775,50 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
           </Collapse>
         </form>
       </div>
-      <div className="border-t border-gray-200 p-4 flex justify-end space-x-3">
-        <Button
-          variant="outline"
-          onClick={onCancel}
-        >
-          Annuler
-        </Button>
-        <Button
-          variant="primary"
-          type="submit"
-          form="signatureForm"
-        >
-          {initialData ? 'Mettre à jour' : 'Créer'}
-        </Button>
+      <div className="border-t border-gray-200 p-4 flex flex-col space-y-4">
+        {/* Message d'erreur global */}
+        {submitError && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{submitError}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="flex justify-end space-x-3">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            form="signatureForm"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center space-x-2">
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{initialData ? 'Mise à jour...' : 'Création...'}</span>
+              </div>
+            ) : (
+              <span>{initialData ? 'Mettre à jour' : 'Créer'}</span>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

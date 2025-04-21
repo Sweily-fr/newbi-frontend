@@ -8,7 +8,7 @@ import { ButtonLink } from '../ui/ButtonLink';
 import { useQuery } from '@apollo/client';
 import { GET_PROFILE } from '../../graphql/profile';
 import axios from 'axios';
-import { UserCircleIcon, CreditCardIcon, ArrowRightOnRectangleIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, CreditCardIcon, ArrowRightOnRectangleIcon, QuestionMarkCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { PremiumModal } from '../subscription/PremiumModal';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
@@ -35,15 +35,6 @@ export const Navbar = () => {
 
   // La navbar s'affiche toujours, mais avec des options différentes selon l'état d'authentification
 
-  // Construire les éléments du menu déroulant en fonction de l'état d'authentification et d'abonnement
-  const dropdownItems = [
-    {
-      label: 'Mon profil',
-      onClick: handleProfileClick,
-      icon: <UserCircleIcon className="h-5 w-5 text-gray-500" />
-    }
-  ];
-  
   // Fonction pour gérer l'abonnement premium
   const handleSubscription = async () => {
     try {
@@ -75,24 +66,56 @@ export const Navbar = () => {
     }
   };
 
-  // Ajouter l'option d'abonnement
+  // Construire les éléments du menu déroulant
+  const isPremium = subscription?.licence;
+  
+  // Créer un tableau d'éléments pour le dropdown
+  const dropdownItems = [
+    // Profil utilisateur
+    {
+      label: 'Mon profil',
+      onClick: handleProfileClick,
+      icon: <UserCircleIcon className="h-5 w-5 text-gray-500" />
+    }
+  ];
+  
+  // Ajouter l'option d'abonnement si l'utilisateur a un ID client Stripe
   if (subscription?.stripeCustomerId) {
-    const isPremium = subscription.licence;
+
+    
+    // Ajouter l'option de gestion d'abonnement
     dropdownItems.push({
       label: isPremium ? 'Gérer mon abonnement' : 'Passer Premium',
       onClick: () => {
         if (isPremium) {
-          // Si l'utilisateur est déjà premium, ouvrir la session de portail client
           handleSubscription();
         } else {
-          // Sinon, ouvrir la modal pour passer premium
           setIsPremiumModalOpen(true);
         }
       },
-      hasDivider: true,
       icon: <CreditCardIcon className="h-5 w-5 text-gray-500" />
     });
+    
+    // Ajouter l'option Communauté uniquement pour les membres premium
+    if (isPremium) {
+      dropdownItems.push({
+        label: (
+          <div className="flex items-center">
+            <span>Communauté</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        ),
+        onClick: () => {
+          window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');
+        },
+        icon: <UserGroupIcon className="h-5 w-5 text-gray-500" />
+      });
+    }
   }
+  
+
   
   // Ajouter l'option de support
   dropdownItems.push({
@@ -100,15 +123,15 @@ export const Navbar = () => {
     onClick: () => {
       window.location.href = 'mailto:contact@sweily.fr?subject=Demande de support - Génération Business';
     },
-    icon: <QuestionMarkCircleIcon className="h-5 w-5 text-gray-500" />,
-    hasDivider: true
+    icon: <QuestionMarkCircleIcon className="h-5 w-5 text-gray-500" />
   });
   
   // Ajouter l'option de déconnexion
   dropdownItems.push({
     label: 'Déconnexion',
     onClick: handleLogout,
-    icon: <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-500" />
+    icon: <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-500" />,
+    hasDivider: true
   });
 
   // Construire le nom pour l'avatar à partir des données du profil
@@ -132,7 +155,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white z-[500] shadow-sm">
+      <nav className="bg-white z-[999] shadow-sm fixed top-0 left-0 w-full">
         <div className="max-w-full mx-auto py-2 px-6 sm:px-8 lg:px-12">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
@@ -169,9 +192,8 @@ export const Navbar = () => {
                         </span>
                       </ButtonLink>
                     ) : (
-                      <div className="flex items-center justify-center">
-                        <CheckBadgeIcon className="h-6 w-6 mr-1 text-yellow-400" />
-                        <span className="text-xs text-gray-400 font-light">Premium</span>
+                      <div className="relative">
+                        {/* Espace vide pour maintenir l'alignement */}
                       </div>
                     )}
                   </>
@@ -190,12 +212,19 @@ export const Navbar = () => {
                 
                 {isAuthenticated && (
                   <div className="relative flex items-center ml-2 z-[9999]">
-                    <Dropdown
-                      trigger={avatarTrigger}
-                      items={dropdownItems}
-                      position="right"
-                      width="w-72"
-                    />
+                    <div className="relative">
+                      <Dropdown
+                        trigger={avatarTrigger}
+                        items={dropdownItems}
+                        position="right"
+                        width="w-72"
+                      />
+                      {subscription && subscription.licence && (
+                        <div className="absolute -bottom-1 -right-1">
+                          <CheckBadgeIcon className="h-5 w-5 text-yellow-400 drop-shadow-md" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

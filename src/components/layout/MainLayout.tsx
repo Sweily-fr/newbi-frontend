@@ -3,6 +3,7 @@ import { Footer } from './Footer';
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../routes/constants';
 import { useDeviceDetection } from '../../hooks/useDeviceDetection';
+import { CommunityButton } from '../ui/CommunityButton';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -24,11 +25,22 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobilePage = location.pathname === ROUTES.MOBILE;
   const shouldHideNavAndFooter = isAuthPage || isMobilePage || isMobile || isTablet;
   
+  // Vérifier si la page actuelle est une page d'outils
+  const isToolsPage = 
+    location.pathname === ROUTES.TOOLS ||
+    location.pathname === ROUTES.INVOICES ||
+    location.pathname === ROUTES.QUOTES ||
+    location.pathname === ROUTES.EMAIL_SIGNATURES ||
+    location.pathname === ROUTES.LEGAL_NOTICE_GENERATOR ||
+    location.pathname === ROUTES.PRIVACY_POLICY_GENERATOR ||
+    location.pathname === ROUTES.BLOG_SEO_OPTIMIZER;
+  
   return (
     <div className="min-h-screen flex flex-col">
       {!shouldHideNavAndFooter && <Navbar />}
-      <main className={`flex-grow ${!isMobilePage && !isMobile && !isTablet ? 'bg-gray-50' : 'bg-white'}`}>
+      <main className={`flex-grow pt-20 ${!isMobilePage && !isMobile && !isTablet ? 'bg-gray-50' : 'bg-white'}`}>
         {children}
+        {isToolsPage && <CommunityButton />}
       </main>
       {!shouldHideNavAndFooter && <Footer />}
     </div>

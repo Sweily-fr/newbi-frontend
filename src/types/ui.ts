@@ -176,7 +176,7 @@ export interface ImageUploaderProps {
 
 // Dropdown
 export interface DropdownItem {
-  label: string;
+  label: string | React.ReactNode;
   onClick: () => void;
   hasDivider?: boolean;
   className?: string;

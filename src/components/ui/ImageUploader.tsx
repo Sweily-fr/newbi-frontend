@@ -190,13 +190,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-blue-600 font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-colors text-sm"
+            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-[#5b50ff] font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#5b50ff] focus:ring-offset-1 transition-colors text-sm"
             disabled={isLoading}
           >
             {isLoading ? (
               <span className="flex items-center">
                 <svg
-                  className="animate-spin h-4 w-4 mr-2 text-blue-600"
+                  className="animate-spin h-4 w-4 mr-2 text-[#5b50ff]"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -226,7 +226,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             <button
               type="button"
               onClick={onDelete}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-500 font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:ring-offset-1 transition-colors text-sm"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-red-600 font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-red-600 focus:ring-offset-1 transition-colors text-sm"
               disabled={isLoading}
             >
               Remove

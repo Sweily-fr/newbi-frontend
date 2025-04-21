@@ -6,6 +6,28 @@
   body {
     @apply bg-gray-50;
   }
+  
+  /* Styles personnalisés pour les champs de formulaire */
+  input, textarea, select {
+    @apply rounded-xl !important;
+    @apply transition-all duration-300 !important;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply border-[#5b50ff] !important;
+    @apply ring-[#5b50ff] !important;
+    @apply ring-1 !important;
+    @apply outline-none !important;
+    @apply transition-all duration-300 !important;
+  }
+  
+  /* Styles personnalisés pour les boutons radio */
+  input[type="radio"] {
+    @apply text-[#5b50ff] !important;
+    @apply focus:ring-[#5b50ff] !important;
+    @apply border-gray-300 !important;
+    @apply cursor-pointer !important;
+  }
 }
 
 /* Animations personnalisées pour les transitions */

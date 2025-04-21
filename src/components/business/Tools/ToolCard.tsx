@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Tool } from "../../../constants/tools";
 import { CheckBadgeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
 import { ButtonLink } from "../../../components/ui/ButtonLink";
@@ -7,98 +7,78 @@ import { useSubscription } from "../../../hooks/useSubscription";
 
 interface ToolCardProps {
   tool: Tool;
-  saved?: boolean;
   onClick?: () => void;
 }
 
-export const ToolCard: React.FC<ToolCardProps> = ({ tool, saved = false, onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
+export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
+
   const { isAuthenticated } = useAuth();
   const { hasActiveSubscription } = useSubscription();
 
-  // Détermine le statut (comme dans l'image)
-  const getStatus = () => {
-    const statuses = [
-      { label: "À jour", color: "bg-green-100 text-green-800" },
-      { label: "Populaire", color: "bg-orange-100 text-orange-800" },
-    ];
-    return saved ? statuses[0] : statuses[1];
-  };
 
-  const status = getStatus();
 
   return (
-    <div className={`bg-white rounded-lg overflow-hidden shadow-sm hover:shadow transition-shadow duration-200 border border-gray-200 ${tool.comingSoon ? 'opacity-80' : ''}`}>
-      <div className="p-5">
-        {/* En-tête avec logo et ID */}
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div
-              className={`h-12 w-12 rounded-lg ${
-                tool.id === "01"
-                  ? "bg-blue-100"
-                  : tool.id === "02"
-                  ? "bg-orange-100"
-                  : "bg-purple-100"
-              } flex items-center justify-center overflow-hidden text-gray-700`}
-            >
-              {tool.icon}
-            </div>
-            <div>
-              <h3 className="text-base font-medium text-gray-900">
-                {tool.name}
-              </h3>
-              <p className="text-sm text-gray-500">{tool.category}</p>
+    <div
+      className={`relative group bg-white rounded-2xl shadow-xl border border-gray-100 transition-all duration-200 overflow-hidden cursor-pointer
+        hover:shadow-2xl hover:scale-[1.035] hover:border-primary-600
+        ${tool.premium ? 'border-2 border-gradient-to-r from-blue-400 to-pink-400' : ''}
+        ${tool.comingSoon ? 'opacity-70 grayscale pointer-events-none' : ''}
+      `}
+    >
+      <div className="p-5 flex flex-col h-full justify-between">
+        {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
+        <div className="flex items-center gap-4 mb-4 pl-2">
+          {/* Icône dans un cercle avec fond blanc */}
+          <div className={`
+            h-16 w-16 rounded-full bg-white
+            flex items-center justify-center
+            border-2 border-gray-200 group-hover:border-[#5b50ff] transition-all flex-shrink-0
+            shadow-md
+          `}>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <div className="transform scale-150">{tool.icon}</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="text-sm font-medium bg-gray-100 px-2 py-1 rounded">
-              {tool.id}
+          
+          {/* Titre et catégorie */}
+          <div className="flex flex-col">
+            <h3 className="text-xl font-bold text-gray-900 tracking-wide">
+              {tool.name}
+            </h3>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-blue-500 font-medium">{tool.category}</p>
+              
+              {/* Badge premium stylisé */}
+              {tool.premium && (
+                <div className="flex items-center justify-center p-1 rounded-full bg-transparent border-2 border-[#5b50ff] text-[#5b50ff] shadow-sm">
+                  <CheckBadgeIcon className="w-4 h-4 text-[#5b50ff]" />
+                </div>
+              )}
             </div>
-            {tool.premium && (
-              <div className="w-6 h-6 flex items-center justify-center">
-                <CheckBadgeIcon className="w-6 h-6 text-blue-600" />
-              </div>
-            )}
           </div>
         </div>
 
-        <div className="text-lg text-gray-700 py-2 mb-2">
-          {tool.comingSoon 
-            ? `${tool.name} bientôt disponible` 
-            : tool.description}
+        <div className="text-sm text-gray-500 mb-3 min-h-[48px]">
+          {tool.comingSoon
+            ? <span className="italic text-blue-400 font-semibold">{tool.name} bientôt disponible</span>
+            : <span className="text-gray-500 text-sm">{tool.description}</span>}
         </div>
 
-        {/* Statut et badges */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className={`text-xs px-3 py-1 rounded-full ${status.color}`}>
-            {tool.category}
-          </div>
-          {tool.comingSoon ? (
-            <div className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 animate-pulse">
+        {/* Statut et badges - Uniquement pour les outils à venir */}
+        {tool.comingSoon && (
+          <div className="flex items-start gap-2 mb-4">
+            <div className="text-xs px-3 py-1 rounded-full bg-transparent border-2 border-[#5b50ff] text-[#5b50ff] font-semibold shadow-sm animate-pulse">
               Bientôt disponible
             </div>
-          ) : (
-            <div
-              className={`text-xs px-3 py-1 rounded-full ${
-                saved
-                  ? "bg-green-100 text-green-800"
-                  : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              {saved ? "À jour" : "Populaire"}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Bouton Visit */}
-        <div className="mt-5">
+        <div className="mt-auto pt-3">
           <ButtonLink
             to={tool.href}
-            variant={isHovered ? "primary" : "outline"}
-            fullWidth
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            variant="primary"
+            className="rounded-xl font-semibold text-base py-3 px-6"
             disabled={tool.comingSoon}
             onClick={onClick}
           >
@@ -107,7 +87,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, saved = false, onClick
             ) : (
               <div className="flex items-center justify-center gap-2">
                 {tool.premium && isAuthenticated && !hasActiveSubscription && (
-                  <LockClosedIcon className="h-4 w-4 text-gray-500" />
+                  <LockClosedIcon className="h-4 w-4 text-yellow-200" />
                 )}
                 <span>{tool.name}</span>
               </div>

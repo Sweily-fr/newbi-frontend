@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generation Business OG Image Creator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .og-container {
+      width: 1200px;
+      height: 630px;
+      background-color: #5b50ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+    .logo {
+      max-width: 70%;
+      max-height: 70%;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #5b50ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .instructions {
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Créateur d'image Open Graph</h1>
+  <div class="og-container" id="capture">
+    <img src="/images/logo_newbi/PNG/Logo_Texte_White.png" alt="Generation Business" class="logo" id="logoImage">
+  </div>
+  
+  <button id="downloadBtn">Télécharger l'image</button>
+  
+  <div class="instructions">
+    <h2>Instructions :</h2>
+    <ol>
+      <li>Assurez-vous que le logo s'affiche correctement ci-dessus</li>
+      <li>Cliquez sur "Télécharger l'image" pour générer le fichier PNG</li>
+      <li>Enregistrez l'image sous le nom "og-image.png" dans le dossier /public/images/</li>
+    </ol>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    // Attendre que l'image soit chargée
+    document.getElementById('logoImage').onload = function() {
+      console.log('Logo chargé avec succès');
+    };
+    
+    document.getElementById('logoImage').onerror = function() {
+      console.error('Erreur de chargement du logo');
+      alert('Erreur: Impossible de charger le logo. Vérifiez le chemin.');
+    };
+    
+    // Fonction pour télécharger l'image
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+      const captureElement = document.getElementById('capture');
+      
+      html2canvas(captureElement, {
+        allowTaint: true,
+        useCORS: true,
+        scale: 1
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'og-image.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    });
+  </script>
+</body>
+</html>

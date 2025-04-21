@@ -38,6 +38,7 @@ export interface EmailSignature {
   socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
   socialLinksIconBgColor?: string;
   socialLinksIconColor?: string;
+  socialLinksIconSize?: number;
   socialLinksPosition?: 'bottom' | 'right';
   layout?: 'horizontal' | 'vertical';
   horizontalSpacing?: number;
@@ -245,7 +246,7 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Rechercher une signature..."
-            className="w-64"
+            className="w-96"
             ref={searchInputRef}
           />
         </div>

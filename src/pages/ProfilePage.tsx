@@ -195,7 +195,7 @@ export const ProfilePage = () => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Navigation à gauche */}
           <div className="w-full md:w-80 flex-shrink-0">
-            <div className="sticky top-4 bg-white shadow-sm rounded-lg p-4">
+            <div className="sticky top-[100px] bg-white shadow-sm rounded-lg p-4">
               <div className="flex flex-col items-center justify-center mb-6">
                 <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden relative mb-2">
                    {data?.me?.profile?.profilePicture ? (

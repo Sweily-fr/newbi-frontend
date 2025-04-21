@@ -4,6 +4,9 @@ import { RegisterOptions } from 'react-hook-form';
 export const EMAIL_PATTERN = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 export const SIRET_PATTERN = /^[0-9]{14}$/;
 export const VAT_PATTERN = /^FR[0-9]{11}$/;
+// Regex pour la validation des noms et prénoms (lettres, espaces, tirets, apostrophes)
+// Exclut explicitement les caractères < et > pour prévenir les risques d'injection XSS
+export const NAME_REGEX = /^(?!.*[<>])[A-Za-zÀ-ÖØ-öø-ÿ\s\-'.(),&]{2,50}$/;
 export const STREET_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s,'\-\.]{3,100}$/;
 export const CITY_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-\.]{2,50}$/;
 export const POSTAL_CODE_PATTERN = /^(0[1-9]|[1-8]\d|9[0-8])\d{3}$/;

@@ -50,7 +50,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           ref={dropdownRef}
           className={`absolute ${positionClass} top-full mt-2 ${width} rounded-md shadow-lg bg-white border border-gray-200 z-[9999] transform origin-top-${position} transition-all duration-200 ease-out ${className}`}
         >
-          <div className="py-1 max-h-60 overflow-y-auto">
+          <div className="py-1">
             {items.map((item, index) => (
               <button
                 key={index}
@@ -58,7 +58,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   item.onClick();
                   setIsOpen(false);
                 }}
-                className={`block w-full text-left px-4 py-3 text-base text-gray-700 hover:bg-blue-50 ${item.hasDivider ? 'border-t border-gray-100' : ''} ${item.className || ''}`}
+                className={`block w-full text-left px-4 py-3 text-base text-gray-700 hover:bg-purple-50 ${item.hasDivider ? 'border-t border-gray-100 mt-1 pt-3' : ''} ${item.className || ''}`}
               >
                 <div className="flex items-center">
                   {item.icon && <span className="mr-2">{item.icon}</span>}

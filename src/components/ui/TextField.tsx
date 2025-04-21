@@ -60,7 +60,7 @@ export const TextField: React.FC<TextFieldProps> = ({
           className={`block w-full rounded-lg border bg-white py-3 px-4 text-base ${type === 'email' ? 'pl-8' : ''} ${
             error
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-opacity-50 focus:ring-1'
+              : 'border-gray-300 focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 focus:ring-2 active:border-[#5b50ff] transition-all duration-300 ease-in-out'
           } ${inputClassName}`}
           placeholder={placeholder}
           disabled={disabled}

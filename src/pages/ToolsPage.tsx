@@ -32,7 +32,7 @@ export const ToolsPage = () => {
             <button
               className={`flex items-center gap-1 border rounded-md px-3 py-1.5 text-sm ${
                 sortDirection === "asc"
-                  ? "bg-blue-50 border-blue-200 text-blue-600"
+                  ? "bg-purple-50 border-purple-200 text-[#5b50ff]"
                   : "bg-white border-gray-200 text-gray-700"
               }`}
               onClick={() => setSortDirection("asc")}
@@ -42,7 +42,7 @@ export const ToolsPage = () => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className={`h-4 w-4 ${
-                  sortDirection === "asc" ? "text-blue-500" : "text-gray-500"
+                  sortDirection === "asc" ? "text-[#5b50ff]" : "text-gray-500"
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -59,7 +59,7 @@ export const ToolsPage = () => {
             <button
               className={`flex items-center gap-1 border rounded-md px-3 py-1.5 text-sm ${
                 sortDirection === "desc"
-                  ? "bg-blue-50 border-blue-200 text-blue-600"
+                  ? "bg-purple-50 border-purple-200 text-[#5b50ff]"
                   : "bg-white border-gray-200 text-gray-700"
               }`}
               onClick={() => setSortDirection("desc")}
@@ -69,7 +69,7 @@ export const ToolsPage = () => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className={`h-4 w-4 ${
-                  sortDirection === "desc" ? "text-blue-500" : "text-gray-500"
+                  sortDirection === "desc" ? "text-[#5b50ff]" : "text-gray-500"
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -186,7 +186,7 @@ export const ToolsPage = () => {
               </div>
               {/* Note d'information pour les outils de facture et devis */}
               {isAuthenticated && (
-                <div className="bg-gray-100 border-l-4 border-gray-500 p-4 mb-6 rounded-md shadow-sm">
+                <div className="bg-purple-50 border-l-4 border-[#5b50ff] p-4 mb-6 rounded-md shadow-sm">
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
                       <svg
@@ -208,12 +208,12 @@ export const ToolsPage = () => {
                       </h3>
                       <div className="mt-1 text-sm text-gray-700">
                         <p>
-                          Pour utiliser les outils de <strong>facture</strong>{" "}
-                          et de <strong>devis</strong>, vous devez d'abord
-                          remplir les informations de votre entreprise dans les{" "}
+                          Pour une meilleure expérience d'utilisation de l'ensemble des outils, notamment les <strong>factures</strong>{" "}
+                          et les <strong>devis</strong>, nous vous recommandons de
+                          compléter les informations de votre entreprise dans les{" "}
                           <a
                             href="#"
-                            className="underline font-medium text-gray-900 hover:text-gray-800"
+                            className="underline font-medium text-[#5b50ff] hover:text-[#4a41cc]"
                             onClick={(e) => {
                               e.preventDefault();
                               // Vérifier si l'utilisateur a une licence active
@@ -251,7 +251,6 @@ export const ToolsPage = () => {
                       // Modifier l'URL pour intercepter les clics sur les outils premium
                       href: handleToolClick(tool.premium, tool.href),
                     }}
-                    saved={index % 3 === 0}
                     onClick={() => {
                       // Si l'utilisateur est authentifié mais n'a pas d'abonnement premium et que l'outil est premium
                       // Et qu'aucune recherche n'est en cours
@@ -287,7 +286,7 @@ export const ToolsPage = () => {
                     </h3>
                     <a
                       href="mailto:contact@generation-business.fr?subject=Suggestion%20d'un%20nouvel%20outil&body=Bonjour,%0A%0AJ'aimerais%20suggérer%20un%20nouvel%20outil%20pour%20la%20plateforme%20Generation%20Business.%0A%0ANom%20de%20l'outil%20:%20%0A%0ADescription%20:%20%0A%0AUtilisation%20principale%20:%20%0A%0AMerci%20de%20prendre%20en%20considération%20ma%20suggestion.%0A%0ACordialement,"
-                      className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
                     >
                       <svg
                         className="-ml-1 mr-2 h-4 w-4 text-gray-500"

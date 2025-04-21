@@ -195,7 +195,7 @@ export const ForgotPasswordForm = () => {
             isLoading={loading}
             loaderPosition="left"
             fullWidth
-            className="bg-blue-500 hover:bg-blue-600 py-3 rounded-lg"
+            className="bg-[#5b50ff] hover:bg-[#4a41d0] py-3 rounded-lg"
           >
             Envoyer le lien de réinitialisation
           </Button>

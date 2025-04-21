@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckboxProps } from '../../types/ui';
 
 /**
@@ -19,38 +19,42 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   variant = 'default',
   ...rest
 }) => {
+  // État local pour suivre l'état de la checkbox pour les variants personnalisés
+  const [isCheckedState, setIsCheckedState] = useState(checked || false);
+  
+  // Mettre à jour l'état local lorsque la prop checked change
+  useEffect(() => {
+    if (checked !== undefined) {
+      setIsCheckedState(checked);
+    }
+  }, [checked]);
+  
   // Déterminer les props à passer à l'input en fonction du mode d'utilisation
   const checkboxProps = register 
     ? { ...register(name) } // Mode React Hook Form
     : { // Mode standard
         name,
-        checked,
-        onChange
+        checked: variant === 'default' ? checked : isCheckedState,
+        onChange: variant === 'default' ? onChange : (e: React.ChangeEvent<HTMLInputElement>) => {
+          setIsCheckedState(e.target.checked);
+          if (onChange) onChange(e);
+        }
       };
 
   // Styles spécifiques en fonction du variant
   const getVariantStyles = () => {
     switch (variant) {
       case 'blue':
-        return 'hidden peer';
       case 'minus':
-        return 'hidden peer';
+        return 'hidden';
       default:
-        return `h-4 w-4 rounded ${error ? 'border-red-300 text-red-600' : 'border-gray-300 text-blue-600'}`;
+        return `h-4 w-4 rounded-md ${error ? 'border-red-300 text-red-600' : 'border-gray-300 text-[#5b50ff]'}`;
     }
   };
 
   // Générer le custom checkbox pour les variants spéciaux
   const renderCustomCheckbox = () => {
     if (variant === 'blue') {
-      // Utiliser l'état local pour suivre l'état de la checkbox
-      const [isCheckedState, setIsCheckedState] = React.useState(checked || false);
-      
-      // Mettre à jour l'état local lorsque la prop checked change
-      React.useEffect(() => {
-        setIsCheckedState(checked || false);
-      }, [checked]);
-      
       return (
         <div className="relative inline-flex">
           <input
@@ -60,15 +64,10 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             {...rest}
             className="absolute opacity-0 w-0 h-0"
             disabled={disabled}
-            checked={isCheckedState}
-            onChange={(e) => {
-              setIsCheckedState(e.target.checked);
-              if (onChange) onChange(e);
-            }}
           />
           <label 
             htmlFor={id} 
-            className={`flex items-center justify-center w-5 h-5 border rounded cursor-pointer transition-colors ${isCheckedState ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'}`}
+            className={`flex items-center justify-center w-5 h-5 border rounded-md cursor-pointer transition-colors ${isCheckedState ? 'bg-[#5b50ff] border-[#5b50ff]' : 'bg-white border-gray-300'}`}
           >
             {isCheckedState && (
               <svg className="w-3 h-3 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -79,14 +78,6 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         </div>
       );
     } else if (variant === 'minus') {
-      // Utiliser l'état local pour suivre l'état de la checkbox
-      const [isCheckedState, setIsCheckedState] = React.useState(checked || false);
-      
-      // Mettre à jour l'état local lorsque la prop checked change
-      React.useEffect(() => {
-        setIsCheckedState(checked || false);
-      }, [checked]);
-      
       return (
         <div className="relative inline-flex">
           <input
@@ -96,15 +87,10 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             {...rest}
             className="absolute opacity-0 w-0 h-0"
             disabled={disabled}
-            checked={isCheckedState}
-            onChange={(e) => {
-              setIsCheckedState(e.target.checked);
-              if (onChange) onChange(e);
-            }}
           />
           <label 
             htmlFor={id} 
-            className={`flex items-center justify-center w-5 h-5 border rounded cursor-pointer transition-colors ${isCheckedState ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'}`}
+            className={`flex items-center justify-center w-5 h-5 border rounded-md cursor-pointer transition-colors ${isCheckedState ? 'bg-[#5b50ff] border-[#5b50ff]' : 'bg-white border-gray-300'}`}
           >
             {isCheckedState && (
               <svg className="w-3 h-3 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
