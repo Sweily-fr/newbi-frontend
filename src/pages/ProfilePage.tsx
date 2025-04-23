@@ -5,8 +5,9 @@ import { PersonalInfoForm } from '../components/forms/profile/PersonalInfoForm';
 import { CompanyInfoForm } from '../components/forms/profile/CompanyInfoForm';
 import { ClientsManager } from '../components/business/clients/ClientsManager';
 import { ProductsManager } from '../components/business/products/ProductsManager';
+import { IntegrationsManager } from '../components/business/integrations/IntegrationsManager';
 import { TabNavigation, TabItem } from '../components/navigation/TabNavigation';
-import { UserIcon, BuildingOfficeIcon, CreditCardIcon, ShoppingBagIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { UserIcon, BuildingOfficeIcon, CreditCardIcon, ShoppingBagIcon, LockClosedIcon, PuzzlePieceIcon } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { SubscriptionContext } from '../context/SubscriptionContext.context';
 import { Button } from '../components/ui';
@@ -25,14 +26,14 @@ export const ProfilePage = () => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
     
-    if (tabParam && ['profile', 'company', 'payment', 'products', 'security'].includes(tabParam)) {
+    if (tabParam && ['profile', 'company', 'payment', 'products', 'security', 'integrations'].includes(tabParam)) {
       // Mettre à jour l'onglet actif et le sauvegarder dans localStorage
       setActiveTab(tabParam);
       localStorage.setItem('profileActiveTab', tabParam);
     } else {
       // Si aucun onglet n'est spécifié dans l'URL, essayer de récupérer du localStorage
       const savedTab = localStorage.getItem('profileActiveTab');
-      if (savedTab && ['profile', 'company', 'payment', 'products', 'security'].includes(savedTab)) {
+      if (savedTab && ['profile', 'company', 'payment', 'products', 'security', 'integrations'].includes(savedTab)) {
         setActiveTab(savedTab);
       }
     }
@@ -80,6 +81,18 @@ export const ProfilePage = () => {
         </div>
       )
     });
+    
+    // Ajouter l'onglet Intégrations pour les utilisateurs premium
+    tabs.push({ 
+      id: 'integrations', 
+      label: 'Intégration',
+      icon: (
+        <div className="flex items-center justify-between w-full">
+          <PuzzlePieceIcon className="w-5 h-5" />
+          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+        </div>
+      )
+    });
   } else {
     // Pour les utilisateurs non premium, ajouter un onglet désactivé
     tabs.push({ 
@@ -100,6 +113,18 @@ export const ProfilePage = () => {
       icon: (
         <div className="flex items-center justify-between w-full">
           <ShoppingBagIcon className="w-5 h-5" />
+          <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
+        </div>
+      )
+    });
+    
+    // Ajouter l'onglet Intégrations désactivé pour les utilisateurs non premium
+    tabs.push({ 
+      id: 'integrations_locked', 
+      label: 'Intégration',
+      icon: (
+        <div className="flex items-center justify-between w-full">
+          <PuzzlePieceIcon className="w-5 h-5" />
           <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
         </div>
       )
@@ -283,7 +308,7 @@ export const ProfilePage = () => {
               </>
             )}
 
-            {(activeTab === 'company_locked' || activeTab === 'products_locked') && (
+            {(activeTab === 'company_locked' || activeTab === 'products_locked' || activeTab === 'integrations_locked') && (
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6 flex flex-col items-center justify-center text-center">
                   <CheckBadgeIcon className="w-12 h-12 text-yellow-500 mb-4" />
@@ -291,7 +316,9 @@ export const ProfilePage = () => {
                   <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
                     {activeTab === 'company_locked' 
                       ? 'La gestion des informations de votre entreprise est disponible uniquement pour les comptes Premium.'
-                      : 'La gestion du catalogue de produits et services est disponible uniquement pour les comptes Premium.'}
+                      : activeTab === 'products_locked'
+                        ? 'La gestion du catalogue de produits et services est disponible uniquement pour les comptes Premium.'
+                        : 'Les outils d\'intégration sont disponibles uniquement pour les comptes Premium.'}
                   </p>
                   <Button
                     onClick={() => setIsPremiumModalOpen(true)}
@@ -309,6 +336,14 @@ export const ProfilePage = () => {
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <ProductsManager />
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'integrations' && subscription?.licence && (
+              <div className="bg-white shadow sm:rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <IntegrationsManager />
                 </div>
               </div>
             )}

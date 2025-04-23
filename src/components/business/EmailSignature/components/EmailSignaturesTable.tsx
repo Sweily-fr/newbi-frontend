@@ -246,7 +246,7 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Rechercher une signature..."
-            className="w-96"
+            className="w-full md:w-[20rem] lg:w-[24rem]"
             ref={searchInputRef}
           />
         </div>

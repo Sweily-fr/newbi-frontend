@@ -121,7 +121,7 @@ export const Navbar = () => {
   dropdownItems.push({
     label: 'Support',
     onClick: () => {
-      window.location.href = 'mailto:contact@sweily.fr?subject=Demande de support - Génération Business';
+      window.location.href = 'mailto:contact@sweily.fr?subject=Demande de support - Newbi';
     },
     icon: <QuestionMarkCircleIcon className="h-5 w-5 text-gray-500" />
   });
@@ -162,6 +162,9 @@ export const Navbar = () => {
               <Link to="/" className="flex items-center h-24">
                 <Logo variant="black" withText={true} className="scale-110 transform-gpu" />
               </Link>
+              <span className="ml-3 text-xs font-medium text-[#5b50ff] border border-[#5b50ff] rounded-full px-2 py-0.5">
+                Version Beta
+              </span>
             </div>
             
             <div className="flex items-center space-x-6">
