@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../components/ui';
 import { useQuotes, TabType } from '../hooks/useQuotes';
 import { TabNavigation } from '../components/navigation/TabNavigation';
@@ -180,13 +180,13 @@ export const QuotesPage = () => {
           setIsSidebarOpen(false);
         }}
         onDelete={() => {
-          if (selectedQuote) {
+          if (selectedQuote && selectedQuote.id) {
             handleDeleteQuote(selectedQuote.id);
             setIsSidebarOpen(false);
           }
         }}
         onStatusChange={(newStatus) => {
-          if (selectedQuote) {
+          if (selectedQuote && selectedQuote.id) {
             handleStatusChange(selectedQuote.id, newStatus);
           }
         }}

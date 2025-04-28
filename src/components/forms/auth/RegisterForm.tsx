@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useMutation, ApolloError } from '@apollo/client';
-import { useForm, SubmitHandler, FieldValues, FieldErrors } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { REGISTER_MUTATION } from '../../../graphql/auth';
 import { Form, TextField, Button, Checkbox } from '../../../components/ui';
 import { PasswordField } from '../../../components/ui/PasswordField';
 import { PasswordStrengthIndicator, PasswordRequirement } from '../../../components/ui/PasswordStrengthIndicator';
 import { getEmailValidationRules } from '../../../constants/formValidations';
-import { Link } from 'react-router-dom';
 
 interface RegisterFormInputs {
   email: string;

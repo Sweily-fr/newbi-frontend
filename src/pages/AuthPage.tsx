@@ -32,7 +32,7 @@ export const AuthPage = () => {
           </Link>
         </div>
         <div className="flex justify-center">
-          <Logo variant="png-black" className="scale-[1.8]" withText={false} />
+          <Logo variant="black" className="scale-[1.8]" withText={false} />
         </div>
         <div className="max-w-3xl mx-auto">
           <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">

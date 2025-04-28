@@ -66,7 +66,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
   orientation = "portrait",
   onGenerated,
   onGenerationStart,
-  onGenerationError,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -370,14 +369,12 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
         // Calculer le ratio pour adapter le contenu à la page
         const contentWidth = canvas.width;
-        const contentHeight = canvas.height;
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
 
         // Calculer le ratio en préservant la largeur
         const ratio = pdfWidth / contentWidth;
-        const canvasWidth = contentWidth * ratio;
-        const canvasHeight = contentHeight * ratio;
+
 
         // Ajouter la pagination si le contenu est trop grand pour une seule page
         await addPaginatedContent(pdf, canvas, footerCanvas, {

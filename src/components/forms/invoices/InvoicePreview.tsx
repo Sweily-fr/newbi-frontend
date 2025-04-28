@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { Button, PDFGenerator, Loader } from "../../ui";
+import { PDFGenerator, Loader } from "../../ui";
 import {
-  Invoice,
   Client,
   CompanyInfo,
-  Item,
   CustomField,
 } from "../../../types";
 

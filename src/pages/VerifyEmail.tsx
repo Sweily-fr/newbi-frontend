@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { gql, useMutation } from '@apollo/client';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '../components/ui';
 import { VERIFY_EMAIL } from '../graphql/auth';

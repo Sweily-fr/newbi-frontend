@@ -2,11 +2,11 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { 
   BlogSeoContextType, 
   BlogSeoState, 
-  ContentAnalysisResult, 
+  // ContentAnalysisResult, // Import inutilisé
   ContentStats, 
   KeywordData, 
   MetaTagsData, 
-  SeoScore 
+  // SeoScore // Import inutilisé
 } from './types';
 import { 
   analyzeContent, 

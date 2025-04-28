@@ -1,5 +1,5 @@
 // /src/components/data-display/Table.tsx
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Pagination } from '../navigation/Pagination';
 import { TruncatedText } from './TruncatedText';
 
@@ -95,7 +95,7 @@ export function Table<T>({
                       {typeof value === 'string' ? (
                         <TruncatedText text={value} />
                       ) : (
-                        value
+                        value as ReactNode
                       )}
                     </td>
                   );

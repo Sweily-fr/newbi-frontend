@@ -3,10 +3,8 @@ import { Select, TextField, Button } from "../../../../components/ui";
 import {
   DISCOUNT_PERCENTAGE_ERROR_MESSAGE,
   DISCOUNT_FIXED_ERROR_MESSAGE,
-  getDiscountValidationRules,
   CUSTOM_FIELD_VALUE_PATTERN,
   CUSTOM_FIELD_VALUE_ERROR_MESSAGE,
-  getCustomFieldValidationRules,
 } from "../../../../constants/formValidations";
 
 interface CustomField {

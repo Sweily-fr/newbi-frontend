@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useAuth } from './AuthContext';
 import { SubscriptionContext } from './SubscriptionContext.context';
-import { Subscription } from './SubscriptionContext.types';
+import { Subscription, SubscriptionContextType } from './SubscriptionContext.types';
 
 // Définir la requête pour récupérer les informations d'abonnement
 const GET_USER_SUBSCRIPTION = gql`

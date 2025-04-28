@@ -80,7 +80,9 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   onStatusChange
 }) => {
   const [isInvoiceCreationModalOpen, setIsInvoiceCreationModalOpen] = useState(false);
-  const [showPreview, setShowPreview] = useState(true);
+  // État non utilisé - à réactiver si besoin
+  // const [showPreview, setShowPreview] = useState(true);
+  const showPreview = true; // Valeur fixe pour l'instant
   // État local pour stocker les données du devis mises à jour
   const [quote, setQuote] = useState(initialQuote);
 
@@ -118,9 +120,10 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   }, [refetch]);
   
   // Fonction pour basculer l'affichage de la prévisualisation
-  const togglePreview = useCallback(() => {
-    setShowPreview(prev => !prev);
-  }, []);
+  // Fonction non utilisée - à conserver pour référence future
+  // const togglePreview = useCallback(() => {
+  //   setShowPreview(prev => !prev);
+  // }, []);
 
   // Définir l'interface pour les actions de statut
   interface StatusAction {

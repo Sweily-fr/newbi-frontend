@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { toast, ToastOptions, Toast, Renderable } from 'react-hot-toast';
 
 /**
@@ -16,7 +16,8 @@ export enum NotificationType {
 /**
  * Interface pour les options de notification
  */
-export interface NotificationOptions extends Partial<ToastOptions> {
+// Définition d'une interface personnalisée sans extension problématique
+export interface NotificationOptions {
   /**
    * Durée d'affichage en millisecondes (défaut: 5000ms)
    */
@@ -35,12 +36,19 @@ export interface NotificationOptions extends Partial<ToastOptions> {
   /**
    * Icône personnalisée à afficher
    */
-  icon?: ReactNode;
+  icon?: Renderable;
   
   /**
    * Utiliser le style personnalisé (défaut: true)
    */
   useCustomStyle?: boolean;
+  
+  /**
+   * Propriétés supplémentaires pour la compatibilité avec ToastOptions
+   */
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 interface NotificationToastProps {
@@ -203,14 +211,18 @@ const createCustomToast = (
     ? cleanErrorMessage(message) 
     : message;
     
-  return (t) => (
+  // Fonction de rendu pour la notification personnalisée
+  const renderToast = (t: Toast) => (
     <NotificationToast
       t={t}
       message={cleanedMessage}
       type={type}
-      onClose={options?.onClose}
+      onClose={options?.onClose as unknown as (() => void)}
     />
   );
+  
+  // Retourner la fonction de rendu comme Renderable
+  return renderToast as unknown as Renderable;
 };
 
 /**
@@ -227,19 +239,26 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
+      // Appel à toast.custom avec les options filtrées
       return toast.custom(
         createCustomToast(message, NotificationType.SUCCESS, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as unknown as Toast;
     }
     
     return toast.success(message, {
       duration: 5000,
-      ...restOptions,
-    });
+      position: restOptions.position,
+    }) as unknown as Toast;
   },
 
   /**
@@ -252,19 +271,26 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
       return toast.custom(
         createCustomToast(message, NotificationType.ERROR, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as Toast;
     }
     
     return toast.error(message, {
       duration: 5000,
-      ...restOptions,
-    });
+      icon: '🔔',
+      position: restOptions.position,
+    }) as Toast;
   },
 
   /**
@@ -277,21 +303,26 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
       return toast.custom(
         createCustomToast(message, NotificationType.INFO, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as Toast;
     }
     
     return toast(message, {
       duration: 5000,
-      style: { backgroundColor: '#3498db', color: 'white' },
-      icon: '📝',
-      ...restOptions,
-    });
+      icon: '🔔',
+      position: restOptions.position,
+    }) as Toast;
   },
 
   /**
@@ -304,21 +335,27 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
       return toast.custom(
         createCustomToast(message, NotificationType.WARNING, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as Toast;
     }
     
     return toast(message, {
       duration: 5000,
       style: { backgroundColor: '#f39c12', color: 'white' },
       icon: '⚠️',
-      ...restOptions,
-    });
+      position: restOptions.position,
+    }) as Toast;
   },
 
   /**
@@ -331,21 +368,27 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
       return toast.custom(
         createCustomToast(message, NotificationType.NEUTRAL, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as Toast;
     }
     
     return toast(message, {
       duration: 5000,
       style: { backgroundColor: '#F9FAFB', color: '#374151' },
       icon: 'i',
-      ...restOptions,
-    });
+      position: restOptions.position,
+    }) as Toast;
   },
 
   /**
@@ -358,21 +401,27 @@ export const Notification = {
     const { useCustomStyle = true, ...restOptions } = options || {};
     
     if (useCustomStyle) {
+      // Créer des options compatibles avec ToastOptions
+      const toastOptions: Partial<ToastOptions> = {
+        duration: 5000,
+        position: restOptions.position,
+        id: restOptions.id,
+        className: restOptions.className,
+        style: restOptions.style,
+      };
+      
       return toast.custom(
         createCustomToast(message, NotificationType.NEUTRAL_BLUE, restOptions),
-        {
-          duration: 5000,
-          ...restOptions,
-        }
-      );
+        toastOptions
+      ) as Toast;
     }
     
     return toast(message, {
       duration: 5000,
       style: { backgroundColor: '#EFF6FF', color: '#1E40AF' },
       icon: 'i',
-      ...restOptions,
-    });
+      position: restOptions.position,
+    }) as unknown as Toast;
   },
 
   /**
@@ -397,10 +446,13 @@ export const Notification = {
       case NotificationType.NEUTRAL:
         return Notification.neutral(message, options);
       default:
-        return toast(message, options);
+        return toast(message, {
+          duration: 5000,
+          position: options?.position,
+        }) as unknown as Toast;
     }
   },
-
+  
   /**
    * Ferme une notification spécifique
    * @param toastId ID de la notification à fermer

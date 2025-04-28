@@ -518,8 +518,8 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   }, [errors]);
 
   useEffect(() => {
-    // Pas besoin de passer des valeurs mises à jour ici car les états sont déjà à jour
-    handleFormChange();
+    // Passer un objet vide car la fonction utilise déjà les états actuels
+    handleFormChange({});
   }, [
     name,
     fullName,

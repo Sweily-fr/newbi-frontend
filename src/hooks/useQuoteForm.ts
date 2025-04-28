@@ -9,7 +9,7 @@ import {
 import { GET_QUOTES } from "../graphql/quotes";
 import { GET_CLIENTS, CREATE_CLIENT } from "../graphql/client";
 import { GET_USER_INFO } from "../graphql/queries";
-import { Quote, Item, CustomField, Client, CompanyInfo } from "../types";
+import { /* Quote, */ Item, CustomField, /* Client, */ CompanyInfo } from "../types";
 
 export interface UseQuoteFormProps {
   quote?: any;
@@ -202,10 +202,10 @@ export const useQuoteForm = ({
     });
 
   // Mutations GraphQL
-  const [createQuote, { loading: createLoading }] = useMutation(
+  const [createQuote /* , { loading: createLoading } */] = useMutation(
     CREATE_QUOTE_MUTATION
   );
-  const [updateQuote, { loading: updateLoading }] = useMutation(
+  const [updateQuote /* , { loading: updateLoading } */] = useMutation(
     UPDATE_QUOTE_MUTATION
   );
   const [createClient] = useMutation(CREATE_CLIENT);
@@ -434,10 +434,9 @@ export const useQuoteForm = ({
       if (!freshQuoteNumber && !quote) {
         console.error("Impossible de récupérer un numéro de devis valide");
         if (showNotifications) {
-          Notification({
-            type: "error",
-            message: "Erreur: impossible de générer un numéro de devis valide",
-          });
+          Notification.error(
+            "Erreur: impossible de générer un numéro de devis valide"
+          );
         }
         setIsSubmitting(false);
         return;
@@ -629,6 +628,9 @@ export const useQuoteForm = ({
       };
 
       // Créer un nouveau client si nécessaire
+      // Variable utilisée pour stocker l'ID du client
+      // Si un nouveau client est créé, cette variable sera mise à jour
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let clientId = selectedClient;
       if (isNewClient) {
         const { data: clientData } = await createClient({
@@ -664,7 +666,8 @@ export const useQuoteForm = ({
       }
 
       // Calculer les totaux
-      const totals = calculateTotals();
+      // Variable non utilisée
+      // const totals = calculateTotals();
       console.log("submitAsDraft", submitAsDraft);
       // Préparer les données communes du devis
       const commonQuoteData = {
@@ -757,10 +760,7 @@ export const useQuoteForm = ({
         });
 
         if (showNotifications) {
-          Notification({
-            type: "success",
-            message: "Devis créé avec succès",
-          });
+          Notification.success("Devis créé avec succès");
         }
 
         if (onSubmit) onSubmit(result.data?.createQuote);
@@ -782,19 +782,13 @@ export const useQuoteForm = ({
           });
 
           if (showNotifications) {
-            Notification({
-              type: "success",
-              message: "Devis mis à jour avec succès",
-            });
+            Notification.success("Devis mis à jour avec succès");
           }
 
           if (onSubmit) onSubmit(result.data?.updateQuote);
         } catch (error) {
           if (showNotifications) {
-            Notification({
-              type: "error",
-              message: "Erreur lors de la mise à jour du devis",
-            });
+            Notification.error("Erreur lors de la mise à jour du devis");
           }
           console.error("Error:", error);
           setIsSubmitting(false);
@@ -808,10 +802,7 @@ export const useQuoteForm = ({
       console.error("Erreur lors de la soumission du devis:", error);
 
       if (showNotifications) {
-        Notification({
-          type: "error",
-          message: "Une erreur est survenue lors de la création du devis",
-        });
+        Notification.error("Une erreur est survenue lors de la création du devis");
       }
     } finally {
       setIsSubmitting(false);

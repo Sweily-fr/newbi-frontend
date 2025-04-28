@@ -1140,8 +1140,7 @@ export const HomePage = () => {
                         const discountedMonthly = monthlyPrice * (1 - discountRate);
                         const monthsInYear = 12;
                         const annualTotal = discountedMonthly * monthsInYear;
-                        const monthlyTotal = monthlyPrice * monthsInYear;
-                        const savings = monthlyTotal - annualTotal;
+                        // const savings = monthlyTotal - annualTotal;
                         if (billingPeriod === "monthly") {
                           return (
                             <div className="flex items-baseline mb-2">
@@ -1168,12 +1167,8 @@ export const HomePage = () => {
 
                       {(() => {
                         const monthlyPrice = 14.99;
-                        const discountRate = 0.10;
-                        const discountedMonthly = monthlyPrice * (1 - discountRate);
-                        const monthsInYear = 12;
-                        const annualTotal = discountedMonthly * monthsInYear;
-                        const monthlyTotal = monthlyPrice * monthsInYear;
-                        const savings = monthlyTotal - annualTotal;
+
+                        // const savings = monthlyTotal - annualTotal;
                         if (billingPeriod === "monthly") {
                           return (
                             <div className="text-sm text-gray-500 mb-6">
@@ -1184,7 +1179,7 @@ export const HomePage = () => {
                           return (
                             <div className="text-sm text-green-500 mb-6">
                               <span className="line-through mr-1">{monthlyPrice.toFixed(2).replace('.', ',')}€</span>
-                              Économisez {savings.toFixed(2).replace('.', ',')}€ par an
+                              Économisez 10% par an
                             </div>
                           );
                         }

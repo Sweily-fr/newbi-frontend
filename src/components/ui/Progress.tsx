@@ -1,6 +1,5 @@
 import React from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export interface ProgressStep {
   id: string;

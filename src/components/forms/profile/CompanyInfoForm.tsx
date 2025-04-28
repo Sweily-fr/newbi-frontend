@@ -9,7 +9,6 @@ import {
   Form, 
   TextField, 
   TextFieldURL,
-  Button, 
   FieldGroup,
   FormActions,
   ImageUploader
@@ -21,8 +20,6 @@ import {
   getSiretValidationRules,
   getVatValidationRules,
   getUrlValidationRules,
-  getIbanValidationRules,
-  getBicValidationRules,
   IBAN_REGEX,
   BIC_REGEX
 } from '../../../utils/validators';
@@ -60,9 +57,6 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
 
   // Vérifier si au moins un des champs bancaires est rempli
   const anyBankFieldFilled = Boolean(iban || bic || bankName);
-  
-  // Vérifier si tous les champs bancaires sont remplis
-  const allBankFieldsFilled = Boolean(iban && bic && bankName);
   
   // Si au moins un champ est rempli mais pas tous, alors tous sont requis
   const bankFieldsRequired = anyBankFieldFilled;

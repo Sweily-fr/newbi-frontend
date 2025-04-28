@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useMutation, useLazyQuery } from '@apollo/client';
+import { useState } from 'react';
+import { useMutation } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
-import { Notification, NotificationType } from '../../../components/feedback/Notification';
+import { Notification } from '../../../components/feedback/Notification';
 import { REQUEST_PASSWORD_RESET_MUTATION } from '../../../graphql/auth';
 import { Form, TextField, Button } from '../../../components/ui';
 import { EMAIL_PATTERN, EMAIL_ERROR_MESSAGE } from '../../../constants/formValidations';

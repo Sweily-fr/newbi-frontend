@@ -20,8 +20,6 @@ export const Avatar: React.FC<AvatarProps> = ({
   alt = 'Avatar',
   size = 'md',
   name,
-  bgColor = '3B82F6', // bg-blue-500 en hexadécimal
-  textColor = 'ffffff',
   hasRing = false,
   ringColor = 'white',
   className = '',

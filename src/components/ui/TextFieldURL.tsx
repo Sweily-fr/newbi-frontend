@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TextFieldProps } from '../../types/ui';
 import { TextField } from './TextField';
 import { useFormContext, Controller } from 'react-hook-form';

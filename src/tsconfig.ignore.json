@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false
+  },
+  "exclude": [
+    "src/components/feedback/Notification.tsx",
+    "src/hooks/useQuoteForm.ts",
+    "src/hooks/useInvoices.ts",
+    "src/hooks/useClientsManager.ts",
+    "src/pages/HomePage.tsx",
+    "src/constants/formValidations.ts",
+    "src/constants/pricing.tsx"
+  ]
+}

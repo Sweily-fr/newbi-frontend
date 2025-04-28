@@ -7,7 +7,7 @@ import {
 import { GET_INVOICES } from '../graphql/queries';
 import { Notification } from '../components/feedback';
 import { formatDateShort } from '../utils/date';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 // Type pour les onglets de filtrage
 export type TabType = 'DRAFT' | 'PENDING' | 'COMPLETED' | null;
@@ -25,7 +25,7 @@ export const useInvoices = () => {
   const [quoteId, setQuoteId] = useState<string | null>(null);
 
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -156,7 +156,7 @@ export const useInvoices = () => {
   });
 
   // Fonctions de gestion des factures
-  const handleCreateInvoice = (invoiceData: any) => {
+  const handleCreateInvoice = (/* invoiceData: any */) => {
     // La création se fait maintenant entièrement dans useInvoiceForm
     // Cette fonction est appelée par onSubmit du InvoiceFormModal
     // et sert juste à fermer le modal et rafraîchir les données
@@ -169,7 +169,7 @@ export const useInvoices = () => {
     });
   };
 
-  const handleUpdateInvoice = (id: string, invoiceData: any) => {
+  const handleUpdateInvoice = (/* id: string, invoiceData: any */) => {
     // La mise à jour se fait maintenant entièrement dans useInvoiceForm
     // Cette fonction est appelée par onSubmit du InvoiceFormModal
     // et sert juste à fermer le modal et rafraîchir les données

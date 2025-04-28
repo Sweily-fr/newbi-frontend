@@ -249,7 +249,7 @@ export const ToolsPage = () => {
                       // Ajouter des propriétés supplémentaires pour correspondre à l'image
                       id: `${index + 1}`.padStart(2, "0"),
                       // Modifier l'URL pour intercepter les clics sur les outils premium
-                      href: handleToolClick(tool.premium, tool.href),
+                      href: handleToolClick(tool.premium === true, tool.href),
                     }}
                     onClick={() => {
                       // Si l'utilisateur est authentifié mais n'a pas d'abonnement premium et que l'outil est premium

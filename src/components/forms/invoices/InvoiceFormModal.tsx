@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useInvoiceForm } from "../../../hooks";
 import { InvoiceFormModalProps } from "../../../types";
-import { Button, Form, Select } from "../../ui";
+import { Button, Form } from "../../ui";
 import Collapse from "../../ui/Collapse";
 import { validateInvoiceDates } from "../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
@@ -10,10 +10,8 @@ import { InvoiceDiscountAndTotals } from "./Sections";
 import { InvoiceGeneralInfo } from "./Sections";
 import { InvoiceFooterNotes } from "./Sections";
 import { InvoiceTermsAndConditions } from "./Sections";
-import { InvoiceCustomFields } from "./Sections";
 import { InvoiceCompanyInfo } from "./Sections";
 import { InvoiceBankDetails } from "./Sections";
-import { InvoiceStatus } from "./Sections";
 import { InvoiceActionButtons } from "./Sections";
 import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
@@ -96,13 +94,10 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     selectedClient,
     setSelectedClient,
     isNewClient,
-    setIsNewClient,
     handleClientModeChange,
     newClient,
     setNewClient,
     items,
-    status,
-    setStatus,
     headerNotes,
     setHeaderNotes,
     footerNotes,
@@ -136,8 +131,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     setCompanyInfo,
     useBankDetails,
     setUseBankDetails,
-    bankDetailsComplete,
-    bankDetailsReadOnly,
     setBankDetailsReadOnly,
 
     // Données

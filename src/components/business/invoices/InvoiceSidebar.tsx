@@ -104,11 +104,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
 
   if (!invoice) return null;
 
-  const statusColors = {
-    DRAFT: "bg-gray-100 text-gray-800",
-    PENDING: "bg-yellow-100 text-yellow-800",
-    COMPLETED: "bg-green-100 text-green-800",
-  };
+  // Palette de couleurs pour les statuts (non utilisée actuellement)
+  // const statusColors = {
+  //   DRAFT: "bg-gray-100 text-gray-800",
+  //   PENDING: "bg-yellow-100 text-yellow-800",
+  //   COMPLETED: "bg-green-100 text-green-800",
+  // };
 
   const getNextStatus = (currentStatus: string) => {
     switch (currentStatus) {
@@ -386,7 +387,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               dueDate={invoice.dueDate}
               executionDate={invoice.executionDate}
               purchaseOrderNumber={invoice.purchaseOrderNumber}
-              companyInfo={invoice.companyInfo}
+              companyInfo={invoice.companyInfo as any}
               calculateTotals={calculateTotals}
               headerNotes={invoice.headerNotes}
               footerNotes={invoice.footerNotes}

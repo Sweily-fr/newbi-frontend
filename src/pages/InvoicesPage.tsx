@@ -1,9 +1,8 @@
 import { InvoiceFormModal } from '../components/forms/invoices/InvoiceFormModal';
 import { Button } from '../components/ui';
-import { useInvoices } from '../hooks/useInvoices';
+import { useInvoices, TabType } from '../hooks/useInvoices';
 import { TabNavigation } from '../components/navigation/TabNavigation';
 import { SearchInput } from '../components/ui';
-import { Modal } from '../components/feedback/Modal';
 import { InvoiceSidebar } from '../components/business/invoices/InvoiceSidebar';
 import { InvoicesTable } from '../components/business/invoices/InvoicesTable';
 import { useQuery } from '@apollo/client';
@@ -32,10 +31,7 @@ export const InvoicesPage = () => {
     searchTerm,
     setSearchTerm,
     rowsPerPageOptions,
-    loading,
     error,
-    data,
-    filteredInvoices,
     handlePageChange,
     handleCreateInvoice,
     handleUpdateInvoice,
@@ -115,7 +111,8 @@ export const InvoicesPage = () => {
               ]}
               activeTab={activeTab}
               onTabChange={(tabId) => {
-                setActiveTab(tabId);
+                // Conversion explicite du type pour s'assurer que tabId est bien un TabType
+                setActiveTab(tabId as TabType);
                 setCurrentPage(1);
               }}
               variant="simple-tabs"

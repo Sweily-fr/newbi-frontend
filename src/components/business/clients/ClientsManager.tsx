@@ -180,7 +180,7 @@ export const ClientsManager = () => {
       >
         <ClientForm
           id="clientForm"
-          initialData={selectedClient}
+          initialData={selectedClient || undefined}
           onSubmit={selectedClient ? handleUpdateClient : handleCreateClient}
         />
       </Modal>

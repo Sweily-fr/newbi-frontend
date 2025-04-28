@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Quote, CompanyInfo } from "../../../types";
-import { Button, PDFGenerator, Loader } from "../../ui";
+import { PDFGenerator, Loader } from "../../ui";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;

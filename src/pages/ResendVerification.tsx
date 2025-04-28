@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { CheckCircleIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Form, TextField, Button } from '../components/ui';
-import { Notification } from '../components/feedback/Notification';
+
 
 // Définition de la mutation GraphQL
 const RESEND_VERIFICATION_EMAIL = gql`
@@ -72,7 +72,8 @@ const ResendVerification: React.FC = () => {
                 label="Adresse email"
                 type="email"
                 placeholder="votre@email.com"
-                leftIcon={<EnvelopeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />}
+                // leftIcon n'est pas supporté par TextField, utiliser un autre moyen d'afficher l'icône
+                // Par exemple, en l'enveloppant dans un div avec position relative
                 {...register('email', {
                   required: 'L\'adresse email est requise',
                   pattern: {

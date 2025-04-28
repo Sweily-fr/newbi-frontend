@@ -4,6 +4,7 @@ import {
   CreditCardIcon,
   CalendarIcon,
 } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -12,6 +13,43 @@ interface PremiumModalProps {
 }
 
 export const PremiumModal = ({ isOpen, onClose, onSubscribe }: PremiumModalProps) => {
+  // Déterminer si nous sommes en mode production
+  const isProduction = import.meta.env.MODE === 'production';
+  
+  // Utiliser la clé API publique depuis les variables d'environnement
+  const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  
+  // Utiliser l'ID de pricing table depuis les variables d'environnement
+  const pricingTableId = import.meta.env.VITE_STRIPE_PRICING_TABLE_ID;
+  
+  // État pour suivre si le script Stripe est chargé
+  const [isStripeLoaded, setIsStripeLoaded] = useState(false);
+
+  // Charger le script Stripe dynamiquement
+  useEffect(() => {
+    if (isOpen && !isStripeLoaded) {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/pricing-table.js';
+      script.async = true;
+      script.onload = () => setIsStripeLoaded(true);
+      document.body.appendChild(script);
+      
+      return () => {
+        // Nettoyer si nécessaire
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
+  }, [isOpen, isStripeLoaded]);
+
+  // Afficher un message de debug en développement
+  useEffect(() => {
+    if (!isProduction) {
+      console.log(`Stripe initialized in TEST mode with pricing table ID: ${pricingTableId}`);
+    }
+  }, [isProduction, pricingTableId]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -48,30 +86,30 @@ export const PremiumModal = ({ isOpen, onClose, onSubscribe }: PremiumModalProps
                 </p>
               </div>
             </div>
+            
+            {/* Badge indiquant l'environnement en mode développement */}
+            {!isProduction && (
+              <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2">
+                <p className="text-xs text-yellow-700 font-medium text-center">
+                  Mode TEST - Aucun paiement réel ne sera effectué
+                </p>
+              </div>
+            )}
           </div>
           
           {/* Tableau de prix Stripe */}
-          <div className="md:w-2/3 border border-gray-200 rounded-lg p-6 bg-gray-900">
-            {/* Bouton pour s'abonner directement */}
-            {onSubscribe && (
-              <button
-                onClick={onSubscribe}
-                className="mb-4 w-full py-2 px-4 bg-[#5b50ff] hover:bg-[#4a41cc] text-white font-medium rounded-md shadow-sm transition-colors duration-200"
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <CreditCardIcon className="h-5 w-5" />
-                  Souscrire maintenant
-                </div>
-              </button>
+          <div className="md:w-2/3 border border-gray-200 rounded-lg p-6 bg-white">
+            {/* Afficher le tableau de prix Stripe uniquement si le script est chargé et les variables d'environnement sont disponibles */}
+            {isStripeLoaded && publishableKey && pricingTableId ? (
+              <stripe-pricing-table
+                pricing-table-id={pricingTableId}
+                publishable-key={publishableKey}
+              ></stripe-pricing-table>
+            ) : (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5b50ff]"></div>
+              </div>
             )}
-            <script
-              async
-              src="https://js.stripe.com/v3/pricing-table.js"
-            ></script>
-            <stripe-pricing-table
-              pricing-table-id="prctbl_1R6D71KC7DkMHAp8DWBdSVEf"
-              publishable-key="pk_test_51R6BRsKC7DkMHAp8CVLAisyHcc8bCT7HhHgWLj4MtuXmxRRMbw21UYZk9BUW2fIncGJ27YfpiskRCHZRvN8qKRTw00JlD22r3x"
-            ></stripe-pricing-table>
           </div>
         </div>
       </div>
