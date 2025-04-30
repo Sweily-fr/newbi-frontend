@@ -85,7 +85,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   console.log("CompanyInfo dans QuotePreview:", companyInfo);
 
   const documentContent = (
-    <div className="bg-white h-full print:overflow-visible">
+    <div className="bg-white print:overflow-visible" style={{ height: "auto", minHeight: "100%" }}>
       <div
         className="p-6 pb-0 max-w-full"
         style={{
@@ -93,6 +93,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
+          paddingBottom: "120px",
         }}
         data-pdf-body="true"
         data-pdf-scale="1"
@@ -374,10 +375,10 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               )}
           </div>
         )}
-
-        {/* Footer avec fond grisé - collé en bas et pleine largeur */}
-        <div
-          className="bg-gray-50 p-0 print:fixed print:bottom-0 absolute bottom-0 left-0"
+      </div>
+      {/* Footer avec fond grisé - collé en bas et pleine largeur */}
+      <div
+          className="bg-gray-50 min-w-full p-0 print:fixed print:bottom-0"
           data-pdf-footer="true"
           data-pdf-footer-on-all-pages="true"
         >
@@ -425,7 +426,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 
@@ -435,7 +435,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
 
   // Rendu final du composant
   return (
-    <div className="bg-white overflow-hidden h-full flex flex-col">
+    <div className="bg-white overflow-hidden flex flex-col" style={{ height: "100vh" }}>
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-medium">Aperçu du devis</h2>
         {showButtons && (
@@ -472,9 +472,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
         )}
       </div>
-      <div className="flex-grow bg-blue-50 py-12 overflow-auto overflow-x-hidden w-full relative">
+      <div className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative" style={{ minHeight: "0" }}>
         {isGeneratingPDF && (
-          <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-90 z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
             {pdfSuccess ? (
               <div className="flex flex-col items-center">
                 <div className="rounded-full bg-green-100 p-3 mb-2">
@@ -509,7 +509,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         )}
         <div
           className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
-          style={{ aspectRatio: "1/1.414", height: "auto" }}
+          style={{ minHeight: "29.7cm", height: "auto" }}
         >
           {documentContent}
         </div>

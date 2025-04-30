@@ -1,13 +1,14 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const PrivacyPolicyPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Helmet>
-        <title>Politique de Confidentialité | Génération Business</title>
-        <meta name="description" content="Politique de confidentialité de Génération Business - Comment nous collectons, utilisons et protégeons vos données personnelles." />
-      </Helmet>
+      <SEOHead
+        title="Politique de Confidentialité | Newbi"
+        description="Politique de confidentialité de Newbi - Comment nous collectons, utilisons et protégeons vos données personnelles."
+        schemaType="Organization"
+      />
       
       <div className="bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Politique de Confidentialité</h1>

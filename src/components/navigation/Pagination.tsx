@@ -157,7 +157,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                   onClick={() => handlePageChange(pageNumber)}
                   className={`relative inline-flex items-center px-4 py-2 border ${
                     currentPage === pageNumber
-                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                      ? 'z-10 bg-[#f9f8ff] border-[#5b50ff] text-[#5b50ff]'
                       : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                   } text-sm font-medium`}
                 >

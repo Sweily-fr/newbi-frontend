@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
 import { PremiumModal } from "../components/subscription/PremiumModal";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { SEOHead } from "../components/SEO/SEOHead";
 
 export const ToolsPage = () => {
   // État pour le tri et la recherche
@@ -24,6 +25,12 @@ export const ToolsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-6">
+      <SEOHead
+        title="Outils pour entrepreneurs | Newbi"
+        description="Découvrez tous les outils Newbi pour gérer votre entreprise efficacement - factures, devis, signatures email et plus encore."
+        keywords="outils entreprise, outils entrepreneurs, factures, devis, signature email, gestion entreprise"
+        schemaType="WebApplication"
+      />
       <div className="max-w-7xl mx-auto">
         {/* En-tête avec options de vue et tri */}
         <div className="flex justify-between items-center mb-6">

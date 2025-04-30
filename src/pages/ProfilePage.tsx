@@ -13,7 +13,6 @@ import { SubscriptionContext } from '../context/SubscriptionContext.context';
 import { Button } from '../components/ui';
 import { PremiumModal } from '../components/subscription/PremiumModal';
 import axios from 'axios';
-import { SEOHead } from '../components/SEO/SEOHead';
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);

@@ -286,7 +286,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               content="Le numéro de facture est automatiquement séquentiel pour assurer la conformité légale"
               position="right"
             >
-              <InformationCircleIcon className="h-6 w-6 ml-2 text-blue-500 cursor-help" />
+              <InformationCircleIcon className="h-6 w-6 ml-2 text-[#5b50ff] cursor-help" />
             </Tooltip>
           </div>
         </div>
@@ -408,7 +408,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   }
                   className={`min-w-[110px] flex-1 ${
                     activeDueDateButton === "emission"
-                      ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                      ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
                   }`}
                   onClick={() => {
@@ -428,7 +428,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   }
                   className={`min-w-[110px] flex-1 ${
                     activeDueDateButton === "15jours"
-                      ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                      ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
                   }`}
                   onClick={() => {
@@ -449,7 +449,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   }
                   className={`min-w-[110px] flex-1 ${
                     activeDueDateButton === "30jours"
-                      ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                      ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
                   }`}
                   onClick={() => {
@@ -470,7 +470,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   }
                   className={`min-w-[110px] flex-1 ${
                     activeDueDateButton === "custom"
-                      ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                      ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
                   }`}
                   onClick={() => {
@@ -544,7 +544,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               }
               className={`min-w-[110px] ${
                 activeHeaderNoteButton === "conditions"
-                  ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                  ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                   : ""
               }`}
               onClick={() => {
@@ -565,7 +565,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               }
               className={`min-w-[110px] ${
                 activeHeaderNoteButton === "delai"
-                  ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                  ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                   : ""
               }`}
               onClick={() => {
@@ -586,7 +586,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               }
               className={`min-w-[110px] ${
                 activeHeaderNoteButton === "reference"
-                  ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                  ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                   : ""
               }`}
               onClick={() => {
@@ -607,7 +607,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               }
               className={`min-w-[110px] ${
                 activeHeaderNoteButton === "custom"
-                  ? "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                  ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                   : ""
               }`}
               onClick={() => {

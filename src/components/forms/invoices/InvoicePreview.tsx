@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { PDFGenerator, Loader } from "../../ui";
-import {
-  Client,
-  CompanyInfo,
-  CustomField,
-} from "../../../types";
+import { Client, CompanyInfo, CustomField } from "../../../types";
 
 interface InvoicePreviewProps {
   invoice?: any;
@@ -130,11 +126,17 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     (invoice?.status === "PENDING" || invoice?.status === "COMPLETED");
 
   // Log des informations de companyInfo pour le débogage
-  console.log("CompanyInfo dans InvoicePreview:", `${import.meta.env.VITE_API_URL}${companyInfo.logo}`);
+  console.log(
+    "CompanyInfo dans InvoicePreview:",
+    `${import.meta.env.VITE_API_URL}${companyInfo.logo}`
+  );
 
   // Contenu du PDF qui sera généré - sans les classes de largeur et centrage pour le PDF
   const documentContent = (
-    <div className="bg-white h-full z-[999999] print:overflow-visible">
+    <div
+      className="bg-white print:overflow-visible"
+      style={{ height: "auto", minHeight: "100%" }}
+    >
       <div
         className="p-6 pb-0 max-w-full"
         style={{
@@ -142,6 +144,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
+          paddingBottom: "120px" /* Espace pour le footer en mode impression */,
         }}
         data-pdf-body="true"
         data-pdf-scale="1"
@@ -453,55 +456,52 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             )}
           </div>
         )}
-
-        {/* Footer avec fond grisé - collé en bas et pleine largeur */}
-        <div
-          className="bg-gray-50 p-0 print:fixed print:bottom-0 absolute bottom-0 left-0"
-          data-pdf-footer="true"
-          data-pdf-footer-on-all-pages="true"
-        >
-          <div className="flex flex-col px-6 space-y-4">
-            {/* Coordonnées bancaires - affichées uniquement si useBankDetails est vrai */}
-            {useBankDetails && companyInfo?.bankDetails && (
-              <div className="py-4">
-                <h3 className="font-medium text-gray-700 mb-4">
-                  Coordonnées bancaires
-                </h3>
-                <div className="text-xs grid grid-cols-[30%_70%] gap-x-2 gap-y-1">
-                  <span className="text-gray-600 text-xs font-normal">
-                    Banque
-                  </span>
-                  <span>{companyInfo.bankDetails.bankName}</span>
-                  <span className="text-gray-600 text-xs font-normal">
-                    IBAN
-                  </span>
-                  <span>{companyInfo.bankDetails.iban}</span>
-                  <span className="text-gray-600 text-xs font-normal">BIC</span>
-                  <span>{companyInfo.bankDetails.bic}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Notes de pied de page */}
-            {(footerNotes || invoice?.footerNotes) && (
-              <div className="border-t border-gray-200 whitespace-pre-line py-4 mt-4 text-[10px] text-gray-600">
-                <div>{footerNotes || invoice?.footerNotes}</div>
-              </div>
-            )}
-
-            {/* Pagination */}
-            <div className="text-xs text-gray-500 text-right py-2">
-              <span style={{ display: "inline", whiteSpace: "nowrap" }}>
-                Page{" "}
-                <span data-pdf-page-number="true" style={{ display: "inline" }}>
-                  1
+      </div>
+      {/* Footer avec fond grisé - collé en bas et pleine largeur */}
+      <div
+        className="bg-gray-50 min-w-full p-0 print:fixed print:bottom-0"
+        data-pdf-footer="true"
+        data-pdf-footer-on-all-pages="true"
+      >
+        <div className="flex flex-col px-6 space-y-4">
+          {/* Coordonnées bancaires - affichées uniquement si useBankDetails est vrai */}
+          {useBankDetails && companyInfo?.bankDetails && (
+            <div className="py-4">
+              <h3 className="font-medium text-gray-700 mb-4">
+                Coordonnées bancaires
+              </h3>
+              <div className="text-xs grid grid-cols-[30%_70%] gap-x-2 gap-y-1">
+                <span className="text-gray-600 text-xs font-normal">
+                  Banque
                 </span>
-                /
-                <span data-pdf-total-pages="true" style={{ display: "inline" }}>
-                  1
-                </span>
-              </span>
+                <span>{companyInfo.bankDetails.bankName}</span>
+                <span className="text-gray-600 text-xs font-normal">IBAN</span>
+                <span>{companyInfo.bankDetails.iban}</span>
+                <span className="text-gray-600 text-xs font-normal">BIC</span>
+                <span>{companyInfo.bankDetails.bic}</span>
+              </div>
             </div>
+          )}
+
+          {/* Notes de pied de page */}
+          {(footerNotes || invoice?.footerNotes) && (
+            <div className="border-t border-gray-200 whitespace-pre-line py-4 mt-4 text-[10px] text-gray-600">
+              <div>{footerNotes || invoice?.footerNotes}</div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          <div className="text-xs text-gray-500 text-right py-2">
+            <span style={{ display: "inline", whiteSpace: "nowrap" }}>
+              Page{" "}
+              <span data-pdf-page-number="true" style={{ display: "inline" }}>
+                1
+              </span>
+              /
+              <span data-pdf-total-pages="true" style={{ display: "inline" }}>
+                1
+              </span>
+            </span>
           </div>
         </div>
       </div>
@@ -514,7 +514,10 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
 
   // Rendu final du composant
   return (
-    <div className="bg-white overflow-hidden h-full flex flex-col">
+    <div
+      className="bg-white overflow-hidden flex flex-col"
+      style={{ height: "100vh" }}
+    >
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-medium">Aperçu de la facture</h2>
         {showButtons && (
@@ -550,10 +553,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         )}
       </div>
       <div
-        className="flex-grow bg-blue-50 py-12 overflow-x-hidden w-full relative"
+        className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative"
+        style={{ minHeight: "0" }}
       >
         {isGeneratingPDF && (
-          <div className="absolute inset-0 flex items-center justify-center bg-blue-50 bg-opacity-90 z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
             {pdfSuccess ? (
               <div className="flex flex-col items-center">
                 <div className="rounded-full bg-green-100 p-3 mb-2">
@@ -588,7 +592,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         )}
         <div
           className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
-          style={{ aspectRatio: "1/1.414", height: "auto" }}
+          style={{ minHeight: "29.7cm", height: "auto" }}
         >
           {documentContent}
         </div>

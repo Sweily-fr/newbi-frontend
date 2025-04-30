@@ -1,13 +1,14 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const LegalNoticePage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Helmet>
-        <title>Mentions Légales | Newbi</title>
-        <meta name="description" content="Mentions légales de Newbi - Informations légales sur notre société et notre site web." />
-      </Helmet>
+      <SEOHead
+        title="Mentions Légales | Newbi"
+        description="Mentions légales de Newbi - Informations légales sur notre société et notre site web."
+        schemaType="Organization"
+      />
       
       <div className="bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Mentions Légales</h1>

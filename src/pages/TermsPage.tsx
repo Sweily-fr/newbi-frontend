@@ -1,13 +1,14 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const TermsPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Helmet>
-        <title>Conditions Générales de Vente | Génération Business</title>
-        <meta name="description" content="Conditions générales de vente de Génération Business - Modalités d'utilisation de nos services et de souscription à nos offres." />
-      </Helmet>
+      <SEOHead
+        title="Conditions Générales de Vente | Newbi"
+        description="Conditions générales de vente de Newbi - Modalités d'utilisation de nos services et de souscription à nos offres."
+        schemaType="Organization"
+      />
       
       <div className="bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Conditions Générales de Vente</h1>

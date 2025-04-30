@@ -67,7 +67,7 @@ export const InvoiceCompanyInfo: React.FC<InvoiceCompanyInfoProps> = ({
               window.location.href = "/profile?tab=company";
             }
           }} 
-          className="text-sm text-blue-500 hover:underline"
+          className="text-sm text-[#5b50ff] hover:underline"
         >
           Configurer mes informations
         </a>

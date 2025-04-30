@@ -37,9 +37,9 @@ const InfoBox: React.FC<InfoBoxProps> = ({
       text: "text-gray-700",
     },
     info: {
-      container: "bg-blue-50 border-l-4 border-blue-400",
-      icon: "text-blue-400",
-      text: "text-blue-700",
+      container: "bg-[#f9f8ff] border-l-4 border-[#5b50ff]",
+      icon: "text-[#5b50ff]",
+      text: "text-[#5b50ff]",
     },
     warning: {
       container: "bg-yellow-50 border-l-4 border-yellow-400",
@@ -82,7 +82,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({
           {actionLink && (
             <a
               href={actionLink.href}
-              className="text-sm text-blue-500 hover:underline mt-2 inline-block"
+              className="text-sm text-[#5b50ff] hover:underline mt-2 inline-block"
               onClick={actionLink.onClick}
             >
               {actionLink.label}

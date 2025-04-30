@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import { SEOHead } from '../components/SEO/SEOHead';
 import { BlogSeoOptimizer } from '../components/business/BlogSeoOptimizer';
 
 const BlogSeoOptimizerPage: React.FC = () => {
@@ -15,18 +15,13 @@ const BlogSeoOptimizerPage: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="keywords" content={keywords} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDescription} />
-        <link rel="canonical" href={window.location.href} />
-      </Helmet>
+      <SEOHead
+        title={pageTitle}
+        description={pageDescription}
+        keywords={keywords}
+        schemaType="WebApplication"
+        schemaName="Optimisation SEO pour Blog | Newbi"
+      />
       
       <main className="container mx-auto px-4 py-8">
         <section className="mb-8">
