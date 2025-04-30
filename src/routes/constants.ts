@@ -23,4 +23,5 @@ export const ROUTES = {
   CONTACT: '/contact',
   COOKIE_PREFERENCES: '/preferences-cookies',
   MOBILE: '/mobile',
+  NOT_FOUND: '/404',
 } as const;

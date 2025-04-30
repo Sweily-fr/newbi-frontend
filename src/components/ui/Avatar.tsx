@@ -55,7 +55,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   
   // Fonction pour rendre l'icône utilisateur par défaut
   const renderUserIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   );
@@ -73,7 +73,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   const ringClasses = hasRing ? `ring-2 ring-${ringColor}` : '';
   
   // Classes pour le bouton si onClick est fourni
-  const buttonClasses = onClick ? 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' : '';
+  const buttonClasses = onClick ? 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]' : '';
   
   // Rendu conditionnel en fonction de si onClick est fourni ou non
   const renderAvatarContent = () => {
@@ -90,12 +90,12 @@ export const Avatar: React.FC<AvatarProps> = ({
             onError={() => setImageError(true)}
           />
           {!imageLoaded && name && (
-            <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-blue-500 text-white flex items-center justify-center overflow-hidden`}>
+            <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-[#5b50ff] text-white flex items-center justify-center overflow-hidden`}>
               <span className={`${fontSizeClasses[size]} font-medium`}>{getInitials(name)}</span>
             </div>
           )}
           {!imageLoaded && !name && (
-            <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-blue-500 text-white flex items-center justify-center overflow-hidden`}>
+            <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-[#5b50ff] text-white flex items-center justify-center overflow-hidden`}>
               {renderUserIcon()}
             </div>
           )}
@@ -105,14 +105,14 @@ export const Avatar: React.FC<AvatarProps> = ({
       // Cas 2: Nom disponible pour générer des initiales
       const initials = getInitials(name);
       return (
-        <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-blue-500 text-white flex items-center justify-center overflow-hidden`}>
+        <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-[#5b50ff] text-white flex items-center justify-center overflow-hidden`}>
           <span className={`${fontSizeClasses[size]} font-medium`}>{initials}</span>
         </div>
       );
     } else {
       // Cas 3: Aucune photo ni nom disponible, afficher l'icône par défaut
       return (
-        <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-blue-500 text-white flex items-center justify-center overflow-hidden`}>
+        <div className={`${sizeClasses[size]} rounded-full ${ringClasses} bg-[#5b50ff] text-white flex items-center justify-center overflow-hidden`}>
           {renderUserIcon()}
         </div>
       );

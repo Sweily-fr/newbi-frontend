@@ -103,7 +103,7 @@ export const ProfileCompletionTracker: React.FC = () => {
       {completionPercentage < 100 ? (
         <>
           <p className="text-gray-600 mb-6">
-            Complétez les informations ci-dessous pour tirer le meilleur parti de Generation Business.
+            Complétez les informations ci-dessous pour tirer le meilleur parti de Newbi.
           </p>
           
           <Progress steps={steps} currentStepId={nextStep?.id} />
@@ -126,7 +126,7 @@ export const ProfileCompletionTracker: React.FC = () => {
           </div>
           <h3 className="mt-3 text-lg font-medium text-gray-900">Profil complet !</h3>
           <p className="mt-2 text-sm text-gray-500">
-            Félicitations ! Vous avez complété toutes les étapes nécessaires pour utiliser pleinement Generation Business.
+            Félicitations ! Vous avez complété toutes les étapes nécessaires pour utiliser pleinement Newbi.
           </p>
         </div>
       )}

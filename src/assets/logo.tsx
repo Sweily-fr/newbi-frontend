@@ -41,7 +41,7 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`flex items-center ${className}`}>
       <img 
         src={getLogoPath()} 
-        alt="Generation Business" 
+        alt="Newbi" 
         className={`${height} w-auto object-contain`} 
       />
     </div>

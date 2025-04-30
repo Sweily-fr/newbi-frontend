@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import {
   HomePage,
   AuthPage,
@@ -19,7 +19,8 @@ import {
   LegalNoticeGeneratorPage,
   PrivacyPolicyGeneratorPage,
   BlogSeoOptimizerPage,
-  EmailSignaturesPage
+  EmailSignaturesPage,
+  NotFoundPage
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -120,8 +121,11 @@ export const AppRoutes = () => {
         {/* Page de redirection mobile */}
         <Route path={ROUTES.MOBILE} element={<PublicRoute><MobileRedirectPage /></PublicRoute>} />
         
-        {/* Redirection par défaut vers la page d'accueil */}
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        {/* Page 404 personnalisée */}
+        <Route path={ROUTES.NOT_FOUND} element={<PublicRoute><NotFoundPage /></PublicRoute>} />
+        
+        {/* Route par défaut - affiche la page 404 pour toutes les routes non définies */}
+        <Route path="*" element={<PublicRoute><NotFoundPage /></PublicRoute>} />
       </Routes>
       </DeviceRedirect>
     </MainLayout>
