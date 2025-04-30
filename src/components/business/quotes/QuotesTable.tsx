@@ -250,7 +250,7 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
               accessor: (quote: any) => (
                 <button
                   onClick={() => onSelectQuote(quote)}
-                  className="text-blue-600 hover:text-blue-900 font-medium cursor-pointer"
+                  className="text-[#5b50ff] hover:text-[#4a41e0] font-medium cursor-pointer"
                 >
                   Voir
                 </button>

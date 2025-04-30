@@ -180,7 +180,7 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
           {onEditSignature && (
             <button
               onClick={() => onEditSignature(signature)}
-              className="p-1 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-100"
+              className="p-1 text-[#5b50ff] hover:text-[#4a41e0] rounded-full hover:bg-[#f0eeff]"
               title="Modifier"
             >
               <PencilIcon className="h-5 w-5" />

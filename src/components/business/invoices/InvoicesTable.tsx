@@ -232,7 +232,7 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
             accessor: (invoice) => (
               <button
                 onClick={() => onSelectInvoice(invoice)}
-                className="text-blue-600 hover:text-blue-900 font-medium cursor-pointer"
+                className="text-[#5b50ff] hover:text-[#4a41e0] font-medium cursor-pointer"
               >
                 Voir
               </button>

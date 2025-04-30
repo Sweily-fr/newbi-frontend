@@ -307,6 +307,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               title="Informations générales"
               defaultOpen={true}
               hasError={sectionErrors.generalInfo}
+              description="Numéro, dates et informations de base du devis"
+              icon="document"
             >
               <QuoteGeneralInfo
                 quotePrefix={quotePrefix}
@@ -323,9 +325,11 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             </Collapse>
 
             <Collapse
-              title="Client"
+              title="Informations client"
               defaultOpen={false}
               hasError={sectionErrors.client}
+              description="Sélection ou création d'un client pour le devis"
+              icon="user"
             >
               <ClientSelection
                 isNewClient={isNewClient}
@@ -339,9 +343,11 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             </Collapse>
 
             <Collapse
-              title="Informations de l'entreprise"
+              title="Informations société"
               defaultOpen={false}
               hasError={sectionErrors.companyInfo}
+              description="Coordonnées et informations de votre entreprise"
+              icon="company"
             >
               <QuoteCompanyInfo
                 companyInfo={companyInfo}
@@ -353,9 +359,11 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             </Collapse>
 
             <Collapse
-              title="Produits / Services"
+              title="Produits et services"
               defaultOpen={false}
               hasError={sectionErrors.items}
+              description="Articles, quantités et prix à facturer"
+              icon="products"
             >
               <QuoteItems
                 items={items}
@@ -370,6 +378,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               title="Remise et totaux"
               defaultOpen={false}
               hasError={sectionErrors.discountAndTotals}
+              description="Remises, taxes et champs personnalisés"
+              icon="calculator"
             >
               <QuoteDiscountAndTotals
                 discount={discount}
@@ -384,7 +394,12 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               />
             </Collapse>
 
-            <Collapse title="Notes de bas de page" defaultOpen={false}>
+            <Collapse
+              title="Notes de bas de page"
+              defaultOpen={false}
+              description="Coordonnées bancaires, conditions et notes"
+              icon="notes"
+            >
               <QuoteBankDetails
                 userData={userData}
                 useBankDetails={useBankDetails}

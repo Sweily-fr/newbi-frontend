@@ -80,7 +80,7 @@ export function Table<T>({
               <tr 
                 key={keyExtractor(item)}
                 onClick={onRowClick ? () => onRowClick(item) : undefined}
-                className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
+                className={onRowClick ? 'cursor-pointer hover:bg-[#f0eeff]/50' : ''}
               >
                 {columns.map((column, index) => {
                   const value = typeof column.accessor === 'function' 

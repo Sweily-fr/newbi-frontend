@@ -314,7 +314,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
         {/* Formulaire à gauche */}
         <div className="w-2/5 overflow-y-auto px-6 pt-6 border-r">
           <Form onSubmit={(e) => e.preventDefault()} spacing="normal" className="w-full">
-            <Collapse title="Informations générales" defaultOpen={true} hasError={sectionErrors.generalInfo}>
+            <Collapse 
+              title="Informations générales" 
+              defaultOpen={true} 
+              hasError={sectionErrors.generalInfo}
+              description="Numéro, dates et informations de base de la facture"
+              icon="document"
+            >
               <InvoiceGeneralInfo
                 isDeposit={isDeposit}
                 setIsDeposit={setIsDeposit}
@@ -334,21 +340,33 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                 setHeaderNotes={setHeaderNotes}
               />
             </Collapse>
-            <Collapse title="Client" defaultOpen={false} hasError={sectionErrors.client}>
+            <Collapse 
+              title="Informations client" 
+              defaultOpen={false} 
+              hasError={sectionErrors.client}
+              description="Sélection ou création d'un client pour la facture"
+              icon="user"
+            >
               <ClientSelection
                 isNewClient={isNewClient}
                 setIsNewClient={handleClientModeChange}
-                selectedClient={selectedClient}
-                setSelectedClient={setSelectedClient}
                 newClient={newClient}
                 setNewClient={setNewClient}
+                selectedClient={selectedClient}
+                setSelectedClient={setSelectedClient}
                 clientsData={clientsData}
                 invoice={invoice}
                 selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
               />
             </Collapse>
 
-            <Collapse title="Informations de l'entreprise" defaultOpen={false} hasError={sectionErrors.companyInfo}>
+            <Collapse 
+              title="Informations société" 
+              defaultOpen={false} 
+              hasError={sectionErrors.companyInfo}
+              description="Coordonnées et informations de votre entreprise"
+              icon="company"
+            >
               <InvoiceCompanyInfo
                 companyInfo={companyInfo}
                 userData={userData}
@@ -358,10 +376,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
               />
             </Collapse>
 
-            {/* <Collapse title="Statut" defaultOpen={false}>
-              <InvoiceStatus status={status} setStatus={setStatus} />
-              </Collapse> */}
-            <Collapse title="Produits/Services" defaultOpen={false} hasError={sectionErrors.items}>
+            <Collapse 
+              title="Produits et services" 
+              defaultOpen={false} 
+              hasError={sectionErrors.items}
+              description="Articles, quantités et prix à facturer"
+              icon="products"
+            >
               <InvoiceItems
                 items={items}
                 handleItemChange={handleItemChange}
@@ -371,7 +392,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
               />
             </Collapse>
 
-            <Collapse title="Remise et totaux" defaultOpen={false} hasError={sectionErrors.discountAndTotals}>
+            <Collapse 
+              title="Remise et totaux" 
+              defaultOpen={false} 
+              hasError={sectionErrors.discountAndTotals}
+              description="Remises, taxes et champs personnalisés"
+              icon="calculator"
+            >
               <InvoiceDiscountAndTotals
                 discount={discount}
                 setDiscount={setDiscount}
@@ -385,10 +412,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
               />
             </Collapse>
 
-            {/* <Collapse title="Conditions générales" defaultOpen={false}>
-            </Collapse> */}
-
-            <Collapse title="Notes de bas de page" defaultOpen={false} hasError={sectionErrors.bankDetails}>
+            <Collapse 
+              title="Notes de bas de page" 
+              defaultOpen={false} 
+              hasError={sectionErrors.bankDetails}
+              description="Coordonnées bancaires, conditions et notes"
+              icon="notes"
+            >
               <InvoiceBankDetails
                 userData={userData}
                 useBankDetails={useBankDetails}
