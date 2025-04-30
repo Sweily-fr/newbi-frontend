@@ -61,7 +61,9 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   const styles = variantStyles[variant];
 
   return (
-    <div className={`${styles.container} rounded-md p-4 mb-4 ${className}`}>
+    <div 
+      className={`${styles.container} rounded-md p-4 mb-4 ${className}`}
+      style={{ boxShadow: variant === 'info' ? '0 4px 20px rgba(91, 80, 255, 0.1)' : 'none' }}>
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg

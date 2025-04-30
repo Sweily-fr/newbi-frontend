@@ -48,7 +48,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className={`absolute ${positionClass} top-full mt-2 ${width} rounded-md shadow-lg bg-white border border-gray-200 z-[9999] transform origin-top-${position} transition-all duration-200 ease-out ${className}`}
+          className={`absolute ${positionClass} top-full mt-2 ${width} rounded-md bg-white border border-[#e6e1ff] z-[9999] transform origin-top-${position} transition-all duration-200 ease-out ${className}`}
+          style={{ boxShadow: '0 4px 20px rgba(91, 80, 255, 0.15)' }}
         >
           <div className="py-1">
             {items.map((item, index) => (

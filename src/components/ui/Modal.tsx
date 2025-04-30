@@ -64,7 +64,7 @@ export const Modal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all`}>
+              <Dialog.Panel className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle transition-all`} style={{ boxShadow: '0 4px 20px rgba(91, 80, 255, 0.15)' }}>
                 {/* En-tête avec titre et bouton de fermeture */}
                 {(title || showCloseButton) && (
                   <div className="flex items-center justify-between mb-4">

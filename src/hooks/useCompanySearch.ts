@@ -20,6 +20,12 @@ export interface CompanyNameResult {
   name: string;
   siret: string;
   siren: string;
+  address: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 export const useCompanySearch = () => {

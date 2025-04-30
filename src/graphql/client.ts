@@ -97,6 +97,12 @@ export const SEARCH_COMPANIES_BY_NAME = gql`
       name
       siret
       siren
+      address {
+        street
+        city
+        postalCode
+        country
+      }
     }
   }
 `;

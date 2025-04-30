@@ -436,7 +436,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
           {/* Recherche d'entreprise - Uniquement pour les entreprises */}
           {newClient.type === ClientType.COMPANY && !showManualEntry && (
             <div className="mb-4">
-              <div className="relative">
+              <div className="relative" style={{ position: 'relative', zIndex: 1000 }}>
                 <div className="flex space-x-2">
                   <div className="flex-grow">
                     <TextField
@@ -468,20 +468,34 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                   </div>
                 </div>
                 
-                {/* Résultats de recherche */}
+                {/* Résultats de recherche - Positionnement absolu avec espace suffisant */}
                 {showResults && companiesList.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                    <ul className="py-1">
+                  <div 
+                    className="absolute left-0 right-0 mt-1 bg-white shadow-xl rounded-md border border-[#e6e1ff] overflow-auto z-[1001]"
+                    style={{
+                      maxHeight: '300px',
+                      position: 'relative',
+                      width: '100%',
+                      boxShadow: '0 4px 20px rgba(91, 80, 255, 0.15)'
+                    }}
+                  >
+                    <ul className="py-1 max-h-[70vh] overflow-y-auto">
                       {companiesList.map((company, index) => (
                         <li
                           key={index}
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          className="px-4 py-3 hover:bg-[#f0eeff] cursor-pointer transition-colors duration-150 border-b border-[#f0eeff] last:border-b-0"
                           onClick={() => handleSelectCompany(company)}
                         >
-                          <div className="font-medium">{company.name}</div>
-                          <div className="text-sm text-gray-500">
+                          <div className="font-medium text-[#5b50ff]">{company.name}</div>
+                          <div className="text-sm text-gray-600">
                             SIRET: {company.siret}
                           </div>
+                          {company.address && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              <div>{company.address.street}</div>
+                              <div>{company.address.postalCode} {company.address.city}</div>
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>
