@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import { SEOHead } from '../components/SEO/SEOHead';
 import { useCookieConsent } from '../hooks/useCookieConsent';
 import { COOKIE_CATEGORIES, CookieCategory } from '../types/cookie';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routes/constants';
+import { Notification } from '../components/feedback';
 
 export const CookiePreferencesPage: React.FC = () => {
+  const navigate = useNavigate();
   const { consent, updateCookieConsent, acceptAllCookies, rejectAllCookies } = useCookieConsent();
   const [preferences, setPreferences] = useState<Record<CookieCategory, boolean>>({
     necessary: true,
@@ -43,10 +45,20 @@ export const CookiePreferencesPage: React.FC = () => {
     
     setSaved(true);
     
-    // Réinitialiser l'état de sauvegarde après 3 secondes
+    // Afficher une notification de succès en bas à gauche
+    Notification.success('Vos préférences de cookies ont été enregistrées avec succès', {
+      position: 'bottom-left',
+      duration: 3000,
+      onClose: () => {
+        // Rediriger vers la page d'accueil après la fermeture de la notification
+        navigate(ROUTES.HOME);
+      }
+    });
+    
+    // Rediriger vers la page d'accueil après un court délai
     setTimeout(() => {
-      setSaved(false);
-    }, 3000);
+      navigate(ROUTES.HOME);
+    }, 300);
   };
 
   const handleAcceptAll = () => {
@@ -90,10 +102,15 @@ export const CookiePreferencesPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Helmet>
-        <title>Préférences de Cookies | Génération Business</title>
-        <meta name="description" content="Gérez vos préférences de cookies sur Génération Business - Contrôlez quels cookies sont utilisés lors de votre navigation sur notre site." />
-      </Helmet>
+      <SEOHead 
+        title="Préférences de Cookies | Newbi"
+        description="Gérez vos préférences de cookies sur Newbi - Contrôlez quels cookies sont utilisés lors de votre navigation sur notre site et personnalisez votre expérience."
+        keywords="cookies, préférences cookies, RGPD, confidentialité, paramètres, vie privée"
+        schemaType="WebPage"
+        additionalSchemaData={{
+          'specialty': 'Privacy Settings'
+        }}
+      />
       
       <div className="bg-white shadow-md rounded-lg p-8">
         <div className="flex justify-between items-center mb-6">
@@ -106,33 +123,25 @@ export const CookiePreferencesPage: React.FC = () => {
         <p className="text-gray-600 mb-6">
           Ce centre de préférences vous permet de personnaliser l'utilisation des cookies sur notre site. 
           Nous utilisons différents types de cookies pour optimiser votre expérience et nos services.
-          Pour plus d'informations, consultez notre <Link to={ROUTES.PRIVACY_POLICY} className="text-blue-600 hover:underline">politique de confidentialité</Link>.
+          Pour plus d'informations, consultez notre <Link to={ROUTES.PRIVACY_POLICY} className="text-[#5b50ff] hover:underline">politique de confidentialité</Link>.
         </p>
         
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <button
               onClick={handleRejectAll}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
             >
               Tout refuser
             </button>
             <button
               onClick={handleAcceptAll}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5b50ff] hover:bg-[#4a40e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
             >
               Tout accepter
             </button>
           </div>
-          
-          {saved && (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-6 flex items-center">
-              <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Vos préférences ont été enregistrées avec succès.
-            </div>
-          )}
+
           
           <div className="space-y-6">
             {COOKIE_CATEGORIES.map((category) => (
@@ -145,7 +154,7 @@ export const CookiePreferencesPage: React.FC = () => {
                       id={`toggle-${category.id}`}
                       className={`
                         absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer
-                        ${preferences[category.id] ? 'right-0 border-blue-500' : 'left-0 border-gray-300'}
+                        ${preferences[category.id] ? 'right-0 border-[#5b50ff]' : 'left-0 border-gray-300'}
                       `}
                       checked={preferences[category.id]}
                       onChange={() => handleToggle(category.id)}
@@ -155,7 +164,7 @@ export const CookiePreferencesPage: React.FC = () => {
                       htmlFor={`toggle-${category.id}`}
                       className={`
                         block overflow-hidden h-6 rounded-full cursor-pointer
-                        ${preferences[category.id] ? 'bg-blue-500' : 'bg-gray-300'}
+                        ${preferences[category.id] ? 'bg-[#5b50ff]' : 'bg-gray-300'}
                         ${category.id === 'necessary' ? 'opacity-70 cursor-not-allowed' : ''}
                       `}
                     ></label>
@@ -165,7 +174,7 @@ export const CookiePreferencesPage: React.FC = () => {
                 <p className="text-gray-600 mb-4">{category.description}</p>
                 
                 {category.id === 'necessary' && (
-                  <div className="bg-blue-50 text-blue-800 text-sm px-4 py-2 rounded">
+                  <div className="bg-[#f5f4ff] text-[#5b50ff] text-sm px-4 py-2 rounded">
                     Ces cookies sont nécessaires au fonctionnement du site et ne peuvent pas être désactivés.
                   </div>
                 )}
@@ -200,10 +209,24 @@ export const CookiePreferencesPage: React.FC = () => {
           </div>
         </div>
         
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center mt-8">
+          <div className="space-x-4">
+            <button
+              onClick={handleRejectAll}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+            >
+              Tout refuser
+            </button>
+            <button
+              onClick={handleAcceptAll}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-[#4a41e0] hover:bg-[#3a32d0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+            >
+              Tout accepter
+            </button>
+          </div>
           <button
             onClick={handleSave}
-            className="px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
           >
             Enregistrer mes préférences
           </button>

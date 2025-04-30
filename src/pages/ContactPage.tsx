@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { gql, useMutation } from '@apollo/client';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -128,10 +128,19 @@ export const ContactPage: React.FC = () => {
   
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Helmet>
-        <title>Contact | Génération Business</title>
-        <meta name="description" content="Contactez l'équipe de Génération Business pour toute question ou demande d'assistance." />
-      </Helmet>
+      <SEOHead 
+        title="Contact | Newbi"
+        description="Contactez l'équipe de Newbi pour toute question, suggestion ou besoin d'assistance. Notre équipe est là pour vous aider."
+        keywords="contact, support, aide, assistance, question, message, Newbi"
+        schemaType="ContactPage"
+        additionalSchemaData={{
+          'contactPoint': {
+            '@type': 'ContactPoint',
+            'contactType': 'customer service',
+            'email': 'contact@newbi.fr'
+          }
+        }}
+      />
       
       <div className="bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Contactez-nous</h1>
@@ -213,7 +222,7 @@ export const ContactPage: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Votre nom"
                   />
                   {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
@@ -227,7 +236,7 @@ export const ContactPage: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Votre email"
                   />
                   {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
@@ -240,7 +249,7 @@ export const ContactPage: React.FC = () => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}
                   >
                     <option value="">Sélectionnez un sujet</option>
                     <option value="question">Question générale</option>
@@ -260,7 +269,7 @@ export const ContactPage: React.FC = () => {
                     value={formData.message}
                     onChange={handleChange}
                     rows={5}
-                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Votre message"
                   ></textarea>
                   {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
@@ -276,7 +285,7 @@ export const ContactPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full bg-[#5b50ff] text-white py-2 px-4 rounded-md hover:bg-[#4a41e0] transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                   >
                     {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
                   </button>

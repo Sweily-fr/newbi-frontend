@@ -78,7 +78,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
           <ButtonLink
             to={tool.href}
             variant="outline"
-            className="rounded-lg font-medium text-sm py-2.5 px-5 w-full hover:bg-[#5b50ff] hover:text-white hover:border-[#5b50ff] transition-all duration-300"
+            className="rounded-lg font-medium text-sm py-2.5 px-5 w-full transition-all duration-300 hover:!bg-[#5b50ff] hover:text-white hover:border-transparent hover:shadow-md hover:transform hover:translate-y-[-2px]"
             disabled={tool.comingSoon}
             onClick={onClick}
           >

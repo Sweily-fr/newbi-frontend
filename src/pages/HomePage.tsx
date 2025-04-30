@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonLink } from "../components/ui/ButtonLink";
+import { SEOHead } from "../components/SEO/SEOHead";
+import { SchemaMarkup, FAQSchema } from "../components/SEO/SchemaMarkup";
 import {
   StarIcon,
   ChevronDownIcon,
@@ -43,68 +44,51 @@ export const HomePage = () => {
 
   const [billingPeriod, setBillingPeriod] = useState("annual");
 
+  // FAQ items pour le schema.org
+  const faqItems = [
+    {
+      question: "Comment créer une facture avec Newbi ?",
+      answer: "Créez un compte gratuit, accédez à l'outil de facturation, remplissez les informations requises et générez votre facture en PDF ou envoyez-la par email en 1 clic."
+    },
+    {
+      question: "Vos factures sont-elles conformes à la législation française ?",
+      answer: "Oui, notre solution respecte la réglementation française (mentions obligatoires, numérotation, archivage, sécurité RGPD, etc.)."
+    }
+  ];
+
   return (
     <>
-      <Helmet>
-        <title>Facturation, Devis & Outils Pros | Newbi</title>
-        <meta name="description" content="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français. Essai gratuit, sans engagement." />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://newbi.fr/" />
-        <meta property="og:title" content="Facturation, Devis & Outils Pros | Newbi" />
-        <meta property="og:description" content="Gérez vos factures, devis et clients facilement. Outils pros, sécurité RGPD, support français, essai gratuit !" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://newbi.fr/" />
-        <meta property="og:image" content="https://newbi.fr/logo-og.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Facturation, Devis & Outils Pros | Newbi" />
-        <meta name="twitter:description" content="Gérez vos factures, devis et clients facilement. Outils pros, sécurité RGPD, support français, essai gratuit !" />
-        <meta name="twitter:image" content="https://newbi.fr/logo-og.png" />
-        {/* Données structurées Organization */}
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Newbi",
-            "url": "https://newbi.fr/",
-            "logo": "https://newbi.fr/logo-og.png",
-            "contactPoint": [{
-              "@type": "ContactPoint",
-              "telephone": "+33-1-23-45-67-89",
-              "contactType": "customer support",
-              "areaServed": "FR",
-              "availableLanguage": ["French"]
-            }],
-            "sameAs": [
-              "https://www.linkedin.com/company/generation-business/"
-            ]
-          }
-        `}</script>
-        {/* Données structurées FAQ */}
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment créer une facture avec Newbi ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Créez un compte gratuit, accédez à l'outil de facturation, remplissez les informations requises et générez votre facture en PDF ou envoyez-la par email en 1 clic."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Est-ce conforme aux obligations légales françaises ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Oui, notre solution respecte la réglementation française (mentions obligatoires, numérotation, archivage, sécurité RGPD, etc.)."
-                }
-              }
-            ]
-          }
-        `}</script>
-      </Helmet>
+      <SEOHead 
+        title="Facturation, Devis & Outils Pros | Newbi"
+        description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français. Essai gratuit, sans engagement."
+        keywords="facturation, devis, gestion clients, outils professionnels, RGPD, auto-entrepreneur, freelance, TPE, PME"
+        canonicalUrl="https://newbi.fr/"
+        ogImage="https://newbi.fr/logo-og.png"
+      />
+      
+      {/* Données structurées Organization */}
+      <SchemaMarkup 
+        type="Organization"
+        name="Newbi"
+        description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français."
+        url="https://newbi.fr/"
+        additionalData={{
+          "logo": "https://newbi.fr/logo-og.png",
+          "contactPoint": [{
+            "@type": "ContactPoint",
+            "telephone": "+33-1-23-45-67-89",
+            "contactType": "customer support",
+            "areaServed": "FR",
+            "availableLanguage": ["French"]
+          }],
+          "sameAs": [
+            "https://www.linkedin.com/company/newbi/"
+          ]
+        }}
+      />
+      
+      {/* Données structurées FAQ */}
+      <FAQSchema items={faqItems} />
       <div className="bg-white" role="main">
 
       {/* Grid background with 6 columns - Fixed to viewport */}

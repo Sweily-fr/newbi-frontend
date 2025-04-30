@@ -5,6 +5,7 @@ import { Button } from '../components';
 import { Spinner } from '../components/feedback';
 import { Notification } from '../components/feedback';
 import { NotificationComponent } from '../components/ui/NotificationComponent';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 // Types pour le formulaire
 interface LegalNoticeForm {
@@ -258,7 +259,7 @@ Tout litige en relation avec l'utilisation du site ${formValues.websiteUrl} est 
 
 ----------
 
-Ces mentions légales ont été générées via Generation Business le ${new Date().toLocaleDateString('fr-FR')}.
+Ces mentions légales ont été générées via Newbi le ${new Date().toLocaleDateString('fr-FR')}.
 `;
 
     setGeneratedText(text);
@@ -316,8 +317,24 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-6">
+      <SEOHead 
+        title="Générateur de Mentions Légales Gratuit | Conforme RGPD | Newbi"
+        description="Créez facilement des mentions légales conformes à la législation française pour votre site web. Outil gratuit, personnalisable et prêt à l'emploi."
+        keywords="mentions légales, générateur, site web, RGPD, conformité légale, hébergeur, entreprise, directeur de publication"
+        schemaType="WebApplication"
+        schemaName="Générateur de Mentions Légales Newbi"
+        schemaPrice="0"
+        additionalSchemaData={{
+          'applicationCategory': 'BusinessApplication',
+          'operatingSystem': 'Web'
+        }}
+      />
+      
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Générateur de mentions légales</h1>
+        <header>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Générateur de mentions légales</h1>
+          <p className="text-gray-600 mb-6">Créez des mentions légales conformes à la législation française en quelques clics</p>
+        </header>
         
         {notification && (
           <NotificationComponent
@@ -328,9 +345,9 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
         )}
         
         {!showResult ? (
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <section className="bg-white shadow-md rounded-lg p-6" aria-labelledby="form-heading">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-700">Informations pour vos mentions légales</h2>
+              <h2 id="form-heading" className="text-lg font-semibold text-gray-700">Informations pour vos mentions légales</h2>
               {isAuthenticated && (
                 <Button
                   onClick={fillCompanyInfo}
@@ -361,7 +378,7 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
                 </p>
               </div>
               
-              <h3 className="text-md font-medium text-gray-700 border-b pb-2 mb-4">Informations sur l'entreprise</h3>
+              <h3 id="company-info-section" className="text-md font-medium text-gray-700 border-b pb-2 mb-4">Informations sur l'entreprise</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -540,7 +557,7 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
                 </div>
               </div>
               
-              <h3 className="text-md font-medium text-gray-700 border-b pb-2 mb-4 mt-8">Informations sur le site web</h3>
+              <h3 id="website-info-section" className="text-md font-medium text-gray-700 border-b pb-2 mb-4 mt-8">Informations sur le site web</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -563,7 +580,7 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
                 </div>
               </div>
               
-              <h3 className="text-md font-medium text-gray-700 border-b pb-2 mb-4 mt-8">Informations sur l'hébergeur</h3>
+              <h3 id="hosting-info-section" className="text-md font-medium text-gray-700 border-b pb-2 mb-4 mt-8">Informations sur l'hébergeur</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -628,16 +645,16 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
               </div>
               
               <div className="flex justify-end mt-8">
-                <Button onClick={generateLegalNotice} variant="primary">
+                <Button onClick={generateLegalNotice} variant="primary" className="hover:bg-[#4a41e0] focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]">
                   Générer les mentions légales
                 </Button>
               </div>
             </form>
-          </div>
+          </section>
         ) : (
-          <div id="result-section" className="bg-white shadow-md rounded-lg p-6">
+          <section id="result-section" className="bg-white shadow-md rounded-lg p-6" aria-labelledby="result-heading">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-700">Mentions légales générées</h2>
+              <h2 id="result-heading" className="text-lg font-semibold text-gray-700">Mentions légales générées</h2>
               <div className="flex items-center space-x-4">
 
                 <div className="flex items-center">
@@ -673,7 +690,9 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
               <textarea
                 value={generatedText}
                 onChange={handleTextChange}
-                className="w-full h-[500px] font-mono text-sm focus:outline-none resize-none"
+                className="w-full h-[500px] font-mono text-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] resize-none"
+                aria-label="Contenu des mentions légales"
+                id="legal-notice-content"
               />
             </div>
             
@@ -690,14 +709,14 @@ Ces mentions légales ont été générées via Generation Business le ${new Dat
                 </svg>
                 Modifier les informations
               </Button>
-              <Button onClick={copyToClipboard} variant="primary" className="flex items-center">
+              <Button onClick={copyToClipboard} variant="primary" className="flex items-center hover:bg-[#4a41e0] focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]">
                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-12a2 2 0 00-2-2h-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Copier au format {copyFormat === 'html' ? 'HTML' : 'texte'}
               </Button>
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>

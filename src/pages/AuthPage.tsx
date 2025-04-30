@@ -5,6 +5,7 @@ import { LoginForm } from '../components/forms/auth/LoginForm';
 import { RegisterForm } from '../components/forms/auth/RegisterForm';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../assets/logo';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,6 +20,13 @@ export const AuthPage = () => {
 
   return (
     <div className="min-h-screen pt-10 bg-gray-50">
+      <SEOHead 
+        title="Connexion et Inscription | Newbi"
+        description="Connectez-vous à votre compte Newbi ou créez un nouveau compte pour accéder à nos outils d'intelligence artificielle pour entrepreneurs et marketeurs."
+        keywords="connexion, inscription, login, register, compte Newbi, outils IA, marketing digital"
+        schemaType="WebPage"
+        noindex={true}
+      />
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="absolute top-8 left-8">
           <Link 

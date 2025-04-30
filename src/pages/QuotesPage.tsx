@@ -9,6 +9,8 @@ import { Notification } from '../components/feedback';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTE_STATS } from '../graphql/quotes';
 import { QuoteFormModal } from '../components/forms/quotes/QuoteFormModal';
+import { SEOHead } from '../components/SEO/SEOHead';
+import { SchemaMarkup } from '../components/SEO/SchemaMarkup';
 
 export const QuotesPage = () => {
   const {
@@ -63,7 +65,37 @@ export const QuotesPage = () => {
   if (statsLoading) return <div className="flex justify-center items-center h-screen">Chargement...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <SEOHead 
+        title="Gestion des Devis | Newbi"
+        description="Créez et gérez vos devis professionnels avec Newbi. Modèles personnalisables, suivi des conversions et transformation en factures en un clic."
+        keywords="devis, gestion devis, devis professionnels, conversion devis, auto-entrepreneur, freelance, TPE, PME"
+        canonicalUrl="https://newbi.fr/devis"
+        noindex={false}
+      />
+      
+      {/* Données structurées Service */}
+      <SchemaMarkup 
+        type="Service"
+        name="Gestion des Devis Newbi"
+        description="Solution complète de création et gestion de devis pour professionnels, auto-entrepreneurs et PME"
+        url="https://newbi.fr/devis"
+        additionalData={{
+          "provider": {
+            "@type": "Organization",
+            "name": "Newbi",
+            "url": "https://newbi.fr/"
+          },
+          "serviceType": "Gestion de devis en ligne",
+          "offers": {
+            "@type": "Offer",
+            "price": "14.99",
+            "priceCurrency": "EUR"
+          }
+        }}
+      />
+      
+      <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0 mb-6">
           <div className="flex justify-between items-center">
@@ -192,5 +224,6 @@ export const QuotesPage = () => {
         }}
       />
     </div>
+    </>
   );
 };

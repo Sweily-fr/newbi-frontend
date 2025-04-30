@@ -13,8 +13,9 @@ import { Notification } from '../../../feedback/Notification';
 interface LinkPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (url: string, isInternal: boolean) => void;
+  onSubmit: (url: string, isInternal: boolean, linkText?: string) => void;
   initialSelection: string;
+  noSelection?: boolean;
 }
 
 interface ImagePopupProps {
@@ -31,16 +32,21 @@ interface EditImagePopupProps {
 }
 
 // Composant de popup pour l'ajout de liens utilisant le composant Modal
-const LinkPopup: React.FC<LinkPopupProps> = ({ isOpen, onClose, onSubmit, initialSelection }) => {
+const LinkPopup: React.FC<LinkPopupProps> = ({ isOpen, onClose, onSubmit, initialSelection, noSelection = false }) => {
   const [url, setUrl] = useState('');
+  const [linkText, setLinkText] = useState(initialSelection);
   const [isInternal, setIsInternal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      // Réinitialiser les valeurs à chaque ouverture
+      setLinkText(initialSelection);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialSelection]);
   
   return (
     <Modal 
@@ -50,7 +56,24 @@ const LinkPopup: React.FC<LinkPopupProps> = ({ isOpen, onClose, onSubmit, initia
       size="md"
     >
       <div>
-        <p className="text-sm text-gray-600 mb-4">Texte sélectionné: <strong>{initialSelection || "(aucun texte sélectionné)"}</strong></p>
+        {noSelection ? (
+          <div className="mb-4">
+            <label htmlFor="linkText" className="block text-sm font-medium text-gray-700 mb-1">Texte du lien</label>
+            <input 
+              type="text" 
+              id="linkText" 
+              value={linkText} 
+              onChange={(e) => setLinkText(e.target.value)} 
+              className="w-full px-3 py-2 border border-[#e6e1ff] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] bg-[#f9f8ff]"
+              placeholder="Texte du lien"
+            />
+            <p className="text-xs text-[#8a82ff] mt-1">Entrez le texte qui sera affiché pour ce lien</p>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600 mb-4 p-2 bg-[#f0eeff] rounded-md border border-[#e6e1ff]">
+            Texte sélectionné: <strong>{initialSelection}</strong>
+          </p>
+        )}
         
         <div className="mb-4">
           <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">URL du lien</label>
@@ -60,7 +83,7 @@ const LinkPopup: React.FC<LinkPopupProps> = ({ isOpen, onClose, onSubmit, initia
             ref={inputRef}
             value={url} 
             onChange={(e) => setUrl(e.target.value)} 
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-[#e6e1ff] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] bg-[#f9f8ff]"
             placeholder="https://exemple.com"
           />
         </div>
@@ -86,14 +109,15 @@ const LinkPopup: React.FC<LinkPopupProps> = ({ isOpen, onClose, onSubmit, initia
           </button>
           <button 
             onClick={() => {
-              if (url.trim()) {
-                onSubmit(url, isInternal);
+              if (url.trim() && (!noSelection || (noSelection && linkText.trim()))) {
+                onSubmit(url, isInternal, noSelection ? linkText : undefined);
                 setUrl('');
+                setLinkText('');
                 setIsInternal(false);
               }
             }} 
-            disabled={!url.trim()}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${url.trim() ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+            disabled={!url.trim() || (noSelection && !linkText.trim())}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] transition-all duration-200 ${url.trim() && (!noSelection || (noSelection && linkText.trim())) ? 'bg-[#5b50ff] hover:bg-[#4a41e0]' : 'bg-[#c4c0ff] cursor-not-allowed'}`}
           >
             Ajouter le lien
           </button>
@@ -239,7 +263,7 @@ const EditImagePopup: React.FC<EditImagePopupProps> = ({ isOpen, onClose, imageE
               onSubmit(alt, width, height);
               onClose();
             }} 
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 text-sm font-medium text-white bg-[#5b50ff] rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-[#5b50ff] transition-all duration-200"
           >
             Appliquer les modifications
           </button>
@@ -433,7 +457,7 @@ const ImagePopup: React.FC<ImagePopupProps> = ({ isOpen, onClose, onSubmit }) =>
               }
             }} 
             disabled={!file}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${file ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] transition-all duration-200 ${file ? 'bg-[#5b50ff] hover:bg-[#4a41e0]' : 'bg-[#c4c0ff] cursor-not-allowed'}`}
           >
             Insérer l'image
           </button>
@@ -1006,7 +1030,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
       case 'good':
         return 'border-l-4 border-green-500';
       case 'improvement':
-        return 'border-l-4 border-orange-500';
+        return 'border-l-4 border-[#5b50ff]';
       case 'problem':
         return 'border-l-4 border-red-500';
       default:
@@ -1021,9 +1045,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
     } else if (count >= 2000 && count <= 2500) {
       return { label: 'Très bien', color: 'text-green-500' };
     } else if (count >= 1500 && count < 2000) {
-      return { label: 'Bien', color: 'text-blue-500' };
+      return { label: 'Bien', color: 'text-[#5b50ff]' };
     } else if (count >= 1000 && count < 1500) {
-      return { label: 'À améliorer', color: 'text-yellow-500' };
+      return { label: 'À améliorer', color: 'text-[#8a82ff]' };
     } else if (count >= 600 && count < 1000) {
       return { label: 'Insuffisant', color: 'text-orange-500' };
     } else {
@@ -1085,7 +1109,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
         );
       case 'improvement':
         return (
-          <svg className="h-5 w-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="h-5 w-5 text-[#5b50ff]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
         );
@@ -1188,15 +1212,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <div className="lg:w-2/3 relative bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="lg:w-2/3 relative bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
       {/* Compteur de mots avec évaluation */}
-      <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-md px-2 py-1 shadow-sm border border-gray-200 flex items-center space-x-2">
+      <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-md px-2 py-1 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
         <span className="text-xs text-gray-500">Mots:</span>
         <span className="text-sm font-medium">{currentWordCount}</span>
         <span className={`text-xs font-medium ${getWordCountRating(currentWordCount).color} ml-1 px-1.5 py-0.5 rounded-full text-xs bg-opacity-20 ${getWordCountRating(currentWordCount).color.replace('text-', 'bg-')}`}>({getWordCountRating(currentWordCount).label})</span>
       </div>
       {/* Barre d'outils */}
-      <div className="flex h-[70px] justify-between items-center bg-gray-100 border-b border-gray-300 p-2">
+      <div className="flex h-[70px] justify-between items-center bg-[#f0eeff] border-b border-[#e6e1ff] p-2">
           <div className="flex flex-wrap gap-2 items-center">
             {/* Groupe 1: Formatage de texte de base */}
             <div className="flex items-center">
@@ -1205,10 +1229,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   handleFormatAction('bold');
                 }}
-                className={`p-1.5 rounded hover:bg-gray-200 ${activeFormats.bold ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#f0eeff] transition-colors duration-200 ${activeFormats.bold ? 'bg-[#d8d3ff]' : ''}`}
                 title="Gras"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="#5b50ff">
                   <text x="6" y="14" fontSize="12" fontWeight="bold">B</text>
                 </svg>
               </button>
@@ -1217,7 +1241,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   handleFormatAction('italic');
                 }}
-                className={`p-1.5 rounded hover:bg-gray-200 ${activeFormats.italic ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.italic ? 'bg-[#d8d3ff]' : ''}`}
                 title="Italique"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -1229,7 +1253,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   handleFormatAction('underline');
                 }}
-                className={`p-1.5 rounded hover:bg-gray-200 ${activeFormats.underline ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.underline ? 'bg-[#d8d3ff]' : ''}`}
                 title="Souligné"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
@@ -1244,7 +1268,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
             {/* Groupe 2: Titres et paragraphes */}
             <div className="flex items-center">
               <button 
-                className={`p-1.5 rounded hover:bg-gray-200 min-w-[28px] text-center ${activeFormats.h1 ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 min-w-[28px] text-center ${activeFormats.h1 ? 'bg-[#d8d3ff]' : ''}`}
                 title="Titre H1"
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -1254,7 +1278,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                 <span className="font-bold text-sm">H1</span>
               </button>
               <button 
-                className={`p-1.5 rounded hover:bg-gray-200 min-w-[28px] text-center ${activeFormats.h2 ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 min-w-[28px] text-center ${activeFormats.h2 ? 'bg-[#d8d3ff]' : ''}`}
                 title="Titre H2"
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -1264,7 +1288,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                 <span className="font-bold text-sm">H2</span>
               </button>
               <button 
-                className={`p-1.5 rounded hover:bg-gray-200 min-w-[28px] text-center ${activeFormats.h3 ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 min-w-[28px] text-center ${activeFormats.h3 ? 'bg-[#d8d3ff]' : ''}`}
                 title="Titre H3"
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -1274,7 +1298,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                 <span className="font-bold text-sm">H3</span>
               </button>
               <button 
-                className={`p-1.5 rounded hover:bg-gray-200 min-w-[28px] text-center ${activeFormats.p ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 min-w-[28px] text-center ${activeFormats.p ? 'bg-[#d8d3ff]' : ''}`}
                 title="Paragraphe"
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -1294,6 +1318,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   // Capturer le texte sélectionné
                   const selection = window.getSelection();
+                  
                   if (selection && selection.toString().trim() && selection.rangeCount > 0) {
                     // Sauvegarder le texte sélectionné
                     setSelectedText(selection.toString());
@@ -1302,10 +1327,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                     const range = selection.getRangeAt(0);
                     setSavedRange(range.cloneRange());
                     
-                    // Ouvrir la popup
+                    // Ouvrir la popup avec le texte sélectionné
                     setIsLinkPopupOpen(true);
                   } else {
-                    alert('Veuillez sélectionner du texte avant d\'ajouter un lien.');
+                    // Aucun texte sélectionné, ouvrir la popup en mode "sans sélection"
+                    setSelectedText('');
+                    
+                    // Sauvegarder la position du curseur
+                    if (selection && selection.rangeCount > 0) {
+                      setSavedRange(selection.getRangeAt(0).cloneRange());
+                    }
+                    
+                    // Ouvrir la popup sans texte sélectionné
+                    setIsLinkPopupOpen(true);
                   }
                 }}
                 className="p-1.5 rounded hover:bg-gray-200"
@@ -1322,7 +1356,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                     e.preventDefault();
                     handleRemoveLink();
                   }}
-                  className="p-1.5 rounded hover:bg-gray-200 bg-red-100"
+                  className="p-1.5 rounded hover:bg-[#e6e1ff] bg-red-50 transition-colors duration-200"
                   title="Supprimer le lien"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
@@ -1361,7 +1395,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   handleFormatAction('insertUnorderedList');
                 }}
-                className={`p-1.5 rounded hover:bg-gray-200 ${activeFormats.ul ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.ul ? 'bg-[#d8d3ff]' : ''}`}
                 title="Liste à puces"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -1378,7 +1412,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                   e.preventDefault();
                   handleFormatAction('insertOrderedList');
                 }}
-                className={`p-1.5 rounded hover:bg-gray-200 ${activeFormats.ol ? 'bg-gray-300' : ''}`}
+                className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.ol ? 'bg-[#d8d3ff]' : ''}`}
                 title="Liste numérotée"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -1408,7 +1442,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
               }, 300);
             }}
             disabled={isAnalyzing}
-            className={`px-4 py-2 rounded-md text-white font-medium flex items-center ${isAnalyzing ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            className={`px-4 py-2 rounded-md text-white font-medium flex items-center transition-all duration-200 ${isAnalyzing ? 'bg-[#8a82ff] cursor-not-allowed' : 'bg-[#5b50ff] hover:bg-[#4a41e0] shadow-sm hover:shadow'}`}
           >
             {isAnalyzing ? (
               <>
@@ -1430,20 +1464,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
       </div>
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* La classe keyword-highlight est désactivée - les titres n'ont plus de bordure bleue */
+            /* La classe keyword-highlight est désactivée - les titres n'ont plus de bordure spéciale */
             .keyword-highlight {
               /* Styles supprimés */
             }
             
             /* Styles pour les liens */
             [contenteditable] a[data-link-type="internal"] {
-              color: #3b82f6;
+              color: #5b50ff;
               text-decoration: underline;
+              transition: color 0.2s ease;
+            }
+            
+            [contenteditable] a[data-link-type="internal"]:hover {
+              color: #4a41e0;
             }
             
             [contenteditable] a[data-link-type="external"] {
-              color: #8b5cf6;
+              color: #8a82ff;
               text-decoration: underline;
+              transition: color 0.2s ease;
+            }
+            
+            [contenteditable] a[data-link-type="external"]:hover {
+              color: #7a71ff;
             }
             
             /* Styles pour les titres */
@@ -1509,7 +1553,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
       </div>
       
       {/* Recommandations */}
-      <div className="lg:w-1/3 bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="lg:w-1/3 bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Recommandations</h2>
           
@@ -1518,7 +1562,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
               <div key={category} className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
                 {/* En-tête de la catégorie (toujours visible) */}
                 <button 
-                  className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="w-full flex items-center justify-between p-3 bg-[#f9f8ff] hover:bg-[#f0eeff] transition-colors duration-200"
                   onClick={() => setExpandedCategories(prev => ({
                     ...prev,
                     [category]: !prev[category]
@@ -1559,7 +1603,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                       .map(result => (
                         <div 
                           key={result.id} 
-                          className={`p-3 bg-white rounded-lg border ${getStatusBorderColor(result.status)}`}
+                          className={`p-3 bg-white rounded-lg border shadow-sm hover:shadow transition-all duration-200 ${getStatusBorderColor(result.status)}`}
                         >
                           <div className="flex items-start">
                             <div className="flex-shrink-0 mt-0.5">
@@ -1601,7 +1645,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                                         <li key={index} className="flex items-start">
                                           {/* Afficher un indicateur visuel pour les liens internes */}
                                           {isInternalLinkSuggestion && (
-                                            <span className="inline-flex items-center justify-center mr-1 text-blue-600">
+                                            <span className="inline-flex items-center justify-center mr-1 text-[#5b50ff]">
                                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
                                               </svg>
@@ -1610,7 +1654,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                                           
                                           {/* Afficher un indicateur visuel pour les liens externes */}
                                           {isExternalLinkSuggestion && (
-                                            <span className="inline-flex items-center justify-center mr-1 text-purple-600">
+                                            <span className="inline-flex items-center justify-center mr-1 text-[#8a82ff]">
                                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                 <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
                                                 <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
@@ -1619,7 +1663,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                                           )}
                                           
                                           {/* Texte de la suggestion */}
-                                          <span className={`${isInternalLinkSuggestion ? 'text-blue-600' : isExternalLinkSuggestion ? 'text-purple-600' : ''}`}>
+                                          <span className={`${isInternalLinkSuggestion ? 'text-[#5b50ff]' : isExternalLinkSuggestion ? 'text-[#8a82ff]' : ''}`}>
                                             {suggestion}
                                           </span>
                                         </li>
@@ -1656,7 +1700,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
         isOpen={isLinkPopupOpen} 
         onClose={() => setIsLinkPopupOpen(false)} 
         initialSelection={selectedText}
-        onSubmit={(url, isInternal) => {
+        noSelection={!selectedText.trim()}
+        onSubmit={(url, isInternal, linkText) => {
           // Ajouter le lien avec un attribut data-link-type pour distinguer les liens internes et externes
           if (url && savedRange) {
             // Focus sur l'éditeur
@@ -1669,6 +1714,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
             if (selection) {
               selection.removeAllRanges();
               selection.addRange(savedRange);
+              
+              // Si un texte de lien est fourni (cas où aucun texte n'était sélectionné)
+              if (linkText) {
+                // Insérer d'abord le texte du lien à la position du curseur
+                document.execCommand('insertText', false, linkText);
+                
+                // Puis sélectionner ce texte nouvellement inséré
+                const newRange = selection.getRangeAt(0);
+                newRange.setStart(newRange.startContainer, newRange.startOffset - linkText.length);
+                newRange.setEnd(newRange.endContainer, newRange.endOffset);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+              }
               
               // Appliquer le lien
               document.execCommand('createLink', false, url);
@@ -1690,10 +1748,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                       // Appliquer directement les styles pour s'assurer que la couleur est visible immédiatement
                       if (link instanceof HTMLElement) {
                         if (isInternal) {
-                          link.style.color = '#3b82f6'; // Bleu
+                          link.style.color = '#5b50ff'; // Violet principal Newbi
                           link.style.textDecoration = 'underline';
                         } else {
-                          link.style.color = '#8b5cf6'; // Violet
+                          link.style.color = '#8a82ff'; // Violet secondaire Newbi
                           link.style.textDecoration = 'underline';
                           
                           // Ajouter target="_blank" et rel="noopener noreferrer" pour les liens externes
@@ -1825,7 +1883,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
           // Afficher la notification de succès
           Notification.success('Image modifiée avec succès', {
             position: 'bottom-left',
-            duration: 3000
+            duration: 3000,
+            style: {
+              backgroundColor: '#f0eeff',
+              borderLeft: '4px solid #5b50ff',
+              color: '#5b50ff'
+            }
           });
           
           // Réinitialiser et fermer la popup

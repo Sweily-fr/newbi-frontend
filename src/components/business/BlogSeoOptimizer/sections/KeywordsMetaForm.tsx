@@ -88,8 +88,8 @@ const KeywordsMetaForm: React.FC = () => {
   }, [state.metaTags, setMetaTags]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-6 border-b border-gray-200">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
+      <div className="p-6 border-b border-[#f0eeff]">
         <h2 className="text-xl font-semibold mb-4">Mots-clés</h2>
         
         {/* Mot-clé principal */}
@@ -102,7 +102,7 @@ const KeywordsMetaForm: React.FC = () => {
             id="main-keyword"
             value={state.keywords.main}
             onChange={handleMainKeywordChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
             placeholder="Entrez votre mot-clé principal"
           />
           <p className="mt-1 text-sm text-gray-500">
@@ -115,13 +115,13 @@ const KeywordsMetaForm: React.FC = () => {
           <label htmlFor="secondary-keyword" className="block text-sm font-medium text-gray-700 mb-1">
             Mots-clés secondaires <span className="text-xs text-gray-500">(5 maximum)</span>
           </label>
-          <div className="flex">
+          <div className="flex gap-2">
             <input
               type="text"
               id="secondary-keyword"
               value={secondaryKeyword}
               onChange={(e) => setSecondaryKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
               placeholder="Ajouter un mot-clé secondaire"
               disabled={state.keywords.secondary.length >= 5}
               onKeyPress={(e) => {
@@ -134,7 +134,7 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddSecondaryKeyword}
-              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff] disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={state.keywords.secondary.length >= 5}
             >
               Ajouter
@@ -145,12 +145,12 @@ const KeywordsMetaForm: React.FC = () => {
           {state.keywords.secondary.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {state.keywords.secondary.map((keyword, index) => (
-                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]">
                   {keyword}
                   <button
                     type="button"
                     onClick={() => handleRemoveSecondaryKeyword(keyword)}
-                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-blue-200 text-blue-500 hover:bg-blue-300 focus:outline-none"
+                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none"
                   >
                     <span className="sr-only">Supprimer</span>
                     <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
@@ -172,13 +172,13 @@ const KeywordsMetaForm: React.FC = () => {
           <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700 mb-1">
             Mots-clés de longue traîne <span className="text-xs text-gray-500">(5 maximum)</span>
           </label>
-          <div className="flex">
+          <div className="flex gap-2">
             <input
               type="text"
               id="long-tail-keyword"
               value={longTailKeyword}
               onChange={(e) => setLongTailKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
               placeholder="Ajouter un mot-clé de longue traîne"
               disabled={state.keywords.longTail.length >= 5}
               onKeyPress={(e) => {
@@ -191,7 +191,7 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddLongTailKeyword}
-              className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff] disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={state.keywords.longTail.length >= 5}
             >
               Ajouter
@@ -202,12 +202,12 @@ const KeywordsMetaForm: React.FC = () => {
           {state.keywords.longTail.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {state.keywords.longTail.map((keyword, index) => (
-                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]">
                   {keyword}
                   <button
                     type="button"
                     onClick={() => handleRemoveLongTailKeyword(keyword)}
-                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-green-200 text-green-500 hover:bg-green-300 focus:outline-none"
+                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none"
                   >
                     <span className="sr-only">Supprimer</span>
                     <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
@@ -239,7 +239,7 @@ const KeywordsMetaForm: React.FC = () => {
             name="title"
             value={state.metaTags.title}
             onChange={handleMetaTagChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
             placeholder="Entrez le titre de votre page"
           />
           <div className="mt-1 flex justify-between">
@@ -263,7 +263,7 @@ const KeywordsMetaForm: React.FC = () => {
             value={state.metaTags.description}
             onChange={handleMetaTagChange}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
             placeholder="Entrez la description de votre page"
           />
           <div className="mt-1 flex justify-between">

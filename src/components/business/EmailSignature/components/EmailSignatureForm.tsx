@@ -40,7 +40,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   });
   // Template est défini par défaut à 'simple' et n'est plus modifiable via l'interface
   const template = initialData?.template || 'simple';
-  const [primaryColor, setPrimaryColor] = useState(initialData?.primaryColor || '#0066cc');
+  const [primaryColor, setPrimaryColor] = useState(initialData?.primaryColor || '#5b50ff');
   const [secondaryColor, setSecondaryColor] = useState(initialData?.secondaryColor || '#f5f5f5');
   const [logoUrl, setLogoUrl] = useState(initialData?.logoUrl || '');
   const [showLogo, setShowLogo] = useState(initialData?.showLogo !== undefined ? initialData.showLogo : true);
@@ -1046,7 +1046,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   </label>
                   <div className="grid grid-cols-3 gap-3">
                     <div 
-                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'plain' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'plain' ? 'border-[#5b50ff] bg-[#f0eeff]' : 'border-gray-300'}`}
                       onClick={() => {
                         setSocialLinksIconStyle('plain');
                         setSocialLinksIconColor(primaryColor);
@@ -1067,7 +1067,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       <div className="text-xs text-gray-500">Sans fond</div>
                     </div>
                     <div 
-                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'rounded' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'rounded' ? 'border-[#5b50ff] bg-[#f0eeff]' : 'border-gray-300'}`}
                       onClick={() => {
                         setSocialLinksIconStyle('rounded');
                         if (socialLinksIconColor === primaryColor) {
@@ -1100,7 +1100,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       <div className="text-xs text-gray-500">Carré arrondi</div>
                     </div>
                     <div 
-                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'circle' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                      className={`border rounded-md p-3 cursor-pointer flex flex-col items-center ${socialLinksIconStyle === 'circle' ? 'border-[#5b50ff] bg-[#f0eeff]' : 'border-gray-300'}`}
                       onClick={() => {
                         setSocialLinksIconStyle('circle');
                         if (socialLinksIconColor === primaryColor) {
@@ -1163,7 +1163,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                               type="text"
                               value={socialLinksIconColor}
                               onChange={(e) => setSocialLinksIconColor(e.target.value)}
-                              className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                              className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-[#5b50ff] focus:border-[#5b50ff] shadow-sm transition-all"
                             />
                             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5b50ff' }} onClick={() => setSocialLinksIconColor('#5b50ff')} title="Violet" />
@@ -1172,7 +1172,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                           <button
                             type="button"
                             onClick={() => setSocialLinksIconColor('#5b50ff')}
-                            className="ml-2 px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-colors"
+                            className="ml-2 px-3 py-1.5 text-xs font-medium bg-[#f0eeff] text-[#5b50ff] border border-[#d6d1ff] hover:bg-[#e6e1ff] transition-colors"
                           >
                             Violet
                           </button>
@@ -1241,7 +1241,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                                 type="text"
                                 value={socialLinksIconBgColor}
                                 onChange={(e) => setSocialLinksIconBgColor(e.target.value)}
-                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-[#5b50ff] focus:border-[#5b50ff] shadow-sm transition-all"
                               />
                               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5b50ff' }} onClick={() => setSocialLinksIconBgColor('#5b50ff')} title="Violet" />
@@ -1250,7 +1250,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             <button
                               type="button"
                               onClick={() => setSocialLinksIconBgColor('#5b50ff')}
-                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-100 transition-colors"
+                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-[#f0eeff] text-[#5b50ff] border border-[#d6d1ff] hover:bg-[#e6e1ff] transition-colors"
                             >
                               Violet
                             </button>
@@ -1279,7 +1279,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                                 type="text"
                                 value={socialLinksIconColor}
                                 onChange={(e) => setSocialLinksIconColor(e.target.value)}
-                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                                className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-xl focus:ring-1 focus:ring-[#5b50ff] focus:border-[#5b50ff] shadow-sm transition-all"
                               />
                               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                                 <div className="w-3 h-3 rounded-full bg-white border border-gray-300" onClick={() => setSocialLinksIconColor('#FFFFFF')} title="Blanc" />
@@ -1352,7 +1352,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                         setLayout('vertical');
                         handleFormChange({ layout: 'vertical' });
                       }}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                     />
                     <label htmlFor="layoutVertical" className="ml-2 block text-sm text-gray-700">
                       Verticale
@@ -1369,7 +1369,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                         setLayout('horizontal');
                         handleFormChange({ layout: 'horizontal' });
                       }}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                     />
                     <label htmlFor="layoutHorizontal" className="ml-2 block text-sm text-gray-700">
                       Horizontale
@@ -1446,7 +1446,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             setVerticalAlignment('left');
                             handleFormChange({ verticalAlignment: 'left' });
                           }}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                         />
                         <label htmlFor="alignLeft" className="ml-2 block text-sm text-gray-700">
                           Gauche
@@ -1463,7 +1463,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             setVerticalAlignment('center');
                             handleFormChange({ verticalAlignment: 'center' });
                           }}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                         />
                         <label htmlFor="alignCenter" className="ml-2 block text-sm text-gray-700">
                           Centre
@@ -1480,7 +1480,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             setVerticalAlignment('right');
                             handleFormChange({ verticalAlignment: 'right' });
                           }}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                         />
                         <label htmlFor="alignRight" className="ml-2 block text-sm text-gray-700">
                           Droite
@@ -1506,7 +1506,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             setImagesLayout('vertical');
                             handleFormChange({ imagesLayout: 'vertical' });
                           }}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                         />
                         <label htmlFor="imagesVertical" className="ml-2 block text-sm text-gray-700">
                           Verticale
@@ -1523,7 +1523,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                             setImagesLayout('horizontal');
                             handleFormChange({ imagesLayout: 'horizontal' });
                           }}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300"
                         />
                         <label htmlFor="imagesHorizontal" className="ml-2 block text-sm text-gray-700">
                           Horizontale

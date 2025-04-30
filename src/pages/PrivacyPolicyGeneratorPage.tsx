@@ -4,6 +4,7 @@ import { Button } from '../components';
 import { Spinner } from '../components/feedback';
 import { Notification } from '../components/feedback';
 import { NotificationComponent } from '../components/ui/NotificationComponent';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 // Types pour le formulaire
 interface PrivacyPolicyForm {
@@ -52,6 +53,7 @@ const initialFormValues: PrivacyPolicyForm = {
 };
 
 const PrivacyPolicyGeneratorPage: React.FC = () => {
+  // Les constantes SEO sont maintenant directement dans le composant SEOHead
   // Récupération des informations de l'entreprise
   const { company, loading } = useCompany();
 
@@ -341,7 +343,7 @@ Adresse : ${formValues.companyAddress}
 
 ----------
 
-Cette politique de confidentialité a été générée via Generation Business le ${new Date().toLocaleDateString('fr-FR')}.
+Cette politique de confidentialité a été générée via Newbi le ${new Date().toLocaleDateString('fr-FR')}.
 `;
 
     setGeneratedText(text);
@@ -410,17 +412,33 @@ Cette politique de confidentialité a été générée via Generation Business l
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEOHead 
+        title="Générateur de Politique de Confidentialité RGPD Gratuit | Newbi"
+        description="Créez facilement une politique de confidentialité conforme au RGPD pour votre site web. Outil gratuit, personnalisable et prêt à l'emploi."
+        keywords="politique de confidentialité, RGPD, générateur, protection des données, confidentialité, site web, légal, mentions légales"
+        schemaType="WebApplication"
+        schemaName="Générateur de Politique de Confidentialité RGPD"
+        schemaPrice="0"
+        additionalSchemaData={{
+          'applicationCategory': 'BusinessApplication',
+          'operatingSystem': 'Web'
+        }}
+      />
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Générateur de Politique de Confidentialité</h1>
+        <header>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Générateur de Politique de Confidentialité</h1>
+          <p className="text-gray-600 mb-6">Créez une politique de confidentialité conforme au RGPD en quelques minutes</p>
+        </header>
         
         {loading ? (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex justify-center items-center h-64" role="status" aria-live="polite">
             <Spinner size="lg" />
+            <span className="sr-only">Chargement des informations...</span>
           </div>
         ) : showResult ? (
-          <div id="result-section" className="bg-white shadow-md rounded-lg p-6">
+          <section id="result-section" className="bg-white shadow-md rounded-lg p-6" aria-labelledby="result-heading">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-700">Politique de confidentialité générée</h2>
+              <h2 id="result-heading" className="text-lg font-semibold text-gray-700">Politique de confidentialité générée</h2>
               <div className="flex items-center space-x-4">
 
                 <div className="flex items-center">
@@ -456,7 +474,9 @@ Cette politique de confidentialité a été générée via Generation Business l
               <textarea
                 value={generatedText}
                 onChange={handleTextChange}
-                className="w-full h-[500px] font-mono text-sm focus:outline-none resize-none"
+                className="w-full h-[500px] font-mono text-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] resize-none"
+                aria-label="Contenu de la politique de confidentialité"
+                id="privacy-policy-content"
               />
             </div>
             
@@ -473,18 +493,18 @@ Cette politique de confidentialité a été générée via Generation Business l
                 </svg>
                 Modifier les informations
               </Button>
-              <Button onClick={copyToClipboard} variant="primary" className="flex items-center">
+              <Button onClick={copyToClipboard} variant="primary" className="flex items-center hover:bg-[#4a41e0] focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]">
                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-12a2 2 0 00-2-2h-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Copier au format {copyFormat === 'html' ? 'HTML' : 'texte'}
               </Button>
             </div>
-          </div>
+          </section>
         ) : (
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <section className="bg-white shadow-md rounded-lg p-6" aria-labelledby="form-heading">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-700">Informations pour votre politique de confidentialité</h2>
+              <h2 id="form-heading" className="text-lg font-semibold text-gray-700">Informations pour votre politique de confidentialité</h2>
               {company && (
                 <Button onClick={fillCompanyInfo} variant="outline" className="flex items-center">
                   <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -503,7 +523,7 @@ Cette politique de confidentialité a été générée via Generation Business l
                   </p>
                 </div>
                 
-                <h3 className="text-md font-semibold text-gray-700 border-b pb-2">Informations sur l'entreprise</h3>
+                <h3 id="company-info-section" className="text-md font-semibold text-gray-700 border-b pb-2">Informations sur l'entreprise</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise <span className="text-red-600">*</span></label>
@@ -625,7 +645,7 @@ Cette politique de confidentialité a été générée via Generation Business l
                   </div>
                 </div>
                 
-                <h3 className="text-md font-semibold text-gray-700 border-b pb-2 mt-8">Informations sur la collecte de données</h3>
+                <h3 id="data-collection-section" className="text-md font-semibold text-gray-700 border-b pb-2 mt-8">Informations sur la collecte de données</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="collectsPersonalData" className="block text-sm font-medium text-gray-700 mb-1">Collectez-vous des données personnelles ?</label>
@@ -776,7 +796,7 @@ Cette politique de confidentialité a été générée via Generation Business l
                 </div>
                 
                 <div className="flex justify-end mt-6">
-                  <Button type="submit" variant="primary" className="flex items-center">
+                  <Button type="submit" variant="primary" className="flex items-center hover:bg-[#4a41e0] focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]">
                     <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
@@ -785,7 +805,7 @@ Cette politique de confidentialité a été générée via Generation Business l
                 </div>
               </div>
             </form>
-          </div>
+          </section>
         )}
       </div>
       
