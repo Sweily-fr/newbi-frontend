@@ -291,7 +291,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'validite' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'validite' ? 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'validite' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Ce devis est valable 30 jours à compter de sa date d'émission. Passé ce délai, les prix sont susceptibles d'être modifiés.";
               setHeaderNotes(text);
@@ -305,7 +305,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'conditions' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'conditions' ? 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'conditions' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Conditions de paiement : 30% à la commande, solde à la livraison. Délai d'exécution : à convenir ensemble après acceptation du devis.";
               setHeaderNotes(text);
@@ -319,7 +319,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'reference' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'reference' ? 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'reference' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre acceptation du devis.";
               setHeaderNotes(text);
@@ -333,7 +333,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'custom' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'custom' ? 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               setHeaderNotes('');
               validateHeaderNotes('');
