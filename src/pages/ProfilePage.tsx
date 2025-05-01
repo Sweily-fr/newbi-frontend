@@ -14,6 +14,7 @@ import { Button } from '../components/ui';
 import { PremiumModal } from '../components/subscription/PremiumModal';
 import axios from 'axios';
 import { SEOHead } from '../components/SEO/SEOHead';
+import { LogoLoader } from '../components/feedback/LogoLoader';
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);
@@ -40,7 +41,7 @@ export const ProfilePage = () => {
     }
   }, []);
 
-  if (loading) return <div>Chargement...</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen"><LogoLoader size="md" /></div>;
   if (error) return <div>Une erreur est survenue</div>;
 
   // Initialiser des objets vides si les données sont manquantes

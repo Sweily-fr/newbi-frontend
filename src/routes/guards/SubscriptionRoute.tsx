@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSubscription } from '../../hooks/useSubscription';
 import { ROUTES } from '../constants';
-import { Spinner } from '../../components/feedback/Spinner';
+import { LogoLoader } from '../../components/feedback/LogoLoader';
 
 interface SubscriptionRouteProps {
   children: React.ReactElement;
@@ -15,11 +15,11 @@ interface SubscriptionRouteProps {
 export const SubscriptionRoute = ({ children }: SubscriptionRouteProps) => {
   const { hasActiveSubscription, loading } = useSubscription();
 
-  // Afficher un spinner pendant le chargement
+  // Afficher un loader avec le logo pendant le chargement
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Spinner size="lg" />
+        <LogoLoader size="lg" />
       </div>
     );
   }

@@ -6,6 +6,7 @@ import { SearchInput } from '../components/ui';
 import { InvoiceSidebar } from '../components/business/invoices/InvoiceSidebar';
 import { InvoicesTable } from '../components/business/invoices/InvoicesTable';
 import { useQuery } from '@apollo/client';
+import { LogoLoader } from '../components/feedback/LogoLoader';
 import { GET_INVOICES } from '../graphql/queries';
 import { Notification } from '../components/feedback';
 import { useEffect } from 'react';
@@ -74,7 +75,7 @@ export const InvoicesPage = () => {
     }
   }, [statsError]);
   
-  if (statsLoading) return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+  if (statsLoading) return <div className="flex justify-center items-center h-screen"><LogoLoader size="md" /></div>;
 
   return (
     <>

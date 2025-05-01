@@ -7,6 +7,7 @@ import { QuoteSidebar } from '../components/business/quotes/QuoteSidebar';
 import { QuotesTable } from '../components/business/quotes/QuotesTable';
 import { Notification } from '../components/feedback';
 import { useQuery } from '@apollo/client';
+import { LogoLoader } from '../components/feedback/LogoLoader';
 import { GET_QUOTE_STATS } from '../graphql/quotes';
 import { QuoteFormModal } from '../components/forms/quotes/QuoteFormModal';
 import { SEOHead } from '../components/SEO/SEOHead';
@@ -62,7 +63,7 @@ export const QuotesPage = () => {
     }
   }, [statsError, error]);
   
-  if (statsLoading) return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+  if (statsLoading) return <div className="flex justify-center items-center h-screen"><LogoLoader size="md" /></div>;
 
   return (
     <>
