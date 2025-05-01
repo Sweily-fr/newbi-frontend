@@ -396,6 +396,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               termsAndConditions={invoice.termsAndConditions}
               termsAndConditionsLinkTitle={invoice.termsAndConditionsLinkTitle}
               termsAndConditionsLink={invoice.termsAndConditionsLink}
+              useBankDetails={true}
             />
           </div>
         </div>

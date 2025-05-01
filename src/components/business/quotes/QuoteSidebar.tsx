@@ -196,6 +196,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                 ...quote,
                 status: quote.status === 'CANCELED' ? 'COMPLETED' : quote.status
               }}
+              useBankDetails={true}
             />
           </div>
         </div>
