@@ -8,6 +8,7 @@ export const TermsPage: React.FC = () => {
         title="Conditions Générales de Vente | Newbi"
         description="Conditions générales de vente de Newbi - Modalités d'utilisation de nos services et de souscription à nos offres."
         schemaType="Organization"
+        canonicalUrl="https://newbi.fr/conditions-generales-de-vente"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

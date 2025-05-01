@@ -423,6 +423,7 @@ Cette politique de confidentialité a été générée via Newbi le ${new Date()
           'applicationCategory': 'BusinessApplication',
           'operatingSystem': 'Web'
         }}
+        canonicalUrl="https://newbi.fr/generator-politique-confidentialite"
       />
       <div className="max-w-4xl mx-auto">
         <header>

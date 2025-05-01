@@ -8,6 +8,7 @@ export const LegalNoticePage: React.FC = () => {
         title="Mentions Légales | Newbi"
         description="Mentions légales de Newbi - Informations légales sur notre société et notre site web."
         schemaType="Organization"
+        canonicalUrl="https://newbi.fr/mentions-legales"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

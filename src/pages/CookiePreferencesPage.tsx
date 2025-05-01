@@ -110,6 +110,8 @@ export const CookiePreferencesPage: React.FC = () => {
         additionalSchemaData={{
           'specialty': 'Privacy Settings'
         }}
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://newbi.fr/preferences-cookies"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

@@ -8,6 +8,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         title="Politique de Confidentialité | Newbi"
         description="Politique de confidentialité de Newbi - Comment nous collectons, utilisons et protégeons vos données personnelles."
         schemaType="Organization"
+        canonicalUrl="https://newbi.fr/politique-de-confidentialite"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

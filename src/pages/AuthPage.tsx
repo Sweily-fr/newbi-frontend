@@ -26,6 +26,8 @@ export const AuthPage = () => {
         keywords="connexion, inscription, login, register, compte Newbi, outils freelances, marketing digital"
         schemaType="WebPage"
         noindex={true}
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://newbi.fr/auth"
       />
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="absolute top-8 left-8">

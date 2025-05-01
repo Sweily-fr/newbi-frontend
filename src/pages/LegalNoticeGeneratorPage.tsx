@@ -324,6 +324,7 @@ Ces mentions légales ont été générées via Newbi le ${new Date().toLocaleDa
         schemaType="WebApplication"
         schemaName="Générateur de Mentions Légales Newbi"
         schemaPrice="0"
+        canonicalUrl="https://newbi.fr/generator-mentions-legales"
         additionalSchemaData={{
           'applicationCategory': 'BusinessApplication',
           'operatingSystem': 'Web'

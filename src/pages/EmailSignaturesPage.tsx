@@ -1,7 +1,6 @@
 import React from 'react';
 import { EmailSignatureManager } from '../components/business/EmailSignature/EmailSignatureManager';
 import { PageHeader } from '../components/layout/PageHeader';
-import { EnvelopeIcon } from '@heroicons/react/24/outline';
 import { SEOHead } from '../components/SEO/SEOHead';
 
 const EmailSignaturesPage: React.FC = () => {
@@ -16,6 +15,8 @@ const EmailSignaturesPage: React.FC = () => {
         schemaType="WebApplication"
         schemaName="Créateur de Signatures Email Professionnelles"
         schemaPrice="14.99"
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://newbi.fr/signatures-email"
         isPremium={true}
         additionalSchemaData={{
           'applicationCategory': 'BusinessApplication',

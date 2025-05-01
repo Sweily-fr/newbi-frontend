@@ -21,7 +21,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   description,
   keywords = '',
   canonicalUrl,
-  ogImage = '/images/og-default.jpg', // Image par défaut pour Open Graph
+  ogImage = '/images/images/PNG/Logo_Texte_Purple.png', // Image par défaut pour Open Graph
   schemaType,
   schemaName,
   schemaPrice,

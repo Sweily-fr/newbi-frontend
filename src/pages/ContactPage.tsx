@@ -140,6 +140,8 @@ export const ContactPage: React.FC = () => {
             'email': 'contact@newbi.fr'
           }
         }}
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://newbi.fr/contact"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

@@ -13,6 +13,7 @@ import { SubscriptionContext } from '../context/SubscriptionContext.context';
 import { Button } from '../components/ui';
 import { PremiumModal } from '../components/subscription/PremiumModal';
 import axios from 'axios';
+import { SEOHead } from '../components/SEO/SEOHead';
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);
@@ -197,6 +198,12 @@ export const ProfilePage = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <SEOHead
+        title="Mon Espace | Newbi"
+        description="Gérez vos informations personnelles et professionnelles"
+        keywords="mon espace, espace personnel, espace professionnel, gestion espace, espace Newbi"
+        canonicalUrl="https://newbi.fr/profile"
+      />
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8 flex justify-between items-start">
           <div>

@@ -21,6 +21,14 @@ const BlogSeoOptimizerPage: React.FC = () => {
         keywords={keywords}
         schemaType="WebApplication"
         schemaName="Optimisation SEO pour Blog | Newbi"
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://newbi.fr/blog-seo-optimizer"
+        additionalSchemaData={{
+          'applicationCategory': 'BusinessApplication',
+          'operatingSystem': 'Web'
+        }}
+        schemaPrice="14.99"
+        isPremium={true}
       />
       
       <main className="container mx-auto px-4 py-8">

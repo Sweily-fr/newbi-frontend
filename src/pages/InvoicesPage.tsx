@@ -83,6 +83,7 @@ export const InvoicesPage = () => {
         description="Créez, gérez et suivez vos factures professionnelles avec Newbi. Interface intuitive, modèles personnalisables et suivi des paiements en temps réel."
         keywords="facturation, factures, gestion factures, suivi paiements, comptabilité, auto-entrepreneur, freelance, TPE, PME"
         canonicalUrl="https://newbi.fr/factures"
+        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
         noindex={false}
       />
       

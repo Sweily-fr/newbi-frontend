@@ -30,6 +30,13 @@ export const ToolsPage = () => {
         description="Découvrez tous les outils Newbi pour gérer votre entreprise efficacement - factures, devis, signatures email et plus encore."
         keywords="outils entreprise, outils entrepreneurs, factures, devis, signature email, gestion entreprise"
         schemaType="WebApplication"
+        canonicalUrl="https://newbi.fr/outils"
+        additionalSchemaData={{
+          'applicationCategory': 'BusinessApplication',
+          'operatingSystem': 'Web'
+        }}
+        schemaPrice="14.99"
+        isPremium={true}
       />
       <div className="max-w-7xl mx-auto">
         {/* En-tête avec options de vue et tri */}

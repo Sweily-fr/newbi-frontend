@@ -53,6 +53,22 @@ export const HomePage = () => {
     {
       question: "Vos factures sont-elles conformes à la législation française ?",
       answer: "Oui, notre solution respecte la réglementation française (mentions obligatoires, numérotation, archivage, sécurité RGPD, etc.)."
+    },
+    {
+      question: "Puis-je utiliser Newbi sur mobile ?",
+      answer: "Oui, Newbi est entièrement responsive et s'adapte à tous les appareils : ordinateurs, tablettes et smartphones. Vous pouvez gérer votre entreprise où que vous soyez."
+    },
+    {
+      question: "Comment fonctionne l'abonnement Premium ?",
+      answer: "L'abonnement Premium vous donne accès à toutes les fonctionnalités avancées de Newbi pour 14,99€/mois. Vous pouvez l'essayer gratuitement pendant 14 jours et annuler à tout moment sans engagement."
+    },
+    {
+      question: "Mes données sont-elles sécurisées avec Newbi ?",
+      answer: "Absolument. Nous utilisons un chiffrement de bout en bout et respectons scrupuleusement le RGPD. Vos données sont stockées sur des serveurs sécurisés en France et ne sont jamais partagées avec des tiers."
+    },
+    {
+      question: "Comment obtenir de l'aide si j'ai un problème ?",
+      answer: "Notre équipe de support française est disponible par email à contact@newbi.fr. Les utilisateurs Premium bénéficient également d'un support prioritaire avec des temps de réponse garantis sous 24h."
     }
   ];
 
@@ -63,7 +79,6 @@ export const HomePage = () => {
         description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français. Essai gratuit, sans engagement."
         keywords="facturation, devis, gestion clients, outils professionnels, RGPD, auto-entrepreneur, freelance, TPE, PME"
         canonicalUrl="https://newbi.fr/"
-        ogImage="https://newbi.fr/logo-og.png"
       />
       
       {/* Données structurées Organization */}
@@ -73,10 +88,10 @@ export const HomePage = () => {
         description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français."
         url="https://newbi.fr/"
         additionalData={{
-          "logo": "https://newbi.fr/logo-og.png",
+          "logo": "https://newbi.fr/images/PNG/Logo_Texte_Purple.png",
           "contactPoint": [{
             "@type": "ContactPoint",
-            "telephone": "+33-1-23-45-67-89",
+            "telephone": "+33-02-21-85-02-40",
             "contactType": "customer support",
             "areaServed": "FR",
             "availableLanguage": ["French"]
