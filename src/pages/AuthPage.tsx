@@ -22,8 +22,8 @@ export const AuthPage = () => {
     <div className="min-h-screen pt-10 bg-gray-50">
       <SEOHead 
         title="Connexion et Inscription | Newbi"
-        description="Connectez-vous à votre compte Newbi ou créez un nouveau compte pour accéder à nos outils d'intelligence artificielle pour entrepreneurs et marketeurs."
-        keywords="connexion, inscription, login, register, compte Newbi, outils IA, marketing digital"
+        description="Connectez-vous à votre compte Newbi ou créez un nouveau compte pour accéder à nos outils pour entrepreneurs et freelances."
+        keywords="connexion, inscription, login, register, compte Newbi, outils freelances, marketing digital"
         schemaType="WebPage"
         noindex={true}
       />

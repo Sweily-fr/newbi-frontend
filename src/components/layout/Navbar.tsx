@@ -121,7 +121,7 @@ export const Navbar = () => {
   dropdownItems.push({
     label: 'Support',
     onClick: () => {
-      window.location.href = 'mailto:contact@sweily.fr?subject=Demande de support - Newbi';
+      window.location.href = 'mailto:contact@newbi.fr?subject=Demande de support - Newbi';
     },
     icon: <QuestionMarkCircleIcon className="h-5 w-5 text-gray-500" />
   });

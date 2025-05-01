@@ -1302,7 +1302,7 @@ export const HomePage = () => {
         </div>
 
         {/* FAQ section */}
-        <div id="faq-section" className="bg-blue-50/50 py-16 sm:py-24">
+        <div id="faq-section" className="bg-[#5b50ff]-50/50 py-16 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center px-4 sm:px-6 lg:px-8">
               <h2 className="text-base font-semibold text-[#5b50ff] tracking-wide uppercase">
