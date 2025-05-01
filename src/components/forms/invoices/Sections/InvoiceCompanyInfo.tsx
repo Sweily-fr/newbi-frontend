@@ -41,7 +41,6 @@ interface UserData {
 interface InvoiceCompanyInfoProps {
   companyInfo: CompanyInfo;
   userData: UserData;
-  apiUrl: string;
   onConfigureInfoClick?: () => void;
   setCompanyInfo?: (companyInfo: CompanyInfo) => void;
 }
@@ -49,9 +48,7 @@ interface InvoiceCompanyInfoProps {
 export const InvoiceCompanyInfo: React.FC<InvoiceCompanyInfoProps> = ({
   companyInfo,
   userData,
-  apiUrl,
   onConfigureInfoClick,
-  setCompanyInfo
 }) => {
   return (
     <div className="mb-6 space-y-4">
@@ -104,7 +101,7 @@ export const InvoiceCompanyInfo: React.FC<InvoiceCompanyInfoProps> = ({
                 <img
                   src={`${import.meta.env.VITE_API_URL}${companyInfo.logo}`}
                   alt="Logo de l'entreprise"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             ) : (
