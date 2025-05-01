@@ -206,7 +206,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
                 id="terms"
                 name="terms"
                 variant="blue"
-                label={<span>J'accepte les <a href="/conditions-generales-de-vente" className="text-blue-500">Conditions d'utilisation</a> et <a href="/politique-de-confidentialite" className="text-blue-500">Politique de confidentialité</a></span>}
+                label={<span>J'accepte les <a href="/conditions-generales-de-vente" className="text-[#5b50ff]">Conditions d'utilisation</a> et <a href="/politique-de-confidentialite" className="text-[#5b50ff]">Politique de confidentialité</a></span>}
                 checked={termsAccepted}
                 {...register('terms')}
               />
@@ -231,7 +231,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
               <span className="text-gray-600">Déja un compte ?</span>{' '}
               <button
                 onClick={onSwitchToLogin}
-                className="font-medium text-blue-500 hover:text-blue-400 border-none bg-transparent cursor-pointer p-0"
+                className="font-medium text-[#5b50ff] hover:text-[#4a41d0] border-none bg-transparent cursor-pointer p-0"
               >
                 Se connecter
               </button>

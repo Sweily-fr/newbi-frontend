@@ -179,7 +179,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <h4 className="text-xl font-medium text-gray-600">Informations du devis</h4>
           <div className="flex items-center">
             <Tooltip content="Le numéro de devis est automatiquement séquentiel pour assurer la conformité légale" position="right">
-              <InformationCircleIcon className="h-6 w-6 ml-2 text-blue-500 cursor-help" />
+              <InformationCircleIcon className="h-6 w-6 ml-2 text-[#5b50ff] cursor-help" />
             </Tooltip>
           </div>
         </div>

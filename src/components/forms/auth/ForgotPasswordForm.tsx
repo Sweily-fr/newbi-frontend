@@ -156,14 +156,14 @@ export const ForgotPasswordForm = () => {
             <Button
               onClick={handleBackToLogin}
               fullWidth
-              className="bg-blue-500 hover:bg-blue-600 py-3 rounded-lg"
+              className="bg-[#5b50ff] hover:bg-[#4a41d0] py-3 rounded-lg"
             >
               Retour à la connexion
             </Button>
             
             <button 
               onClick={handleResendEmail}
-              className="mt-4 text-blue-500 hover:text-blue-700 hover:underline text-sm font-medium transition-colors duration-200"
+              className="mt-4 text-[#5b50ff] hover:text-[#4a41d0] hover:underline text-sm font-medium transition-colors duration-200"
               disabled={loading}
             >
               {loading ? 'Envoi en cours...' : 'Vous n\'avez pas reçu l\'email ? Cliquez ici pour renvoyer'}
@@ -204,7 +204,7 @@ export const ForgotPasswordForm = () => {
             <span className="text-gray-600">Vous vous souvenez de votre mot de passe?</span>{' '}
             <Link
               to="/auth"
-              className="font-medium text-blue-500 hover:text-blue-400"
+              className="font-medium text-[#5b50ff] hover:text-[#4a41d0]"
             >
               Connexion
             </Link>

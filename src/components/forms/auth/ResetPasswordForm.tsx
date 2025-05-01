@@ -160,7 +160,7 @@ export const ResetPasswordForm = () => {
           <span className="text-gray-600">Vous vous souvenez de votre mot de passe?</span>{' '}
           <Link
             to="/auth"
-            className="font-medium text-blue-500 hover:text-blue-400"
+            className="font-medium text-[#5b50ff] hover:text-[#4a41d0]"
           >
             Connexion
           </Link>

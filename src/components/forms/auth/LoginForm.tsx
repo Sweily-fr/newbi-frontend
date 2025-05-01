@@ -269,7 +269,7 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
               <span className="text-gray-600">Vous n'avez pas de compte?</span>{' '}
               <button
                 onClick={onSwitchToRegister}
-                className="font-medium text-blue-500 hover:text-blue-400 border-none bg-transparent cursor-pointer p-0"
+                className="font-medium text-[#5b50ff] hover:text-[#4a41d0] border-none bg-transparent cursor-pointer p-0"
               >
                 S'inscrire
               </button>
