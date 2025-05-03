@@ -6,17 +6,15 @@ interface QuotePreviewProps {
   companyInfo?: CompanyInfo;
   selectedClient?: Client | null;
   isNewClient?: boolean;
-  newClient?: any;
+  newClient?: Partial<Client>;
   calculateTotals?: () => {
     finalTotalHT: number;
     totalVAT: number;
     finalTotalTTC: number;
   };
   footerNotes?: string;
-  // Ces props sont conservées dans l'interface pour la compatibilité avec les appels existants,
-  // mais ne sont plus utilisées directement dans ce composant
+  // Cette prop est utilisée pour déterminer si les coordonnées bancaires doivent être affichées
   useBankDetails?: boolean;
-  showActionButtons?: boolean;
 }
 
 export const QuotePreview: React.FC<QuotePreviewProps> = ({
@@ -26,11 +24,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   isNewClient,
   newClient,
   footerNotes,
-  // Ces paramètres sont conservés pour la compatibilité mais ne sont pas utilisés
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   useBankDetails,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  showActionButtons = true,
 }) => {
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
@@ -70,7 +64,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
       const year = date.getFullYear();
 
       return `${day}-${month}-${year}`;
-    } catch (error) {
+    } catch {
       return "Erreur de date";
     }
   };
@@ -90,17 +84,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
     ? newClient
     : selectedClient || quote.client || {};
     
-  // Log pour déboguer les informations client
-  console.log("Client Info dans QuotePreview:", {
-    isNewClient,
-    newClient,
-    selectedClient,
-    quoteClient: quote.client,
-    resultingClientInfo: clientInfo
-  });
-  
-  // Log des informations de companyInfo pour le débogage
-  console.log("CompanyInfo dans QuotePreview:", companyInfo);
+  // Détermination des informations client terminée
 
   const documentContent = (
     <div className="bg-white print:overflow-visible" style={{ height: "auto", minHeight: "100%" }}>
@@ -174,19 +158,19 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
           <div className="w-1/2 pl-4">
             <h3 className="font-normal mb-2">
-              {quote.client?.name || "Client"}
+              {clientInfo?.name || "Client"}
             </h3>
-            <p className="text-xs">{quote.client?.email}</p>
-            <p className="text-xs">{quote.client?.address?.street}</p>
+            <p className="text-xs">{clientInfo?.email}</p>
+            <p className="text-xs">{clientInfo?.address?.street}</p>
             <p className="text-xs">
-              {quote.client?.address?.postalCode} {quote.client?.address?.city}
+              {clientInfo?.address?.postalCode} {clientInfo?.address?.city}
             </p>
-            <p className="text-xs">{quote.client?.address?.country}</p>
-            {quote.client?.siret && (
-              <p className="text-xs">SIRET: {quote.client.siret}</p>
+            <p className="text-xs">{clientInfo?.address?.country}</p>
+            {clientInfo?.siret && (
+              <p className="text-xs">SIRET: {clientInfo.siret}</p>
             )}
-            {quote.client?.vatNumber && (
-              <p className="text-xs">TVA: {quote.client.vatNumber}</p>
+            {clientInfo?.vatNumber && (
+              <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
         </div>

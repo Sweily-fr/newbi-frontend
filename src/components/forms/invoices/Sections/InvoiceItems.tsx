@@ -79,6 +79,38 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
       });
     }
   }, [items.length, itemErrors.length]);
+  
+  // Effet pour valider les items après leur mise à jour
+  useEffect(() => {
+    // Pour chaque item, valider les champs et mettre à jour les erreurs
+    const validateAllItems = () => {
+      const newErrors = items.map(item => {
+        // Valider l'item
+        const result = validateInvoiceItem(
+          item.description,
+          item.quantity,
+          item.unitPrice,
+          item.vatRate,
+          item.unit,
+          item.discount,
+          item.discountType as 'PERCENTAGE' | 'FIXED',
+        );
+        
+        return {
+          descriptionError: result.descriptionError,
+          quantityError: result.quantityError,
+          unitPriceError: result.unitPriceError,
+          vatRateError: result.vatRateError,
+          unitError: result.unitError,
+          discountError: result.discountError
+        };
+      });
+      
+      setItemErrors(newErrors);
+    };
+    
+    validateAllItems();
+  }, [items]); // Se déclenche chaque fois que les items changent
 
   // Fonction pour valider un item et mettre à jour les erreurs
   const validateItem = (index: number, field: string, value: any) => {
@@ -184,6 +216,13 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
         // Utiliser la fonction fournie par le parent pour mettre à jour l'item complet
         handleProductSelect(index, product);
         console.log('Mise à jour complète de l\'item via handleProductSelect');
+        
+        // Réinitialiser les erreurs pour cet item après la mise à jour
+        setItemErrors(prev => {
+          const newErrors = [...prev];
+          newErrors[index] = {}; // Réinitialiser les erreurs pour cet item
+          return newErrors;
+        });
       } else {
         // Fallback: mettre à jour uniquement le champ description
         // C'est le seul qui fonctionne de manière fiable

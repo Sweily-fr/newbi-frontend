@@ -103,12 +103,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
 
   // Fonction pour valider le formulaire et gérer la soumission
   const onValidateForm = async (asDraft: boolean) => {
-    console.log(
-      "Validation du formulaire déclenchée, brouillon:",
-      asDraft,
-      "type:",
-      typeof asDraft
-    );
+    // Validation du formulaire déclenchée
 
     // Définir si on soumet en brouillon
     setSubmitAsDraft(asDraft);
@@ -126,13 +121,13 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     // Vérifier les erreurs dans la section Informations générales
     if (!quoteNumber || !issueDate || !validUntil) {
       errors.generalInfo = true;
-      console.log("Erreurs dans les informations générales");
+
     }
 
     // Vérifier les erreurs dans la section Client
     if (!selectedClient && !isNewClient) {
       errors.client = true;
-      console.log("Erreur: aucun client sélectionné");
+
     } else if (isNewClient) {
       if (
         !newClient.name ||
@@ -143,7 +138,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         !newClient.country
       ) {
         errors.client = true;
-        console.log("Erreur: informations du nouveau client incomplètes");
+
       }
     }
 
@@ -157,28 +152,20 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
       !companyInfo.address.country
     ) {
       errors.companyInfo = true;
-      console.log("Erreur: informations de l'entreprise incomplètes");
     }
 
     // Vérifier les erreurs dans la section Produits/Services
-    const hasItemErrors = items.some((item, index) => {
-      const hasError =
-        !item.description ||
-        !item.quantity ||
-        !item.unitPrice ||
+    const hasItemErrors = items.some((item) => {
+      return !item.description || !item.quantity || !item.unitPrice ||
         item.vatRate === undefined || item.vatRate === null ||
         !item.unit;
-      if (hasError) {
-        console.log(`Erreur dans l'article ${index + 1}:`, item);
-      }
-      return hasError;
     });
     errors.items = hasItemErrors;
 
     // Vérifier les erreurs dans la section Remise et totaux
     if (discount < 0 || (discountType === "PERCENTAGE" && discount > 100)) {
       errors.discountAndTotals = true;
-      console.log("Erreur: valeur de remise invalide");
+
     }
 
     // Vérifier les erreurs dans la section Notes de bas de page (coordonnées bancaires)
@@ -189,26 +176,23 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         !companyInfo.bankDetails?.bankName)
     ) {
       errors.bankDetails = true;
-      console.log("Erreur: coordonnées bancaires incomplètes");
+
     }
 
     // Mettre à jour l'état des erreurs
     setSectionErrors(errors);
-    console.log("État des erreurs mis à jour:", errors);
+
 
     // Si aucune erreur, soumettre le formulaire
     if (!Object.values(errors).some(Boolean)) {
-      console.log("Aucune erreur, soumission du formulaire");
+
 
       // Récupérer le dernier numéro de devis disponible pour éviter les doublons
       if (!quote) {
         try {
           await refetchNextQuoteNumber();
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération du prochain numéro de devis:",
-            error
-          );
+        } catch {
+          // Gestion silencieuse des erreurs de soumission de devis
         }
       }
 
@@ -447,13 +431,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               number: quoteNumber,
               issueDate,
               validUntil,
-              client: isNewClient
-                ? newClient
-                : (Array.isArray(clientsData?.clients) 
-                    ? clientsData?.clients.find(
-                        (c: { id: string }) => c.id === selectedClient
-                      )
-                    : null),
+              // Ne pas définir client ici, nous utiliserons les props séparées
+              client: undefined,
               companyInfo,
               items,
               discount,
@@ -466,6 +445,11 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               customFields: customFields.filter((f) => f.key && f.value),
               ...totals,
             }}
+            isNewClient={isNewClient}
+            newClient={newClient}
+            selectedClient={Array.isArray(clientsData?.clients?.items) 
+              ? clientsData?.clients?.items.find((c: { id: string }) => c.id === selectedClient)
+              : null}
             useBankDetails={useBankDetails}
           />
         </div>

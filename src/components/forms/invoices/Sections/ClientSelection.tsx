@@ -98,14 +98,52 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   
   // Fonction pour remplir le formulaire avec les données de l'entreprise trouvée
   const fillFormWithCompanyData = React.useCallback((company: CompanySearchResult) => {
+    // Initialiser les valeurs avec les données de l'API
+    let streetValue = company.address.street;
+    let postalCodeValue = company.address.postalCode;
+    let cityValue = company.address.city;
+    
+    // Format observé: "229 rue saint-honore 75001 Paris"
+    // Extraire le code postal (5 chiffres) et la ville qui suit
+    const postalCityMatch = streetValue.match(/(.*?)\s+(\d{5})\s+([^,]+)$/);
+    
+    if (postalCityMatch) {
+      // Extraire les composants de l'adresse
+      streetValue = postalCityMatch[1].trim(); // La rue sans le code postal et la ville
+      postalCodeValue = postalCityMatch[2].trim(); // Le code postal (5 chiffres)
+      cityValue = postalCityMatch[3].trim(); // La ville
+    } else {
+      // Si le format principal n'est pas détecté, essayer d'autres formats
+      // Format alternatif: "Rue, Code Postal Ville"
+      const altFormatMatch = streetValue.match(/^(.+),\s*(\d{5})\s+(.+)$/);
+      
+      if (altFormatMatch) {
+        streetValue = altFormatMatch[1].trim();
+        postalCodeValue = altFormatMatch[2].trim();
+        cityValue = altFormatMatch[3].trim();
+      } else if (/^\d{5}$/.test(cityValue)) {
+        // Si le champ city contient un code postal, essayer de trouver la ville dans l'adresse
+        postalCodeValue = cityValue; // Utiliser le code postal du champ city
+        
+        // Chercher dans la chaîne d'adresse un format "XXXXX Ville"
+        const cityInAddressMatch = streetValue.match(/\b(\d{5})\s+([^,\d]+)\b/);
+        if (cityInAddressMatch) {
+          cityValue = cityInAddressMatch[2].trim(); // La ville après le code postal
+          // Enlever le code postal et la ville de l'adresse
+          streetValue = streetValue.replace(cityInAddressMatch[0], '').trim();
+        }
+      }
+    }
+    
+    // Mettre à jour l'état du client avec les valeurs extraites
     setNewClient({
       ...newClient,
       name: company.name,
       siret: company.siret,
       vatNumber: company.vatNumber || "",
-      street: company.address.street,
-      city: company.address.city,
-      postalCode: company.address.postalCode,
+      street: streetValue,
+      city: cityValue,
+      postalCode: postalCodeValue,
       country: company.address.country,
       type: ClientType.COMPANY // S'assurer que le type est bien défini comme entreprise
     });
