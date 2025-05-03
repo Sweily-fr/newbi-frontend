@@ -1,32 +1,37 @@
-import React, { useState } from "react";
-import { Quote, CompanyInfo } from "../../../types";
-import { PDFGenerator, Loader } from "../../ui";
+import React from "react";
+import { Quote, CompanyInfo, Client } from "../../../types";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;
-  showActionButtons?: boolean;
   companyInfo?: CompanyInfo;
+  selectedClient?: Client | null;
+  isNewClient?: boolean;
+  newClient?: any;
   calculateTotals?: () => {
     finalTotalHT: number;
     totalVAT: number;
     finalTotalTTC: number;
   };
+  footerNotes?: string;
+  // Ces props sont conservées dans l'interface pour la compatibilité avec les appels existants,
+  // mais ne sont plus utilisées directement dans ce composant
   useBankDetails?: boolean;
+  showActionButtons?: boolean;
 }
 
 export const QuotePreview: React.FC<QuotePreviewProps> = ({
   quote,
-  showActionButtons = true,
   companyInfo = quote.companyInfo,
+  selectedClient,
+  isNewClient,
+  newClient,
+  footerNotes,
+  // Ces paramètres sont conservés pour la compatibilité mais ne sont pas utilisés
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   useBankDetails,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  showActionButtons = true,
 }) => {
-  // Vérifier si les boutons doivent être affichés en fonction du statut
-  const showButtons = showActionButtons;
-  // Vérifier si le bouton de téléchargement PDF doit être affiché
-  const showPdfButton =
-    quote?.status === "PENDING" ||
-    quote?.status === "DRAFT" ||
-    quote?.status === "COMPLETED";
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
     if (!dateInput) return "";
@@ -80,7 +85,20 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
     }).format(amount);
   };
 
-  // Contenu du PDF qui sera généré - sans les classes de largeur et centrage pour le PDF
+  // Déterminer les informations du client à afficher
+  const clientInfo = isNewClient
+    ? newClient
+    : selectedClient || quote.client || {};
+    
+  // Log pour déboguer les informations client
+  console.log("Client Info dans QuotePreview:", {
+    isNewClient,
+    newClient,
+    selectedClient,
+    quoteClient: quote.client,
+    resultingClientInfo: clientInfo
+  });
+  
   // Log des informations de companyInfo pour le débogage
   console.log("CompanyInfo dans QuotePreview:", companyInfo);
 
@@ -368,7 +386,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                   href={quote.termsAndConditionsLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 text-xs hover:underline"
+                  className="text-violet-600 text-xs hover:underline"
                 >
                   {quote.termsAndConditionsLinkTitle}
                 </a>
@@ -378,135 +396,67 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
       </div>
       {/* Footer avec fond grisé - collé en bas et pleine largeur */}
       <div
-          className="bg-gray-50 min-w-full p-0 print:fixed print:bottom-0"
-          data-pdf-footer="true"
-          data-pdf-footer-on-all-pages="true"
-        >
-          <div className="flex flex-col px-6 space-y-4">
-            {/* Coordonnées bancaires - affichées uniquement si useBankDetails est vrai */}
-            {useBankDetails && companyInfo?.bankDetails && (
-              <div className="py-4">
-                <h3 className="font-medium text-gray-700 mb-4">
-                  Coordonnées bancaires
-                </h3>
-                <div className="text-xs grid grid-cols-[30%_70%] gap-x-2 gap-y-1">
-                  <span className="text-gray-600 text-xs font-normal">
-                    Banque
-                  </span>
-                  <span>{companyInfo.bankDetails.bankName}</span>
-                  <span className="text-gray-600 text-xs font-normal">
-                    IBAN
-                  </span>
-                  <span>{companyInfo.bankDetails.iban}</span>
-                  <span className="text-gray-600 text-xs font-normal">BIC</span>
-                  <span>{companyInfo.bankDetails.bic}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Notes de pied de page */}
-            {quote.footerNotes && (
-              <div className="border-t border-gray-200 whitespace-pre-line py-4 mt-4 text-[10px] text-gray-600">
-                <div>{quote.footerNotes}</div>
-              </div>
-            )}
-
-            {/* Pagination */}
-            <div className="text-xs text-gray-500 text-right py-2">
-              <span style={{ display: "inline", whiteSpace: "nowrap" }}>
-                Page{" "}
-                <span data-pdf-page-number="true" style={{ display: "inline" }}>
-                  1
+        className="bg-gray-50 min-w-full p-0 print:fixed print:bottom-0"
+        data-pdf-footer="true"
+        data-pdf-footer-on-all-pages="true"
+      >
+        <div className="flex flex-col px-6 space-y-4">
+          {/* Coordonnées bancaires - affichées uniquement si useBankDetails est vrai */}
+          {useBankDetails && companyInfo?.bankDetails && (
+            <div className="py-4">
+              <h3 className="font-medium text-gray-700 mb-4">
+                Coordonnées bancaires
+              </h3>
+              <div className="text-xs grid grid-cols-[30%_70%] gap-x-2 gap-y-1">
+                <span className="text-gray-600 text-xs font-normal">
+                  Banque
                 </span>
-                /
-                <span data-pdf-total-pages="true" style={{ display: "inline" }}>
-                  1
-                </span>
-              </span>
+                <span>{companyInfo.bankDetails.bankName}</span>
+                <span className="text-gray-600 text-xs font-normal">IBAN</span>
+                <span>{companyInfo.bankDetails.iban}</span>
+                <span className="text-gray-600 text-xs font-normal">BIC</span>
+                <span>{companyInfo.bankDetails.bic}</span>
+              </div>
             </div>
+          )}
+
+          {/* Notes de pied de page */}
+          {(footerNotes || quote?.footerNotes) && (
+            <div className="border-t border-gray-200 whitespace-pre-line py-4 mt-4 text-[10px] text-gray-600">
+              <div>{footerNotes || quote?.footerNotes}</div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          <div className="text-xs text-gray-500 text-right py-2">
+            <span style={{ display: "inline", whiteSpace: "nowrap" }}>
+              Page{" "}
+              <span data-pdf-page-number="true" style={{ display: "inline" }}>
+                1
+              </span>
+              /
+              <span data-pdf-total-pages="true" style={{ display: "inline" }}>
+                1
+              </span>
+            </span>
           </div>
         </div>
+      </div>
     </div>
   );
 
-  // États pour gérer le chargement et l'affichage
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [pdfSuccess, setPdfSuccess] = useState(false);
-
-  // Rendu final du composant
   return (
-    <div className="bg-white overflow-hidden flex flex-col" style={{ height: "100vh" }}>
+    <div
+      className="bg-white overflow-hidden flex flex-col"
+      style={{ height: "100vh" }}
+    >
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-medium">Aperçu du devis</h2>
-        {showButtons && (
-          <div className="flex space-x-2">
-            {showPdfButton && (
-              <PDFGenerator
-                content={documentContent}
-                fileName={`Devis_${quote.prefix || ""}${
-                  quote.number || ""
-                }.pdf`}
-                buttonText="Télécharger en PDF"
-                buttonProps={{
-                  variant: "outline",
-                  size: "sm",
-                  className: "flex items-center",
-                }}
-                format="a4"
-                orientation="portrait"
-                onGenerationStart={() => {
-                  setIsGeneratingPDF(true);
-                }}
-                onGenerated={(pdf) => {
-                  console.log("PDF généré avec succès", pdf);
-                  setIsGeneratingPDF(false);
-                  setPdfSuccess(true);
-                  // Réinitialiser l'état de succès après 2 secondes
-                  setTimeout(() => setPdfSuccess(false), 2000);
-                }}
-                onGenerationError={() => {
-                  setIsGeneratingPDF(false);
-                }}
-              />
-            )}
-          </div>
-        )}
       </div>
-      <div className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative" style={{ minHeight: "0" }}>
-        {isGeneratingPDF && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
-            {pdfSuccess ? (
-              <div className="flex flex-col items-center">
-                <div className="rounded-full bg-green-100 p-3 mb-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-green-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-gray-700">
-                  Téléchargement réussi
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <Loader className="h-8 w-8 text-primary mb-2" />
-                <p className="text-sm font-medium text-gray-700">
-                  Génération du PDF en cours...
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+      <div
+        className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative"
+        style={{ minHeight: "0" }}
+      >
         <div
           className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
           style={{ minHeight: "29.7cm", height: "auto" }}

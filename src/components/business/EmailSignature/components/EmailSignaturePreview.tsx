@@ -1005,9 +1005,9 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
         {/* Contenu */}
         <div style={{ position: 'relative', zIndex: 1 }}>
           {/* Photo de profil, Logo et nom */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
             {profilePhotoUrl && (
-              <div style={{ marginRight: '15px' }}>
+              <div style={{ marginRight: '15px', marginBottom: '10px' }}>
                 <img 
                   src={getFullProfilePhotoUrl(profilePhotoUrl)} 
                   alt="Photo de profil" 
@@ -1019,7 +1019,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
               </div>
             )}
             {logoUrl && displayLogo && (
-              <div style={{ marginRight: '15px', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <div style={{ marginRight: '15px', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '10px' }}>
                 <img 
                   src={getFullLogoUrl(logoUrl)} 
                   alt="Logo" 
@@ -1030,20 +1030,22 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 />
               </div>
             )}
-            <div style={{ fontWeight: 'bold', fontSize: '20px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>
-            <div style={{ fontSize: '16px', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>
-            {companyName && <div style={{ fontStyle: 'italic' }}>{companyName}</div>}
+            <div>
+              <div style={{ fontWeight: 'bold', fontSize: '20px', color: primaryColor || '#0066cc' }}>{fullName || 'Votre Nom'}</div>
+              <div style={{ fontSize: '16px', marginBottom: '5px' }}>{jobTitle || 'Votre Poste'}</div>
+              {companyName && <div style={{ fontStyle: 'italic' }}>{companyName}</div>}
+            </div>
           </div>
           
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap', marginBottom: '15px' }}>
             {email && (
-              <a href={`mailto:${email}`} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', textDecoration: 'none', display: 'inline-block' }}>{email}</a>
+              <a href={`mailto:${email}`} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', textDecoration: 'none', display: 'inline-block', marginBottom: '5px' }}>{email}</a>
             )}
             {phone && (
-              <div style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', display: 'inline-block' }}>{phone}</div>
+              <div style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', display: 'inline-block', marginBottom: '5px' }}>{phone}</div>
             )}
             {website && (
-              <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', textDecoration: 'none', display: 'inline-block' }} target="_blank" rel="noopener noreferrer">{website}</a>
+              <a href={website.startsWith('http') ? website : `https://${website}`} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', padding: '8px 15px', borderRadius: '5px', textDecoration: 'none', display: 'inline-block', marginBottom: '5px' }} target="_blank" rel="noopener noreferrer">{website}</a>
             )}
           </div>
           
@@ -1054,18 +1056,18 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
           )}
           
           {socialLinks && Object.values(socialLinks).some(link => link) && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
               {socialLinks.linkedin && (
-                <a href={socialLinks.linkedin} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Li</a>
+                <a href={socialLinks.linkedin} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', margin: '2px' }} target="_blank" rel="noopener noreferrer">Li</a>
               )}
               {socialLinks.twitter && (
-                <a href={socialLinks.twitter} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">X</a>
+                <a href={socialLinks.twitter} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', margin: '2px' }} target="_blank" rel="noopener noreferrer">X</a>
               )}
               {socialLinks.facebook && (
-                <a href={socialLinks.facebook} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Fb</a>
+                <a href={socialLinks.facebook} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', margin: '2px' }} target="_blank" rel="noopener noreferrer">Fb</a>
               )}
               {socialLinks.instagram && (
-                <a href={socialLinks.instagram} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} target="_blank" rel="noopener noreferrer">Ig</a>
+                <a href={socialLinks.instagram} style={{ color: 'white', backgroundColor: primaryColor || '#0066cc', width: '35px', height: '35px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', margin: '2px' }} target="_blank" rel="noopener noreferrer">Ig</a>
               )}
             </div>
           )}
@@ -1073,8 +1075,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
       </div>
     );
   };
-
-  // Fonction pour copier la signature dans le presse-papiers
+  
+  // Fonction pour copier la signature dans le presse-papiers avec support responsive
   const copySignatureToClipboard = () => {
     if (signatureRef.current) {
       // Créer un élément temporaire pour contenir le HTML de la signature
@@ -1088,13 +1090,60 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
         el.removeAttribute('data-react-checksum');
       });
       
-      // Créer un blob avec le HTML nettoyé
-      const htmlContent = tempElem.innerHTML;
+      // Ajouter des styles responsives
+      const responsiveStyles = `
+        <style type="text/css">
+          @media screen and (max-width: 600px) {
+            table, tr, td, div, p, a, span, img {
+              max-width: 100% !important;
+              width: auto !important;
+              height: auto !important;
+              min-width: 0 !important;
+            }
+            
+            table {
+              width: 100% !important;
+            }
+            
+            div[style*="display: flex"] {
+              display: block !important;
+              text-align: center !important;
+            }
+            
+            div[style*="display: flex"] > div,
+            div[style*="display: flex"] > a {
+              display: inline-block !important;
+              margin: 5px !important;
+            }
+            
+            img {
+              max-width: 100% !important;
+              height: auto !important;
+            }
+            
+            div[style*="borderLeft"],
+            td[style*="borderLeft"] {
+              border-left: none !important;
+              padding-left: 0 !important;
+              margin-top: 10px !important;
+            }
+            
+            div[style*="marginRight"],
+            td[style*="paddingRight"] {
+              margin-right: 0 !important;
+              padding-right: 0 !important;
+            }
+          }
+        </style>
+      `;
+      
+      // Créer un blob avec le HTML nettoyé et les styles responsives
+      const htmlContent = responsiveStyles + tempElem.innerHTML;
       
       // Utiliser l'API Clipboard pour copier le HTML
       const clipboardItem = new ClipboardItem({
         'text/html': new Blob([htmlContent], { type: 'text/html' }),
-        'text/plain': new Blob([htmlContent], { type: 'text/plain' })
+        'text/plain': new Blob([tempElem.innerText], { type: 'text/plain' })
       });
       
       navigator.clipboard.write([clipboardItem])
@@ -1110,7 +1159,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
         });
     }
   };
-
+  
   return (
     <div className="bg-white overflow-hidden h-full flex flex-col">
       <div className="flex justify-between items-center p-4 border-b">

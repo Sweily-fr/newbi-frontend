@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import { UserGroupIcon } from '@heroicons/react/24/solid';
-import { useSubscription } from '../../hooks/useSubscription';
 
 interface CommunityButtonProps {
   className?: string;
 }
 
 export const CommunityButton: React.FC<CommunityButtonProps> = ({ className = '' }) => {
-  const { subscription } = useSubscription();
-  const isPremium = subscription?.licence;
   const [showTooltip, setShowTooltip] = useState(false);
-  
-  // Si l'utilisateur n'est pas premium, ne pas afficher le bouton
-  if (!isPremium) return null;
   
   const handleClick = () => {
     window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');

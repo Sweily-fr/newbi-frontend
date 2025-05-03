@@ -20,6 +20,8 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   onCancel,
   onChange
 }) => {
+  // Nous n'utilisons plus l'état global formData pour éviter les boucles infinies
+  
   // États pour les champs du formulaire
   // Utiliser directement initialData?.id sans état pour éviter l'avertissement "setId is never used"
   const id = initialData?.id;
@@ -187,7 +189,8 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   const handleFormChange = useCallback((changes: Partial<EmailSignature>) => {
     if (onChange) {
       // Créer l'objet de base avec les valeurs actuelles
-      const formData: Partial<EmailSignature> = {
+      const updatedFormData: Partial<EmailSignature> = {
+        ...changes,
         id: id || undefined,
         name,
         fullName,
@@ -224,19 +227,16 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         socialLinksPosition,
       };
       
-      // Fusionner avec les valeurs mises à jour si elles sont fournies
-      if (changes) {
-        Object.assign(formData, changes);
-      }
-
+      // Ajouter les propriétés spécifiques à l'objet updatedFormData
+      
       // Pour la prévisualisation de la photo de profil
       if (previewProfilePhoto) {
-        formData.profilePhotoUrl = previewProfilePhoto;
+        updatedFormData.profilePhotoUrl = previewProfilePhoto;
       } else if (profilePhotoUrl) {
-        formData.profilePhotoUrl = profilePhotoUrl;
+        updatedFormData.profilePhotoUrl = profilePhotoUrl;
       }
 
-      onChange(formData);
+      onChange(updatedFormData);
     }
     
     // Validation en temps réel pour certains champs
@@ -282,7 +282,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         }
       }
     }
-  }, [id, name, fullName, jobTitle, email, phone, mobilePhone, website, address, companyName, socialLinks, template, primaryColor, secondaryColor, logoUrl, showLogo, isDefault, previewProfilePhoto, profilePhotoUrl, profilePhotoSize, layout, horizontalSpacing, verticalSpacing, verticalAlignment, imagesLayout, socialLinksDisplayMode, socialLinksIconStyle, socialLinksIconBgColor, socialLinksIconColor, socialLinksIconSize, socialLinksPosition, onChange]);
+  }, [id, name, fullName, jobTitle, email, phone, mobilePhone, website, address, companyName, socialLinks, template, primaryColor, secondaryColor, logoUrl, showLogo, isDefault, previewProfilePhoto, profilePhotoUrl, profilePhotoSize, layout, horizontalSpacing, verticalSpacing, verticalAlignment, imagesLayout, socialLinksDisplayMode, socialLinksIconStyle, socialLinksIconBgColor, socialLinksIconColor, socialLinksIconSize, socialLinksPosition, onChange, fontFamily, fontSize, profilePhotoBase64, profilePhotoToDelete]);
 
   // Fonction de soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1637,6 +1637,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                     const newFontFamily = e.target.value;
                     setFontFamily(newFontFamily);
                     // Passer directement la nouvelle valeur pour contourner l'asynchronicité
+                    // Ne pas mettre à jour formData ici pour éviter la boucle infinie
                     handleFormChange({ fontFamily: newFontFamily });
                   }}
                   className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
@@ -1671,6 +1672,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                     onChange={(e) => {
                       const newFontSize = parseInt(e.target.value);
                       setFontSize(newFontSize);
+                      // Ne pas mettre à jour formData ici pour éviter la boucle infinie
                       handleFormChange({ fontSize: newFontSize });
                     }}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -1681,6 +1683,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       onClick={() => {
                         const newFontSize = Math.max(10, fontSize - 1);
                         setFontSize(newFontSize);
+                        // Ne pas mettre à jour formData ici pour éviter la boucle infinie
                         handleFormChange({ fontSize: newFontSize });
                       }}
                       className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"
@@ -1692,6 +1695,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                       onClick={() => {
                         const newFontSize = Math.min(20, fontSize + 1);
                         setFontSize(newFontSize);
+                        // Ne pas mettre à jour formData ici pour éviter la boucle infinie
                         handleFormChange({ fontSize: newFontSize });
                       }}
                       className="px-2 py-1 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 text-sm"

@@ -159,17 +159,20 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   };
 
   // Gestionnaire pour la mise à jour des données du formulaire (pour la prévisualisation)
-  // Utiliser useCallback avec un délai pour éviter les boucles infinies
+  // Utiliser useCallback avec un traitement optimisé pour éviter les boucles infinies
   const handleFormChange = useCallback((data: Partial<EmailSignature>) => {
+    // Priorité aux changements de typographie et taille de police pour une mise à jour immédiate
+    const hasFontChanges = data.fontFamily !== undefined || data.fontSize !== undefined;
+    
     // Utiliser une fonction de mise à jour pour éviter les problèmes de fermeture
     setFormData(prevData => {
-      // Vérifier si les données ont réellement changé pour éviter les rendus inutiles
-      if (JSON.stringify(prevData) === JSON.stringify(data)) {
+      // Pour les changements de police, ne pas vérifier l'égalité pour garantir la mise à jour
+      if (!hasFontChanges && JSON.stringify(prevData) === JSON.stringify(data)) {
         return prevData; // Retourner les données précédentes si aucun changement
       }
       
       // S'assurer que les URLs sont correctement préfixées
-      const updatedData = { ...data };
+      const updatedData = { ...prevData, ...data };
       
       // Traiter l'URL du logo
       if (updatedData.logoUrl) {

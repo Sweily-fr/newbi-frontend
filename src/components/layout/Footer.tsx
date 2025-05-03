@@ -38,7 +38,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to={isAuthenticated ? (hasActiveSubscription ? "/email-signature" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link to={isAuthenticated ? (hasActiveSubscription ? "/signatures-email" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
                   Signatures Email
                 </Link>
               </li>
