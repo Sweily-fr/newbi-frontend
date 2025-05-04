@@ -1,5 +1,6 @@
 import React from "react";
 import { Quote, CompanyInfo, Client } from "../../../types";
+import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;
@@ -262,7 +263,10 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                       )}
                     </td>
                     <td className="p-2 text-xs text-right">
-                      {item.quantity} {item.unit}
+                      {item.quantity} {(() => {
+                        console.log('Quote Unit:', item.unit, 'Abbreviation:', getUnitAbbreviation(item.unit));
+                        return getUnitAbbreviation(item.unit);
+                      })()}
                     </td>
                     <td className="p-2 text-xs text-right">
                       {formatAmount(item.unitPrice)}

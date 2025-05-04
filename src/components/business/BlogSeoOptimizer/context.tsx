@@ -91,6 +91,26 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
   
   // Fonction pour analyser le contenu
   const analyzeContentHandler = () => {
+    // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
+    const defaultContent = '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>';
+    const isContentEmpty = !state.content || state.content === '' || state.content === defaultContent;
+    
+    // Vérifier si les métadonnées sont vides
+    const isMetaTagsEmpty = !state.metaTags.title && !state.metaTags.description;
+    
+    // Si le contenu est vide ou par défaut ET que les métadonnées sont vides,
+    // définir directement le score à 0, même si des mots-clés sont présents
+    if (isContentEmpty && isMetaTagsEmpty) {
+      setState(prevState => ({
+        ...prevState,
+        contentStats: initialContentStats,
+        analysisResults: [],
+        overallScore: { value: 0, label: 'Non évalué', color: 'red' },
+        history: [...prevState.history, { timestamp: Date.now(), score: 0 }]
+      }));
+      return;
+    }
+    
     // Calcul des statistiques du contenu
     const contentStats = calculateContentStats(state.content, state.keywords);
     

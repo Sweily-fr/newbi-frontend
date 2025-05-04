@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { SubscriptionContext } from "../../context/SubscriptionContext.context";
 import { useContext } from "react";
 
 export const Footer = () => {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { hasActiveSubscription } = useContext(SubscriptionContext);
   return (
@@ -76,16 +77,30 @@ export const Footer = () => {
                 </a>
               </li> */}
               <li>
-                <Link to="/" onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/#faq-section';
-                  setTimeout(() => {
-                    const faqSection = document.getElementById('faq-section');
-                    if (faqSection) {
-                      faqSection.scrollIntoView({ behavior: 'smooth' });
+                <Link 
+                  to="/#faq-section" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Si vous êtes déjà sur la page d'accueil
+                    if (window.location.pathname === '/' || window.location.pathname === '') {
+                      const faqSection = document.getElementById('faq-section');
+                      if (faqSection) {
+                        faqSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    } else {
+                      // Si vous n'êtes pas sur la page d'accueil, naviguer d'abord
+                      navigate('/');
+                      // Attendre que la navigation soit terminée avant de faire défiler
+                      setTimeout(() => {
+                        const faqSection = document.getElementById('faq-section');
+                        if (faqSection) {
+                          faqSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 300);
                     }
-                  }, 100);
-                }} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                  }} 
+                  className="text-gray-600 hover:text-[#5b50ff] text-sm transition-colors"
+                >
                   FAQ
                 </Link>
               </li>

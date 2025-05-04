@@ -9,9 +9,9 @@ import { ClientFormData, Client } from '../types/client';
  * @param obj L'objet à nettoyer
  * @returns Une copie nettoyée de l'objet
  */
-const removeTypename = <T extends Record<string, any>>(obj: T): T => {
+const removeTypename = <T>(obj: T): T => {
   // Créer une copie de l'objet
-  const cleanedObj = { ...obj };
+  const cleanedObj = { ...obj } as Record<string, unknown>;
   
   // Supprimer __typename de l'objet
   if ('__typename' in cleanedObj) {
@@ -22,17 +22,17 @@ const removeTypename = <T extends Record<string, any>>(obj: T): T => {
   Object.keys(cleanedObj).forEach(key => {
     // Si la propriété est un objet, appliquer récursivement la fonction
     if (cleanedObj[key] && typeof cleanedObj[key] === 'object' && !Array.isArray(cleanedObj[key])) {
-      cleanedObj[key] = removeTypename(cleanedObj[key]);
+      cleanedObj[key] = removeTypename(cleanedObj[key] as Record<string, unknown>);
     }
     // Si la propriété est un tableau d'objets, appliquer la fonction à chaque élément
     else if (Array.isArray(cleanedObj[key])) {
-      cleanedObj[key] = cleanedObj[key].map((item: any) => 
-        typeof item === 'object' && item !== null ? removeTypename(item) : item
+      cleanedObj[key] = (cleanedObj[key] as unknown[]).map((item: unknown) => 
+        typeof item === 'object' && item !== null ? removeTypename(item as Record<string, unknown>) : item
       );
     }
   });
   
-  return cleanedObj;
+  return cleanedObj as T;
 };
 
 export const useClientsManager = () => {
@@ -75,6 +75,46 @@ export const useClientsManager = () => {
 
   const handleCreateClient = async (formData: ClientFormData) => {
     try {
+      // Vérifier si les champs obligatoires sont remplis
+      const requiredFields = ['name', 'email'];
+      const missingFields = requiredFields.filter(field => !formData[field as keyof ClientFormData]);
+      
+      // Vérifier si les champs d'adresse obligatoires sont remplis
+      const requiredAddressFields = ['street', 'city', 'postalCode', 'country'];
+      const missingAddressFields = formData.address ? 
+        requiredAddressFields.filter(field => !formData.address?.[field as keyof typeof formData.address]) : 
+        requiredAddressFields;
+      
+      // Si des champs obligatoires sont manquants, afficher un message d'erreur spécifique
+      if (missingFields.length > 0 || missingAddressFields.length > 0) {
+        let errorMessage = 'Veuillez remplir les champs obligatoires : ';
+        
+        if (missingFields.length > 0) {
+          const fieldLabels = {
+            name: 'Nom',
+            email: 'Email'
+          };
+          errorMessage += missingFields.map(field => fieldLabels[field as keyof typeof fieldLabels]).join(', ');
+        }
+        
+        if (missingAddressFields.length > 0) {
+          const addressLabels = {
+            street: 'Rue',
+            city: 'Ville',
+            postalCode: 'Code postal',
+            country: 'Pays'
+          };
+          if (missingFields.length > 0) errorMessage += ' et ';
+          errorMessage += missingAddressFields.map(field => addressLabels[field as keyof typeof addressLabels]).join(', ');
+        }
+        
+        Notification.error(errorMessage, {
+          duration: 5000,
+          position: 'bottom-left'
+        });
+        return;
+      }
+      
       // Nettoyer les données du formulaire des champs __typename
       const cleanedData = removeTypename(formData);
       
@@ -99,8 +139,48 @@ export const useClientsManager = () => {
 
   const handleUpdateClient = async (formData: ClientFormData) => {
     try {
+      // Vérifier si les champs obligatoires sont remplis
+      const requiredFields = ['name', 'email'];
+      const missingFields = requiredFields.filter(field => !formData[field as keyof ClientFormData]);
+      
+      // Vérifier si les champs d'adresse obligatoires sont remplis
+      const requiredAddressFields = ['street', 'city', 'postalCode', 'country'];
+      const missingAddressFields = formData.address ? 
+        requiredAddressFields.filter(field => !formData.address?.[field as keyof typeof formData.address]) : 
+        requiredAddressFields;
+      
+      // Si des champs obligatoires sont manquants, afficher un message d'erreur spécifique
+      if (missingFields.length > 0 || missingAddressFields.length > 0) {
+        let errorMessage = 'Veuillez remplir les champs obligatoires : ';
+        
+        if (missingFields.length > 0) {
+          const fieldLabels = {
+            name: 'Nom',
+            email: 'Email'
+          };
+          errorMessage += missingFields.map(field => fieldLabels[field as keyof typeof fieldLabels]).join(', ');
+        }
+        
+        if (missingAddressFields.length > 0) {
+          const addressLabels = {
+            street: 'Rue',
+            city: 'Ville',
+            postalCode: 'Code postal',
+            country: 'Pays'
+          };
+          if (missingFields.length > 0) errorMessage += ' et ';
+          errorMessage += missingAddressFields.map(field => addressLabels[field as keyof typeof addressLabels]).join(', ');
+        }
+        
+        Notification.error(errorMessage, {
+          duration: 5000,
+          position: 'bottom-left'
+        });
+        return;
+      }
+      
       // Nettoyer les données du formulaire des champs __typename
-      const cleanedData = removeTypename(formData);
+      const cleanedData = removeTypename<ClientFormData>(formData as any);
       
       await updateClient({
         variables: {

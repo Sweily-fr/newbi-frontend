@@ -194,7 +194,7 @@ export const InvoiceDiscountAndTotals: React.FC<
                 }
                 setValidationErrors(errors);
               }}
-              placeholder="Clé"
+              placeholder="Nom"
               disabled={false}
               className="flex-1"
               error={validationErrors[index]?.key}

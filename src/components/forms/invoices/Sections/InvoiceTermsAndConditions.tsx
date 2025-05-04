@@ -16,6 +16,8 @@ interface InvoiceTermsAndConditionsProps {
   setTermsAndConditionsLink: (value: string) => void;
   register?: any;
   errors?: any;
+  onApplyDefaults?: () => void;
+  hasDefaults?: boolean;
 }
 
 export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps> = ({
@@ -26,7 +28,9 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
   termsAndConditionsLink,
   setTermsAndConditionsLink,
   register,
-  errors
+  errors,
+  onApplyDefaults,
+  hasDefaults = false
 }) => {
   // États locaux pour les erreurs de validation
   const [localErrors, setLocalErrors] = useState({
@@ -89,10 +93,23 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
     <>
       {/* Conditions de vente */}
       <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <label htmlFor="terms-and-conditions" className="block text-sm font-medium text-gray-700">
+            Conditions de vente
+          </label>
+          {hasDefaults && onApplyDefaults && (
+            <button
+              type="button"
+              onClick={onApplyDefaults}
+              className="text-sm text-[#5b50ff] hover:underline"
+            >
+              Appliquer les paramètres par défaut
+            </button>
+          )}
+        </div>
         <TextArea
           id="terms-and-conditions"
           name="termsAndConditions"
-          label="Conditions de vente"
           value={termsAndConditions}
           onChange={handleTermsAndConditionsChange}
           register={register ? () => register('termsAndConditions', getTermsAndConditionsValidationRules()) : undefined}

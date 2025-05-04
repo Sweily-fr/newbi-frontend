@@ -8,6 +8,7 @@ import { useQuery } from '@apollo/client';
 import { GET_QUOTE } from '../../../graphql/quotes';
 import { QuotePreview } from '../../forms/quotes/QuotePreview';
 import { Quote } from '../../../types';
+import { ConfirmationModal } from '../../feedback/ConfirmationModal';
 
 interface Invoice {
   id: string;
@@ -80,6 +81,8 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   onStatusChange
 }) => {
   const [isInvoiceCreationModalOpen, setIsInvoiceCreationModalOpen] = useState(false);
+  // État pour la popup de confirmation d'annulation
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   // État non utilisé - à réactiver si besoin
   // const [showPreview, setShowPreview] = useState(true);
   const showPreview = true; // Valeur fixe pour l'instant
@@ -334,7 +337,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             <Button
               variant="outline"
               color="red"
-              onClick={() => onStatusChange('CANCELED')}
+              onClick={() => setShowCancelConfirmation(true)}
               fullWidth
               className="flex items-center justify-center"
             >
@@ -494,6 +497,21 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         quoteTotal={quote.finalTotalTTC}
         linkedInvoices={quote.linkedInvoices}
         onInvoiceCreated={handleInvoiceCreated}
+      />
+      
+      {/* Modal de confirmation d'annulation */}
+      <ConfirmationModal
+        isOpen={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+        onConfirm={() => {
+          onStatusChange('CANCELED');
+          setShowCancelConfirmation(false);
+        }}
+        title="Confirmation d'annulation"
+        message="Êtes-vous sûr de vouloir annuler ce devis ? Cette action ne peut pas être annulée."
+        confirmButtonText="Oui, annuler le devis"
+        cancelButtonText="Non, conserver"
+        confirmButtonVariant="danger"
       />
     </Sidebar>
     </>

@@ -36,6 +36,7 @@ interface InvoiceGeneralInfoProps {
   setInvoiceNumber: (invoiceNumber: string) => void;
   headerNotes: string;
   setHeaderNotes: (headerNotes: string) => void;
+  defaultHeaderNotes?: string;
 }
 
 export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
@@ -55,6 +56,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
   setInvoiceNumber,
   headerNotes,
   setHeaderNotes,
+  defaultHeaderNotes,
 }) => {
   // États pour les erreurs de validation
   const [invoicePrefixError, setInvoicePrefixError] = useState<
@@ -515,7 +517,23 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
 
       {/* Notes d'entête */}
       <div className="mb-4">
-        <h4 className="text-xl font-medium mb-3 text-gray-600">Notes</h4>
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-xl font-medium text-gray-600">Notes</h4>
+          {defaultHeaderNotes && (
+            <button
+              type="button"
+              onClick={() => {
+                if (defaultHeaderNotes) {
+                  setHeaderNotes(defaultHeaderNotes);
+                  validateHeaderNotes(defaultHeaderNotes);
+                }
+              }}
+              className="text-sm text-[#5b50ff] hover:underline"
+            >
+              Appliquer les paramètres par défaut
+            </button>
+          )}
+        </div>
         <div>
           <TextArea
             id="headerNotes"
@@ -535,6 +553,8 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
             error={headerNotesError ? { message: headerNotesError } : undefined}
             helpText="Maximum 1000 caractères"
           />
+
+          <p className="text-xs text-gray-500 mt-1">Ces notes apparaîtront en haut de la facture, juste après les informations de base.</p>
 
           <div className="flex flex-wrap gap-2 mt-2">
             <Button

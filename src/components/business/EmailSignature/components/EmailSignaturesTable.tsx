@@ -4,7 +4,7 @@ import { GET_EMAIL_SIGNATURES } from '../../../../graphql/emailSignatures';
 import { Table, Column } from '../../../data-display/Table';
 import { Button, SearchInput } from '../../../ui';
 import { PlusIcon, EnvelopeIcon, PencilIcon, TrashIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
-import { formatDate } from '../../../../utils/formatters';
+import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../feedback/Spinner';
 
 // Type pour une signature email
@@ -141,6 +141,19 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
       className: 'w-2/12'
     },
     {
+      header: 'Template',
+      accessor: (signature) => {
+        const templates = {
+          SIMPLE: 'Simple',
+          PROFESSIONAL: 'Professionnel',
+          MODERN: 'Moderne',
+          CREATIVE: 'Créatif'
+        };
+        return templates[signature.template as keyof typeof templates] || signature.template;
+      },
+      className: 'w-1/12'
+    },
+    {
       header: 'Nom complet',
       accessor: 'fullName',
       className: 'w-2/12'
@@ -156,21 +169,8 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
       className: 'w-2/12'
     },
     {
-      header: 'Template',
-      accessor: (signature) => {
-        const templates = {
-          SIMPLE: 'Simple',
-          PROFESSIONAL: 'Professionnel',
-          MODERN: 'Moderne',
-          CREATIVE: 'Créatif'
-        };
-        return templates[signature.template as keyof typeof templates] || signature.template;
-      },
-      className: 'w-1/12'
-    },
-    {
       header: 'Date de création',
-      accessor: (signature) => formatDate(signature.createdAt),
+      accessor: (signature) => formatDateShort(signature.createdAt),
       className: 'w-2/12'
     },
     {

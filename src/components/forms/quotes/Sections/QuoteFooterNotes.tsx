@@ -7,11 +7,15 @@ import { GET_QUOTES } from '../../../../graphql/quotes';
 interface QuoteFooterNotesProps {
   footerNotes: string;
   setFooterNotes: (value: string) => void;
+  onApplyDefaults?: () => void;
+  hasDefaults?: boolean;
 }
 
 export const QuoteFooterNotes: React.FC<QuoteFooterNotesProps> = ({
   footerNotes,
   setFooterNotes,
+  onApplyDefaults,
+  hasDefaults = false
 }) => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [defaultFooterNotesSet, setDefaultFooterNotesSet] = useState(false);
@@ -59,10 +63,23 @@ export const QuoteFooterNotes: React.FC<QuoteFooterNotesProps> = ({
   return (
     <div className="space-y-4">
       <FieldGroup>
+        <div className="flex justify-between items-center mb-2">
+          <label htmlFor="footerNotes" className="block text-sm font-medium text-gray-700">
+            Notes de bas de page
+          </label>
+          {hasDefaults && onApplyDefaults && (
+            <button
+              type="button"
+              onClick={onApplyDefaults}
+              className="text-sm text-[#5b50ff] hover:underline"
+            >
+              Appliquer les paramètres par défaut
+            </button>
+          )}
+        </div>
         <TextArea
           id="footerNotes"
           name="footerNotes"
-          label="Notes de bas de page"
           value={footerNotes}
           onChange={(e) => {
             setFooterNotes(e.target.value);

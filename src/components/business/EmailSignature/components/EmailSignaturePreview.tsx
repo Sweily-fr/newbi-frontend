@@ -433,7 +433,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                                         alt="Photo de profil" 
                                         width={photoSize} 
                                         height={photoSize} 
-                                        style={{ borderRadius: '50%', display: 'block' }} 
+                                        style={{ borderRadius: '10px', display: 'block' }} 
                                       />
                                     </td>
                                   )}
@@ -461,7 +461,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                                         alt="Photo de profil" 
                                         width={photoSize} 
                                         height={photoSize} 
-                                        style={{ borderRadius: '50%', display: 'block', margin: textAlignment === 'center' ? '0 auto' : (textAlignment === 'right' ? '0 0 0 auto' : '0 auto 0 0') }} 
+                                        style={{ borderRadius: '10px', display: 'block', margin: textAlignment === 'center' ? '0 auto' : (textAlignment === 'right' ? '0 0 0 auto' : '0 auto 0 0') }} 
                                       />
                                     </td>
                                   </tr>
@@ -1186,21 +1186,13 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
       </div>
       <div className="flex-grow bg-gray-50 p-8 overflow-auto">
         <div className="max-w-2xl mx-auto bg-white p-8 shadow-md rounded-md">
-          <div className="mb-6 pb-6 border-b border-gray-200">
+          <div className="mb-6 pb-6 border-gray-200">
             <h3 className="text-lg font-medium text-gray-700 mb-2">Exemple d'email</h3>
             <div className="bg-gray-50 p-4 rounded-md">
               <p className="mb-4">Bonjour,</p>
               <p className="mb-4">Je vous remercie pour votre message. Nous avons bien pris en compte votre demande et nous reviendrons vers vous dans les plus brefs délais.</p>
               <p className="mb-4">Cordialement,</p>
               <div className="mt-6 border-t pt-4 border-gray-200">
-                {renderSignatureTemplate()}
-              </div>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-lg font-medium text-gray-700 mb-2">Signature seule</h3>
-            <div className="bg-gray-50 p-4 rounded-md">
-              <div ref={signatureRef}>
                 {renderSignatureTemplate()}
               </div>
             </div>

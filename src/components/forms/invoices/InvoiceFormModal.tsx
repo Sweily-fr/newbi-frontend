@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useInvoiceForm } from "../../../hooks";
+import React, { useEffect, useState, useCallback } from "react";
+import { useInvoiceForm, useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../hooks";
 import { InvoiceFormModalProps } from "../../../types";
 import { Button, Form } from "../../ui";
+import { DocumentSettings } from "../common/DocumentSettings";
 import Collapse from "../../ui/Collapse";
 import { validateInvoiceDates } from "../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
@@ -25,6 +26,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   onSubmit,
   quoteId
 }) => {
+  // Verrouiller le défilement du body lorsque la modale est ouverte
+  useBodyScrollLock(true);
   // Vérifier si la facture est en statut PENDING, dans ce cas empêcher l'édition
   if (invoice && invoice.status === 'PENDING') {
     // Utiliser setTimeout pour permettre au composant de se monter avant de fermer
@@ -39,6 +42,11 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   // État pour la popup de confirmation
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<"close" | "configureInfo" | "configureBankDetails" | null>(null);
+  
+  // Utiliser le hook useBeforeUnload pour empêcher la navigation non intentionnelle avec le modal de confirmation personnalisé
+  const { showConfirmModal, confirmNavigation, cancelNavigation } = useBeforeUnload(true);
+  // État pour afficher les paramètres
+  const [showSettings, setShowSettings] = useState(false);
   // État pour suivre les sections avec des erreurs
   const [sectionErrors, setSectionErrors] = useState({
     generalInfo: false,
@@ -87,6 +95,30 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   const handleCancelConfirmation = () => {
     setShowConfirmationModal(false);
     setPendingAction(null);
+  };
+
+  // Hook pour gérer les paramètres globaux des factures
+  const {
+    defaultHeaderNotes,
+    setDefaultHeaderNotes,
+    defaultFooterNotes,
+    setDefaultFooterNotes,
+    defaultTermsAndConditions,
+    setDefaultTermsAndConditions,
+    defaultTermsAndConditionsLinkTitle,
+    setDefaultTermsAndConditionsLinkTitle,
+    defaultTermsAndConditionsLink,
+    setDefaultTermsAndConditionsLink,
+    handleSaveSettings,
+    isSaving: isSavingSettings
+  } = useDocumentSettings('INVOICE');
+
+  // Fonction pour gérer l'enregistrement des paramètres
+  const handleSaveDocumentSettings = async () => {
+    const success = await handleSaveSettings();
+    if (success) {
+      setShowSettings(false);
+    }
   };
 
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
@@ -161,6 +193,24 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     showNotifications: false // Désactiver les notifications ici pour éviter les doublons avec useInvoices
   });
 
+  // Fonction pour appliquer les paramètres par défaut
+  const applyDefaultSettingsToForm = useCallback(() => {
+    if (defaultHeaderNotes && !headerNotes) setHeaderNotes(defaultHeaderNotes);
+    if (defaultFooterNotes && !footerNotes) setFooterNotes(defaultFooterNotes);
+    if (defaultTermsAndConditions && !termsAndConditions) setTermsAndConditions(defaultTermsAndConditions);
+    if (defaultTermsAndConditionsLinkTitle && !termsAndConditionsLinkTitle) setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+    if (defaultTermsAndConditionsLink && !termsAndConditionsLink) setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+  }, [defaultHeaderNotes, defaultFooterNotes, defaultTermsAndConditions, defaultTermsAndConditionsLinkTitle, defaultTermsAndConditionsLink, 
+      headerNotes, footerNotes, termsAndConditions, termsAndConditionsLinkTitle, termsAndConditionsLink, 
+      setHeaderNotes, setFooterNotes, setTermsAndConditions, setTermsAndConditionsLinkTitle, setTermsAndConditionsLink]);
+  
+  // Appliquer les paramètres par défaut au chargement du formulaire
+  useEffect(() => {
+    if (!invoice) { // Seulement pour les nouvelles factures
+      applyDefaultSettingsToForm();
+    }
+  }, [invoice, applyDefaultSettingsToForm]);
+
   // Récupérer les données du devis si quoteId est fourni
   const { data: quoteData, loading: quoteLoading } = useQuery(GET_QUOTE, {
     variables: { id: quoteId },
@@ -188,8 +238,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       setBankDetailsReadOnly(quote.bankDetailsReadOnly);
     }
   }, [quoteData]);
-
-
 
   // Fonction pour valider le formulaire et gérer la soumission
   const onValidateForm = (asDraft: boolean) => {
@@ -312,143 +360,207 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       {/* Contenu principal avec formulaire à gauche et aperçu à droite */}
       <div className="flex flex-1 h-full overflow-hidden">
         {/* Formulaire à gauche */}
-        <div className="w-2/5 overflow-y-auto px-6 pt-6 border-r">
-          <Form onSubmit={(e) => e.preventDefault()} spacing="normal" className="w-full">
-            <Collapse 
-              title="Informations générales" 
-              defaultOpen={true} 
-              hasError={sectionErrors.generalInfo}
-              description="Numéro, dates et informations de base de la facture"
-              icon="document"
-            >
-              <InvoiceGeneralInfo
-                isDeposit={isDeposit}
-                setIsDeposit={setIsDeposit}
-                purchaseOrderNumber={purchaseOrderNumber}
-                setPurchaseOrderNumber={setPurchaseOrderNumber}
-                issueDate={issueDate}
-                setIssueDate={setIssueDate}
-                executionDate={executionDate}
-                setExecutionDate={setExecutionDate}
-                dueDate={dueDate}
-                setDueDate={setDueDate}
-                invoicePrefix={invoicePrefix}
-                setInvoicePrefix={setInvoicePrefix}
-                invoiceNumber={invoiceNumber}
-                setInvoiceNumber={setInvoiceNumber}
-                headerNotes={headerNotes}
-                setHeaderNotes={setHeaderNotes}
+        <div className="w-2/5 overflow-y-auto border-r border-gray-200">
+          <Form onSubmit={(e) => e.preventDefault()} className="p-4">
+            {showSettings ? (
+              <DocumentSettings
+                documentType="INVOICE"
+                defaultHeaderNotes={defaultHeaderNotes}
+                setDefaultHeaderNotes={setDefaultHeaderNotes}
+                defaultFooterNotes={defaultFooterNotes}
+                setDefaultFooterNotes={setDefaultFooterNotes}
+                defaultTermsAndConditions={defaultTermsAndConditions}
+                setDefaultTermsAndConditions={setDefaultTermsAndConditions}
+                defaultTermsAndConditionsLinkTitle={defaultTermsAndConditionsLinkTitle}
+                setDefaultTermsAndConditionsLinkTitle={setDefaultTermsAndConditionsLinkTitle}
+                defaultTermsAndConditionsLink={defaultTermsAndConditionsLink}
+                setDefaultTermsAndConditionsLink={setDefaultTermsAndConditionsLink}
+                onSave={handleSaveDocumentSettings}
+                onCancel={() => setShowSettings(false)}
+                isSaving={isSavingSettings}
               />
-            </Collapse>
-            <Collapse 
-              title="Informations client" 
-              defaultOpen={false} 
-              hasError={sectionErrors.client}
-              description="Sélection ou création d'un client pour la facture"
-              icon="user"
-            >
-              <ClientSelection
-                isNewClient={isNewClient}
-                setIsNewClient={handleClientModeChange}
-                newClient={newClient}
-                setNewClient={setNewClient}
-                selectedClient={selectedClient}
-                setSelectedClient={setSelectedClient}
-                clientsData={clientsData}
-                invoice={invoice}
-                selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
-              />
-            </Collapse>
+            ) : (
+              <>
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => setShowSettings(true)}
+                    variant="secondary"
+                    size="md"
+                    className="flex items-center gap-2"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Paramètres
+                  </Button>
+                </div>
+                <Collapse 
+                  title="Informations générales" 
+                  defaultOpen={true} 
+                  hasError={sectionErrors.generalInfo}
+                  description="Informations de base de la facture"
+                  icon="document"
+                >
+                  <InvoiceGeneralInfo
+                    isDeposit={isDeposit}
+                    setIsDeposit={setIsDeposit}
+                    purchaseOrderNumber={purchaseOrderNumber}
+                    setPurchaseOrderNumber={setPurchaseOrderNumber}
+                    issueDate={issueDate}
+                    setIssueDate={setIssueDate}
+                    executionDate={executionDate}
+                    setExecutionDate={setExecutionDate}
+                    dueDate={dueDate}
+                    setDueDate={setDueDate}
+                    invoicePrefix={invoicePrefix}
+                    setInvoicePrefix={setInvoicePrefix}
+                    invoiceNumber={invoiceNumber}
+                    setInvoiceNumber={setInvoiceNumber}
+                    headerNotes={headerNotes}
+                    setHeaderNotes={setHeaderNotes}
+                    defaultHeaderNotes={defaultHeaderNotes}
+                  />
+                </Collapse>
+                <Collapse 
+                  title="Informations client" 
+                  defaultOpen={false} 
+                  hasError={sectionErrors.client}
+                  description="Sélection ou création d'un client pour la facture"
+                  icon="user"
+                >
+                  <ClientSelection
+                    isNewClient={isNewClient}
+                    setIsNewClient={handleClientModeChange}
+                    newClient={newClient}
+                    setNewClient={setNewClient}
+                    selectedClient={selectedClient}
+                    setSelectedClient={setSelectedClient}
+                    clientsData={clientsData}
+                    invoice={invoice}
+                    selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
+                  />
+                </Collapse>
 
-            <Collapse 
-              title="Informations société" 
-              defaultOpen={false} 
-              hasError={sectionErrors.companyInfo}
-              description="Coordonnées et informations de votre entreprise"
-              icon="company"
-            >
-              <InvoiceCompanyInfo
-                companyInfo={companyInfo}
-                userData={userData}
-                apiUrl={apiUrl}
-                onConfigureInfoClick={handleConfigureInfoRequest}
-                setCompanyInfo={setCompanyInfo}
-              />
-            </Collapse>
+                <Collapse 
+                  title="Informations société" 
+                  defaultOpen={false} 
+                  hasError={sectionErrors.companyInfo}
+                  description="Coordonnées et informations de votre entreprise"
+                  icon="company"
+                >
+                  <InvoiceCompanyInfo
+                    companyInfo={companyInfo}
+                    userData={userData}
+                    apiUrl={apiUrl}
+                    onConfigureInfoClick={handleConfigureInfoRequest}
+                    setCompanyInfo={setCompanyInfo}
+                  />
+                </Collapse>
 
-            <Collapse 
-              title="Produits et services" 
-              defaultOpen={false} 
-              hasError={sectionErrors.items}
-              description="Articles, quantités et prix à facturer"
-              icon="products"
-            >
-              <InvoiceItems
-                items={items}
-                handleItemChange={handleItemChange}
-                handleRemoveItem={handleRemoveItem}
-                handleAddItem={handleAddItem}
-                handleProductSelect={handleProductSelect}
-              />
-            </Collapse>
+                <Collapse 
+                  title="Produits et services" 
+                  defaultOpen={false} 
+                  hasError={sectionErrors.items}
+                  description="Articles, quantités et prix à facturer"
+                  icon="products"
+                >
+                  <InvoiceItems
+                    items={items}
+                    handleItemChange={handleItemChange}
+                    handleRemoveItem={handleRemoveItem}
+                    handleAddItem={handleAddItem}
+                    handleProductSelect={handleProductSelect}
+                  />
+                </Collapse>
 
-            <Collapse 
-              title="Remise et totaux" 
-              defaultOpen={false} 
-              hasError={sectionErrors.discountAndTotals}
-              description="Remises, taxes et champs personnalisés"
-              icon="calculator"
-            >
-              <InvoiceDiscountAndTotals
-                discount={discount}
-                setDiscount={setDiscount}
-                discountType={discountType}
-                setDiscountType={setDiscountType}
-                calculateTotals={calculateTotals}
-                customFields={customFields || []}
-                handleAddCustomField={handleAddCustomField}
-                handleRemoveCustomField={handleRemoveCustomField}
-                handleCustomFieldChange={handleCustomFieldChange}
-              />
-            </Collapse>
+                <Collapse 
+                  title="Remise et totaux" 
+                  defaultOpen={false} 
+                  hasError={sectionErrors.discountAndTotals}
+                  description="Remises, taxes et champs personnalisés"
+                  icon="calculator"
+                >
+                  <InvoiceDiscountAndTotals
+                    discount={discount}
+                    setDiscount={setDiscount}
+                    discountType={discountType}
+                    setDiscountType={setDiscountType}
+                    calculateTotals={calculateTotals}
+                    customFields={customFields || []}
+                    handleAddCustomField={handleAddCustomField}
+                    handleRemoveCustomField={handleRemoveCustomField}
+                    handleCustomFieldChange={handleCustomFieldChange}
+                  />
+                </Collapse>
 
-            <Collapse 
-              title="Notes de bas de page" 
-              defaultOpen={false} 
-              hasError={sectionErrors.bankDetails}
-              description="Coordonnées bancaires, conditions et notes"
-              icon="notes"
-            >
-              <InvoiceBankDetails
-                userData={userData}
-                useBankDetails={useBankDetails}
-                setUseBankDetails={setUseBankDetails}
-                setCompanyInfo={setCompanyInfo}
-                onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
-              />
-              <InvoiceTermsAndConditions
-                termsAndConditions={termsAndConditions}
-                setTermsAndConditions={setTermsAndConditions}
-                termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
-                setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
-                termsAndConditionsLink={termsAndConditionsLink}
-                setTermsAndConditionsLink={setTermsAndConditionsLink}
-              />
-              <InvoiceFooterNotes
-                footerNotes={footerNotes}
-                setFooterNotes={setFooterNotes}
-              />
-            </Collapse>
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-8">
-              <div className="max-w-7xl mx-auto">
-                <InvoiceActionButtons 
-                  onValidateForm={onValidateForm}
-                  isSubmitting={isSubmitting}
-                  isEditMode={!!invoice}
-                  onClose={handleCloseRequest}
-                />
-              </div>
-            </div>
+                <Collapse 
+                  title="Notes de bas de page" 
+                  defaultOpen={false} 
+                  hasError={sectionErrors.bankDetails}
+                  description="Coordonnées bancaires, conditions et notes"
+                  icon="notes"
+                >
+                  <InvoiceBankDetails
+                    userData={userData}
+                    useBankDetails={useBankDetails}
+                    setUseBankDetails={setUseBankDetails}
+                    setCompanyInfo={setCompanyInfo}
+                    onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
+                  />
+                  <InvoiceTermsAndConditions
+                    termsAndConditions={termsAndConditions}
+                    setTermsAndConditions={setTermsAndConditions}
+                    termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
+                    setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
+                    termsAndConditionsLink={termsAndConditionsLink}
+                    setTermsAndConditionsLink={setTermsAndConditionsLink}
+                    onApplyDefaults={() => {
+                      if (defaultTermsAndConditions) {
+                        setTermsAndConditions(defaultTermsAndConditions);
+                      }
+                      if (defaultTermsAndConditionsLinkTitle) {
+                        setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+                      }
+                      if (defaultTermsAndConditionsLink) {
+                        setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+                      }
+                    }}
+                    hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
+                  />
+                  <InvoiceFooterNotes
+                    footerNotes={footerNotes}
+                    setFooterNotes={setFooterNotes}
+                    onApplyDefaults={() => {
+                      if (defaultFooterNotes) {
+                        setFooterNotes(defaultFooterNotes);
+                      }
+                    }}
+                    hasDefaults={!!defaultFooterNotes}
+                  />
+                </Collapse>
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-8">
+                  <div className="max-w-7xl mx-auto flex justify-end items-center">
+                    <InvoiceActionButtons 
+                      onValidateForm={onValidateForm}
+                      isSubmitting={isSubmitting}
+                      isEditMode={!!invoice}
+                      onClose={handleCloseRequest}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </Form>
         </div>
 
@@ -481,11 +593,23 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
           />
         </div>
       </div>
-      {/* Modal de confirmation */}
+      {/* Modal de confirmation pour les actions internes */}
       <ConfirmationModal
         isOpen={showConfirmationModal}
         onClose={handleCancelConfirmation}
         onConfirm={handleConfirmAction}
+        title="Confirmation"
+        message="Toute progression non enregistrée sera perdue. Êtes-vous sûr de vouloir continuer ?"
+        confirmButtonText="Continuer"
+        cancelButtonText="Annuler"
+        confirmButtonVariant="danger"
+      />
+      
+      {/* Modal de confirmation pour la navigation entre pages */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={cancelNavigation}
+        onConfirm={confirmNavigation}
         title="Confirmation"
         message="Toute progression non enregistrée sera perdue. Êtes-vous sûr de vouloir continuer ?"
         confirmButtonText="Continuer"

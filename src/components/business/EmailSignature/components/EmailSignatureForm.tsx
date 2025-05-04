@@ -72,7 +72,20 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   const [imagesLayout, setImagesLayout] = useState(initialData?.imagesLayout || 'vertical'); // Valeur par défaut: verticale
   
   // Police de caractères pour la signature
-  const [fontFamily, setFontFamily] = useState(initialData?.fontFamily || 'Arial, sans-serif'); // Valeur par défaut: Arial
+  // Utiliser exactement l'une des valeurs acceptées par le backend
+  const [fontFamily, setFontFamily] = useState(
+    // Vérifier si initialData.fontFamily est l'une des valeurs autorisées
+    initialData?.fontFamily && [
+      'Arial, sans-serif',
+      'Helvetica, sans-serif',
+      'Georgia, serif',
+      'Times New Roman, serif',
+      'Courier New, monospace',
+      'Verdana, sans-serif'
+    ].includes(initialData.fontFamily)
+      ? initialData.fontFamily
+      : 'Arial, sans-serif' // Valeur par défaut: Arial
+  );
   
   // Taille de police pour la signature
   const [fontSize, setFontSize] = useState(initialData?.fontSize || 14); // Valeur par défaut: 14px
@@ -568,12 +581,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         <form id="signatureForm" onSubmit={handleSubmit} className="space-y-6">
           <Collapse title="Informations générales" defaultOpen={true}>
             <div className="grid grid-cols-1 gap-4 mb-4">
-              {/* Affichage de débogage pour vérifier l'erreur */}
-              {errors.name && (
-                <div className="p-2 mb-2 bg-red-100 text-red-800 rounded">
-                  Erreur détectée pour le champ nom: {errors.name}
-                </div>
-              )}
+              {/* Suppression de l'affichage de débogage qui n'est plus nécessaire */}
               <TextField
                 id="name"
                 name="name"
@@ -628,7 +636,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   acceptedFileTypes="image/*"
                   helpText="Format recommandé : PNG ou JPG, max 2MB. Cette photo apparaîtra dans votre signature email."
                   imageSize={profilePhotoSize}
-                  roundedStyle="full"
+                  roundedStyle="rounded"
                   className="flex flex-col items-center mx-auto"
                 />
                 
@@ -751,6 +759,15 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   const value = e.target.value;
                   setEmail(value);
                   handleFormChange({ email: value });
+                  
+                  // Validation en temps réel
+                  if (!value) {
+                    setErrors(prev => ({ ...prev, email: 'L\'email est requis' }));
+                  } else if (!EMAIL_PATTERN.test(value)) {
+                    setErrors(prev => ({ ...prev, email: 'Format d\'email invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, email: '' }));
+                  }
                 }}
                 error={errors.email}
                 required
@@ -767,9 +784,17 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   const value = e.target.value;
                   setPhone(value);
                   handleFormChange({ phone: value });
+                  
+                  // Validation en temps réel - format plus permissif pour accepter différents formats internationaux
+                  const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
+                  if (value && !phonePattern.test(value)) {
+                    setErrors(prev => ({ ...prev, phone: 'Format de numéro de téléphone invalide (accepte 01 XX XX XX XX ou +33 1 XX XX XX XX)' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, phone: '' }));
+                  }
                 }}
                 error={errors.phone}
-                helpText="Format attendu : +33 1 23 45 67 89"
+                helpText="Ex: 01 23 45 67 89 ou +33 1 23 45 67 89"
               />
 
               <TextField
@@ -782,9 +807,17 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   const value = e.target.value;
                   setMobilePhone(value);
                   handleFormChange({ mobilePhone: value });
+                  
+                  // Validation en temps réel - format plus permissif pour accepter différents formats internationaux
+                  const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
+                  if (value && !phonePattern.test(value)) {
+                    setErrors(prev => ({ ...prev, mobilePhone: 'Format de numéro de mobile invalide (chiffres, espaces et +)' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, mobilePhone: '' }));
+                  }
                 }}
                 error={errors.mobilePhone}
-                helpText="Format attendu : +33 6 12 34 56 78"
+                helpText="Ex: 06 12 34 56 78 ou +33 6 12 34 56 78"
               />
 
               <TextField
@@ -797,6 +830,14 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   const value = e.target.value;
                   setWebsite(value);
                   handleFormChange({ website: value });
+                  
+                  // Validation en temps réel
+                  const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+                  if (value && !urlPattern.test(value)) {
+                    setErrors(prev => ({ ...prev, website: 'Format d\'URL invalide' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, website: '' }));
+                  }
                 }}
                 error={errors.website}
                 helpText="Format attendu : https://www.exemple.com"
@@ -824,7 +865,18 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Nom de l'entreprise"
                 placeholder="Ex: Acme Inc."
                 value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setCompanyName(value);
+                  handleFormChange({ companyName: value });
+                  
+                  // Validation en temps réel
+                  if (value && !NAME_REGEX.test(value)) {
+                    setErrors(prev => ({ ...prev, companyName: 'Le nom de l\'entreprise contient des caractères non autorisés (<, > non autorisés)' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, companyName: '' }));
+                  }
+                }}
                 error={errors.companyName}
               />
 
@@ -834,7 +886,18 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                 label="Adresse"
                 placeholder="Ex: 123 rue de Paris, 75001 Paris, France"
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAddress(value);
+                  handleFormChange({ address: value });
+                  
+                  // Validation en temps réel
+                  if (value && !NAME_REGEX.test(value)) {
+                    setErrors(prev => ({ ...prev, address: 'L\'adresse contient des caractères non autorisés (<, > non autorisés)' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, address: '' }));
+                  }
+                }}
                 error={errors.address}
                 rows={3}
               />
@@ -1247,13 +1310,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5b50ff' }} onClick={() => setSocialLinksIconBgColor('#5b50ff')} title="Violet" />
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => setSocialLinksIconBgColor('#5b50ff')}
-                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-[#f0eeff] text-[#5b50ff] border border-[#d6d1ff] hover:bg-[#e6e1ff] transition-colors"
-                            >
-                              Violet
-                            </button>
                           </div>
                         </div>
                         <div>
@@ -1285,13 +1341,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                                 <div className="w-3 h-3 rounded-full bg-white border border-gray-300" onClick={() => setSocialLinksIconColor('#FFFFFF')} title="Blanc" />
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => setSocialLinksIconColor('#FFFFFF')}
-                              className="ml-2 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
-                            >
-                              Blanc
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -1643,14 +1692,11 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
                 >
                   <option value="Arial, sans-serif">Arial</option>
-                  <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
-                  <option value="'Calibri', sans-serif">Calibri</option>
-                  <option value="'Verdana', sans-serif">Verdana</option>
-                  <option value="'Georgia', serif">Georgia</option>
-                  <option value="'Times New Roman', Times, serif">Times New Roman</option>
-                  <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-                  <option value="'Tahoma', sans-serif">Tahoma</option>
-                  <option value="'Courier New', Courier, monospace">Courier New</option>
+                  <option value="Helvetica, sans-serif">Helvetica</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="Times New Roman, serif">Times New Roman</option>
+                  <option value="Courier New, monospace">Courier New</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
                   Choisissez une police standard pour assurer la compatibilité avec tous les clients de messagerie.

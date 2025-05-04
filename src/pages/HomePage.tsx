@@ -673,7 +673,7 @@ export const HomePage = () => {
 
                 <div className="mt-auto">
                   <Link
-                    to={getRedirectPath("/outils")}
+                    to={getRedirectPath("/signatures-email")}
                     className="text-base font-medium text-indigo-600 hover:text-indigo-800 group"
                   >
                     Créer ma signature{" "}

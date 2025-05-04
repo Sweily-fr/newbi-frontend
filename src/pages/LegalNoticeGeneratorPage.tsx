@@ -96,11 +96,13 @@ export const LegalNoticeGeneratorPage: React.FC = () => {
 
   // Fonction pour valider un champ du formulaire
   const validateField = (name: keyof LegalNoticeForm, value: string): string => {
-    const { EMAIL_PATTERN, URL_PATTERN, REQUIRED_FIELD_MESSAGE, EMAIL_ERROR_MESSAGE } = {
+    const { EMAIL_PATTERN, URL_PATTERN, PHONE_PATTERN, REQUIRED_FIELD_MESSAGE, EMAIL_ERROR_MESSAGE, PHONE_ERROR_MESSAGE } = {
       EMAIL_PATTERN: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
       URL_PATTERN: /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[-a-z\d%_.~+]*)*([?][;&a-z\d%_.~+=-]*)?([#][-a-z\d_]*)?$/i,
+      PHONE_PATTERN: /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       REQUIRED_FIELD_MESSAGE: 'Ce champ est requis',
-      EMAIL_ERROR_MESSAGE: 'Adresse email invalide'
+      EMAIL_ERROR_MESSAGE: 'Adresse email invalide',
+      PHONE_ERROR_MESSAGE: 'Format de téléphone invalide (format français attendu)'
     };
 
     // Définir les champs obligatoires
@@ -132,9 +134,13 @@ export const LegalNoticeGeneratorPage: React.FC = () => {
         }
         break;
       case 'companyPhone':
-      case 'hostingPhone':
         if (value && !/^[+]?[0-9\s]{8,15}$/.test(value)) {
           return 'Numéro de téléphone invalide';
+        }
+        break;
+      case 'hostingPhone':
+        if (value && !PHONE_PATTERN.test(value)) {
+          return PHONE_ERROR_MESSAGE;
         }
         break;
       case 'companySIRET':
@@ -626,8 +632,12 @@ Ces mentions légales ont été générées via Newbi le ${new Date().toLocaleDa
                     name="hostingPhone"
                     value={formValues.hostingPhone}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ex: 06 12 34 56 78"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none ${errors.hostingPhone ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
                   />
+                  {errors.hostingPhone && (
+                    <p className="mt-1 text-sm text-red-600 font-medium">{errors.hostingPhone}</p>
+                  )}
                 </div>
                 
                 <div>

@@ -87,16 +87,57 @@ export const ClientForm: React.FC<ClientFormProps> = ({
 
   // Fonction pour remplir le formulaire avec les données de l'entreprise trouvée
   const fillFormWithCompanyData = (company: CompanySearchResult) => {
+    // Initialiser les valeurs avec les données de l'API
+    let streetValue = company.address.street;
+    let postalCodeValue = company.address.postalCode;
+    let cityValue = company.address.city;
+    
+    // Format observé: "229 rue saint-honore 75001 Paris"
+    // Extraire le code postal (5 chiffres) et la ville qui suit
+    const postalCityMatch = streetValue.match(/(.*?)\s+(\d{5})\s+([^,]+)$/);
+    
+    if (postalCityMatch) {
+      // Extraire les composants de l'adresse
+      streetValue = postalCityMatch[1].trim(); // La rue sans le code postal et la ville
+      postalCodeValue = postalCityMatch[2].trim(); // Le code postal (5 chiffres)
+      cityValue = postalCityMatch[3].trim(); // La ville
+    } else {
+      // Si le format principal n'est pas détecté, essayer d'autres formats
+      // Format alternatif: "Rue, Code Postal Ville"
+      const altFormatMatch = streetValue.match(/^(.+),\s*(\d{5})\s+(.+)$/);
+      
+      if (altFormatMatch) {
+        streetValue = altFormatMatch[1].trim();
+        postalCodeValue = altFormatMatch[2].trim();
+        cityValue = altFormatMatch[3].trim();
+      } else if (/^\d{5}$/.test(cityValue)) {
+        // Si le champ city contient un code postal, essayer de trouver la ville dans l'adresse
+        postalCodeValue = cityValue; // Utiliser le code postal du champ city
+        
+        // Chercher dans la chaîne d'adresse un format "XXXXX Ville"
+        const cityInAddressMatch = streetValue.match(/\b(\d{5})\s+([^,\d]+)\b/);
+        if (cityInAddressMatch) {
+          cityValue = cityInAddressMatch[2].trim(); // La ville après le code postal
+          // Enlever le code postal et la ville de l'adresse
+          streetValue = streetValue.replace(cityInAddressMatch[0], '').trim();
+        }
+      }
+    }
+    
+    // Mettre à jour les champs du formulaire avec les valeurs extraites
     setValue("name", company.name);
     setValue("siret", company.siret);
     setValue("vatNumber", company.vatNumber || "");
-    setValue("address.street", company.address.street);
-    setValue("address.city", company.address.city);
-    setValue("address.postalCode", company.address.postalCode);
+    setValue("address.street", streetValue);
+    setValue("address.city", cityValue);
+    setValue("address.postalCode", postalCodeValue);
     setValue("address.country", company.address.country);
+    
+    // Réinitialiser l'interface utilisateur
     resetSearch();
     setSearchTerm("");
     setShowResults(false);
+    setShowManualEntry(true); // Afficher le formulaire pour compléter les informations
   };
 
   // Fonction pour rechercher une entreprise

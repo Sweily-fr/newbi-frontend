@@ -1220,7 +1220,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
         <span className={`text-xs font-medium ${getWordCountRating(currentWordCount).color} ml-1 px-1.5 py-0.5 rounded-full text-xs bg-opacity-20 ${getWordCountRating(currentWordCount).color.replace('text-', 'bg-')}`}>({getWordCountRating(currentWordCount).label})</span>
       </div>
       {/* Barre d'outils */}
-      <div className="flex h-[70px] justify-between items-center bg-[#f0eeff] border-b border-[#e6e1ff] p-2">
+      <div className="flex h-[70px] justify-between items-center bg-[#f0eeff] border-b border-[#e6e1ff] p-2 f top-0">
           <div className="flex flex-wrap gap-2 items-center">
             {/* Groupe 1: Formatage de texte de base */}
             <div className="flex items-center">

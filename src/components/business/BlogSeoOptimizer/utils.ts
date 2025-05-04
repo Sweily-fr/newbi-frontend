@@ -203,6 +203,19 @@ export const analyzeContent = (
   metaTags: MetaTagsData, 
   stats: ContentStats
 ): ContentAnalysisResult[] => {
+  // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
+  const defaultContent = '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>';
+  const isContentEmpty = !content || content === '' || content === defaultContent;
+  
+  // Vérifier si les métadonnées sont vides
+  const isMetaTagsEmpty = !metaTags.title && !metaTags.description;
+  
+  // Si le contenu est vide ou par défaut ET que les métadonnées sont vides,
+  // retourner un tableau vide pour obtenir un score de 0
+  if (isContentEmpty && isMetaTagsEmpty && keywords.main) {
+    return [];
+  }
+  
   const results: ContentAnalysisResult[] = [];
   
   // Vérification des mots-clés secondaires
@@ -685,6 +698,22 @@ export const analyzeContent = (
  */
 export const calculateOverallScore = (results: ContentAnalysisResult[]): SeoScore => {
   if (results.length === 0) {
+    return { value: 0, label: 'Non évalué', color: 'red' };
+  }
+  
+  // Vérifier si seuls les mots-clés sont présents, sans métadonnées ni texte significatif
+  const hasKeywords = results.some(result => result.category === 'keywords');
+  const hasMetaTags = results.some(result => 
+    (result.id === 'title-length' && result.description.includes('caractères') && !result.description.includes('0 caractères')) || 
+    (result.id === 'description-length' && result.description.includes('caractères') && !result.description.includes('0 caractères'))
+  );
+  const hasContent = results.some(result => 
+    (result.id === 'content-length' && result.score > 0) || 
+    (result.id === 'paragraph-length' && result.score > 0) ||
+    (result.id === 'h1-presence' && result.status !== 'problem')
+  );
+  
+  if (hasKeywords && !hasMetaTags && !hasContent) {
     return { value: 0, label: 'Non évalué', color: 'red' };
   }
   

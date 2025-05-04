@@ -17,6 +17,8 @@ interface QuoteTermsAndConditionsProps {
   setTermsAndConditionsLink: (value: string) => void;
   register?: UseFormRegister<any>;
   errors?: Record<string, FieldError>;
+  onApplyDefaults?: () => void;
+  hasDefaults?: boolean;
 }
 
 export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = ({
@@ -27,7 +29,9 @@ export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = (
   termsAndConditionsLink,
   setTermsAndConditionsLink,
   register,
-  errors
+  errors,
+  onApplyDefaults,
+  hasDefaults = false
 }) => {
   // États locaux pour les erreurs de validation
   const [localErrors, setLocalErrors] = useState({
@@ -90,18 +94,33 @@ export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = (
   return (
     <div className="space-y-4">
       {/* Conditions générales */}
-      <TextArea
-        id="termsAndConditions"
-        name="termsAndConditions"
-        label="Conditions générales"
-        value={termsAndConditions}
-        onChange={handleTermsAndConditionsChange}
-        register={register ? () => register('termsAndConditions', getTermsAndConditionsValidationRules()) : undefined}
-        error={errors?.termsAndConditions || localErrors.termsAndConditions}
-        placeholder="Conditions générales du devis"
-        rows={4}
-        helpText={`${termsAndConditions?.length || 0}/2000 caractères - Les sauts de ligne seront préservés dans l'aperçu`}
-      />
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <label htmlFor="termsAndConditions" className="block text-sm font-medium text-gray-700">
+            Conditions générales
+          </label>
+          {hasDefaults && onApplyDefaults && (
+            <button
+              type="button"
+              onClick={onApplyDefaults}
+              className="text-sm text-[#5b50ff] hover:underline"
+            >
+              Appliquer les paramètres par défaut
+            </button>
+          )}
+        </div>
+        <TextArea
+          id="termsAndConditions"
+          name="termsAndConditions"
+          value={termsAndConditions}
+          onChange={handleTermsAndConditionsChange}
+          register={register ? () => register('termsAndConditions', getTermsAndConditionsValidationRules()) : undefined}
+          error={errors?.termsAndConditions || localErrors.termsAndConditions}
+          placeholder="Conditions générales du devis"
+          rows={4}
+          helpText={`${termsAndConditions?.length || 0}/2000 caractères - Les sauts de ligne seront préservés dans l'aperçu`}
+        />
+      </div>
       
       {/* Suggestions pour les conditions générales */}
       <div className="mt-2 mb-4">

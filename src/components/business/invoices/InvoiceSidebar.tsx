@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { formatDate } from "../../../utils/date";
+import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
 import { Sidebar } from "../../layout/Sidebar";
 import { Button } from "../../ui";
 import { InvoicePreview } from "../../forms/invoices/InvoicePreview";
+import { ConfirmationModal } from "../../feedback/ConfirmationModal";
 
 interface InvoiceSidebarProps {
   invoice: {
@@ -89,6 +91,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
   onStatusChange,
 }) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -119,6 +122,13 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         return "COMPLETED";
       default:
         return null;
+    }
+  };
+  
+  // Fonction pour annuler une facture
+  const cancelInvoice = () => {
+    if (invoice.status === "PENDING") {
+      setShowCancelConfirmation(true);
     }
   };
 
@@ -251,7 +261,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{item.description}</p>
                     <p className="text-sm text-gray-500">
-                      {item.quantity} {item.unit || 'unité(s)'} x {item.unitPrice.toFixed(2)} € 
+                      {item.quantity} {getUnitAbbreviation(item.unit) || 'u'} x {item.unitPrice.toFixed(2)} € 
                       {item.discount && item.discount > 0 && ` (-${item.discount}${item.discountType === 'PERCENTAGE' ? '%' : '€'})`}
                     </p>
                   </div>
@@ -315,10 +325,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
               invoice.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
               invoice.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+              invoice.status === 'CANCELED' ? 'bg-red-100 text-red-800' :
               'bg-green-100 text-green-800'
             }`}>
               {invoice.status === 'DRAFT' ? 'Brouillon' :
                invoice.status === 'PENDING' ? 'À encaisser' :
+               invoice.status === 'CANCELED' ? 'Annulée' :
                'Payée'}
             </span>
           </div>
@@ -333,6 +345,16 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               onClick={() => onStatusChange(nextStatus)}
             >
               {nextStatus === "PENDING" ? "Marquer à encaisser" : "Indiquer comme payée"}
+            </Button>
+          )}
+          {invoice.status === "PENDING" && (
+            <Button
+              variant="outline"
+              color="red"
+              fullWidth
+              onClick={cancelInvoice}
+            >
+              Annuler la facture
             </Button>
           )}
         </div>
@@ -369,6 +391,21 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
 
   return (
     <>
+      {/* Modal de confirmation d'annulation */}
+      <ConfirmationModal
+        isOpen={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+        onConfirm={() => {
+          onStatusChange("CANCELED");
+          setShowCancelConfirmation(false);
+        }}
+        title="Confirmation d'annulation"
+        message="Êtes-vous sûr de vouloir annuler cette facture ? Cette action ne peut pas être annulée."
+        confirmButtonText="Oui, annuler la facture"
+        cancelButtonText="Non, conserver la facture"
+        confirmButtonVariant="danger"
+      />
+      
       {/* Prévisualisation de la facture */}
       {showPreview && (
         <div

@@ -1,5 +1,5 @@
 // src/components/layout/Sidebar.tsx
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Button } from '../ui';
 
 export interface SidebarProps {
@@ -60,6 +60,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
   className = '',
   showOverlay = true,
 }) => {
+  // Effet pour bloquer le défilement de la page lorsque la sidebar est ouverte
+  useEffect(() => {
+    const body = document.body;
+    if (isOpen) {
+      // Sauvegarder la position actuelle du défilement
+      const scrollY = window.scrollY;
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}px`;
+      body.style.width = '100%';
+      body.style.overflowY = 'scroll';
+    } else {
+      // Restaurer la position du défilement
+      const scrollY = body.style.top;
+      body.style.position = '';
+      body.style.top = '';
+      body.style.width = '';
+      body.style.overflowY = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY.replace('-', '')) || 0);
+      }
+    }
+    
+    // Nettoyer l'effet lors du démontage du composant
+    return () => {
+      body.style.position = '';
+      body.style.top = '';
+      body.style.width = '';
+      body.style.overflowY = '';
+    };
+  }, [isOpen]);
   // Détermine la classe de transformation en fonction de la position
   const transformClass = position === 'right' 
     ? isOpen ? 'translate-x-0' : 'translate-x-full'

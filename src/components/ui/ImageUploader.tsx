@@ -218,7 +218,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 {loadingMessage}
               </span>
             ) : (
-              "Upload"
+              "Télécharger"
             )}
           </button>
           
@@ -229,7 +229,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-red-600 font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-red-600 focus:ring-offset-1 transition-colors text-sm"
               disabled={isLoading}
             >
-              Remove
+              Supprimer
             </button>
           )}
           

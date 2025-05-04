@@ -7,11 +7,15 @@ import { GET_INVOICES } from '../../../../graphql/queries';
 interface InvoiceFooterNotesProps {
   footerNotes: string;
   setFooterNotes: (value: string) => void;
+  onApplyDefaults?: () => void;
+  hasDefaults?: boolean;
 }
 
 export const InvoiceFooterNotes: React.FC<InvoiceFooterNotesProps> = ({
   footerNotes,
-  setFooterNotes
+  setFooterNotes,
+  onApplyDefaults,
+  hasDefaults = false
 }) => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [defaultFooterNotesSet, setDefaultFooterNotesSet] = useState(false);
@@ -57,10 +61,23 @@ export const InvoiceFooterNotes: React.FC<InvoiceFooterNotesProps> = ({
   }, [invoicesData, footerNotes, setFooterNotes, defaultFooterNotesSet]);
   return (
     <div className="mb-4">
+      <div className="flex justify-between items-center mb-2">
+        <label htmlFor="footer-notes" className="block text-sm font-medium text-gray-700">
+          Notes de pied de page
+        </label>
+        {hasDefaults && onApplyDefaults && (
+          <button
+            type="button"
+            onClick={onApplyDefaults}
+            className="text-sm text-[#5b50ff] hover:underline"
+          >
+            Appliquer les paramètres par défaut
+          </button>
+        )}
+      </div>
       <TextArea
         id="footer-notes"
         name="footer-notes"
-        label="Notes de pied de page"
         value={footerNotes}
         onChange={(e) => {
           setFooterNotes(e.target.value);

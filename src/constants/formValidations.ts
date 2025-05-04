@@ -15,7 +15,7 @@ export const CUSTOM_FIELD_NAME_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-']{2,50}$/;
 export const CUSTOM_FIELD_VALUE_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.,;:!?@#$%&*()\[\]\-_+='"/\\€£¥₽¢₩₴₦₱₸₺₼₾₿]{1,500}$/;;
 
 export const ITEM_DESCRIPTION_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.,;:!?@#$%&*()\[\]\-_+='"/\\]{1,200}$/;
-export const UNIT_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.\/\-]{1,20}$/;
+export const UNIT_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.\/\-²³]{1,20}$/;
 // Messages d'erreur
 export const EMAIL_ERROR_MESSAGE = 'Adresse email invalide';
 export const SIRET_ERROR_MESSAGE = 'Le SIRET doit contenir 14 chiffres';

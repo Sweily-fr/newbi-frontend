@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PDFGenerator, Loader } from "../../ui";
 import { Client, CompanyInfo, CustomField } from "../../../types";
+import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
 
 interface InvoicePreviewProps {
   invoice?: any;
@@ -324,7 +325,10 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                       )}
                     </td>
                     <td className="p-2 text-xs text-right">
-                      {item.quantity} {item.unit}
+                      {item.quantity} {(() => {
+                        console.log('Unit:', item.unit, 'Abbreviation:', getUnitAbbreviation(item.unit));
+                        return getUnitAbbreviation(item.unit);
+                      })()}
                     </td>
                     <td className="p-2 text-xs text-right">
                       {formatAmount(item.unitPrice)}

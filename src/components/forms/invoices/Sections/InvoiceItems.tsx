@@ -318,6 +318,18 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
 
   return (
     <div className="mb-6">
+         <div className="mb-4 p-3 bg-[#f0eeff] border border-[#e6e1ff] rounded-lg text-sm text-gray-700">
+        <div className="flex items-start">
+          <svg className="h-5 w-5 text-[#5b50ff] mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="font-medium text-[#5b50ff] mb-1">Astuce</p>
+            <p>Vous pouvez enregistrer vos produits et services dans le catalogue pour les réutiliser facilement dans vos factures et devis.</p>
+            <p className="mt-1">Rendez-vous dans <a href="/profile?tab=products" className="font-medium text-[#5b50ff] hover:text-[#4a41e0] underline">Paramètres &gt; Catalogue de produits</a> pour gérer votre catalogue.</p>
+          </div>
+        </div>
+      </div>
       <h3 className="block text-sm font-medium text-gray-700 mb-2">
         Éléments
       </h3>
@@ -424,7 +436,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   min="1"
                   required
                   className="w-3/5"
-                  inputClassName="rounded-r-none"
+                  inputClassName="!rounded-r-none"
                   error={itemErrors[index]?.quantityError ? { message: itemErrors[index].quantityError } : undefined}
                 />
                 <Select
@@ -436,7 +448,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   options={unitOptions}
                   required
                   className="w-2/5"
-                  selectClassName="rounded-l-none"
+                  selectClassName="!rounded-l-none"
                   error={itemErrors[index]?.unitError ? { message: itemErrors[index].unitError } : undefined}
                 />
               </div>
@@ -560,6 +572,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           </div>
         </div>
       ))}
+      
       <div className="flex justify-center w-full mt-2">
         <Button
           type="button"

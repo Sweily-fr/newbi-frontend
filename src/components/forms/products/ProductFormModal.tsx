@@ -320,14 +320,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       onChange={handleChange}
                       error={errors.unitPrice}
                       required
-                      placeholder="0.00"
                       type="number"
-                      step="1"
+                      step="0.01"
                       min="0"
+                      placeholder="0.00"
                       className="mb-0"
                       inputClassName="pl-7"
                       prefix="€"
-                      helpText={errors.unitPrice ? undefined : "Prix HT"}
+                      helpText={errors.unitPrice ? undefined : "Prix HT (décimal accepté)"}
                     />
                   </div>
                   

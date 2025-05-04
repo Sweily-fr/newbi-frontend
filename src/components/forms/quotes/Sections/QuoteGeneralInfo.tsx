@@ -21,6 +21,7 @@ interface QuoteGeneralInfoProps {
   setValidUntil: (value: string) => void;
   headerNotes: string;
   setHeaderNotes: (value: string) => void;
+  defaultHeaderNotes?: string;
 }
 
 export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
@@ -34,6 +35,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
   setValidUntil,
   headerNotes,
   setHeaderNotes,
+  defaultHeaderNotes,
 }) => {
   // États pour gérer les erreurs de validation
   const [quotePrefixError, setQuotePrefixError] = useState<string | null>(null);
@@ -42,6 +44,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
   const [issueDateError, setIssueDateError] = useState<string | null>(null);
   const [validUntilError, setValidUntilError] = useState<string | null>(null);
   const [activeHeaderNoteButton, setActiveHeaderNoteButton] = useState<string>('');
+  const [activeValidityButton, setActiveValidityButton] = useState<string>('');
   
   // Fonction pour valider les dates
   const validateDates = useCallback(() => {
@@ -77,6 +80,16 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
     return isValid;
   }, [issueDate, validUntil, setIssueDateError, setValidUntilError]);
   
+  // Fonction pour calculer une date future basée sur le nombre de jours
+  const calculateFutureDate = useCallback((days: number): string => {
+    const date = new Date();
+    if (issueDate) {
+      date.setTime(new Date(issueDate).getTime());
+    }
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split('T')[0];
+  }, [issueDate]);
+
   // Définir les valeurs par défaut pour les dates si elles ne sont pas déjà définies
   useEffect(() => {
     // Date d'émission par défaut : aujourd'hui
@@ -90,6 +103,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
       const nextMonth = new Date();
       nextMonth.setMonth(nextMonth.getMonth() + 1);
       setValidUntil(nextMonth.toISOString().split('T')[0]);
+      setActiveValidityButton('30');
     }
     
     // Valider les dates au chargement initial
@@ -228,8 +242,8 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           />
         </div>
       </div>
-      <div className="flex gap-4">
-        <div className="w-1/2">
+      <div className="flex flex-col gap-4">
+        <div className="w-full">
           <TextField
             id="issueDate"
             name="issueDate"
@@ -245,7 +259,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
             error={issueDateError || undefined}
           />
         </div>
-        <div className="w-1/2">
+        <div className="w-full">
           <TextField
             id="validUntil"
             name="validUntil"
@@ -255,17 +269,93 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
             onChange={(e) => {
               setValidUntil(e.target.value);
               validateDates();
+              // Réinitialiser le bouton actif si la date est modifiée manuellement
+              if (activeValidityButton) {
+                setActiveValidityButton('');
+              }
             }}
             onBlur={() => validateDates()}
             required
             error={validUntilError || undefined}
           />
+          <div className="flex flex-wrap gap-2 mt-2">
+            <Button 
+              size="sm"
+              variant={activeValidityButton === '15' ? 'primary' : 'outline'}
+              className={`min-w-[90px] ${activeValidityButton === '15' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+              onClick={() => {
+                const newDate = calculateFutureDate(15);
+                setValidUntil(newDate);
+                validateDates();
+                setActiveValidityButton('15');
+              }}
+            >
+              15 jours
+            </Button>
+            
+            <Button 
+              size="sm"
+              variant={activeValidityButton === '30' ? 'primary' : 'outline'}
+              className={`min-w-[90px] ${activeValidityButton === '30' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+              onClick={() => {
+                const newDate = calculateFutureDate(30);
+                setValidUntil(newDate);
+                validateDates();
+                setActiveValidityButton('30');
+              }}
+            >
+              30 jours
+            </Button>
+            
+            <Button 
+              size="sm"
+              variant={activeValidityButton === '90' ? 'primary' : 'outline'}
+              className={`min-w-[90px] ${activeValidityButton === '90' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+              onClick={() => {
+                const newDate = calculateFutureDate(90);
+                setValidUntil(newDate);
+                validateDates();
+                setActiveValidityButton('90');
+              }}
+            >
+              90 jours
+            </Button>
+            
+            <Button 
+              size="sm"
+              variant={activeValidityButton === 'custom' ? 'primary' : 'outline'}
+              className={`min-w-[110px] ${activeValidityButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+              onClick={() => {
+                setActiveValidityButton('custom');
+                // Focus sur le champ de date
+                document.getElementById('validUntil')?.focus();
+              }}
+            >
+              Personnaliser
+            </Button>
+          </div>
         </div>
       </div>
       
       {/* Notes d'en-tête */}
       <div className="mt-4">
-        <h4 className="text-xl font-medium mb-3 text-gray-600">Notes d'en-tête</h4>
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-xl font-medium text-gray-600">Notes</h4>
+          {defaultHeaderNotes && (
+            <button
+              type="button"
+              onClick={() => {
+                if (defaultHeaderNotes) {
+                  setHeaderNotes(defaultHeaderNotes);
+                  validateHeaderNotes(defaultHeaderNotes);
+                }
+              }}
+              className="text-sm text-[#5b50ff] hover:underline"
+            >
+              Appliquer les paramètres par défaut
+            </button>
+          )}
+        </div>
         <TextArea
           id="headerNotes"
           name="headerNotes"

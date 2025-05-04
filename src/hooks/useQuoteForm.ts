@@ -506,11 +506,25 @@ export const useQuoteForm = ({
           }
 
           // Rechercher le client par ID
-          // Vérifier que clientsData et clients existent et que clients est un tableau
-          const clients = clientsData?.clients || [];
-          const selectedClientData = Array.isArray(clients) 
-            ? clients.find((c) => c.id === selectedClient)
-            : undefined;
+    // Vérifier que clientsData et clients existent et que clients est un tableau
+    // Utiliser items car clientsData.clients est un objet avec une propriété items qui contient le tableau des clients
+    const clients = clientsData?.clients?.items || [];
+    
+    // Log pour débogage
+    console.log('Client sélectionné (ID):', selectedClient);
+    console.log('Structure de clientsData:', {
+      'clientsData': clientsData,
+      'clientsData?.clients': clientsData?.clients,
+      'clientsData?.clients?.items': clientsData?.clients?.items,
+    });
+    
+    // Rechercher le client sélectionné dans la liste des clients
+    const selectedClientData = Array.isArray(clients) 
+      ? clients.find((c) => c.id === selectedClient)
+      : undefined;
+    
+    // Log pour débogage
+    console.log('Client trouvé dans la liste:', selectedClientData);
           if (!selectedClientData) {
             console.warn("Client non trouvé", {
               selectedClient,
