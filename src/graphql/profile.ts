@@ -19,6 +19,11 @@ export const GET_PROFILE = gql`
         logo
         siret
         vatNumber
+        capitalSocial
+        rcs
+        companyStatus
+        transactionCategory
+        vatPaymentCondition
         address {
           street
           city
@@ -61,6 +66,11 @@ export const UPDATE_COMPANY = gql`
         logo
         siret
         vatNumber
+        capitalSocial
+        rcs
+        companyStatus
+        transactionCategory
+        vatPaymentCondition
         address {
           street
           city

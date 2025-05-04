@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField } from '../../ui';
+import { useQuery } from '@apollo/client';
+import { GET_USER_INFO } from '../../../graphql/queries';
 
 export interface DocumentSettingsProps {
   documentType: 'INVOICE' | 'QUOTE';
@@ -17,6 +19,112 @@ export interface DocumentSettingsProps {
   onCancel: () => void;
   isSaving?: boolean;
 }
+
+// Interface pour les informations de l'entreprise
+interface CompanyInfoType {
+  name: string;
+  rcs?: string;
+  capitalSocial?: string;
+  companyStatus?: string;
+}
+
+// Composant pour le bouton d'autocomplétion des informations de l'entreprise
+const CompanyInfoAutoComplete: React.FC<{ 
+  setDefaultFooterNotes: (value: string) => void;
+  defaultFooterNotes: string;
+}> = ({ setDefaultFooterNotes, defaultFooterNotes }) => {
+  const { data, loading } = useQuery(GET_USER_INFO);
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfoType | null>(null);
+
+  useEffect(() => {
+    if (data?.me?.company) {
+      console.log('Données de l\'entreprise récupérées:', data.me.company);
+      setCompanyInfo(data.me.company);
+    }
+  }, [data]);
+
+  const handleAutoComplete = () => {
+    if (!companyInfo) return;
+
+    console.log('Informations de l\'entreprise pour l\'autocomplétion:', companyInfo);
+    const { name, rcs, capitalSocial, companyStatus } = companyInfo;
+    console.log('Valeurs extraites:', { name, rcs, capitalSocial, companyStatus });
+    
+    // Formater le statut de l'entreprise pour l'affichage
+    let statusText = '';
+    switch(companyStatus) {
+      case 'SARL':
+        statusText = 'SARL';
+        break;
+      case 'SAS':
+        statusText = 'SAS';
+        break;
+      case 'SASU':
+        statusText = 'SASU';
+        break;
+      case 'EURL':
+        statusText = 'EURL';
+        break;
+      case 'EI':
+        statusText = 'Entreprise Individuelle';
+        break;
+      case 'EIRL':
+        statusText = 'EIRL';
+        break;
+      case 'SA':
+        statusText = 'SA';
+        break;
+      case 'SNC':
+        statusText = 'SNC';
+        break;
+      case 'SCI':
+        statusText = 'SCI';
+        break;
+      case 'AUTRE':
+      default:
+        statusText = '';
+    }
+
+    // Construire le texte avec les informations de l'entreprise
+    let companyInfoText = `${name}`;
+    
+    if (statusText) {
+      companyInfoText += ` - ${statusText}`;
+    }
+    
+    if (rcs) {
+      companyInfoText += ` - RCS ${rcs}`;
+    }
+    
+    if (capitalSocial) {
+      // Formater le capital social avec séparateur de milliers et symbole €
+      const formattedCapital = new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(parseFloat(capitalSocial));
+      
+      companyInfoText += ` - Capital social : ${formattedCapital}`;
+    }
+
+    // Construire le texte final avec les notes existantes
+    const separator = defaultFooterNotes && !defaultFooterNotes.endsWith('.') && !defaultFooterNotes.endsWith('\n') ? '. ' : '';
+    const finalText = defaultFooterNotes ? `${defaultFooterNotes}${separator}${companyInfoText}` : companyInfoText;
+    setDefaultFooterNotes(finalText);
+  };
+
+  return (
+    <button 
+      type="button" 
+      onClick={handleAutoComplete}
+      disabled={loading || !companyInfo}
+      className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? 'Chargement...' : 'Infos légales entreprise'}
+    </button>
+  );
+};
 
 export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
   documentType,
@@ -91,11 +199,15 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
             </button>
             <button 
               type="button" 
-              onClick={() => setDefaultFooterNotes(documentType === 'INVOICE' ? "Paiement à réception de facture. Tout retard de paiement entraînera des pénalités." : "Pour accepter ce devis, veuillez le retourner signé avec la mention 'Bon pour accord'.")}
+              onClick={() => setDefaultFooterNotes(documentType === 'INVOICE' ? "Paiement à effectuer sous 30 jours. Pénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire de recouvrement : 40€." : "La signature de ce devis vaut acceptation des conditions générales de vente.")}
               className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
             >
               {documentType === 'INVOICE' ? "Conditions de paiement" : "Acceptation du devis"}
             </button>
+            <CompanyInfoAutoComplete 
+              setDefaultFooterNotes={setDefaultFooterNotes} 
+              defaultFooterNotes={defaultFooterNotes} 
+            />
           </div>
         </div>
         

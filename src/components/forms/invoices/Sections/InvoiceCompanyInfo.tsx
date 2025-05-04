@@ -102,9 +102,9 @@ export const InvoiceCompanyInfo: React.FC<InvoiceCompanyInfoProps> = ({
             {companyInfo.logo ? (
               <div className="relative rounded-full overflow-hidden w-32 h-32">
                 <img
-                  src={`${apiUrl}${companyInfo.logo}`}
+                  src={`${import.meta.env.VITE_API_URL}${companyInfo.logo}`}
                   alt="Logo de l'entreprise"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             ) : (

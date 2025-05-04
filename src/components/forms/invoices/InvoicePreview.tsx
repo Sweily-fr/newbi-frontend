@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PDFGenerator, Loader } from "../../ui";
 import { Client, CompanyInfo, CustomField } from "../../../types";
 import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
+import { getTransactionCategoryDisplayText } from "../../../utils/transactionCategoryUtils";
 
 interface InvoicePreviewProps {
   invoice?: any;
@@ -440,6 +441,15 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             )}
           </div>
         </div>
+
+        {/* Affichage de la catégorie de transaction */}
+        {companyInfo?.transactionCategory && (
+          <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
+            <p className="text-xs font-medium text-gray-700">
+              {getTransactionCategoryDisplayText(companyInfo.transactionCategory)}
+            </p>
+          </div>
+        )}
 
         {(termsAndConditions || invoice?.termsAndConditions) && (
           <div className="mb-6 w-4/6 print:w-4/6" data-pdf-keep-together="true">

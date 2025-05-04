@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { UPDATE_COMPANY } from '../../../graphql/profile';
@@ -11,7 +11,8 @@ import {
   TextFieldURL,
   FieldGroup,
   FormActions,
-  ImageUploader
+  ImageUploader,
+  Select
 } from '../../../components/ui';
 import { 
   getNameValidationRules, 
@@ -20,11 +21,17 @@ import {
   getSiretValidationRules,
   getVatValidationRules,
   getUrlValidationRules,
+  getCapitalSocialValidationRules,
+  getRCSValidationRules,
   IBAN_REGEX,
   BIC_REGEX
 } from '../../../utils/validators';
 
 export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
+  // Log pour vérifier la valeur du statut d'entreprise dans les données initiales
+  console.log('Statut d\'entreprise dans les données initiales:', initialData?.companyStatus);
+  
+  // Le log nous permet de vérifier si la valeur est bien récupérée du backend
   // Utiliser react-hook-form
   const { 
     register, 
@@ -33,6 +40,7 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
     setValue,
     watch
   } = useForm({
+    mode: 'onBlur',  // Validation à la perte de focus
     defaultValues: {
       name: initialData?.name || '',
       email: initialData?.email || '',
@@ -40,6 +48,11 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
       website: initialData?.website || '',
       siret: initialData?.siret || '',
       vatNumber: initialData?.vatNumber || '',
+      capitalSocial: initialData?.capitalSocial || '',
+      rcs: initialData?.rcs || '',
+      transactionCategory: initialData?.transactionCategory || '',
+      vatPaymentCondition: initialData?.vatPaymentCondition || '',
+      companyStatus: initialData?.companyStatus || 'AUTRE',
       street: initialData?.address?.street || '',
       city: initialData?.address?.city || '',
       postalCode: initialData?.address?.postalCode || '',
@@ -54,6 +67,19 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
   const iban = watch('iban');
   const bic = watch('bic');
   const bankName = watch('bankName');
+  
+  // Utiliser useEffect pour s'assurer que la valeur du statut d'entreprise est correctement initialisée
+  useEffect(() => {
+    // Force la mise à jour de la valeur du select, même si la valeur par défaut est déjà définie
+    // Cela garantit que le select affiche la bonne valeur, même si react-hook-form a déjà une valeur par défaut
+    if (initialData?.companyStatus) {
+      setValue('companyStatus', initialData.companyStatus);
+      console.log('Valeur du statut définie via useEffect:', initialData.companyStatus);
+    } else {
+      // Si aucun statut n'est défini, utiliser 'AUTRE' comme valeur par défaut
+      setValue('companyStatus', 'AUTRE');
+    }
+  }, [initialData, setValue]);
 
   // Vérifier si au moins un des champs bancaires est rempli
   const anyBankFieldFilled = Boolean(iban || bic || bankName);
@@ -96,6 +122,9 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
     logo: initialData?.logo || '',
     siret: initialData?.siret || '',
     vatNumber: initialData?.vatNumber || '',
+    transactionCategory: initialData?.transactionCategory || '',
+    vatPaymentCondition: initialData?.vatPaymentCondition || '',
+    companyStatus: initialData?.companyStatus || 'AUTRE',
     address: {
       street: initialData?.address?.street || '',
       city: initialData?.address?.city || '',
@@ -147,6 +176,11 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
       logo: formData.logo, // Utiliser le logo du state
       siret: data.siret,
       vatNumber: data.vatNumber,
+      capitalSocial: data.capitalSocial,
+      rcs: data.rcs,
+      transactionCategory: data.transactionCategory,
+      vatPaymentCondition: data.vatPaymentCondition,
+      companyStatus: data.companyStatus,
       address: {
         street: data.street,
         city: data.city,
@@ -214,16 +248,41 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
           />
         </div>
 
-        <div className="sm:col-span-2">
-          <TextField
-            id="companyName"
-            name="name"
-            label="Nom de l'entreprise"
-            register={register}
-            validation={getNameValidationRules("Le nom de l'entreprise")}
-            error={errors.name}
-            required
-          />
+        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="sm:col-span-2">
+            <TextField
+              id="name"
+              name="name"
+              label="Nom de l'entreprise"
+              register={register}
+              error={errors.name}
+              validation={getNameValidationRules("Le nom de l'entreprise")}
+              required
+            />
+          </div>
+          <div>
+            <Select
+              id="companyStatus"
+              name="companyStatus"
+              label="Statut juridique"
+              register={register}
+              error={errors.companyStatus}
+              options={[
+                { value: 'SARL', label: 'SARL' },
+                { value: 'SAS', label: 'SAS' },
+                { value: 'EURL', label: 'EURL' },
+                { value: 'SASU', label: 'SASU' },
+                { value: 'EI', label: 'EI' },
+                { value: 'EIRL', label: 'EIRL' },
+                { value: 'SA', label: 'SA' },
+                { value: 'SNC', label: 'SNC' },
+                { value: 'SCI', label: 'SCI' },
+                { value: 'SCOP', label: 'SCOP' },
+                { value: 'ASSOCIATION', label: 'Association' },
+                { value: 'AUTRE', label: 'Autre' }
+              ]}
+            />
+          </div>
         </div>
 
         <div className="sm:col-span-2">
@@ -284,6 +343,61 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             register={register}
             validation={getVatValidationRules()}
             error={errors.vatNumber}
+          />
+        </div>
+
+        <div>
+          <TextField
+            id="capitalSocial"
+            name="capitalSocial"
+            label="Capital social"
+            register={register}
+            validation={getCapitalSocialValidationRules()}
+            error={errors.capitalSocial}
+            helpText="Montant du capital social (ex: 10000)"
+          />
+        </div>
+
+        <div>
+          <TextField
+            id="rcs"
+            name="rcs"
+            label="RCS"
+            register={register}
+            validation={getRCSValidationRules()}
+            error={errors.rcs}
+            helpText="Format: 981 576 549 R.C.S. Paris ou Paris B 123 456 789"
+          />
+        </div>
+
+        <div>
+          <Select
+            id="transactionCategory"
+            name="transactionCategory"
+            label="Catégorie de transaction"
+            register={register}
+            error={errors.transactionCategory}
+            required
+            options={[
+              { value: 'GOODS', label: 'Livraison de biens' },
+              { value: 'SERVICES', label: 'Prestations de services' },
+              { value: 'MIXED', label: 'Opérations mixtes' }
+            ]}
+          />
+        </div>
+        
+        <div>
+          <Select
+            id="vatPaymentCondition"
+            name="vatPaymentCondition"
+            label="Condition de paiement de TVA"
+            register={register}
+            error={errors.vatPaymentCondition}
+            options={[
+              { value: 'ENCAISSEMENTS', label: 'Encaissements' },
+              { value: 'DEBITS', label: 'Débits' },
+              { value: 'EXONERATION', label: 'Exonération' }
+            ]}
           />
         </div>
 

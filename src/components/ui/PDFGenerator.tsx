@@ -393,7 +393,7 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
         // Télécharger le PDF
         console.log("Téléchargement du PDF", { fileName });
-        pdf.save(`${fileName}.pdf`);
+        pdf.save(`${fileName}`);
         console.log("PDF téléchargé avec succès");
       } catch (canvasError) {
         console.error("Erreur lors de la génération du canvas:", canvasError);

@@ -12,6 +12,10 @@ export const GET_USER_INFO = gql`
         siret
         vatNumber
         logo
+        transactionCategory
+        rcs
+        capitalSocial
+        companyStatus
         address {
           street
           city

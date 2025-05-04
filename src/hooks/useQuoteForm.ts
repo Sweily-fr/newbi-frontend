@@ -164,6 +164,7 @@ export const useQuoteForm = ({
         siret: "",
         vatNumber: "",
         logo: "",
+        transactionCategory: "",
         address: {
           street: "",
           city: "",
@@ -194,6 +195,34 @@ export const useQuoteForm = ({
   // Requêtes GraphQL
   const { data: clientsData } = useQuery(GET_CLIENTS);
   const { data: userData } = useQuery(GET_USER_INFO);
+  
+  // Mettre à jour les informations de l'entreprise avec les données du profil utilisateur
+  useEffect(() => {
+    if (userData?.me?.company && !quote?.companyInfo) {
+      // Si nous avons des données utilisateur et qu'il s'agit d'un nouveau devis
+      setCompanyInfo({
+        name: userData.me.company.name || "",
+        email: userData.me.company.email || "",
+        phone: userData.me.company.phone || "",
+        website: userData.me.company.website || "",
+        siret: userData.me.company.siret || "",
+        vatNumber: userData.me.company.vatNumber || "",
+        logo: userData.me.company.logo || "",
+        transactionCategory: userData.me.company.transactionCategory || "",
+        address: {
+          street: userData.me.company.address?.street || "",
+          city: userData.me.company.address?.city || "",
+          postalCode: userData.me.company.address?.postalCode || "",
+          country: userData.me.company.address?.country || "",
+        },
+        bankDetails: {
+          iban: userData.me.company.bankDetails?.iban || "",
+          bic: userData.me.company.bankDetails?.bic || "",
+          bankName: userData.me.company.bankDetails?.bankName || "",
+        },
+      });
+    }
+  }, [userData, quote]);
 
   // Requête pour récupérer le prochain numéro de devis
   const { data: nextQuoteNumberData, refetch: refetchNextQuoteNumber } =
@@ -225,6 +254,7 @@ export const useQuoteForm = ({
         siret: company.siret || "",
         vatNumber: company.vatNumber || "",
         logo: company.logo || "",
+        transactionCategory: company.transactionCategory || "",
         address: {
           street: company.address?.street || "",
           city: company.address?.city || "",
@@ -697,6 +727,7 @@ export const useQuoteForm = ({
           siret: companyInfo.siret,
           vatNumber: companyInfo.vatNumber,
           logo: companyInfo.logo,
+          transactionCategory: companyInfo.transactionCategory,
           address: {
             street: companyInfo.address.street,
             city: companyInfo.address.city,

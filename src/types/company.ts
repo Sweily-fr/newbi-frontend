@@ -13,6 +13,11 @@ export interface CompanyInfo {
   logo?: string;
   siret: string;
   vatNumber: string;
+  capitalSocial?: string;
+  rcs?: string;
+  transactionCategory?: 'goods' | 'services' | 'mixed';
+  vatPaymentCondition?: 'ENCAISSEMENTS' | 'DEBITS' | 'EXONERATION';
+  companyStatus?: 'SARL' | 'SAS' | 'EURL' | 'SASU' | 'EI' | 'EIRL' | 'SA' | 'SNC' | 'SCI' | 'SCOP' | 'ASSOCIATION' | 'AUTRE';
   address: {
     street: string;
     city: string;

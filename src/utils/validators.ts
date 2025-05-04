@@ -26,6 +26,13 @@ export const IBAN_REGEX = /^FR[0-9]{2}[0-9]{5}[0-9]{5}[A-Z0-9]{11}[0-9]{2}$/;
 // Regex pour la validation de BIC/SWIFT (8 ou 11 caractères)
 export const BIC_REGEX = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
 
+// Regex pour la validation du capital social (montant avec ou sans décimales)
+export const CAPITAL_SOCIAL_REGEX = /^\d{1,20}(\.\d{1,2})?$/;
+
+// Regex pour la validation du RCS (Registre du Commerce et des Sociétés)
+// Format: Accepte les formats courants comme "981 576 549 R.C.S. Paris" ou "Paris B 123 456 789"
+export const RCS_REGEX = /^(\d{3}\s?\d{3}\s?\d{3}\s?R\.?C\.?S\.?\s[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,30}|[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,30}\s[A-Z]?\s?\d{3}\s?\d{3}\s?\d{3})$/;
+
 /**
  * Règles de validation pour les champs de type nom/prénom
  */
@@ -103,5 +110,25 @@ export const getBicValidationRules = (fieldName: string = 'Le BIC/SWIFT') => ({
   pattern: {
     value: BIC_REGEX,
     message: `${fieldName} doit être au format valide (8 ou 11 caractères)`
+  }
+});
+
+/**
+ * Règles de validation pour le capital social
+ */
+export const getCapitalSocialValidationRules = (fieldName: string = 'Le capital social') => ({
+  pattern: {
+    value: CAPITAL_SOCIAL_REGEX,
+    message: `${fieldName} doit être un montant valide (ex: 10000 ou 10000.50)`
+  }
+});
+
+/**
+ * Règles de validation pour le RCS
+ */
+export const getRCSValidationRules = (fieldName: string = 'Le RCS') => ({
+  pattern: {
+    value: RCS_REGEX,
+    message: `${fieldName} doit être au format "Ville B 123 456 789"`
   }
 });

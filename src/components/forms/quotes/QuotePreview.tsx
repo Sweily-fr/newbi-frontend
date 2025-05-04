@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Quote, CompanyInfo, Client } from "../../../types";
 import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
+import { getTransactionCategoryDisplayText } from "../../../utils/transactionCategoryUtils";
+import { PDFGenerator, Loader } from "../../ui";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;
@@ -16,6 +18,8 @@ interface QuotePreviewProps {
   footerNotes?: string;
   // Cette prop est utilisée pour déterminer si les coordonnées bancaires doivent être affichées
   useBankDetails?: boolean;
+  // Prop pour contrôler l'affichage des boutons d'action
+  showActionButtons?: boolean;
 }
 
 export const QuotePreview: React.FC<QuotePreviewProps> = ({
@@ -26,6 +30,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   newClient,
   footerNotes,
   useBankDetails,
+  showActionButtons = true,
 }) => {
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
@@ -363,6 +368,19 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
         </div>
 
+        {/* Affichage de la catégorie de transaction */}
+        {companyInfo?.transactionCategory ? (
+          <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
+            <p className="text-xs font-medium text-gray-700">
+              {(() => {
+                const displayText = getTransactionCategoryDisplayText(companyInfo.transactionCategory);
+                console.log('Display text:', displayText);
+                return displayText || `Catégorie de transaction : ${companyInfo.transactionCategory}`;
+              })()}
+            </p>
+          </div>
+        ) : null}
+
         {quote.termsAndConditions && (
           <div className="mb-6 w-4/6 print:w-4/6" data-pdf-keep-together="true">
             <p className="whitespace-pre-line text-xs">
@@ -433,6 +451,14 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
     </div>
   );
 
+  // États pour gérer le chargement et l'affichage
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
+
+  // Vérifier si les boutons doivent être affichés en fonction du statut
+  const showButtons = showActionButtons && 
+    (quote?.status === "PENDING" || quote?.status === "COMPLETED" || !quote?.status);
+
   return (
     <div
       className="bg-white overflow-hidden flex flex-col"
@@ -440,11 +466,74 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
     >
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-medium">Aperçu du devis</h2>
+        {showButtons && (
+          <div className="flex space-x-2">
+            <PDFGenerator
+              content={documentContent}
+              fileName={`Devis_${quote?.prefix || ""}${quote?.number || ""}.pdf`}
+              buttonText="Télécharger en PDF"
+              buttonProps={{
+                variant: "outline",
+                size: "sm",
+                className: "flex items-center",
+              }}
+              format="a4"
+              orientation="portrait"
+              onGenerationStart={() => {
+                setIsGeneratingPDF(true);
+              }}
+              onGenerated={(pdf) => {
+                console.log("PDF généré avec succès", pdf);
+                setIsGeneratingPDF(false);
+                setPdfSuccess(true);
+                // Réinitialiser l'état de succès après 2 secondes
+                setTimeout(() => setPdfSuccess(false), 2000);
+              }}
+              onGenerationError={() => {
+                setIsGeneratingPDF(false);
+              }}
+            />
+          </div>
+        )}
       </div>
       <div
         className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative"
         style={{ minHeight: "0" }}
       >
+        {isGeneratingPDF && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
+            {pdfSuccess ? (
+              <div className="flex flex-col items-center">
+                <div className="rounded-full bg-green-100 p-3 mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-green-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <p className="text-sm font-medium text-gray-700">
+                  Téléchargement réussi
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <Loader className="h-8 w-8 text-primary mb-2" />
+                <p className="text-sm font-medium text-gray-700">
+                  Génération du PDF en cours...
+                </p>
+              </div>
+            )}
+          </div>
+        )}
         <div
           className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
           style={{ minHeight: "29.7cm", height: "auto" }}
