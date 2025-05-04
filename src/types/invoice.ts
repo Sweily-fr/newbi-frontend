@@ -51,6 +51,13 @@ export interface Invoice {
   finalTotalTTC?: number;
   notes?: string;
   customFields?: CustomField[];
+  hasDifferentShippingAddress?: boolean;
+  shippingAddress?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
 }
 
 /**

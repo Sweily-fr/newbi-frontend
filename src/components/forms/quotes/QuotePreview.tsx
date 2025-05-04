@@ -20,6 +20,14 @@ interface QuotePreviewProps {
   useBankDetails?: boolean;
   // Prop pour contrôler l'affichage des boutons d'action
   showActionButtons?: boolean;
+  // Props pour l'adresse de livraison
+  hasDifferentShippingAddress?: boolean;
+  shippingAddress?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
 }
 
 export const QuotePreview: React.FC<QuotePreviewProps> = ({
@@ -31,6 +39,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   footerNotes,
   useBankDetails,
   showActionButtons = true,
+  hasDifferentShippingAddress = quote.hasDifferentShippingAddress || false,
+  shippingAddress = quote.shippingAddress || {},
 }) => {
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
@@ -149,7 +159,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         </div>
 
         <div className="flex justify-between mb-8" data-pdf-no-break="true">
-          <div className="w-1/2 pr-4">
+          <div className={hasDifferentShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
             <h3 className="font-normal mb-2">
               {companyInfo?.name || "Votre Entreprise"}
             </h3>
@@ -162,10 +172,11 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {quote.companyInfo.vatNumber}</p>
             )}
           </div>
-          <div className="w-1/2 pl-4">
+          <div className={hasDifferentShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
             <h3 className="font-normal mb-2">
-              {clientInfo?.name || "Client"}
+              Facturer à :
             </h3>
+            <p className="text-xs">{clientInfo?.name || "Client"}</p>
             <p className="text-xs">{clientInfo?.email}</p>
             <p className="text-xs">{clientInfo?.address?.street}</p>
             <p className="text-xs">
@@ -179,6 +190,19 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
+          {hasDifferentShippingAddress && (
+            <div className="w-1/3 pl-2">
+              <h3 className="font-normal mb-2">
+                Livrer à :
+              </h3>
+              <p className="text-xs">{clientInfo?.name || "Client"}</p>
+              <p className="text-xs">{shippingAddress?.street}</p>
+              <p className="text-xs">
+                {shippingAddress?.postalCode} {shippingAddress?.city}
+              </p>
+              <p className="text-xs">{shippingAddress?.country}</p>
+            </div>
+          )}
         </div>
 
         {quote.headerNotes && (
@@ -456,8 +480,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   const [pdfSuccess, setPdfSuccess] = useState(false);
 
   // Vérifier si les boutons doivent être affichés en fonction du statut
+  // Afficher les boutons uniquement si le devis a un statut défini (donc déjà créé)
   const showButtons = showActionButtons && 
-    (quote?.status === "PENDING" || quote?.status === "COMPLETED" || !quote?.status);
+    quote?.status && (quote.status === "PENDING" || quote.status === "COMPLETED");
 
   return (
     <div

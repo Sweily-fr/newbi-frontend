@@ -64,7 +64,7 @@ const ResendVerification: React.FC = () => {
       </div>
 
       <div className="max-w-lg mx-auto">
-        <div className="bg-white py-8 px-6 shadow rounded-lg">
+        <div className="bg-white py-8 px-6 shadow rounded-lg border border-[#f0eeff]">
           {!isSubmitted ? (
             <Form onSubmit={handleSubmit(onSubmit)} spacing="normal">
               <TextField
@@ -90,20 +90,20 @@ const ResendVerification: React.FC = () => {
                 isLoading={loading}
                 loaderPosition="left"
                 fullWidth
-                className="mt-4"
+                className="mt-4 bg-[#5b50ff] hover:bg-[#4a41e0] py-3 rounded-lg"
               >
                 Envoyer l'email de vérification
               </Button>
 
               <div className="text-sm text-center mt-6">
-                <Link to="/login" className="font-medium text-blue-500 hover:text-blue-400">
+                <Link to="/auth" className="font-medium text-[#5b50ff] hover:text-[#4a41e0]">
                   Retour à la page de connexion
                 </Link>
               </div>
             </Form>
           ) : (
             <div className="flex flex-col items-center space-y-6 py-4">
-              <CheckCircleIcon className="h-20 w-20 text-green-500" />
+              <CheckCircleIcon className="h-20 w-20 text-[#5b50ff]" />
               <h3 className="text-xl font-semibold text-gray-800">Email envoyé</h3>
               <p className="text-center text-gray-600 mb-4">
                 Si votre adresse email existe dans notre système et n'est pas encore vérifiée, un nouvel email de vérification a été envoyé. Veuillez vérifier votre boîte de réception.
@@ -111,7 +111,8 @@ const ResendVerification: React.FC = () => {
               <Button
                 variant="primary"
                 fullWidth
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth')}
+                className="bg-[#5b50ff] hover:bg-[#4a41e0] py-3 rounded-lg"
               >
                 Retour à la page de connexion
               </Button>

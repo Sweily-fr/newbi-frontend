@@ -34,6 +34,13 @@ export interface Quote {
   termsAndConditionsLinkTitle?: string;
   termsAndConditionsLink?: string;
   customFields?: CustomField[];
+  hasDifferentShippingAddress?: boolean;
+  shippingAddress?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
   convertedToInvoice?: {
     id: string;
     number: string;

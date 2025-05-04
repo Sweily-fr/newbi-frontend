@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { PDFGenerator, Loader } from "../../ui";
-import { Client, CompanyInfo, CustomField } from "../../../types";
+import { Client, CompanyInfo, Invoice, Item } from "../../../types";
 import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../utils/transactionCategoryUtils";
 
 interface InvoicePreviewProps {
-  invoice?: any;
+  invoice?: Partial<Invoice>;
   selectedClient?: Client | null;
   isNewClient?: boolean;
-  newClient?: any;
-  items?: any[];
+  newClient?: Partial<Client>;
+  items?: Item[];
   invoiceNumber?: string;
   invoicePrefix?: string;
   issueDate?: string;
@@ -17,7 +17,13 @@ interface InvoicePreviewProps {
   executionDate?: string;
   purchaseOrderNumber?: string;
   companyInfo?: CompanyInfo;
-  calculateTotals?: () => any;
+  calculateTotals?: () => {
+    totalHT?: number;
+    finalTotalHT?: number;
+    totalVAT?: number;
+    finalTotalTTC?: number;
+    discountAmount?: number;
+  };
   headerNotes?: string;
   footerNotes?: string;
   isDeposit?: boolean;
@@ -27,6 +33,13 @@ interface InvoicePreviewProps {
   termsAndConditionsLink?: string;
   showActionButtons?: boolean;
   useBankDetails?: boolean;
+  hasDifferentShippingAddress?: boolean;
+  shippingAddress?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
 }
 
 export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
@@ -52,10 +65,12 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   termsAndConditionsLink,
   showActionButtons,
   useBankDetails,
+  hasDifferentShippingAddress = false,
+  shippingAddress = {},
 }) => {
   const totals = calculateTotals
     ? calculateTotals()
-    : { finalTotalHT: 0, totalVAT: 0, finalTotalTTC: 0 };
+    : { finalTotalHT: 0, totalVAT: 0, finalTotalTTC: 0, totalHT: 0, discountAmount: 0 };
 
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | undefined | null) => {
@@ -113,13 +128,39 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   };
 
   // Déterminer les informations du client à afficher
-  const clientInfo = isNewClient
+  let clientInfo = isNewClient
     ? newClient
     : selectedClient || invoice?.client || {};
 
-  // S'assurer que l'adresse du client existe toujours pour éviter les erreurs
-  if (!clientInfo.address) {
-    clientInfo.address = { street: "", city: "", postalCode: "", country: "" };
+  // Restructurer les données du nouveau client si nécessaire
+  if (isNewClient) {
+    // Créer une structure compatible avec l'affichage
+    clientInfo = {
+      ...clientInfo,
+      // Si le client est nouveau et que les données d'adresse sont à plat (pas dans un objet address)
+      address: {
+        street: clientInfo.street || "",
+        city: clientInfo.city || "",
+        postalCode: clientInfo.postalCode || "",
+        country: clientInfo.country || ""
+      },
+      siret: clientInfo.siret || "",
+      vatNumber: clientInfo.vatNumber || ""
+    };
+  } else {
+    // S'assurer que l'adresse du client existe toujours pour éviter les erreurs
+    if (!clientInfo.address) {
+      clientInfo.address = { street: "", city: "", postalCode: "", country: "" };
+    }
+    
+    // S'assurer que les autres champs importants existent
+    if (clientInfo.siret === undefined) {
+      clientInfo.siret = "";
+    }
+    
+    if (clientInfo.vatNumber === undefined) {
+      clientInfo.vatNumber = "";
+    }
   }
 
   // Vérifier si les boutons doivent être affichés en fonction du statut
@@ -203,7 +244,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         </div>
 
         <div className="flex justify-between mb-8">
-          <div className="w-1/2 pr-4">
+          <div className={hasDifferentShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
             <h3 className="font-normal mb-2">
               {companyInfo?.name || "Votre Entreprise"}
             </h3>
@@ -216,8 +257,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               <p className="text-xs">TVA: {companyInfo.vatNumber}</p>
             )}
           </div>
-          <div className="w-1/2 pl-4">
-            <h3 className="font-normal mb-2">À</h3>
+          <div className={hasDifferentShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
+            <h3 className="font-normal mb-2">Facturer à :</h3>
             <p className="text-xs">{clientInfo.name}</p>
             <p className="text-xs">{clientInfo.email}</p>
             <p className="text-xs">{clientInfo.address?.street}</p>
@@ -232,6 +273,17 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
+          {hasDifferentShippingAddress && (
+            <div className="w-1/3 pl-2">
+              <h3 className="font-normal mb-2">Livrer à :</h3>
+              <p className="text-xs">{clientInfo.name}</p>
+              <p className="text-xs">{shippingAddress?.street}</p>
+              <p className="text-xs">
+                {shippingAddress?.postalCode} {shippingAddress?.city}
+              </p>
+              <p className="text-xs">{shippingAddress?.country}</p>
+            </div>
+          )}
         </div>
 
         {(headerNotes || invoice?.headerNotes) && (
@@ -326,10 +378,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                       )}
                     </td>
                     <td className="p-2 text-xs text-right">
-                      {item.quantity} {(() => {
-                        console.log('Unit:', item.unit, 'Abbreviation:', getUnitAbbreviation(item.unit));
-                        return getUnitAbbreviation(item.unit);
-                      })()}
+                      {item.quantity} {getUnitAbbreviation(item.unit)}
                     </td>
                     <td className="p-2 text-xs text-right">
                       {formatAmount(item.unitPrice)}
@@ -421,24 +470,6 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                 )}
               </span>
             </div>
-
-            {(customFields.length > 0 ||
-              (invoice?.customFields || []).length > 0) && (
-              <div>
-                {(customFields.length > 0
-                  ? customFields
-                  : invoice?.customFields || []
-                ).map((field: CustomField, index: number) => (
-                  <div
-                    key={index}
-                    className="flex justify-between py-1 text-xs"
-                  >
-                    <span>{field.key}</span>
-                    <span>{field.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 

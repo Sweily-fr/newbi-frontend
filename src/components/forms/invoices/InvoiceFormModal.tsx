@@ -193,6 +193,15 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     showNotifications: false // Désactiver les notifications ici pour éviter les doublons avec useInvoices
   });
 
+  // État pour l'adresse de livraison
+  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || false);
+  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || {
+    street: '',
+    city: '',
+    postalCode: '',
+    country: ''
+  });
+
   // Fonction pour appliquer les paramètres par défaut
   const applyDefaultSettingsToForm = useCallback(() => {
     if (defaultHeaderNotes && !headerNotes) setHeaderNotes(defaultHeaderNotes);
@@ -234,13 +243,14 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       setTermsAndConditionsLink(quote.termsAndConditionsLink);
       setCompanyInfo(quote.companyInfo);
       setUseBankDetails(quote.useBankDetails);
-      setBankDetailsComplete(quote.bankDetailsComplete);
       setBankDetailsReadOnly(quote.bankDetailsReadOnly);
+      setHasDifferentShippingAddress(quote.hasDifferentShippingAddress);
+      setShippingAddress(quote.shippingAddress);
     }
   }, [quoteData]);
 
   // Fonction pour valider le formulaire et gérer la soumission
-  const onValidateForm = (asDraft: boolean) => {
+  const onValidateForm = async (asDraft: boolean) => {
     console.log("Validation du formulaire déclenchée, brouillon:", asDraft);
     
     // Définir si on soumet en brouillon et le logger pour débogage
@@ -311,6 +321,26 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     if (useBankDetails && (!companyInfo.bankDetails?.iban || !companyInfo.bankDetails?.bic || !companyInfo.bankDetails?.bankName)) {
       errors.bankDetails = true;
       console.log("Erreur: coordonnées bancaires incomplètes");
+    }
+    
+    // Vérifier les erreurs dans la section Adresse de livraison
+    if (hasDifferentShippingAddress) {
+      if (!shippingAddress.street || shippingAddress.street.trim() === '') {
+        errors.client = true;
+        console.log("Erreur: adresse de livraison incomplète");
+      }
+      if (!shippingAddress.city || shippingAddress.city.trim() === '') {
+        errors.client = true;
+        console.log("Erreur: ville de livraison incomplète");
+      }
+      if (!shippingAddress.postalCode || shippingAddress.postalCode.trim() === '') {
+        errors.client = true;
+        console.log("Erreur: code postal de livraison incomplet");
+      }
+      if (!shippingAddress.country || shippingAddress.country.trim() === '') {
+        errors.client = true;
+        console.log("Erreur: pays de livraison incomplet");
+      }
     }
     
     // Mettre à jour l'état des erreurs
@@ -450,6 +480,47 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     invoice={invoice}
                     selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
                   />
+                  {hasDifferentShippingAddress && (
+                    <div className="mt-4">
+                      <h3 className="text-lg font-semibold">Adresse de livraison</h3>
+                      <div className="flex flex-col mt-2">
+                        <label className="text-sm font-medium">Rue</label>
+                        <input
+                          type="text"
+                          value={shippingAddress.street}
+                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, street: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div className="flex flex-col mt-2">
+                        <label className="text-sm font-medium">Ville</label>
+                        <input
+                          type="text"
+                          value={shippingAddress.city}
+                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, city: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div className="flex flex-col mt-2">
+                        <label className="text-sm font-medium">Code postal</label>
+                        <input
+                          type="text"
+                          value={shippingAddress.postalCode}
+                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, postalCode: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div className="flex flex-col mt-2">
+                        <label className="text-sm font-medium">Pays</label>
+                        <input
+                          type="text"
+                          value={shippingAddress.country}
+                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, country: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </Collapse>
 
                 <Collapse 
@@ -481,6 +552,17 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     handleRemoveItem={handleRemoveItem}
                     handleAddItem={handleAddItem}
                     handleProductSelect={handleProductSelect}
+                    hasDifferentShippingAddress={hasDifferentShippingAddress}
+                    shippingAddress={shippingAddress}
+                    onShippingAddressChange={(field, value) => {
+                      setShippingAddress(prev => ({
+                        ...prev,
+                        [field]: value
+                      }));
+                    }}
+                    onHasDifferentShippingAddressChange={(value) => {
+                      setHasDifferentShippingAddress(value);
+                    }}
                   />
                 </Collapse>
 
@@ -497,7 +579,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     discountType={discountType}
                     setDiscountType={setDiscountType}
                     calculateTotals={calculateTotals}
-                    customFields={customFields || []}
+                    customFields={customFields}
                     handleAddCustomField={handleAddCustomField}
                     handleRemoveCustomField={handleRemoveCustomField}
                     handleCustomFieldChange={handleCustomFieldChange}
@@ -590,6 +672,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
             termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
             termsAndConditionsLink={termsAndConditionsLink}
             useBankDetails={useBankDetails}
+            hasDifferentShippingAddress={hasDifferentShippingAddress}
+            shippingAddress={shippingAddress}
           />
         </div>
       </div>

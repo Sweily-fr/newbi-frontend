@@ -349,7 +349,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
           <TextField
             id="purchaseOrderNumber"
             name="purchaseOrderNumber"
-            label="Numéro de bon de commande"
+            label="Référence devis"
             placeholder="ex: D-2025-0042"
             value={purchaseOrderNumber}
             onChange={(e) => {

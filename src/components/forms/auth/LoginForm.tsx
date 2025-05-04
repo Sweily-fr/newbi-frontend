@@ -79,6 +79,9 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
       // Vérifier si c'est une erreur de vérification d'email
       if (errorCode === 'EMAIL_NOT_VERIFIED' || errorMsg.includes('vérifier votre adresse email')) {
         setEmailVerificationError(errorMsg);
+        // S'assurer que l'email est stocké pour le renvoi de vérification
+        const formValues = watch();
+        setLastAttemptedEmail(formValues.email);
         return;
       }
       

@@ -1192,7 +1192,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
               <p className="mb-4">Bonjour,</p>
               <p className="mb-4">Je vous remercie pour votre message. Nous avons bien pris en compte votre demande et nous reviendrons vers vous dans les plus brefs délais.</p>
               <p className="mb-4">Cordialement,</p>
-              <div className="mt-6 border-t pt-4 border-gray-200">
+              <div ref={signatureRef} className="mt-6 border-t pt-4 border-gray-200">
                 {renderSignatureTemplate()}
               </div>
             </div>
