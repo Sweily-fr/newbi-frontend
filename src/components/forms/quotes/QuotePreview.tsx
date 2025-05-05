@@ -124,7 +124,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                 src={
                   companyInfo.logo.startsWith("http")
                     ? companyInfo.logo
-                    : `${import.meta.env.VITE_API_URL}${companyInfo.logo}`
+                    : `${import.meta.env.VITE_API_URL}/${companyInfo.logo}`
                 }
                 alt="Logo entreprise"
                 className="h-auto mb-2 pdf-image"

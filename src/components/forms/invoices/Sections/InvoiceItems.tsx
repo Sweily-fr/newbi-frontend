@@ -4,6 +4,7 @@ import { TextField, Select, Button, TextArea, Checkbox } from '../../../../compo
 import { validateInvoiceItem } from '../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../../graphql/products';
+import { isValidPostalCodeFR } from '../../../../utils/validators';
 
 interface InvoiceItemsProps {
   items: Item[];
@@ -52,6 +53,11 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     discountError?: string;
   }>>([]);
   
+  // État pour stocker les erreurs de validation de l'adresse de livraison
+  const [shippingAddressErrors, setShippingAddressErrors] = useState<{
+    postalCodeError?: string;
+  }>({});
+  
   // État pour afficher/masquer le champ de taux de TVA personnalisé
   const [showCustomVatRate, setShowCustomVatRate] = useState<Record<number, boolean>>({});
 
@@ -65,6 +71,45 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatRate?: number;
     unit?: string;
   }>>([]);
+  
+  // Fonction pour valider le code postal français
+  const validatePostalCode = (postalCode: string) => {
+    if (!postalCode || postalCode.trim() === '') {
+      // Si le code postal est vide, on ne met pas d'erreur
+      setShippingAddressErrors(prev => ({ ...prev, postalCodeError: undefined }));
+      return true;
+    }
+    
+    const isValid = isValidPostalCodeFR(postalCode);
+    if (!isValid) {
+      setShippingAddressErrors(prev => ({
+        ...prev,
+        postalCodeError: 'Veuillez fournir un code postal français valide (5 chiffres)'
+      }));
+      return false;
+    }
+    
+    setShippingAddressErrors(prev => ({ ...prev, postalCodeError: undefined }));
+    return true;
+  };
+  
+  // Fonction personnalisée pour gérer les changements d'adresse de livraison avec validation
+  const handleShippingAddressChange = (field: string, value: string) => {
+    // Appeler la fonction originale pour mettre à jour l'état
+    onShippingAddressChange(field, value);
+    
+    // Valider le code postal si c'est ce champ qui a changé
+    if (field === 'postalCode') {
+      validatePostalCode(value);
+    }
+  };
+  
+  // Valider le code postal lorsqu'il change ou quand le composant est monté
+  useEffect(() => {
+    if (hasDifferentShippingAddress && shippingAddress.postalCode) {
+      validatePostalCode(shippingAddress.postalCode);
+    }
+  }, [hasDifferentShippingAddress, shippingAddress.postalCode]);
   const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
   
   // Pour débogage
@@ -373,16 +418,17 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   name="shipping-postal-code"
                   label="Code postal"
                   value={shippingAddress.postalCode || ''}
-                  onChange={(e) => onShippingAddressChange('postalCode', e.target.value)}
+                  onChange={(e) => handleShippingAddressChange('postalCode', e.target.value)}
                   placeholder="75001"
                   className="w-full"
+                  error={shippingAddressErrors.postalCodeError || ''}
                 />
                 <TextField
                   id="shipping-city"
                   name="shipping-city"
                   label="Ville"
                   value={shippingAddress.city || ''}
-                  onChange={(e) => onShippingAddressChange('city', e.target.value)}
+                  onChange={(e) => handleShippingAddressChange('city', e.target.value)}
                   placeholder="Paris"
                   className="w-full"
                 />

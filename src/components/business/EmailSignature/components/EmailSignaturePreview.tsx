@@ -14,7 +14,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Référence au conteneur de la signature
   const signatureRef = useRef<HTMLDivElement>(null);
   // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
-  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
   
   console.log('API URL from env:', apiUrl);
   console.log('All env variables:', import.meta.env);

@@ -20,7 +20,7 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   signature
 }) => {
   // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
-  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   // Fonction pour préfixer l'URL du logo avec l'URL de l'API si nécessaire
   // Utiliser useCallback pour éviter que la fonction ne change à chaque rendu

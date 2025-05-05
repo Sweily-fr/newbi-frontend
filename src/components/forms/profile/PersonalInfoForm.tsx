@@ -254,7 +254,7 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
           <div className="flex justify-center mb-6">
             <ImageUploader
               imageUrl={formData.profilePicture || ''}
-              apiBaseUrl={import.meta.env.VITE_API_URL}
+              apiBaseUrl={`${import.meta.env.VITE_API_URL}/`}
               previewImage={previewImage}
               isLoading={updateLoading || uploadLoading || deleteLoading}
               loadingMessage="Traitement de l'image en cours..."

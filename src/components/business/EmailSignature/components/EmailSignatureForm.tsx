@@ -117,9 +117,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   const { company, loading: companyLoading } = useCompany();
   
   // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
-  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || "http://localhost:4000";
-  console.log('EmailSignatureForm - API URL from env:', apiUrl);
-  console.log('EmailSignatureForm - All env variables:', import.meta.env);
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   // Fonction pour préfixer l'URL du logo avec l'URL de l'API si nécessaire
   const getFullLogoUrl = (logoPath: string) => {

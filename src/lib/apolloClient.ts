@@ -44,7 +44,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
           duration: 5000,
           onClose: () => {
             // Rediriger vers la page de connexion après la notification
-            window.location.href = '/login';
+            window.location.href = '/auth';
           }
         });
       } else {

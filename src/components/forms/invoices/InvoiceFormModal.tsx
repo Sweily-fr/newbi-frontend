@@ -181,6 +181,12 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     handleRemoveCustomField,
     handleCustomFieldChange,
     handleSubmit,
+    
+    // États pour l'adresse de livraison du hook useInvoiceForm
+    hasDifferentShippingAddress: hookHasDifferentShippingAddress,
+    setHasDifferentShippingAddress: setHookHasDifferentShippingAddress,
+    shippingAddress: hookShippingAddress,
+    setShippingAddress: setHookShippingAddress,
 
     // Constantes
     apiUrl,
@@ -193,14 +199,29 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     showNotifications: false // Désactiver les notifications ici pour éviter les doublons avec useInvoices
   });
 
-  // État pour l'adresse de livraison
-  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || false);
-  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || {
+  // État local pour l'adresse de livraison
+  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || hookHasDifferentShippingAddress || false);
+  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || hookShippingAddress || {
     street: '',
     city: '',
     postalCode: '',
     country: ''
   });
+  
+  // Mettre à jour les valeurs du hook uniquement lors de la soumission du formulaire
+  // Cela évite la boucle infinie de mises à jour
+  const updateHookValuesBeforeSubmit = useCallback(() => {
+    setHookHasDifferentShippingAddress(hasDifferentShippingAddress);
+    setHookShippingAddress(shippingAddress);
+  }, [hasDifferentShippingAddress, shippingAddress, setHookHasDifferentShippingAddress, setHookShippingAddress]);
+  
+  // Initialiser les valeurs du hook avec les états locaux au montage du composant
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Cette initialisation ne se produit qu'une seule fois au montage
+    setHookHasDifferentShippingAddress(hasDifferentShippingAddress);
+    setHookShippingAddress(shippingAddress);
+  }, []);
 
   // Fonction pour appliquer les paramètres par défaut
   const applyDefaultSettingsToForm = useCallback(() => {
@@ -350,6 +371,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     // Si aucune erreur, soumettre le formulaire
     if (!Object.values(errors).some(Boolean)) {
       console.log("Aucune erreur, soumission du formulaire avec asDraft =", asDraft);
+      // Mettre à jour les valeurs du hook avant la soumission
+      updateHookValuesBeforeSubmit();
       // Passer directement asDraft à handleSubmit pour éviter les problèmes de synchronisation
       handleSubmit(new Event('submit') as unknown as React.FormEvent, asDraft);
     } else {
@@ -480,47 +503,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     invoice={invoice}
                     selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
                   />
-                  {hasDifferentShippingAddress && (
-                    <div className="mt-4">
-                      <h3 className="text-lg font-semibold">Adresse de livraison</h3>
-                      <div className="flex flex-col mt-2">
-                        <label className="text-sm font-medium">Rue</label>
-                        <input
-                          type="text"
-                          value={shippingAddress.street}
-                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, street: e.target.value }))}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div className="flex flex-col mt-2">
-                        <label className="text-sm font-medium">Ville</label>
-                        <input
-                          type="text"
-                          value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, city: e.target.value }))}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div className="flex flex-col mt-2">
-                        <label className="text-sm font-medium">Code postal</label>
-                        <input
-                          type="text"
-                          value={shippingAddress.postalCode}
-                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, postalCode: e.target.value }))}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div className="flex flex-col mt-2">
-                        <label className="text-sm font-medium">Pays</label>
-                        <input
-                          type="text"
-                          value={shippingAddress.country}
-                          onChange={(e) => setShippingAddress((prev: { street?: string; city?: string; postalCode?: string; country?: string; }) => ({ ...prev, country: e.target.value }))}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </Collapse>
 
                 <Collapse 

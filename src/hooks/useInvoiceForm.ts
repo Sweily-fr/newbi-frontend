@@ -117,7 +117,6 @@ export const useInvoiceForm = ({
     return `F-${year}${month}-`;
   })());
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState<string>(invoice?.purchaseOrderNumber || '');
-
   // Helper function to safely format dates
   const formatDate = (dateString: string | undefined | null): string => {
     if (!dateString) return new Date().toISOString().split('T')[0];
@@ -150,6 +149,13 @@ export const useInvoiceForm = ({
   const [issueDate, setIssueDate] = useState(formatDate(invoice?.issueDate));
   const [executionDate, setExecutionDate] = useState(formatDate(invoice?.executionDate));
   const [dueDate, setDueDate] = useState(formatDate(invoice?.dueDate));
+  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || false);
+  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || {
+    street: '',
+    city: '',
+    postalCode: '',
+    country: ''
+  });
 
   const defaultCompanyInfo: CompanyInfo = {
     name: '',
@@ -807,6 +813,14 @@ export const useInvoiceForm = ({
           },
           bankDetails
         },
+        // Ajouter les données d'adresse de livraison
+        hasDifferentShippingAddress: hasDifferentShippingAddress || false,
+        shippingAddress: hasDifferentShippingAddress ? {
+          street: shippingAddress?.street || '',
+          city: shippingAddress?.city || '',
+          postalCode: shippingAddress?.postalCode || '',
+          country: shippingAddress?.country || ''
+        } : null,
         customFields: cleanCustomFields,
         isDeposit,
         issueDate,
@@ -877,7 +891,7 @@ export const useInvoiceForm = ({
   };
 
   // Récupérer l'URL de l'API à partir des variables d'environnement ou utiliser une valeur par défaut
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const apiUrl = import.meta.env.VITE_API_URL + "/" || 'http://localhost:4000';
 
   return {
     // États
@@ -929,6 +943,10 @@ export const useInvoiceForm = ({
     bankDetailsComplete,
     bankDetailsReadOnly,
     setBankDetailsReadOnly,
+    hasDifferentShippingAddress,
+    setHasDifferentShippingAddress,
+    shippingAddress,
+    setShippingAddress,
     
     // Données
     clientsData,

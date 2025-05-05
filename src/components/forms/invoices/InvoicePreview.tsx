@@ -168,12 +168,6 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     showActionButtons !== false &&
     (invoice?.status === "PENDING" || invoice?.status === "COMPLETED");
 
-  // Log des informations de companyInfo pour le débogage
-  console.log(
-    "CompanyInfo dans InvoicePreview:",
-    `${import.meta.env.VITE_API_URL}${companyInfo.logo}`
-  );
-
   // Contenu du PDF qui sera généré - sans les classes de largeur et centrage pour le PDF
   const documentContent = (
     <div
@@ -197,7 +191,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           <div className="w-24 h-24 flex justify-center items-center">
             {companyInfo?.logo && (
               <img
-                src={`${import.meta.env.VITE_API_URL}${companyInfo.logo}`}
+                src={`${import.meta.env.VITE_API_URL}/${companyInfo.logo}`}
                 alt="Logo entreprise"
                 className="h-auto mb-2 pdf-image"
                 style={{

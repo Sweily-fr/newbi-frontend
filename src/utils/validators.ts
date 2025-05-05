@@ -33,6 +33,9 @@ export const CAPITAL_SOCIAL_REGEX = /^\d{1,20}(\.\d{1,2})?$/;
 // Format: Accepte les formats courants comme "981 576 549 R.C.S. Paris" ou "Paris B 123 456 789"
 export const RCS_REGEX = /^(\d{3}\s?\d{3}\s?\d{3}\s?R\.?C\.?S\.?\s[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,30}|[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,30}\s[A-Z]?\s?\d{3}\s?\d{3}\s?\d{3})$/;
 
+// Regex pour la validation des codes postaux français (5 chiffres)
+export const POSTAL_CODE_FR_REGEX = /^(0[1-9]|[1-8]\d|9[0-8])\d{3}$/;
+
 /**
  * Règles de validation pour les champs de type nom/prénom
  */
@@ -132,3 +135,20 @@ export const getRCSValidationRules = (fieldName: string = 'Le RCS') => ({
     message: `${fieldName} doit être au format "Ville B 123 456 789"`
   }
 });
+
+/**
+ * Règles de validation pour les codes postaux français
+ */
+export const getPostalCodeFRValidationRules = (fieldName: string = 'Le code postal') => ({
+  pattern: {
+    value: POSTAL_CODE_FR_REGEX,
+    message: `${fieldName} doit être un code postal français valide (5 chiffres)`
+  }
+});
+
+/**
+ * Vérifie si un code postal français est valide
+ */
+export const isValidPostalCodeFR = (postalCode: string): boolean => {
+  return POSTAL_CODE_FR_REGEX.test(postalCode);
+};
