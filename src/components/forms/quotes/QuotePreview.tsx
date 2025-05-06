@@ -103,7 +103,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   // Détermination des informations client terminée
 
   const documentContent = (
-    <div className="bg-white print:overflow-visible" style={{ height: "auto", minHeight: "100%" }}>
+    <div className="bg-white print:overflow-visible" style={{ height: "auto", minHeight: "100%", fontFamily: "Poppins, sans-serif", color: "#5c5c5c" }}>
       <div
         className="p-6 pb-0 max-w-full"
         style={{
@@ -165,6 +165,10 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             </h3>
             <p className="text-xs">{quote.companyInfo?.email}</p>
             <p className="text-xs">{quote.companyInfo?.phone}</p>
+            <p className="text-xs">{quote.companyInfo?.address?.street}</p>
+            <p className="text-xs">{quote.companyInfo?.address?.city}</p>
+            <p className="text-xs">{quote.companyInfo?.address?.postalCode}</p>
+            <p className="text-xs">{quote.companyInfo?.address?.country}</p>
             {quote.companyInfo?.siret && (
               <p className="text-xs">SIRET: {quote.companyInfo.siret}</p>
             )}
@@ -219,11 +223,11 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           >
             <thead
               data-pdf-thead="true"
-              style={{ backgroundColor: "#111111", color: "#ffffff" }}
+              style={{ backgroundColor: "#3e3e3e", color: "#ffffff" }}
             >
               <tr data-pdf-tr="header">
                 <th
-                  className="text-xs font-normal text-left w-2/5 print:w-auto print:text-xs p-2"
+                  className="text-xs font-normal text-left w-2/5 print:w-auto print:text-xs p-3"
                   data-pdf-column-width="40%"
                 >
                   <span>Description</span>
@@ -269,7 +273,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                 return (
                   <tr
                     key={index}
-                    className="border-b"
+                    className="border-b "
                     style={{ pageBreakInside: "avoid" }}
                   >
                     <td className="p-2 text-xs">

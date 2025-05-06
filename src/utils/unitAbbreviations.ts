@@ -71,18 +71,25 @@ export const getUnitAbbreviation = (unit?: string): string => {
   }
   
   // Recherche insensible à la casse
-  const unitLowerCase = unit.toLowerCase();
+  const unitLowerCase = unit.toLowerCase().trim();
   for (const [key, value] of Object.entries(unitAbbreviations)) {
-    if (key.toLowerCase() === unitLowerCase) {
+    if (key.toLowerCase().trim() === unitLowerCase) {
       console.log('Abréviation trouvée (insensible à la casse):', value);
       return value;
     }
   }
   
-  // Recherche par inclusion partielle (pour les cas où l'unité contient des espaces ou caractères supplémentaires)
+  // Recherche par inclusion partielle - UNIQUEMENT si l'unité est un mot complet dans la clé
+  // Cela évite les correspondances incorrectes comme "Heure" dans "Kilowattheure"
   for (const [key, value] of Object.entries(unitAbbreviations)) {
-    if (unit.includes(key) || key.includes(unit)) {
-      console.log('Abréviation trouvée (correspondance partielle):', value);
+    const keyWords = key.toLowerCase().split(/\s+/);
+    const unitWords = unitLowerCase.split(/\s+/);
+    
+    // Vérifier si tous les mots de l'unité sont présents dans la clé comme mots complets
+    const allWordsMatch = unitWords.every(word => keyWords.includes(word));
+    
+    if (allWordsMatch) {
+      console.log('Abréviation trouvée (correspondance de mots):', value);
       return value;
     }
   }

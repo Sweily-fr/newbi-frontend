@@ -139,13 +139,13 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       ...clientInfo,
       // Si le client est nouveau et que les données d'adresse sont à plat (pas dans un objet address)
       address: {
-        street: clientInfo.street || "",
-        city: clientInfo.city || "",
-        postalCode: clientInfo.postalCode || "",
-        country: clientInfo.country || ""
+        street: clientInfo?.street || "",
+        city: clientInfo?.city || "",
+        postalCode: clientInfo?.postalCode || "",
+        country: clientInfo?.country || ""
       },
-      siret: clientInfo.siret || "",
-      vatNumber: clientInfo.vatNumber || ""
+      siret: clientInfo?.siret || "",
+      vatNumber: clientInfo?.vatNumber || ""
     };
   } else {
     // S'assurer que l'adresse du client existe toujours pour éviter les erreurs
@@ -154,11 +154,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     }
     
     // S'assurer que les autres champs importants existent
-    if (clientInfo.siret === undefined) {
+    if (clientInfo?.siret === undefined) {
       clientInfo.siret = "";
     }
     
-    if (clientInfo.vatNumber === undefined) {
+    if (clientInfo?.vatNumber === undefined) {
       clientInfo.vatNumber = "";
     }
   }
@@ -172,7 +172,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   const documentContent = (
     <div
       className="bg-white print:overflow-visible"
-      style={{ height: "auto", minHeight: "100%" }}
+      style={{ height: "auto", minHeight: "100%", fontFamily: "Poppins, sans-serif", color: "#5c5c5c" }}
     >
       <div
         className="p-6 pb-0 max-w-full"
@@ -244,6 +244,10 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             </h3>
             <p className="text-xs">{companyInfo?.email}</p>
             <p className="text-xs">{companyInfo?.phone}</p>
+            <p className="text-xs">{companyInfo?.address?.street}</p>
+            <p className="text-xs">{companyInfo?.address?.city}</p>
+            <p className="text-xs">{companyInfo?.address?.postalCode}</p>
+            <p className="text-xs">{companyInfo?.address?.country}</p>
             {companyInfo?.siret && (
               <p className="text-xs">SIRET: {companyInfo.siret}</p>
             )}
@@ -253,11 +257,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
           <div className={hasDifferentShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
             <h3 className="font-normal mb-2">Facturer à :</h3>
-            <p className="text-xs">{clientInfo.name}</p>
-            <p className="text-xs">{clientInfo.email}</p>
-            <p className="text-xs">{clientInfo.address?.street}</p>
+            <p className="text-xs">{clientInfo?.name}</p>
+            <p className="text-xs">{clientInfo?.email}</p>
+            <p className="text-xs">{clientInfo?.address?.street}</p>
             <p className="text-xs">
-              {clientInfo.address?.postalCode} {clientInfo.address?.city}
+              {clientInfo?.address?.postalCode} {clientInfo?.address?.city}
             </p>
             <p className="text-xs">{clientInfo.address?.country}</p>
             {clientInfo.siret && (
@@ -298,11 +302,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           >
             <thead
               data-pdf-thead="true"
-              style={{ backgroundColor: "#111111", color: "#ffffff" }}
+              style={{ backgroundColor: "#3e3e3e", color: "#ffffff" }}
             >
               <tr data-pdf-tr="header">
                 <th
-                  className="text-xs font-normal text-left w-2/5 print:w-auto print:text-xs p-2"
+                  className="text-xs font-normal text-left w-2/5 print:w-auto print:text-xs p-3"
                   data-pdf-column-width="40%"
                 >
                   <span>Description</span>
@@ -453,7 +457,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             </div>
 
             <div
-              className="flex justify-between py-1 text-xs font-medium border-t border-gray-300"
+              className="flex justify-between py-1 text-xs font-bold border-t border-gray-300"
               data-pdf-total-item="true"
               data-pdf-total-ttc="true"
             >

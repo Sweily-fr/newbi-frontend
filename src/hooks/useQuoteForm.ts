@@ -322,7 +322,7 @@ export const useQuoteForm = ({
     }
 
     // Calcul des totaux finaux après remise globale
-    const finalTotalHT = totalHT - discountAmount;
+    const finalTotalHT = Math.max(0, totalHT - discountAmount);
     const finalTotalTTC = finalTotalHT + totalVAT;
 
     return {

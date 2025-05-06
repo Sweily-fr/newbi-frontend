@@ -493,7 +493,9 @@ export const useInvoiceForm = ({
       }
     }
 
-    const finalTotalHT = totalHT - discountAmount;
+    // Vérifier si la remise est supérieure au total HT
+    // Si c'est le cas, limiter finalTotalHT à 0 (et non pas négatif)
+    const finalTotalHT = Math.max(0, totalHT - discountAmount);
     const finalTotalTTC = finalTotalHT + totalVAT;
 
     return {

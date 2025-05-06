@@ -84,17 +84,17 @@ export const ProfilePage = () => {
       )
     });
     
-    // Ajouter l'onglet Intégrations pour les utilisateurs premium
-    tabs.push({ 
-      id: 'integrations', 
-      label: 'Intégration',
-      icon: (
-        <div className="flex items-center justify-between w-full">
-          <PuzzlePieceIcon className="w-5 h-5" />
-          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
-        </div>
-      )
-    });
+    // // Ajouter l'onglet Intégrations pour les utilisateurs premium
+    // tabs.push({ 
+    //   id: 'integrations', 
+    //   label: 'Intégration',
+    //   icon: (
+    //     <div className="flex items-center justify-between w-full">
+    //       <PuzzlePieceIcon className="w-5 h-5" />
+    //       <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+    //     </div>
+    //   )
+    // });
   } else {
     // Pour les utilisateurs non premium, ajouter un onglet désactivé
     tabs.push({ 
