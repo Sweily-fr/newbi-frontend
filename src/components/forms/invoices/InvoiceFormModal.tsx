@@ -182,11 +182,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     handleCustomFieldChange,
     handleSubmit,
     
-    // États pour l'adresse de livraison du hook useInvoiceForm
-    hasDifferentShippingAddress: hookHasDifferentShippingAddress,
-    setHasDifferentShippingAddress: setHookHasDifferentShippingAddress,
-    shippingAddress: hookShippingAddress,
-    setShippingAddress: setHookShippingAddress,
+    
 
     // Constantes
     apiUrl,
@@ -199,30 +195,10 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     showNotifications: false // Désactiver les notifications ici pour éviter les doublons avec useInvoices
   });
 
-  // État local pour l'adresse de livraison
-  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || hookHasDifferentShippingAddress || false);
-  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || hookShippingAddress || {
-    street: '',
-    city: '',
-    postalCode: '',
-    country: ''
-  });
   
-  // Mettre à jour les valeurs du hook uniquement lors de la soumission du formulaire
-  // Cela évite la boucle infinie de mises à jour
-  const updateHookValuesBeforeSubmit = useCallback(() => {
-    setHookHasDifferentShippingAddress(hasDifferentShippingAddress);
-    setHookShippingAddress(shippingAddress);
-  }, [hasDifferentShippingAddress, shippingAddress, setHookHasDifferentShippingAddress, setHookShippingAddress]);
+ 
   
-  // Initialiser les valeurs du hook avec les états locaux au montage du composant
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    // Cette initialisation ne se produit qu'une seule fois au montage
-    setHookHasDifferentShippingAddress(hasDifferentShippingAddress);
-    setHookShippingAddress(shippingAddress);
-  }, []);
-
+  
   // Fonction pour appliquer les paramètres par défaut
   const applyDefaultSettingsToForm = useCallback(() => {
     if (defaultHeaderNotes && !headerNotes) setHeaderNotes(defaultHeaderNotes);
@@ -265,8 +241,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       setCompanyInfo(quote.companyInfo);
       setUseBankDetails(quote.useBankDetails);
       setBankDetailsReadOnly(quote.bankDetailsReadOnly);
-      setHasDifferentShippingAddress(quote.hasDifferentShippingAddress);
-      setShippingAddress(quote.shippingAddress);
+     
     }
   }, [quoteData]);
 
@@ -344,25 +319,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       console.log("Erreur: coordonnées bancaires incomplètes");
     }
     
-    // Vérifier les erreurs dans la section Adresse de livraison
-    if (hasDifferentShippingAddress) {
-      if (!shippingAddress.street || shippingAddress.street.trim() === '') {
-        errors.client = true;
-        console.log("Erreur: adresse de livraison incomplète");
-      }
-      if (!shippingAddress.city || shippingAddress.city.trim() === '') {
-        errors.client = true;
-        console.log("Erreur: ville de livraison incomplète");
-      }
-      if (!shippingAddress.postalCode || shippingAddress.postalCode.trim() === '') {
-        errors.client = true;
-        console.log("Erreur: code postal de livraison incomplet");
-      }
-      if (!shippingAddress.country || shippingAddress.country.trim() === '') {
-        errors.client = true;
-        console.log("Erreur: pays de livraison incomplet");
-      }
-    }
+   
+   
     
     // Mettre à jour l'état des erreurs
     setSectionErrors(errors);
@@ -371,8 +329,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     // Si aucune erreur, soumettre le formulaire
     if (!Object.values(errors).some(Boolean)) {
       console.log("Aucune erreur, soumission du formulaire avec asDraft =", asDraft);
-      // Mettre à jour les valeurs du hook avant la soumission
-      updateHookValuesBeforeSubmit();
       // Passer directement asDraft à handleSubmit pour éviter les problèmes de synchronisation
       handleSubmit(new Event('submit') as unknown as React.FormEvent, asDraft);
     } else {
@@ -534,17 +490,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     handleRemoveItem={handleRemoveItem}
                     handleAddItem={handleAddItem}
                     handleProductSelect={handleProductSelect}
-                    hasDifferentShippingAddress={hasDifferentShippingAddress}
-                    shippingAddress={shippingAddress}
-                    onShippingAddressChange={(field, value) => {
-                      setShippingAddress(prev => ({
-                        ...prev,
-                        [field]: value
-                      }));
-                    }}
-                    onHasDifferentShippingAddressChange={(value) => {
-                      setHasDifferentShippingAddress(value);
-                    }}
                   />
                 </Collapse>
 
@@ -653,9 +598,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
             termsAndConditions={termsAndConditions}
             termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
             termsAndConditionsLink={termsAndConditionsLink}
-            useBankDetails={useBankDetails}
-            hasDifferentShippingAddress={hasDifferentShippingAddress}
-            shippingAddress={shippingAddress}
+            useBankDetails={useBankDetails}    
           />
         </div>
       </div>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Item } from '../../../../types';
-import { TextField, Select, Button, TextArea, Checkbox } from '../../../../components/ui';
+import { TextField, Select, Button, TextArea } from '../../../../components/ui';
 import { validateInvoiceItem } from '../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../../graphql/products';
-import { isValidPostalCodeFR } from '../../../../utils/validators';
 
 interface InvoiceItemsProps {
   items: Item[];
@@ -20,16 +19,6 @@ interface InvoiceItemsProps {
     vatRate?: number;
     unit?: string;
   }) => void;
-  // Props pour l'adresse de livraison
-  hasDifferentShippingAddress?: boolean;
-  shippingAddress?: {
-    street?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-  };
-  onShippingAddressChange?: (field: string, value: string) => void;
-  onHasDifferentShippingAddressChange?: (value: boolean) => void;
 }
 
 export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
@@ -38,10 +27,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
   handleRemoveItem,
   handleAddItem,
   handleProductSelect,
-  hasDifferentShippingAddress = false,
-  shippingAddress = { street: '', city: '', postalCode: '', country: '' },
-  onShippingAddressChange = () => {},
-  onHasDifferentShippingAddressChange = () => {}
 }) => {
   // État pour stocker les erreurs de validation
   const [itemErrors, setItemErrors] = useState<Array<{
@@ -53,10 +38,8 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     discountError?: string;
   }>>([]);
   
-  // État pour stocker les erreurs de validation de l'adresse de livraison
-  const [shippingAddressErrors, setShippingAddressErrors] = useState<{
-    postalCodeError?: string;
-  }>({});
+  // État pour suivre l'index de l'élément en cours de modification
+  const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
   
   // État pour afficher/masquer le champ de taux de TVA personnalisé
   const [showCustomVatRate, setShowCustomVatRate] = useState<Record<number, boolean>>({});
@@ -71,47 +54,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatRate?: number;
     unit?: string;
   }>>([]);
-  
-  // Fonction pour valider le code postal français
-  const validatePostalCode = (postalCode: string) => {
-    if (!postalCode || postalCode.trim() === '') {
-      // Si le code postal est vide, on ne met pas d'erreur
-      setShippingAddressErrors(prev => ({ ...prev, postalCodeError: undefined }));
-      return true;
-    }
-    
-    const isValid = isValidPostalCodeFR(postalCode);
-    if (!isValid) {
-      setShippingAddressErrors(prev => ({
-        ...prev,
-        postalCodeError: 'Veuillez fournir un code postal français valide (5 chiffres)'
-      }));
-      return false;
-    }
-    
-    setShippingAddressErrors(prev => ({ ...prev, postalCodeError: undefined }));
-    return true;
-  };
-  
-  // Fonction personnalisée pour gérer les changements d'adresse de livraison avec validation
-  const handleShippingAddressChange = (field: string, value: string) => {
-    // Appeler la fonction originale pour mettre à jour l'état
-    onShippingAddressChange(field, value);
-    
-    // Valider le code postal si c'est ce champ qui a changé
-    if (field === 'postalCode') {
-      validatePostalCode(value);
-    }
-  };
-  
-  // Valider le code postal lorsqu'il change ou quand le composant est monté
-  useEffect(() => {
-    if (hasDifferentShippingAddress && shippingAddress.postalCode) {
-      validatePostalCode(shippingAddress.postalCode);
-    }
-  }, [hasDifferentShippingAddress, shippingAddress.postalCode]);
-  const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
-  
+
   // Pour débogage
   useEffect(() => {
     if (searchResults.length > 0) {
@@ -388,63 +331,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
             <p className="mt-1">Rendez-vous dans <a href="/profile?tab=products" className="font-medium text-[#5b50ff] hover:text-[#4a41e0] underline">Paramètres &gt; Catalogue de produits</a> pour gérer votre catalogue.</p>
           </div>
         </div>
-      </div>
-      
-      <div className="mb-4">
-        <Checkbox
-          id="different-shipping-address"
-          name="different-shipping-address"
-          checked={hasDifferentShippingAddress}
-          onChange={(e) => onHasDifferentShippingAddressChange(e.target.checked)}
-          label="Adresse de livraison différente de l'adresse de facturation"
-        />
-        
-        {hasDifferentShippingAddress && (
-          <div className="mt-4 p-4 border border-gray-200 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Adresse de livraison</h4>
-            <div className="grid grid-cols-1 gap-4">
-              <TextField
-                id="shipping-street"
-                name="shipping-street"
-                label="Adresse"
-                value={shippingAddress.street || ''}
-                onChange={(e) => onShippingAddressChange('street', e.target.value)}
-                placeholder="123 rue de Paris"
-                className="w-full"
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <TextField
-                  id="shipping-postal-code"
-                  name="shipping-postal-code"
-                  label="Code postal"
-                  value={shippingAddress.postalCode || ''}
-                  onChange={(e) => handleShippingAddressChange('postalCode', e.target.value)}
-                  placeholder="75001"
-                  className="w-full"
-                  error={shippingAddressErrors.postalCodeError || ''}
-                />
-                <TextField
-                  id="shipping-city"
-                  name="shipping-city"
-                  label="Ville"
-                  value={shippingAddress.city || ''}
-                  onChange={(e) => handleShippingAddressChange('city', e.target.value)}
-                  placeholder="Paris"
-                  className="w-full"
-                />
-              </div>
-              <TextField
-                id="shipping-country"
-                name="shipping-country"
-                label="Pays"
-                value={shippingAddress.country || ''}
-                onChange={(e) => onShippingAddressChange('country', e.target.value)}
-                placeholder="France"
-                className="w-full"
-              />
-            </div>
-          </div>
-        )}
       </div>
       <h3 className="block text-sm font-medium text-gray-700 mb-2">
         Éléments

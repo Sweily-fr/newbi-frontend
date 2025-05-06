@@ -813,14 +813,6 @@ export const useInvoiceForm = ({
           },
           bankDetails
         },
-        // Ajouter les données d'adresse de livraison
-        hasDifferentShippingAddress: hasDifferentShippingAddress || false,
-        shippingAddress: hasDifferentShippingAddress ? {
-          street: shippingAddress?.street || '',
-          city: shippingAddress?.city || '',
-          postalCode: shippingAddress?.postalCode || '',
-          country: shippingAddress?.country || ''
-        } : null,
         customFields: cleanCustomFields,
         isDeposit,
         issueDate,
