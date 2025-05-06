@@ -19,43 +19,83 @@ export const Footer = () => {
               Simplifiez votre gestion d'entreprise avec nos outils innovants.
             </p>
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Newbi par Sweily. Tous droits réservés.
+              © {new Date().getFullYear()} Newbi par Sweily. Tous droits
+              réservés.
             </p>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
               Produits
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to={isAuthenticated ? (hasActiveSubscription ? "/factures" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link
+                  to={
+                    isAuthenticated
+                      ? hasActiveSubscription
+                        ? "/factures"
+                        : "/outils"
+                      : "/auth"
+                  }
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Facturation
                 </Link>
               </li>
               <li>
-                <Link to={isAuthenticated ? (hasActiveSubscription ? "/devis" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link
+                  to={
+                    isAuthenticated
+                      ? hasActiveSubscription
+                        ? "/devis"
+                        : "/outils"
+                      : "/auth"
+                  }
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Devis
                 </Link>
               </li>
               <li>
-                <Link to={isAuthenticated ? (hasActiveSubscription ? "/signatures-email" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link
+                  to={
+                    isAuthenticated
+                      ? hasActiveSubscription
+                        ? "/signatures-email"
+                        : "/outils"
+                      : "/auth"
+                  }
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Signatures Email
                 </Link>
               </li>
               <li>
-                <Link to={isAuthenticated ? (hasActiveSubscription ? "/blog-seo-optimizer" : "/outils") : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link
+                  to={
+                    isAuthenticated
+                      ? hasActiveSubscription
+                        ? "/blog-seo-optimizer"
+                        : "/outils"
+                      : "/auth"
+                  }
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Optimisation blog SEO
                 </Link>
               </li>
               <li>
-                <Link to={isAuthenticated ? "/outils" : "/auth"} className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <Link
+                  to={isAuthenticated ? "/outils" : "/auth"}
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Tous nos outils
                 </Link>
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
               Ressources
@@ -77,28 +117,32 @@ export const Footer = () => {
                 </a>
               </li> */}
               <li>
-                <Link 
-                  to="/#faq-section" 
+                <Link
+                  to="/#faq-section"
                   onClick={(e) => {
                     e.preventDefault();
                     // Si vous êtes déjà sur la page d'accueil
-                    if (window.location.pathname === '/' || window.location.pathname === '') {
-                      const faqSection = document.getElementById('faq-section');
+                    if (
+                      window.location.pathname === "/" ||
+                      window.location.pathname === ""
+                    ) {
+                      const faqSection = document.getElementById("faq-section");
                       if (faqSection) {
-                        faqSection.scrollIntoView({ behavior: 'smooth' });
+                        faqSection.scrollIntoView({ behavior: "smooth" });
                       }
                     } else {
                       // Si vous n'êtes pas sur la page d'accueil, naviguer d'abord
-                      navigate('/');
+                      navigate("/");
                       // Attendre que la navigation soit terminée avant de faire défiler
                       setTimeout(() => {
-                        const faqSection = document.getElementById('faq-section');
+                        const faqSection =
+                          document.getElementById("faq-section");
                         if (faqSection) {
-                          faqSection.scrollIntoView({ behavior: 'smooth' });
+                          faqSection.scrollIntoView({ behavior: "smooth" });
                         }
                       }, 300);
                     }
-                  }} 
+                  }}
                   className="text-gray-600 hover:text-[#5b50ff] text-sm transition-colors"
                 >
                   FAQ
@@ -106,56 +150,77 @@ export const Footer = () => {
               </li>
               {hasActiveSubscription && (
                 <li>
-                  <a 
-                    href="https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href="https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-gray-600 hover:text-[#5b50ff] text-sm transition-colors flex items-center"
                   >
                     Communauté
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 ml-1">
-                      <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-3 h-3 ml-1"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </a>
                 </li>
               )}
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
               Légal
             </h3>
             <ul className="space-y-3">
-              {/* <li>
-                <a href="/mentions-legales" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+              <li>
+                <a
+                  href="/mentions-legales"
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Mentions légales
                 </a>
               </li>
               <li>
-                <a href="/politique-de-confidentialite" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <a
+                  href="/politique-de-confidentialite"
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Politique de confidentialité
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="/conditions-generales-de-vente" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
                   CGV
                 </a>
               </li> */}
               <li>
-                <a href="/contact" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <a
+                  href="/contact"
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Contact
                 </a>
               </li>
               <li>
-                <a href="/preferences-cookies" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
+                <a
+                  href="/preferences-cookies"
+                  className="text-gray-600 hover:text-indigo-600 text-sm transition-colors"
+                >
                   Préférences cookies
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        
+
         <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row px-4 sm:px-6 lg:px-8 justify-between items-center">
           <div className="flex space-x-6 mb-4 md:mb-0">
             {/* <a href="https://twitter.com" className="text-gray-400 hover:text-indigo-600" aria-label="Twitter">
@@ -175,7 +240,7 @@ export const Footer = () => {
             </a> */}
           </div>
           <div className="text-gray-500 text-sm">
-            Conçu avec ❤️ en France par{' '}
+            Conçu avec ❤️ en France par{" "}
             <a
               href="https://www.sweily.fr"
               target="_blank"

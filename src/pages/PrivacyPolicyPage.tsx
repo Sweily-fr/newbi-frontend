@@ -14,13 +14,13 @@ export const PrivacyPolicyPage: React.FC = () => {
       <div className="bg-white shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Politique de Confidentialité</h1>
         <p className="text-gray-600 mb-6">
-          Dernière mise à jour : 31 mars 2025
+          Dernière mise à jour : 06 mai 2025
         </p>
         
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">1. Introduction</h2>
           <p className="text-gray-600 mb-3">
-            Génération Business s'engage à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité 
+            Newbi s'engage à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité 
             explique comment nous collectons, utilisons, partageons et protégeons vos informations lorsque vous utilisez notre site web 
             et nos services.
           </p>
@@ -110,7 +110,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             <li className="mb-2">Droit d'opposition : vous pouvez vous opposer au traitement de vos données dans certaines circonstances.</li>
           </ul>
           <p className="text-gray-600 mb-3">
-            Pour exercer ces droits, veuillez nous contacter à <a href="mailto:privacy@generation-business.fr" className="text-blue-600 hover:underline">privacy@generation-business.fr</a>.
+            Pour exercer ces droits, veuillez nous contacter à <a href="mailto:contact@newbi.fr" className="text-blue-600 hover:underline">contact@newbi.fr</a>.
           </p>
         </section>
         
@@ -136,11 +136,11 @@ export const PrivacyPolicyPage: React.FC = () => {
             Si vous avez des questions concernant cette politique de confidentialité, veuillez nous contacter à :
           </p>
           <p className="text-gray-600 mb-3">
-            <a href="mailto:privacy@generation-business.fr" className="text-blue-600 hover:underline">privacy@generation-business.fr</a>
+            <a href="mailto:contact@newbi.fr" className="text-blue-600 hover:underline">contact@newbi.fr</a>
           </p>
           <p className="text-gray-600 mb-3">
-            Génération Business<br />
-            123 Avenue des Entrepreneurs<br />
+            Sweily<br />
+            229 rue Saint-Honoré<br />
             75001 Paris, France
           </p>
         </section>

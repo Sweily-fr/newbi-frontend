@@ -17,17 +17,17 @@ export const LegalNoticePage: React.FC = () => {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">1. Informations légales</h2>
           <p className="text-gray-600 mb-3">
-            Le site Newbi est édité par la société Sweily, SAS au capital de 1 000 euros, 
-            immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro 123 456 789.
+            Le site Newbi est édité par la société Sweily, SAS au capital de 10 000 euros, 
+            immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro 981 576 549.
           </p>
           <p className="text-gray-600 mb-3">
-            <strong>Siège social :</strong> 123 Avenue des Entrepreneurs, 75001 Paris, France
+            <strong>Siège social :</strong> 229 rue Saint-Honoré, 75001 Paris, France
           </p>
           <p className="text-gray-600 mb-3">
-            <strong>Numéro de TVA intracommunautaire :</strong> FR 12 345 678 901
+            <strong>Numéro de TVA intracommunautaire :</strong> FR 70 981 576 549
           </p>
           <p className="text-gray-600 mb-3">
-            <strong>Directeur de la publication :</strong> Jean Dupont, Président
+            <strong>Directeur de la publication :</strong> Joaquim Gameiro, Président
           </p>
         </section>
         
@@ -50,12 +50,12 @@ export const LegalNoticePage: React.FC = () => {
           <p className="text-gray-600 mb-3">
             L'ensemble des éléments constituant le site Newbi (textes, graphismes, logiciels, photographies, 
             images, vidéos, sons, plans, logos, marques, etc.) ainsi que le site lui-même, sont la propriété exclusive 
-            de Newbi ou de ses partenaires. Ces éléments sont protégés par les lois relatives à la propriété 
+            de Sweily ou de ses partenaires. Ces éléments sont protégés par les lois relatives à la propriété 
             intellectuelle et notamment le droit d'auteur.
           </p>
           <p className="text-gray-600 mb-3">
             Toute reproduction, représentation, utilisation ou adaptation, sous quelque forme que ce soit, de tout ou 
-            partie des éléments du site sans l'accord écrit préalable de Newbi est strictement interdite 
+            partie des éléments du site sans l'accord écrit préalable de Sweily est strictement interdite 
             et constituerait un acte de contrefaçon sanctionné par les articles L.335-2 et suivants du Code de la propriété intellectuelle.
           </p>
         </section>
@@ -80,7 +80,7 @@ export const LegalNoticePage: React.FC = () => {
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">6. Liens hypertextes</h2>
           <p className="text-gray-600 mb-3">
             Le site Newbi peut contenir des liens hypertextes vers d'autres sites internet. 
-            Newbi n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
+            Sweily n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
           </p>
         </section>
         

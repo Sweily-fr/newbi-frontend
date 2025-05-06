@@ -42,7 +42,7 @@ export const COOKIE_CATEGORIES: CookieCategoryInfo[] = [
     cookies: [
       {
         name: 'auth_token',
-        provider: 'Génération Business',
+        provider: 'Newbi',
         purpose: 'Authentification et sécurité',
         expiry: 'Session',
         type: 'HTTP',
@@ -50,7 +50,7 @@ export const COOKIE_CATEGORIES: CookieCategoryInfo[] = [
       },
       {
         name: 'cookie_consent',
-        provider: 'Génération Business',
+        provider: 'Newbi',
         purpose: 'Stockage des préférences de cookies',
         expiry: '1 an',
         type: 'HTTP',
@@ -66,7 +66,7 @@ export const COOKIE_CATEGORIES: CookieCategoryInfo[] = [
     cookies: [
       {
         name: 'user_preferences',
-        provider: 'Génération Business',
+        provider: 'Newbi',
         purpose: 'Mémorisation des préférences utilisateur',
         expiry: '6 mois',
         type: 'HTTP',
@@ -74,7 +74,7 @@ export const COOKIE_CATEGORIES: CookieCategoryInfo[] = [
       },
       {
         name: 'recently_viewed',
-        provider: 'Génération Business',
+        provider: 'Newbi',
         purpose: 'Suivi des derniers éléments consultés',
         expiry: '30 jours',
         type: 'HTTP',
@@ -122,7 +122,7 @@ export const COOKIE_CATEGORIES: CookieCategoryInfo[] = [
       },
       {
         name: 'ads_prefs',
-        provider: 'Génération Business',
+        provider: 'Google',
         purpose: 'Personnalisation des publicités',
         expiry: '6 mois',
         type: 'HTTP',
