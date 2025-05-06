@@ -511,8 +511,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               number: quoteNumber,
               issueDate,
               validUntil,
-              // Ne pas définir client ici, nous utiliserons les props séparées
-              client: undefined,
+              // Utiliser le client original du devis lors de la modification
+              client: quote ? quote.client : undefined,
               companyInfo,
               items,
               discount,

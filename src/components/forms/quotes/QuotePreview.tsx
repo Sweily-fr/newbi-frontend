@@ -176,7 +176,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {quote.companyInfo.vatNumber}</p>
             )}
           </div>
-          <div className={hasDifferentShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
+          <div className="w-1/2 pl-4">
             <h3 className="font-normal mb-2">
               Facturer à :
             </h3>
@@ -194,19 +194,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
-          {hasDifferentShippingAddress && (
-            <div className="w-1/3 pl-2">
-              <h3 className="font-normal mb-2">
-                Livrer à :
-              </h3>
-              <p className="text-xs">{clientInfo?.name || "Client"}</p>
-              <p className="text-xs">{shippingAddress?.street}</p>
-              <p className="text-xs">
-                {shippingAddress?.postalCode} {shippingAddress?.city}
-              </p>
-              <p className="text-xs">{shippingAddress?.country}</p>
-            </div>
-          )}
         </div>
 
         {quote.headerNotes && (

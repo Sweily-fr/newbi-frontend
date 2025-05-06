@@ -23,16 +23,14 @@ export const InvoiceActionButtons: React.FC<InvoiceActionButtonsProps> = ({
       >
         Annuler
       </Button>
-      {!isEditMode &&
-        <Button
+      <Button
         type="button"
         variant="secondary"
         onClick={() => onValidateForm(true)}
         disabled={isSubmitting}
-        >
+      >
         Brouillon
       </Button>
-      }
       <Button
         type="button"
         variant="primary"

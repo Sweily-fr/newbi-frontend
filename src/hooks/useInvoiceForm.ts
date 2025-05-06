@@ -520,25 +520,20 @@ export const useInvoiceForm = ({
       setSubmitAsDraft(isDraft);
     }
     
-    // Forcer le statut à DRAFT si isDraft est true, sinon à PENDING
+    // Déterminer le statut à utiliser
+    let status;
     if (isDraft) {
-      console.log('Forçage du statut à DRAFT car isDraft est true (asDraft =', asDraft, ', submitAsDraft =', submitAsDraft, ')');
+      // Si on demande explicitement un brouillon, utiliser DRAFT
+      status = 'DRAFT';
+      console.log('Statut défini à DRAFT car isDraft est true (asDraft =', asDraft, ', submitAsDraft =', submitAsDraft, ')');
+    } else if (invoice && invoice.status === 'DRAFT') {
+      // Si on met à jour une facture existante qui est en brouillon, conserver son statut DRAFT
+      status = 'DRAFT';
+      console.log('Conservation du statut DRAFT pour la mise à jour de la facture');
     } else {
-      console.log('Forçage du statut à PENDING car isDraft est false (asDraft =', asDraft, ', submitAsDraft =', submitAsDraft, ')');
-    }
-
-    // Forcer un rafraîchissement du numéro de facture pour éviter les doublons
-    // Ne pas le faire pour les factures existantes
-    if (!invoice) {
-      try {
-        const { data } = await refetchNextInvoiceNumber({ prefix: invoicePrefix });
-        if (data?.nextInvoiceNumber) {
-          console.log('Numéro de facture rafraîchi:', data.nextInvoiceNumber);
-          setInvoiceNumber(data.nextInvoiceNumber);
-        }
-      } catch (error) {
-        console.error('Erreur lors du rafraîchissement du numéro de facture:', error);
-      }
+      // Sinon (nouvelle facture ou facture non-brouillon), utiliser PENDING
+      status = 'PENDING';
+      console.log('Statut défini à PENDING car isDraft est false et ce n\'est pas une mise à jour de brouillon');
     }
 
     try {
@@ -600,9 +595,23 @@ export const useInvoiceForm = ({
         } else {
           // Si on modifie une facture existante et que le client est déjà dans la facture
           if (invoice && invoice.client) {
+            // S'assurer que les champs SIRET et TVA sont renseignés pour les entreprises
+            const clientType = invoice.client.type || 'COMPANY';
+            const needsSiretAndVat = clientType === 'COMPANY';
+            
+            // Toujours fournir des valeurs par défaut pour SIRET et TVA si le client est une entreprise
+            const siret = invoice.client.siret || (needsSiretAndVat ? "12345678901234" : "");
+            const vatNumber = invoice.client.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
+            
+            console.log("Mise à jour d'une facture avec client existant:", {
+              type: clientType,
+              siret: siret,
+              vatNumber: vatNumber
+            });
+            
             return {
               id: invoice.client.id,
-              type: invoice.client.type || 'COMPANY',
+              type: clientType,
               name: invoice.client.name,
               email: invoice.client.email || "client@example.com",
               address: {
@@ -611,8 +620,8 @@ export const useInvoiceForm = ({
                 postalCode: invoice.client.address?.postalCode || "00000",
                 country: invoice.client.address?.country || "France",
               },
-              siret: invoice.client.type === 'COMPANY' ? (invoice.client.siret || "12345678901234") : "",
-              vatNumber: invoice.client.type === 'COMPANY' ? (invoice.client.vatNumber || "FR12345678901") : "",
+              siret: siret,
+              vatNumber: vatNumber,
               firstName: invoice.client.firstName || "",
               lastName: invoice.client.lastName || ""
             };
@@ -790,8 +799,8 @@ export const useInvoiceForm = ({
           discountType: item.discountType || 'FIXED',
           details: item.details || ''
         })),
-        // Forcer explicitement le statut en fonction de isDraft
-        status: isDraft ? 'DRAFT' : 'PENDING',
+        // Utiliser le statut déterminé plus haut
+        status: status,
         headerNotes,
         footerNotes,
         termsAndConditions,
