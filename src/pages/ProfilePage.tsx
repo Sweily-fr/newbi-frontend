@@ -1,24 +1,32 @@
-import { useQuery } from '@apollo/client';
-import { useState, useContext, useEffect } from 'react';
-import { GET_PROFILE } from '../graphql/profile';
-import { PersonalInfoForm } from '../components/forms/profile/PersonalInfoForm';
-import { CompanyInfoForm } from '../components/forms/profile/CompanyInfoForm';
-import { ClientsManager } from '../components/business/clients/ClientsManager';
-import { ProductsManager } from '../components/business/products/ProductsManager';
-import { IntegrationsManager } from '../components/business/integrations/IntegrationsManager';
-import { TabNavigation, TabItem } from '../components/navigation/TabNavigation';
-import { UserIcon, BuildingOfficeIcon, CreditCardIcon, ShoppingBagIcon, LockClosedIcon, PuzzlePieceIcon } from '@heroicons/react/24/outline';
-import { CheckBadgeIcon } from '@heroicons/react/24/solid';
-import { SubscriptionContext } from '../context/SubscriptionContext.context';
-import { Button } from '../components/ui';
-import { PremiumModal } from '../components/subscription/PremiumModal';
-import axios from 'axios';
-import { SEOHead } from '../components/SEO/SEOHead';
-import { LogoLoader } from '../components/feedback/LogoLoader';
+import { useQuery } from "@apollo/client";
+import { useState, useContext, useEffect } from "react";
+import { GET_PROFILE } from "../graphql/profile";
+import { PersonalInfoForm } from "../components/forms/profile/PersonalInfoForm";
+import { CompanyInfoForm } from "../components/forms/profile/CompanyInfoForm";
+import { ClientsManager } from "../components/business/clients/ClientsManager";
+import { ProductsManager } from "../components/business/products/ProductsManager";
+import { IntegrationsManager } from "../components/business/integrations/IntegrationsManager";
+import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";
+import {
+  UserIcon,
+  BuildingOfficeIcon,
+  CreditCardIcon,
+  ShoppingBagIcon,
+  LockClosedIcon,
+  PuzzlePieceIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { SubscriptionContext } from "../context/SubscriptionContext.context";
+import { Button } from "../components/ui";
+import { PremiumModal } from "../components/subscription/PremiumModal";
+import axios from "axios";
+import { SEOHead } from "../components/SEO/SEOHead";
+import { LogoLoader } from "../components/feedback/LogoLoader";
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);
-  const [activeTab, setActiveTab] = useState<string | null>('profile');
+  const [activeTab, setActiveTab] = useState<string | null>("profile");
   const { subscription } = useContext(SubscriptionContext);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
@@ -26,22 +34,49 @@ export const ProfilePage = () => {
   useEffect(() => {
     // D'abord vérifier l'URL (priorité la plus haute)
     const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get('tab');
-    
-    if (tabParam && ['profile', 'company', 'payment', 'products', 'security', 'integrations'].includes(tabParam)) {
+    const tabParam = params.get("tab");
+
+    if (
+      tabParam &&
+      [
+        "profile",
+        "company",
+        "payment",
+        "products",
+        "security",
+        "integrations",
+        "clients",
+      ].includes(tabParam)
+    ) {
       // Mettre à jour l'onglet actif et le sauvegarder dans localStorage
       setActiveTab(tabParam);
-      localStorage.setItem('profileActiveTab', tabParam);
+      localStorage.setItem("profileActiveTab", tabParam);
     } else {
       // Si aucun onglet n'est spécifié dans l'URL, essayer de récupérer du localStorage
-      const savedTab = localStorage.getItem('profileActiveTab');
-      if (savedTab && ['profile', 'company', 'payment', 'products', 'security', 'integrations'].includes(savedTab)) {
+      const savedTab = localStorage.getItem("profileActiveTab");
+      if (
+        savedTab &&
+        [
+          "profile",
+          "company",
+          "payment",
+          "products",
+          "security",
+          "integrations",
+          "clients",
+        ].includes(savedTab)
+      ) {
         setActiveTab(savedTab);
       }
     }
   }, []);
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><LogoLoader size="md" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LogoLoader size="md" />
+      </div>
+    );
   if (error) return <div>Une erreur est survenue</div>;
 
   // Initialiser des objets vides si les données sont manquantes
@@ -52,105 +87,109 @@ export const ProfilePage = () => {
 
   // Définir les onglets en fonction de l'état d'abonnement
   const tabs: TabItem[] = [
-    { 
-      id: 'profile', 
-      label: 'Profile',
-      icon: <UserIcon className="w-5 h-5" />
+    {
+      id: "profile",
+      label: "Profile",
+      icon: <UserIcon className="w-5 h-5" />,
     },
   ];
-  
+
   // Ajouter l'onglet Entreprise uniquement pour les utilisateurs premium
   if (subscription?.licence) {
-    tabs.push({ 
-      id: 'company', 
-      label: 'Entreprise',
+    tabs.push({
+      id: "company",
+      label: "Entreprise",
       icon: (
         <div className="flex items-center justify-between w-full">
           <BuildingOfficeIcon className="w-5 h-5" />
           <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
         </div>
-      )
+      ),
     });
-    
+
     // Ajouter l'onglet Catalogue Produits/Services pour les utilisateurs premium
-    tabs.push({ 
-      id: 'products', 
-      label: 'Catalogue',
+    tabs.push({
+      id: "products",
+      label: "Catalogue",
       icon: (
         <div className="flex items-center justify-between w-full">
           <ShoppingBagIcon className="w-5 h-5" />
           <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
         </div>
-      )
+      ),
     });
-    
-    // // Ajouter l'onglet Intégrations pour les utilisateurs premium
-    // tabs.push({ 
-    //   id: 'integrations', 
-    //   label: 'Intégration',
-    //   icon: (
-    //     <div className="flex items-center justify-between w-full">
-    //       <PuzzlePieceIcon className="w-5 h-5" />
-    //       <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
-    //     </div>
-    //   )
-    // });
+
+    // Ajouter l'onglet Mes clients pour les utilisateurs premium
+    tabs.push({
+      id: "clients",
+      label: "Mes clients",
+      icon: (
+        <div className="flex items-center justify-between w-full">
+          <UsersIcon className="w-5 h-5" />
+          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+        </div>
+      ),
+    });
   } else {
     // Pour les utilisateurs non premium, ajouter un onglet désactivé
-    tabs.push({ 
-      id: 'company_locked', 
-      label: 'Entreprise',
+    tabs.push({
+      id: "company_locked",
+      label: "Entreprise",
       icon: (
         <div className="flex items-center justify-between w-full">
           <BuildingOfficeIcon className="w-5 h-5" />
           <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
         </div>
-      )
+      ),
     });
-    
+
     // Ajouter l'onglet Catalogue Produits/Services désactivé pour les utilisateurs non premium
-    tabs.push({ 
-      id: 'products_locked', 
-      label: 'Catalogue',
+    tabs.push({
+      id: "products_locked",
+      label: "Catalogue",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <ShoppingBagIcon className="w-5 h-5" />
+          <UsersIcon className="w-5 h-5" />
           <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
         </div>
-      )
+      ),
     });
-    
-    // Ajouter l'onglet Intégrations désactivé pour les utilisateurs non premium
-    tabs.push({ 
-      id: 'integrations_locked', 
-      label: 'Intégration',
+
+    // Ajouter l'onglet Mes clients désactivé pour les utilisateurs non premium
+    tabs.push({
+      id: "clients_locked",
+      label: "Mes clients",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <PuzzlePieceIcon className="w-5 h-5" />
+          <UsersIcon className="w-5 h-5" />
           <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
         </div>
-      )
+      ),
     });
   }
 
   const handleTabChange = (tabId: string | null) => {
     // Si l'utilisateur clique sur un onglet verrouillé, ouvrir la modal premium
-    if (tabId === 'company_locked' || tabId === 'products_locked') {
+    if (
+      tabId === "company_locked" ||
+      tabId === "products_locked" ||
+      tabId === "clients_locked"
+    ) {
       setIsPremiumModalOpen(true);
       return;
     }
-    
+
     // Mettre à jour l'onglet actif
     setActiveTab(tabId);
-    
+
     if (tabId) {
       // Sauvegarder l'onglet actif dans localStorage
-      localStorage.setItem('profileActiveTab', tabId);
-      
+      localStorage.setItem("profileActiveTab", tabId);
+
       // Mettre à jour l'URL sans recharger la page
       const url = new URL(window.location.href);
-      url.searchParams.set('tab', tabId);
-      window.history.pushState({}, '', url.toString());
+      url.searchParams.set("tab", tabId);
+      window.history.pushState({}, "", url.toString());
     }
   };
 
@@ -158,30 +197,35 @@ export const ProfilePage = () => {
   const handleSubscription = async () => {
     try {
       // Récupérer le token d'authentification
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.error('Aucun token d\'authentification trouvé');
+        console.error("Aucun token d'authentification trouvé");
         return;
       }
-      
+
       // Appeler l'endpoint pour créer une session de portail client
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/create-customer-portal-session`,
         {},
         {
           headers: {
-            Authorization: token
-          }
+            Authorization: token,
+          },
         }
       );
-      
+
       // Rediriger vers l'URL de la session
       if (response.data.url) {
-        window.open(response.data.url, '_blank');
+        window.open(response.data.url, "_blank");
       }
     } catch (error) {
-      console.error('Erreur lors de la création de la session de portail client:', error);
-      alert('Une erreur est survenue lors de la création de la session de portail client.');
+      console.error(
+        "Erreur lors de la création de la session de portail client:",
+        error
+      );
+      alert(
+        "Une erreur est survenue lors de la création de la session de portail client."
+      );
     }
   };
 
@@ -208,7 +252,9 @@ export const ProfilePage = () => {
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">Mon Espace</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              Mon Espace
+            </h1>
             <p className="mt-1 text-sm text-gray-600">
               Gérez vos informations personnelles et professionnelles
             </p>
@@ -220,7 +266,9 @@ export const ProfilePage = () => {
               className="flex items-center gap-2"
             >
               <CreditCardIcon className="h-5 w-5" />
-              {subscription?.licence ? "Gérer mon abonnement" : "Passer Premium"}
+              {subscription?.licence
+                ? "Gérer mon abonnement"
+                : "Passer Premium"}
             </Button>
           )}
         </div>
@@ -231,31 +279,46 @@ export const ProfilePage = () => {
             <div className="sticky top-[100px] bg-white shadow-sm rounded-lg p-4">
               <div className="flex flex-col items-center justify-center mb-6">
                 <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden relative mb-2">
-                   {data?.me?.profile?.profilePicture ? (
-                      <img 
-                      src={import.meta.env.VITE_API_URL + data.me.profile.profilePicture} 
-                      alt={`${data?.me?.profile?.firstName || ''} ${data?.me?.profile?.lastName || ''}`}
+                  {data?.me?.profile?.profilePicture ? (
+                    <img
+                      src={
+                        import.meta.env.VITE_API_URL +
+                        data.me.profile.profilePicture
+                      }
+                      alt={`${data?.me?.profile?.firstName || ""} ${
+                        data?.me?.profile?.lastName || ""
+                      }`}
                       className="w-full h-full object-cover"
                     />
-                  ) : (
-                    data?.me?.profile?.avatar ? (
-                    <img 
-                      src={data.me.profile.avatar} 
-                      alt={`${data?.me?.profile?.firstName || ''} ${data?.me?.profile?.lastName || ''}`}
+                  ) : data?.me?.profile?.avatar ? (
+                    <img
+                      src={data.me.profile.avatar}
+                      alt={`${data?.me?.profile?.firstName || ""} ${
+                        data?.me?.profile?.lastName || ""
+                      }`}
                       className="w-full h-full object-cover"
                     />
+                  ) : data?.me?.profile?.firstName?.[0] ||
+                    data?.me?.profile?.lastName?.[0] ? (
+                    <span className="text-2xl font-bold text-gray-400">
+                      {data?.me?.profile?.firstName?.[0] || ""}
+                      {data?.me?.profile?.lastName?.[0] || ""}
+                    </span>
                   ) : (
-                    data?.me?.profile?.firstName?.[0] || data?.me?.profile?.lastName?.[0] ? (
-                      <span className="text-2xl font-bold text-gray-400">
-                        {data?.me?.profile?.firstName?.[0] || ''}
-                        {data?.me?.profile?.lastName?.[0] || ''}
-                      </span>
-                    ) : (
-                      <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    )
-                  ))}
+                    <svg
+                      className="w-10 h-10 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  )}
                   {data?.me?.unreadNotifications > 0 && (
                     <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4">
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
@@ -265,15 +328,18 @@ export const ProfilePage = () => {
                   )}
                 </div>
                 <h3 className="font-medium text-gray-900 text-lg">
-                  {data?.me?.profile?.firstName || ''} {data?.me?.profile?.lastName || ''}
+                  {data?.me?.profile?.firstName || ""}{" "}
+                  {data?.me?.profile?.lastName || ""}
                 </h3>
-                <p className="text-sm text-gray-500 mb-6">{data?.me?.profile?.title || 'Utilisateur'}</p>
+                <p className="text-sm text-gray-500 mb-6">
+                  {data?.me?.profile?.title || "Utilisateur"}
+                </p>
               </div>
-              <TabNavigation 
-                tabs={tabs} 
-                activeTab={activeTab} 
-                onTabChange={handleTabChange} 
-                className="flex-col items-center space-y-3 space-x-0" 
+              <TabNavigation
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                className="flex-col items-center space-y-3 space-x-0"
                 variant="default"
               />
             </div>
@@ -281,7 +347,7 @@ export const ProfilePage = () => {
 
           {/* Contenu à droite */}
           <div className="flex-grow space-y-8">
-            {activeTab === 'profile' && (
+            {activeTab === "profile" && (
               <>
                 {/* Informations personnelles */}
                 <div className="bg-white shadow sm:rounded-lg">
@@ -295,7 +361,7 @@ export const ProfilePage = () => {
               </>
             )}
 
-            {activeTab === 'company' && subscription?.licence && (
+            {activeTab === "company" && subscription?.licence && (
               <>
                 {/* Informations de l'entreprise */}
                 <div className="bg-white shadow sm:rounded-lg">
@@ -303,30 +369,81 @@ export const ProfilePage = () => {
                     <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                       Informations de l'entreprise
                     </h2>
+                    <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                      <p className="text-sm text-gray-600">
+                        <span className="text-[#5b50ff] font-medium">
+                          Important :
+                        </span>{" "}
+                        Renseignez avec précision les informations légales de
+                        votre entreprise. Ces données sont obligatoires sur vos
+                        documents commerciaux (factures, devis, contrats)
+                        conformément à la législation en vigueur. Des
+                        informations incomplètes ou erronées peuvent entraîner
+                        la nullité de vos documents et des sanctions
+                        administratives. Newbi intègre automatiquement ces
+                        informations dans tous vos documents générés,
+                        garantissant leur conformité légale.
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-10">
+                    <p className="text-sm text-amber-600 mb-4">
+                      <span className="text-amber-600 font-medium">
+                        Rappel :
+                      </span>{" "}
+                      Bien que Newbi facilite la génération de documents
+                      commerciaux, nous vous recommandons vivement de faire
+                      relire tous vos documents par un professionnel compétent
+                      (expert-comptable, avocat) avant leur utilisation
+                      officielle. Newbi ne peut être tenu responsable des
+                      conséquences juridiques ou fiscales résultant de
+                      l'utilisation des documents générés par notre plateforme.
+                    </p>
+                    </div>
                     <CompanyInfoForm initialData={companyData} />
-                  </div>
-                </div>
-
-                {/* Gestion des clients */}
-                <div className="bg-white shadow sm:rounded-lg">
-                  <div className="px-4 py-5 sm:p-6">
-                    <ClientsManager />
                   </div>
                 </div>
               </>
             )}
 
-            {(activeTab === 'company_locked' || activeTab === 'products_locked' || activeTab === 'integrations_locked') && (
+            {activeTab === "clients" && subscription?.licence && (
+              <div className="bg-white shadow sm:rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                    Gestion des clients
+                  </h2>
+                  <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                    <p className="text-sm text-gray-600">
+                      <span className="text-[#5b50ff] font-medium">
+                        Astuce :
+                      </span>{" "}
+                      Gérez efficacement vos clients en un seul endroit. Une
+                      base de clients bien organisée vous permettra d'utiliser
+                      tous les outils de Newbi de manière optimale. Les
+                      informations de vos clients sont automatiquement intégrées
+                      dans vos factures, devis et autres documents, vous faisant
+                      gagner un temps précieux dans vos tâches administratives.
+                    </p>
+                  </div>
+                  <ClientsManager />
+                </div>
+              </div>
+            )}
+
+            {(activeTab === "company_locked" ||
+              activeTab === "products_locked" ||
+              activeTab === "clients_locked") && (
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6 flex flex-col items-center justify-center text-center">
                   <CheckBadgeIcon className="w-12 h-12 text-yellow-500 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Fonctionnalité Premium</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Fonctionnalité Premium
+                  </h3>
                   <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
-                    {activeTab === 'company_locked' 
-                      ? 'La gestion des informations de votre entreprise est disponible uniquement pour les comptes Premium.'
-                      : activeTab === 'products_locked'
-                        ? 'La gestion du catalogue de produits et services est disponible uniquement pour les comptes Premium.'
-                        : 'Les outils d\'intégration sont disponibles uniquement pour les comptes Premium.'}
+                    {activeTab === "company_locked"
+                      ? "La gestion des informations de votre entreprise est disponible uniquement pour les comptes Premium."
+                      : activeTab === "products_locked"
+                      ? "La gestion du catalogue de produits et services est disponible uniquement pour les comptes Premium."
+                      : "La gestion des clients est disponible uniquement pour les comptes Premium."}
                   </p>
                   <Button
                     onClick={() => setIsPremiumModalOpen(true)}
@@ -339,16 +456,34 @@ export const ProfilePage = () => {
                 </div>
               </div>
             )}
-            
-            {activeTab === 'products' && subscription?.licence && (
+
+            {activeTab === "products" && subscription?.licence && (
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
+                  <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                    Gestion des produits
+                  </h2>
+                  <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                    <p className="text-sm text-gray-600">
+                      <span className="text-[#5b50ff] font-medium">
+                        Astuce :
+                      </span>{" "}
+                      Créez et organisez votre catalogue de produits et services
+                      pour simplifier vos processus de facturation. Ajoutez des
+                      descriptions détaillées, fixez vos tarifs et personnalisez
+                      vos offres. Lors de la création de factures ou devis, il
+                      vous suffira de sélectionner les éléments de votre
+                      catalogue pour les intégrer automatiquement, avec calcul
+                      instantané des montants et taxes applicables. Un gain de
+                      temps et de précision considérable !
+                    </p>
+                  </div>
                   <ProductsManager />
                 </div>
               </div>
             )}
-            
-            {activeTab === 'integrations' && subscription?.licence && (
+
+            {activeTab === "integrations" && subscription?.licence && (
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <IntegrationsManager />

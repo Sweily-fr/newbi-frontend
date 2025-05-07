@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
-import { useMutation } from '@apollo/client';
-import { useForm } from 'react-hook-form';
-import { UPDATE_COMPANY } from '../../../graphql/profile';
-import { CompanyInfoFormProps } from '../../../types/company';
-import { useCompanyForm } from '../../../hooks';
-import { Notification } from '../../../components/feedback';
-import { 
-  Form, 
-  TextField, 
+import { useState, useEffect } from "react";
+import { useMutation } from "@apollo/client";
+import { useForm } from "react-hook-form";
+import { UPDATE_COMPANY } from "../../../graphql/profile";
+import { CompanyInfoFormProps } from "../../../types/company";
+import { useCompanyForm } from "../../../hooks";
+import { Notification } from "../../../components/feedback";
+import {
+  Form,
+  TextField,
   TextFieldURL,
   FieldGroup,
   FormActions,
   ImageUploader,
-  Select
-} from '../../../components/ui';
-import { 
-  getNameValidationRules, 
-  getPhoneValidationRules, 
+  Select,
+} from "../../../components/ui";
+import {
+  getNameValidationRules,
+  getPhoneValidationRules,
   getEmailValidationRules,
   getSiretValidationRules,
   getVatValidationRules,
@@ -24,66 +24,83 @@ import {
   getCapitalSocialValidationRules,
   getRCSValidationRules,
   IBAN_REGEX,
-  BIC_REGEX
-} from '../../../utils/validators';
+  BIC_REGEX,
+  isFieldRequiredForCompanyStatus,
+  REQUIRED_FIELDS_BY_COMPANY_STATUS
+} from "../../../utils/validators";
 
 export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
   // Log pour vérifier la valeur du statut d'entreprise dans les données initiales
-  console.log('Statut d\'entreprise dans les données initiales:', initialData?.companyStatus);
-  
+  console.log(
+    "Statut d'entreprise dans les données initiales:",
+    initialData?.companyStatus
+  );
+
   // Le log nous permet de vérifier si la valeur est bien récupérée du backend
   // Utiliser react-hook-form
-  const { 
-    register, 
-    handleSubmit: hookFormSubmit, 
+  const {
+    register,
+    handleSubmit: hookFormSubmit,
     formState: { errors },
     setValue,
-    watch
+    watch,
+    trigger,
   } = useForm({
-    mode: 'onBlur',  // Validation à la perte de focus
+    mode: "onBlur", // Validation à la perte de focus
     defaultValues: {
-      name: initialData?.name || '',
-      email: initialData?.email || '',
-      phone: initialData?.phone || '',
-      website: initialData?.website || '',
-      siret: initialData?.siret || '',
-      vatNumber: initialData?.vatNumber || '',
-      capitalSocial: initialData?.capitalSocial || '',
-      rcs: initialData?.rcs || '',
-      transactionCategory: initialData?.transactionCategory || '',
-      vatPaymentCondition: initialData?.vatPaymentCondition || '',
-      companyStatus: initialData?.companyStatus || 'AUTRE',
-      street: initialData?.address?.street || '',
-      city: initialData?.address?.city || '',
-      postalCode: initialData?.address?.postalCode || '',
-      country: initialData?.address?.country || '',
-      iban: initialData?.bankDetails?.iban || '',
-      bic: initialData?.bankDetails?.bic || '',
-      bankName: initialData?.bankDetails?.bankName || '',
-    }
+      name: initialData?.name || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
+      website: initialData?.website || "",
+      siret: initialData?.siret || "",
+      vatNumber: initialData?.vatNumber || "",
+      capitalSocial: initialData?.capitalSocial || "",
+      rcs: initialData?.rcs || "",
+      transactionCategory: initialData?.transactionCategory || "",
+      vatPaymentCondition: initialData?.vatPaymentCondition || "",
+      companyStatus: initialData?.companyStatus || "AUTRE",
+      street: initialData?.address?.street || "",
+      city: initialData?.address?.city || "",
+      postalCode: initialData?.address?.postalCode || "",
+      country: initialData?.address?.country || "",
+      iban: initialData?.bankDetails?.iban || "",
+      bic: initialData?.bankDetails?.bic || "",
+      bankName: initialData?.bankDetails?.bankName || "",
+    },
   });
 
   // Observer les valeurs des champs bancaires
-  const iban = watch('iban');
-  const bic = watch('bic');
-  const bankName = watch('bankName');
-  
+  const iban = watch("iban");
+  const bic = watch("bic");
+  const bankName = watch("bankName");
+
+  // Observer le statut juridique pour les validations conditionnelles
+  const companyStatus = watch("companyStatus");
+
+  // Fonction pour déterminer si un champ est obligatoire en fonction du statut juridique
+  const isFieldRequired = (fieldName: string): boolean => {
+    return isFieldRequiredForCompanyStatus(fieldName, companyStatus);
+  };
+
   // Utiliser useEffect pour s'assurer que la valeur du statut d'entreprise est correctement initialisée
   useEffect(() => {
     // Force la mise à jour de la valeur du select, même si la valeur par défaut est déjà définie
     // Cela garantit que le select affiche la bonne valeur, même si react-hook-form a déjà une valeur par défaut
     if (initialData?.companyStatus) {
-      setValue('companyStatus', initialData.companyStatus);
-      console.log('Valeur du statut définie via useEffect:', initialData.companyStatus);
+      setValue("companyStatus", initialData.companyStatus);
+      console.log(
+        "Valeur du statut définie via useEffect:",
+        initialData.companyStatus
+      );
     } else {
       // Si aucun statut n'est défini, utiliser 'AUTRE' comme valeur par défaut
-      setValue('companyStatus', 'AUTRE');
+      setValue("companyStatus", "AUTRE");
     }
   }, [initialData, setValue]);
 
   // Vérifier si au moins un des champs bancaires est rempli
   const anyBankFieldFilled = Boolean(iban || bic || bankName);
-  
+
   // Si au moins un champ est rempli mais pas tous, alors tous sont requis
   const bankFieldsRequired = anyBankFieldFilled;
 
@@ -100,66 +117,72 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
     handleLogoUpload,
     uploadLogoToServer,
     deleteLogoFromServer,
-    resetLogoState
+    resetLogoState,
   } = useCompanyForm({
-    initialLogo: initialData?.logo || '',
+    initialLogo: initialData?.logo || "",
     onLogoChange: (logoUrl) => {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        logo: logoUrl
+        logo: logoUrl,
       }));
-    }
+    },
   });
 
   // Récupérer l'URL de l'API à partir des variables d'environnement ou utiliser une valeur par défaut
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const apiUrl = import.meta.env.VITE_API_URL + '/' || "http://localhost:4000";
 
   const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    email: initialData?.email || '',
-    phone: initialData?.phone || '',
-    website: initialData?.website || '',
-    logo: initialData?.logo || '',
-    siret: initialData?.siret || '',
-    vatNumber: initialData?.vatNumber || '',
-    transactionCategory: initialData?.transactionCategory || '',
-    vatPaymentCondition: initialData?.vatPaymentCondition || '',
-    companyStatus: initialData?.companyStatus || 'AUTRE',
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    website: initialData?.website || "",
+    logo: initialData?.logo || "",
+    siret: initialData?.siret || "",
+    vatNumber: initialData?.vatNumber || "",
+    transactionCategory: initialData?.transactionCategory || "",
+    vatPaymentCondition: initialData?.vatPaymentCondition || "",
+    companyStatus: initialData?.companyStatus || "AUTRE",
     address: {
-      street: initialData?.address?.street || '',
-      city: initialData?.address?.city || '',
-      postalCode: initialData?.address?.postalCode || '',
-      country: initialData?.address?.country || '',
+      street: initialData?.address?.street || "",
+      city: initialData?.address?.city || "",
+      postalCode: initialData?.address?.postalCode || "",
+      country: initialData?.address?.country || "",
     },
     bankDetails: {
-      iban: initialData?.bankDetails?.iban || '',
-      bic: initialData?.bankDetails?.bic || '',
-      bankName: initialData?.bankDetails?.bankName || '',
+      iban: initialData?.bankDetails?.iban || "",
+      bic: initialData?.bankDetails?.bic || "",
+      bankName: initialData?.bankDetails?.bankName || "",
     },
   });
 
-  const [updateCompany, { loading: updateLoading }] = useMutation(UPDATE_COMPANY, {
-    onCompleted: () => {
-      Notification.success('Informations de l\'entreprise mises à jour avec succès', {
-        duration: 5000,
-        position: 'bottom-left'
-      });
-      // Réinitialiser l'image base64 après la sauvegarde
-      resetLogoState();
-    },
-    onError: (error) => {
-      // L'erreur est déjà affichée par le toaster dans App.tsx
-      console.error("Erreur lors de la mise à jour de l'entreprise:", error);
-    },
-  });
+  const [updateCompany, { loading: updateLoading }] = useMutation(
+    UPDATE_COMPANY,
+    {
+      onCompleted: () => {
+        Notification.success(
+          "Informations de l'entreprise mises à jour avec succès",
+          {
+            duration: 5000,
+            position: "bottom-left",
+          }
+        );
+        // Réinitialiser l'image base64 après la sauvegarde
+        resetLogoState();
+      },
+      onError: (error) => {
+        // L'erreur est déjà affichée par le toaster dans App.tsx
+        console.error("Erreur lors de la mise à jour de l'entreprise:", error);
+      },
+    }
+  );
 
   const onSubmit = hookFormSubmit(async (data) => {
     // Si le logo doit être supprimé
     if (logoToDelete) {
-      console.log('Suppression du logo demandée');
+      console.log("Suppression du logo demandée");
       const deleted = await deleteLogoFromServer(false); // Ne pas afficher les notifications ici
       if (deleted) {
-        console.log('Logo supprimé avec succès');
+        console.log("Logo supprimé avec succès");
         // Continuer avec la mise à jour du reste des informations
       }
     }
@@ -189,15 +212,17 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
       },
       // Si tous les champs bancaires sont vides, envoyer des valeurs vides
       // Sinon, envoyer les valeurs saisies
-      bankDetails: allBankFieldsEmpty ? {
-        iban: '',
-        bic: '',
-        bankName: '',
-      } : {
-        iban: data.iban,
-        bic: data.bic,
-        bankName: data.bankName,
-      },
+      bankDetails: allBankFieldsEmpty
+        ? {
+            iban: "",
+            bic: "",
+            bankName: "",
+          }
+        : {
+            iban: data.iban,
+            bic: data.bic,
+            bankName: data.bankName,
+          },
     };
 
     // Si une nouvelle image a été sélectionnée mais pas encore uploadée
@@ -220,35 +245,45 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
   return (
     <Form onSubmit={onSubmit} className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      <div className="sm:col-span-2">
-          <label htmlFor="logo" className="block text-sm font-medium text-gray-700">
-            Logo
+        <div className="sm:col-span-2 flex flex-col items-center justify-center mb-6">
+          <label
+            htmlFor="logo"
+            className="text-sm font-medium mb-3 text-gray-700"
+          >
+            Logo de votre entreprise
           </label>
           <ImageUploader
             imageUrl={formData.logo}
             apiBaseUrl={apiUrl}
             previewImage={previewImage}
             isLoading={isUploading || uploadLoading || deleteLoading}
-            loadingMessage={isUploading ? "Téléchargement en cours..." : "Enregistrement en cours..."}
+            loadingMessage={
+              isUploading
+                ? "Téléchargement en cours..."
+                : "Enregistrement en cours..."
+            }
             onFileSelect={handleLogoUpload}
             onDelete={() => {
               if (formData.logo) {
-                console.log('Marquage du logo pour suppression:', formData.logo);
+                console.log(
+                  "Marquage du logo pour suppression:",
+                  formData.logo
+                );
                 // Si un logo existe en BDD, marquer pour suppression
                 setLogoToDelete(true);
               }
-              setFormData({ ...formData, logo: '' });
+              setFormData({ ...formData, logo: "" });
               // Ne pas réinitialiser logoToDelete ici
             }}
             fileInputRef={fileInputRef}
             maxSizeMB={2}
             acceptedFileTypes="image/*"
-            objectFit='adaptive'
+            objectFit="adaptive"
             imageSize={128}
           />
         </div>
 
-        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:col-span-2">
           <div className="sm:col-span-2">
             <TextField
               id="name"
@@ -264,22 +299,53 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             <Select
               id="companyStatus"
               name="companyStatus"
-              label="Statut juridique"
+              label={
+                <div className="flex items-center">
+                  Statut juridique
+                  <div className="relative inline-block ml-1 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#5b50ff] cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="absolute left-0 bottom-full mb-2 w-64 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                      Les champs obligatoires (marqués par *) varient selon le statut juridique sélectionné.
+                    </div>
+                  </div>
+                </div>
+              }
               register={register}
               error={errors.companyStatus}
+              onChange={(e) => {
+                // Mise à jour du statut juridique
+                setValue("companyStatus", e.target.value);
+                
+                // Déclencher la validation des champs qui dépendent du statut juridique
+                if (isFieldRequiredForCompanyStatus('siret', e.target.value)) {
+                  trigger("siret");
+                }
+                if (isFieldRequiredForCompanyStatus('vatNumber', e.target.value)) {
+                  trigger("vatNumber");
+                }
+                if (isFieldRequiredForCompanyStatus('capitalSocial', e.target.value)) {
+                  trigger("capitalSocial");
+                }
+                if (isFieldRequiredForCompanyStatus('rcs', e.target.value)) {
+                  trigger("rcs");
+                }
+              }}
               options={[
-                { value: 'SARL', label: 'SARL' },
-                { value: 'SAS', label: 'SAS' },
-                { value: 'EURL', label: 'EURL' },
-                { value: 'SASU', label: 'SASU' },
-                { value: 'EI', label: 'EI' },
-                { value: 'EIRL', label: 'EIRL' },
-                { value: 'SA', label: 'SA' },
-                { value: 'SNC', label: 'SNC' },
-                { value: 'SCI', label: 'SCI' },
-                { value: 'SCOP', label: 'SCOP' },
-                { value: 'ASSOCIATION', label: 'Association' },
-                { value: 'AUTRE', label: 'Autre' }
+                { value: "SARL", label: "SARL" },
+                { value: "SAS", label: "SAS" },
+                { value: "EURL", label: "EURL" },
+                { value: "SASU", label: "SASU" },
+                { value: "EI", label: "EI" },
+                { value: "EIRL", label: "EIRL" },
+                { value: "SA", label: "SA" },
+                { value: "SNC", label: "SNC" },
+                { value: "SCI", label: "SCI" },
+                { value: "SCOP", label: "SCOP" },
+                { value: "ASSOCIATION", label: "Association" },
+                { value: "AUTO_ENTREPRENEUR", label: "Auto-entrepreneur" },
+                { value: "AUTRE", label: "Autre" },
               ]}
             />
           </div>
@@ -329,9 +395,15 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             name="siret"
             label="Numéro SIRET"
             register={register}
-            validation={getSiretValidationRules()}
             error={errors.siret}
-            required
+            required={isFieldRequired('siret')}
+            helpText="14 chiffres sans espaces (ex: 12345678901234)"
+            validation={{
+              ...getSiretValidationRules(),
+              required: isFieldRequired('siret') 
+                ? "Le numéro SIRET est obligatoire pour ce statut juridique" 
+                : false
+            }}
           />
         </div>
 
@@ -341,8 +413,15 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             name="vatNumber"
             label="Numéro de TVA"
             register={register}
-            validation={getVatValidationRules()}
             error={errors.vatNumber}
+            required={isFieldRequired('vatNumber')}
+            helpText="Format FR + 11 chiffres (ex: FR12345678901)"
+            validation={{
+              ...getVatValidationRules(),
+              required: isFieldRequired('vatNumber') 
+                ? "Le numéro de TVA est obligatoire pour ce statut juridique" 
+                : false
+            }}
           />
         </div>
 
@@ -352,9 +431,15 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             name="capitalSocial"
             label="Capital social"
             register={register}
-            validation={getCapitalSocialValidationRules()}
             error={errors.capitalSocial}
-            helpText="Montant du capital social (ex: 10000)"
+            required={isFieldRequired('capitalSocial')}
+            helpText="Montant sans symbole € (ex: 10000)"
+            validation={{
+              ...getCapitalSocialValidationRules(),
+              required: isFieldRequired('capitalSocial') 
+                ? "Le capital social est obligatoire pour ce statut juridique" 
+                : false
+            }}
           />
         </div>
 
@@ -364,9 +449,15 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             name="rcs"
             label="RCS"
             register={register}
-            validation={getRCSValidationRules()}
             error={errors.rcs}
-            helpText="Format: 981 576 549 R.C.S. Paris ou Paris B 123 456 789"
+            required={isFieldRequired('rcs')}
+            helpText="Registre du Commerce et des Sociétés (ex: Paris B 123 456 789)"
+            validation={{
+              ...getRCSValidationRules(),
+              required: isFieldRequired('rcs') 
+                ? "Le RCS est obligatoire pour ce statut juridique" 
+                : false
+            }}
           />
         </div>
 
@@ -379,13 +470,13 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             error={errors.transactionCategory}
             required
             options={[
-              { value: 'GOODS', label: 'Livraison de biens' },
-              { value: 'SERVICES', label: 'Prestations de services' },
-              { value: 'MIXED', label: 'Opérations mixtes' }
+              { value: "GOODS", label: "Livraison de biens" },
+              { value: "SERVICES", label: "Prestations de services" },
+              { value: "MIXED", label: "Opérations mixtes" },
             ]}
           />
         </div>
-        
+
         <div>
           <Select
             id="vatPaymentCondition"
@@ -394,9 +485,10 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             register={register}
             error={errors.vatPaymentCondition}
             options={[
-              { value: 'ENCAISSEMENTS', label: 'Encaissements' },
-              { value: 'DEBITS', label: 'Débits' },
-              { value: 'EXONERATION', label: 'Exonération' }
+              { value: "", label: "Non applicable" },
+              { value: "ENCAISSEMENTS", label: "Encaissements" },
+              { value: "DEBITS", label: "Débits" },
+              { value: "EXONERATION", label: "Exonération" },
             ]}
           />
         </div>
@@ -446,11 +538,21 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
         </div>
 
         <div className="sm:col-span-2 mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Coordonnées bancaires</h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Note: Les coordonnées bancaires sont optionnelles. Vous pouvez soit laisser tous les champs vides, soit tous les remplir. Si vous remplissez un des champs bancaires, tous les champs deviennent obligatoires.
-          </p>
-          <FieldGroup title="Coordonnées bancaires" className="mb-4">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Coordonnées bancaires
+          </h3>
+          <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+            <p className="text-sm text-gray-600">
+              <span className="text-[#5b50ff] font-medium">
+                Note:
+              </span>{" "}
+              Les coordonnées bancaires sont optionnelles. Vous pouvez soit
+              laisser tous les champs vides, soit tous les remplir. Si vous
+              remplissez un des champs bancaires, tous les champs deviennent
+              obligatoires.
+            </p>
+          </div>
+          <FieldGroup className="mb-4">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <TextField
@@ -461,13 +563,19 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
                   error={errors.iban}
                   helpText="Format FR de numéro de compte bancaire (ex: FR + 2 chiffres + 23 caractères)"
                   validation={{
-                    required: bankFieldsRequired ? 'L\'IBAN est obligatoire lorsque des informations bancaires sont fournies' : false,
+                    required: bankFieldsRequired
+                      ? "L'IBAN est obligatoire lorsque des informations bancaires sont fournies"
+                      : false,
                     validate: {
                       ibanFormat: (value) => {
                         // Ne valider le format que si une valeur est présente
-                        return !value || IBAN_REGEX.test(value) || 'L\'IBAN doit être au format français valide (FR suivi de 25 caractères)';
-                      }
-                    }
+                        return (
+                          !value ||
+                          IBAN_REGEX.test(value) ||
+                          "L'IBAN doit être au format français valide (FR suivi de 25 caractères)"
+                        );
+                      },
+                    },
                   }}
                 />
               </div>
@@ -481,13 +589,19 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
                   error={errors.bic}
                   helpText="Code d'identification bancaire international (ex: BNPAFRPPXXX)"
                   validation={{
-                    required: bankFieldsRequired ? 'Le BIC est obligatoire lorsque des informations bancaires sont fournies' : false,
+                    required: bankFieldsRequired
+                      ? "Le BIC est obligatoire lorsque des informations bancaires sont fournies"
+                      : false,
                     validate: {
                       bicFormat: (value) => {
                         // Ne valider le format que si une valeur est présente
-                        return !value || BIC_REGEX.test(value) || 'Le BIC doit être au format valide (8 ou 11 caractères)';
-                      }
-                    }
+                        return (
+                          !value ||
+                          BIC_REGEX.test(value) ||
+                          "Le BIC doit être au format valide (8 ou 11 caractères)"
+                        );
+                      },
+                    },
                   }}
                 />
               </div>
@@ -500,7 +614,9 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
                   register={register}
                   error={errors.bankName}
                   validation={{
-                    required: bankFieldsRequired ? 'Le nom de la banque est obligatoire lorsque des informations bancaires sont fournies' : false
+                    required: bankFieldsRequired
+                      ? "Le nom de la banque est obligatoire lorsque des informations bancaires sont fournies"
+                      : false,
                   }}
                 />
               </div>
@@ -509,9 +625,9 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
               <button
                 type="button"
                 onClick={() => {
-                  setValue('iban', '');
-                  setValue('bic', '');
-                  setValue('bankName', '');
+                  setValue("iban", "");
+                  setValue("bic", "");
+                  setValue("bankName", "");
                 }}
                 className="px-3 py-1 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
               >
@@ -523,8 +639,14 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
       </div>
 
       <FormActions
-        submitText={isUploading || uploadLoading || deleteLoading ? 'Enregistrement...' : 'Enregistrer'}
-        isSubmitting={isUploading || uploadLoading || deleteLoading || updateLoading}
+        submitText={
+          isUploading || uploadLoading || deleteLoading
+            ? "Enregistrement..."
+            : "Enregistrer mes informations"
+        }
+        isSubmitting={
+          isUploading || uploadLoading || deleteLoading || updateLoading
+        }
       />
     </Form>
   );

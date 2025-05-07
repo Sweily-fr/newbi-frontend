@@ -152,3 +152,46 @@ export const getPostalCodeFRValidationRules = (fieldName: string = 'Le code post
 export const isValidPostalCodeFR = (postalCode: string): boolean => {
   return POSTAL_CODE_FR_REGEX.test(postalCode);
 };
+
+/**
+ * Configuration des champs obligatoires par statut juridique
+ * Cette constante définit quels champs sont obligatoires pour chaque statut juridique
+ */
+export const REQUIRED_FIELDS_BY_COMPANY_STATUS: Record<string, string[]> = {
+  // Sociétés commerciales
+  'SARL': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  'SAS': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  'EURL': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  'SASU': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  'SA': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  'SNC': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  
+  // Sociétés civiles
+  'SCI': ['siret', 'rcs'],
+  
+  // Sociétés coopératives
+  'SCOP': ['siret', 'vatNumber', 'capitalSocial', 'rcs'],
+  
+  // Autres formes juridiques
+  'EI': ['siret'],
+  'EIRL': ['siret'],
+  'ASSOCIATION': [],
+  'AUTO_ENTREPRENEUR': ['siret'],
+  'AUTRE': []
+};
+
+/**
+ * Vérifie si un champ est obligatoire pour un statut juridique donné
+ * @param field - Le nom du champ à vérifier
+ * @param companyStatus - Le statut juridique de l'entreprise
+ * @returns True si le champ est obligatoire, false sinon
+ */
+export const isFieldRequiredForCompanyStatus = (field: string, companyStatus?: string): boolean => {
+  // Si le statut n'est pas défini ou n'existe pas dans la configuration, aucun champ n'est obligatoire
+  if (!companyStatus || !REQUIRED_FIELDS_BY_COMPANY_STATUS[companyStatus]) {
+    return false;
+  }
+  
+  // Vérifier si le champ est dans la liste des champs obligatoires pour ce statut
+  return REQUIRED_FIELDS_BY_COMPANY_STATUS[companyStatus].includes(field);
+};

@@ -52,7 +52,8 @@ export const useClientsManager = () => {
       limit: itemsPerPage,
       search: searchTerm || undefined
     },
-    fetchPolicy: "network-only"
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true
   });
   
   const [createClient] = useMutation(CREATE_CLIENT, {
@@ -260,9 +261,30 @@ export const useClientsManager = () => {
   };
   
   // Fonction pour gérer la recherche
-  const handleSearch = (search: string) => {
-    setSearchTerm(search);
-    setCurrentPage(1); // Réinitialiser à la première page lors d'une nouvelle recherche
+  const handleSearch = async (search: string) => {
+    try {
+      console.log("Début de la recherche pour:", search);
+      
+      // Mettre à jour l'état local
+      setSearchTerm(search);
+      setCurrentPage(1); // Réinitialiser à la première page lors d'une nouvelle recherche
+      
+      // Déclencher explicitement une nouvelle requête avec les nouveaux paramètres
+      const result = await refetch({
+        page: 1,
+        limit: itemsPerPage,
+        search: search || undefined
+      });
+      
+      console.log("Requête terminée avec succès");
+      console.log("Terme de recherche:", search);
+      console.log("Résultats:", result.data?.clients?.items);
+      
+      return result;
+    } catch (error) {
+      console.error("Erreur lors de la recherche:", error);
+      throw error;
+    }
   };
 
   return {

@@ -39,25 +39,16 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
   // Référence pour le champ de recherche
   const searchInputRef = useRef<HTMLInputElement>(null);
   
-  // Fonction pour appliquer un délai à la recherche
-  const debouncedSearch = useCallback(
-    (value: string) => {
-      const timer = setTimeout(() => {
-        setSearch(value);
-      }, 500); // Délai de 500ms
-      
-      return () => {
-        clearTimeout(timer);
-      };
-    },
-    []
-  );
+  // Fonction pour effectuer la recherche
+  const handleSearch = useCallback(() => {
+    setSearch(searchInput);
+  }, [searchInput]);
   
-  // Effet pour déclencher la recherche avec délai
-  useEffect(() => {
-    const cleanup = debouncedSearch(searchInput);
-    return cleanup;
-  }, [searchInput, debouncedSearch]);
+  // Fonction pour réinitialiser la recherche
+  const clearSearch = useCallback(() => {
+    setSearchInput('');
+    setSearch('');
+  }, []);
   
   const { loading, error, data } = useQuery(GET_PRODUCTS, {
     variables: { page, limit, search },
@@ -169,13 +160,21 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
       <div className="mb-4 flex justify-between items-center">
         <div>
           {/* Barre de recherche */}
-          <SearchInput
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Rechercher un produit..."
-            className="w-64"
-            ref={searchInputRef}
-          />
+          <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex items-center space-x-4">
+            <SearchInput
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onClear={clearSearch}
+              isLoading={localLoading}
+              width="w-[300px]"
+              className="py-3"
+              ref={searchInputRef}
+              placeholder="Rechercher un produit..."
+            />
+            <Button type="submit" variant="secondary" className="h-[100%]">
+              Rechercher
+            </Button>
+          </form>
         </div>
         <div>
           {onAddProduct && (

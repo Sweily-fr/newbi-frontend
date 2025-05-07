@@ -1,51 +1,71 @@
-import React, { InputHTMLAttributes, forwardRef } from 'react';
+import React, { forwardRef } from "react";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
-interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
-  placeholder?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
+interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  isLoading?: boolean;
+  onClear?: () => void;
   width?: string;
 }
 
 /**
  * Composant de champ de recherche avec icône
  */
-export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>((
-  {
-    placeholder = 'Rechercher...',
-    value,
-    onChange,
-    className = '',
-    width = 'w-full',
-    ...props
-  }, ref) => {
-  return (
-    <div className={`relative ${width} ${className}`}>
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg 
-          className="h-5 w-5 text-gray-400" 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 20 20" 
-          fill="currentColor" 
-          aria-hidden="true"
-        >
-          <path 
-            fillRule="evenodd" 
-            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" 
-            clipRule="evenodd" 
+export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
+  (
+    { 
+      isLoading = false, 
+      onClear, 
+      value, 
+      width = "w-full", 
+      className = "", 
+      ...props 
+    }, 
+    ref
+  ) => {
+    const hasValue = value && String(value).length > 0;
+
+    return (
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <MagnifyingGlassIcon
+            className={`h-5 w-5 ${
+              isLoading ? "text-[#5b50ff]" : "text-gray-400"
+            }`}
           />
-        </svg>
+        </div>
+        <input
+          ref={ref}
+          type="text"
+          className={`block ${width} pl-10 ${hasValue && onClear ? "pr-10" : "pr-3"} py-2 border ${
+            isLoading ? "border-[#5b50ff]" : "border-gray-300"
+          } rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#5b50ff] focus:border-[#5b50ff] sm:text-sm transition-colors duration-200 ${className}`}
+          value={value}
+          {...props}
+        />
+        {hasValue && onClear && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+            <button
+              type="button"
+              onClick={onClear}
+              className="text-gray-400 hover:text-gray-500 focus:outline-none"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+        {isLoading && !hasValue && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+            <div className="h-4 w-4 border-t-2 border-r-2 border-[#5b50ff] rounded-full animate-spin"></div>
+          </div>
+        )}
+        {isLoading && hasValue && onClear && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-10">
+            <div className="h-4 w-4 border-t-2 border-r-2 border-[#5b50ff] rounded-full animate-spin"></div>
+          </div>
+        )}
       </div>
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:ring-opacity-50 focus:border-blue-500 text-base"
-        ref={ref}
-        {...props}
-      />
-    </div>
-  );
-});
+    );
+  }
+);
+
+SearchInput.displayName = "SearchInput";

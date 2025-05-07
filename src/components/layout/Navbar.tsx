@@ -140,7 +140,7 @@ export const Navbar = () => {
   const fullName = [firstName, lastName].filter(Boolean).join(' ');
   
   // Récupérer l'URL de la photo de profil si elle existe
-  const profilePicture = import.meta.env.VITE_API_URL + userData?.me?.profile?.profilePicture || null;
+  const profilePicture = import.meta.env.VITE_API_URL + '/' + userData?.me?.profile?.profilePicture || '';
   
   const avatarTrigger = (
     <Avatar 
