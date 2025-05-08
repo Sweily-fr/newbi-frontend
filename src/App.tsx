@@ -20,7 +20,6 @@ function App() {
             <CookieConsentProvider>
               <SessionExpiredNotification />
               <AppRoutes />
-              {/* Cookie Banner */}
               <CookieBanner />
               <Toaster position="bottom-left" />
             </CookieConsentProvider>
