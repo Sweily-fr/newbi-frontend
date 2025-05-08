@@ -20,7 +20,7 @@ import {
   PrivacyPolicyGeneratorPage,
   BlogSeoOptimizerPage,
   EmailSignaturesPage,
-  NotFoundPage
+  NotFoundPage,
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';

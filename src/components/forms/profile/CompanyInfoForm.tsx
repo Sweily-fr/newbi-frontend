@@ -57,7 +57,7 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
       capitalSocial: initialData?.capitalSocial || "",
       rcs: initialData?.rcs || "",
       transactionCategory: initialData?.transactionCategory || "",
-      vatPaymentCondition: initialData?.vatPaymentCondition || "",
+      vatPaymentCondition: initialData?.vatPaymentCondition || "NONE",
       companyStatus: initialData?.companyStatus || "AUTRE",
       street: initialData?.address?.street || "",
       city: initialData?.address?.city || "",
@@ -140,7 +140,7 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
     siret: initialData?.siret || "",
     vatNumber: initialData?.vatNumber || "",
     transactionCategory: initialData?.transactionCategory || "",
-    vatPaymentCondition: initialData?.vatPaymentCondition || "",
+    vatPaymentCondition: initialData?.vatPaymentCondition || "NONE",
     companyStatus: initialData?.companyStatus || "AUTRE",
     address: {
       street: initialData?.address?.street || "",
@@ -481,15 +481,18 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
           <Select
             id="vatPaymentCondition"
             name="vatPaymentCondition"
-            label="Condition de paiement de TVA"
+            label="Régime de TVA"
             register={register}
             error={errors.vatPaymentCondition}
             options={[
-              { value: "", label: "Non applicable" },
+              { value: "NONE", label: "Aucun" },
               { value: "ENCAISSEMENTS", label: "Encaissements" },
               { value: "DEBITS", label: "Débits" },
-              { value: "EXONERATION", label: "Exonération" },
+              { value: "EXONERATION", label: "Exonération" }
             ]}
+            validation={{
+              required: "Veuillez sélectionner un régime de TVA"
+            }}  
           />
         </div>
 

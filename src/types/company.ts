@@ -16,7 +16,7 @@ export interface CompanyInfo {
   capitalSocial?: string;
   rcs?: string;
   transactionCategory?: 'goods' | 'services' | 'mixed';
-  vatPaymentCondition?: 'ENCAISSEMENTS' | 'DEBITS' | 'EXONERATION';
+  vatPaymentCondition?: 'ENCAISSEMENTS' | 'DEBITS' | 'EXONERATION' | 'NONE';
   companyStatus?: 'SARL' | 'SAS' | 'EURL' | 'SASU' | 'EI' | 'EIRL' | 'SA' | 'SNC' | 'SCI' | 'SCOP' | 'ASSOCIATION' | 'AUTRE';
   address: {
     street: string;

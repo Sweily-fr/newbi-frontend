@@ -282,7 +282,7 @@ export const ProfilePage = () => {
                   {data?.me?.profile?.profilePicture ? (
                     <img
                       src={
-                        import.meta.env.VITE_API_URL +
+                        import.meta.env.VITE_API_URL + "/" +
                         data.me.profile.profilePicture
                       }
                       alt={`${data?.me?.profile?.firstName || ""} ${

@@ -7,6 +7,7 @@ import { Form, TextField, Button } from '../../../components/ui';
 import { PasswordField } from '../../../components/ui/PasswordField';
 import { PasswordStrengthIndicator, PasswordRequirement } from '../../../components/ui/PasswordStrengthIndicator';
 import { getEmailValidationRules } from '../../../constants/formValidations';
+import CryptoJS from 'crypto-js';
 
 interface ResetPasswordFormInputs {
   email: string;
@@ -84,16 +85,38 @@ export const ResetPasswordForm = () => {
     }
 
     try {
+      // Chiffrer le mot de passe avec AES-CBC et clé hachée SHA256
+      const keyRaw = (import.meta.env.VITE_PASSWORD_ENCRYPTION_KEY as string) || 'newbi-public-key';
+      const key = CryptoJS.SHA256(keyRaw); // Clé 256 bits (WordArray)
+
+      // Générer un IV aléatoire de 16 octets
+      const iv = CryptoJS.lib.WordArray.random(16);
+
+      // Chiffrer avec AES en mode CBC (PKCS7 padding par défaut)
+      const encrypted = CryptoJS.AES.encrypt(data.password, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      });
+
+      // Préparer IV et texte chiffré pour la transmission
+      const ivStr = CryptoJS.enc.Base64.stringify(iv);
+      const cipherTextBase64 = CryptoJS.enc.Base64.stringify(
+        encrypted.ciphertext
+      );
+      const combined = `${ivStr}:${cipherTextBase64}`;
+
       await resetPassword({
         variables: {
           input: {
             token,
-            newPassword: data.password,
+            newPassword: combined,
+            passwordEncrypted: true // Indiquer que le mot de passe est chiffré
           }
         },
       });
     } catch (err) {
-      console.log(err);
+      console.error('Erreur lors de la réinitialisation du mot de passe:', err);
     }
   };
 

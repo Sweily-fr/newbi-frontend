@@ -68,9 +68,9 @@ export const PremiumModal = ({ isOpen, onClose, onSubscribe }: PremiumModalProps
                 <CalendarIcon className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-blue-800 text-sm">1er mois gratuit</h3>
+                <h3 className="font-semibold text-blue-800 text-sm">21 jours gratuit</h3>
                 <p className="text-xs text-blue-700">
-                  Essayez sans frais pendant 30 jours
+                  Essayez sans frais pendant 21 jours
                 </p>
               </div>
             </div>
