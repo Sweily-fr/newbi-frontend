@@ -9,7 +9,11 @@ import {
 import { GET_QUOTES } from "../graphql/quotes";
 import { GET_CLIENTS, CREATE_CLIENT } from "../graphql/client";
 import { GET_USER_INFO } from "../graphql/queries";
-import { /* Quote, */ Item, CustomField, /* Client, */ CompanyInfo } from "../types";
+import {
+  /* Quote, */ Item,
+  CustomField,
+  /* Client, */ CompanyInfo,
+} from "../types";
 
 export interface UseQuoteFormProps {
   quote?: any;
@@ -32,7 +36,7 @@ export const useQuoteForm = ({
 
   // Initialiser newClient avec des valeurs par défaut ou les valeurs du devis si disponibles
   const defaultNewClient = {
-    type: 'COMPANY', // Type par défaut: entreprise
+    type: "COMPANY", // Type par défaut: entreprise
     name: "",
     email: "",
     street: "",
@@ -44,7 +48,7 @@ export const useQuoteForm = ({
     vatNumber: "",
     // Champs spécifiques aux particuliers
     firstName: "",
-    lastName: ""
+    lastName: "",
   };
 
   const [newClient, setNewClient] = useState(defaultNewClient);
@@ -195,7 +199,7 @@ export const useQuoteForm = ({
   // Requêtes GraphQL
   const { data: clientsData } = useQuery(GET_CLIENTS);
   const { data: userData } = useQuery(GET_USER_INFO);
-  
+
   // Mettre à jour les informations de l'entreprise avec les données du profil utilisateur
   useEffect(() => {
     if (userData?.me?.company && !quote?.companyInfo) {
@@ -381,34 +385,41 @@ export const useQuoteForm = ({
   };
 
   // Fonction pour sélectionner un produit et remplir automatiquement les champs de l'item
-  const handleProductSelect = (index: number, product: {
-    id: string;
-    name: string;
-    description?: string;
-    unitPrice?: number;
-    vatRate?: number;
-    unit?: string;
-  }) => {
-    
+  const handleProductSelect = (
+    index: number,
+    product: {
+      id: string;
+      name: string;
+      description?: string;
+      unitPrice?: number;
+      vatRate?: number;
+      unit?: string;
+    }
+  ) => {
     // Créer une copie du tableau d'items
     const newItems = [...items];
-    
+
     // Créer un nouvel objet item en conservant les propriétés existantes
     // qui ne doivent pas être modifiées
     newItems[index] = {
       ...newItems[index],
       description: product.name,
-      details: product.description || '',
-      unitPrice: product.unitPrice !== undefined && product.unitPrice !== null ? product.unitPrice : 0,
-      vatRate: product.vatRate !== undefined && product.vatRate !== null ? product.vatRate : 20,
-      unit: product.unit || 'unité',
+      details: product.description || "",
+      unitPrice:
+        product.unitPrice !== undefined && product.unitPrice !== null
+          ? product.unitPrice
+          : 0,
+      vatRate:
+        product.vatRate !== undefined && product.vatRate !== null
+          ? product.vatRate
+          : 20,
+      unit: product.unit || "unité",
       // Conserver la quantité existante ou initialiser à 1
-      quantity: newItems[index].quantity || 1
+      quantity: newItems[index].quantity || 1,
     };
-    
+
     // Mettre à jour le tableau d'items en une seule fois
     setItems(newItems);
-    
   };
 
   // Fonction pour ajouter un champ personnalisé
@@ -446,7 +457,7 @@ export const useQuoteForm = ({
   const handleSubmit = async (e: React.FormEvent, asDraft?: boolean) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Utiliser le paramètre asDraft s'il est fourni, sinon utiliser l'état submitAsDraft
     const isDraft = asDraft !== undefined ? asDraft : submitAsDraft;
 
@@ -473,15 +484,15 @@ export const useQuoteForm = ({
       const getClientData = () => {
         // Forcer le type à COMPANY par défaut si aucun type n'est spécifié
         // C'est nécessaire car le type est requis par le serveur
-        
+
         if (isNewClient) {
           // Déterminer le type de client en fonction des champs remplis
-          let clientType = newClient.type || 'COMPANY';
+          let clientType = newClient.type || "COMPANY";
           // Si firstName et lastName sont remplis, c'est un particulier
           if (newClient.firstName && newClient.lastName) {
-            clientType = 'INDIVIDUAL';
+            clientType = "INDIVIDUAL";
           }
-  
+
           // Si c'est un nouveau client, on utilise les données saisies
           const clientData = {
             type: clientType,
@@ -498,11 +509,10 @@ export const useQuoteForm = ({
             vatNumber: newClient.vatNumber || "",
             // Champs spécifiques aux particuliers
             firstName: newClient.firstName || "",
-            lastName: newClient.lastName || ""
+            lastName: newClient.lastName || "",
           };
           return clientData;
         } else {
-
           // Si on modifie un devis existant et que le client est déjà dans le devis
           if (quote && quote.client) {
             return {
@@ -521,28 +531,30 @@ export const useQuoteForm = ({
               vatNumber: quote.client.vatNumber || "",
               // Champs spécifiques aux particuliers
               firstName: quote.client.firstName || "",
-              lastName: quote.client.lastName || ""
+              lastName: quote.client.lastName || "",
             };
           }
 
           // Rechercher le client par ID
-    // Vérifier que clientsData et clients existent et que clients est un tableau
-    // Utiliser items car clientsData.clients est un objet avec une propriété items qui contient le tableau des clients
-    const clients = clientsData?.clients?.items || [];
-    
-    // Rechercher le client sélectionné dans la liste des clients
-    const selectedClientData = Array.isArray(clients) 
-      ? clients.find((c) => c.id === selectedClient)
-      : undefined;
-    
+          // Vérifier que clientsData et clients existent et que clients est un tableau
+          // Utiliser items car clientsData.clients est un objet avec une propriété items qui contient le tableau des clients
+          const clients = clientsData?.clients?.items || [];
+
+          // Rechercher le client sélectionné dans la liste des clients
+          const selectedClientData = Array.isArray(clients)
+            ? clients.find((c) => c.id === selectedClient)
+            : undefined;
+
           if (!selectedClientData) {
             console.warn("Client non trouvé", {
               selectedClient,
-              clients: Array.isArray(clients) ? clients.map((c) => ({
-                id: c.id,
-                name: c.name,
-                type: c.type
-              })) : [],
+              clients: Array.isArray(clients)
+                ? clients.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    type: c.type,
+                  }))
+                : [],
             });
 
             // Si aucun client n'est trouvé mais qu'il y a des clients disponibles, utiliser le premier
@@ -563,30 +575,34 @@ export const useQuoteForm = ({
                 vatNumber: clients[0].vatNumber || "",
                 // Champs spécifiques aux particuliers
                 firstName: clients[0].firstName || "",
-                lastName: clients[0].lastName || ""
+                lastName: clients[0].lastName || "",
               };
             }
           }
           // Vérifier que selectedClientData existe
           if (!selectedClientData) {
-            console.error("Aucun client sélectionné trouvé et aucun client par défaut disponible");
-            
+            console.error(
+              "Aucun client sélectionné trouvé et aucun client par défaut disponible"
+            );
+
             // Vérifier si nous avons des données utilisateur pour pré-remplir les champs
             const userCompany = userData?.me?.company || {};
-            
+
             // Si nous avons des données de l'utilisateur avec firstName et lastName, créer un client de type INDIVIDUAL
             // sinon créer un client de type COMPANY avec les données de l'entreprise
-            const isIndividual = userData?.me?.firstName && userData?.me?.lastName;
-            
+            const isIndividual =
+              userData?.me?.firstName && userData?.me?.lastName;
+
             if (isIndividual) {
               // Créer un client de type particulier avec les données de l'utilisateur
               return {
                 id: "", // ID vide, sera géré côté serveur
-                type: 'INDIVIDUAL',
+                type: "INDIVIDUAL",
                 name: `${userData.me.firstName} ${userData.me.lastName}`,
                 email: userData.me.email || "client@example.com", // Email obligatoire
                 address: {
-                  street: userCompany.address?.street || "Adresse non spécifiée",
+                  street:
+                    userCompany.address?.street || "Adresse non spécifiée",
                   city: userCompany.address?.city || "Ville non spécifiée",
                   postalCode: userCompany.address?.postalCode || "00000",
                   country: userCompany.address?.country || "France",
@@ -594,17 +610,18 @@ export const useQuoteForm = ({
                 siret: "", // Pas obligatoire pour un particulier
                 vatNumber: "", // Pas obligatoire pour un particulier
                 firstName: userData.me.firstName || "Prénom",
-                lastName: userData.me.lastName || "Nom"
+                lastName: userData.me.lastName || "Nom",
               };
             } else {
               // Créer un client de type entreprise avec les données de l'entreprise de l'utilisateur
               return {
                 id: "", // ID vide, sera géré côté serveur
-                type: 'COMPANY',
+                type: "COMPANY",
                 name: userCompany.name || "Entreprise par défaut",
                 email: userCompany.email || "entreprise@example.com", // Email obligatoire
                 address: {
-                  street: userCompany.address?.street || "Adresse non spécifiée",
+                  street:
+                    userCompany.address?.street || "Adresse non spécifiée",
                   city: userCompany.address?.city || "Ville non spécifiée",
                   postalCode: userCompany.address?.postalCode || "00000",
                   country: userCompany.address?.country || "France",
@@ -612,23 +629,31 @@ export const useQuoteForm = ({
                 siret: userCompany.siret || "12345678901234", // SIRET obligatoire pour une entreprise
                 vatNumber: userCompany.vatNumber || "FR12345678901", // TVA obligatoire pour une entreprise
                 firstName: "",
-                lastName: ""
+                lastName: "",
               };
             }
           }
-          
+
           // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
-          let clientType = selectedClientData.type || 'COMPANY';
+          let clientType = selectedClientData.type || "COMPANY";
           // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
-          if (!selectedClientData.type && selectedClientData.firstName && selectedClientData.lastName) {
-            clientType = 'INDIVIDUAL';
+          if (
+            !selectedClientData.type &&
+            selectedClientData.firstName &&
+            selectedClientData.lastName
+          ) {
+            clientType = "INDIVIDUAL";
           }
-          
+
           // Si le type est COMPANY, vérifier que nous avons les champs obligatoires
-          const needsSiretAndVat = clientType === 'COMPANY';
-          const siret = selectedClientData.siret || (needsSiretAndVat ? "12345678901234" : "");
-          const vatNumber = selectedClientData.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
-          
+          const needsSiretAndVat = clientType === "COMPANY";
+          const siret =
+            selectedClientData.siret ||
+            (needsSiretAndVat ? "12345678901234" : "");
+          const vatNumber =
+            selectedClientData.vatNumber ||
+            (needsSiretAndVat ? "FR12345678901" : "");
+
           return {
             id: selectedClientData.id,
             type: clientType, // Utiliser le type calculé ou par défaut
@@ -645,7 +670,7 @@ export const useQuoteForm = ({
             vatNumber: vatNumber,
             // Champs spécifiques aux particuliers
             firstName: selectedClientData.firstName || "",
-            lastName: selectedClientData.lastName || ""
+            lastName: selectedClientData.lastName || "",
           };
         }
       };
@@ -668,7 +693,11 @@ export const useQuoteForm = ({
                 country: newClient.country,
               },
               // Utiliser le type exact du client s'il existe, sinon déterminer en fonction des champs
-              type: newClient.type || ((newClient.firstName && newClient.lastName) ? 'INDIVIDUAL' : (quote?.client?.type || 'COMPANY')),
+              type:
+                newClient.type ||
+                (newClient.firstName && newClient.lastName
+                  ? "INDIVIDUAL"
+                  : quote?.client?.type || "COMPANY"),
               // Champs spécifiques aux entreprises
               siret: newClient.siret,
               vatNumber: newClient.vatNumber,
@@ -733,7 +762,7 @@ export const useQuoteForm = ({
         client: {
           ...getClientData(),
           // S'assurer que le type est toujours défini, même pour les clients existants
-          type: getClientData().type || 'COMPANY'
+          type: getClientData().type || "COMPANY",
         },
       };
 
@@ -741,10 +770,17 @@ export const useQuoteForm = ({
 
       // Logs détaillés pour vérifier les données du client avant envoi
       const clientDataToSend = getClientData();
-      
+
       // Alerte si le type n'est pas défini correctement
-      if (!clientDataToSend.type && isNewClient && newClient.firstName && newClient.lastName) {
-        console.warn("ATTENTION: Le type de client devrait être INDIVIDUAL mais n'est pas défini!");
+      if (
+        !clientDataToSend.type &&
+        isNewClient &&
+        newClient.firstName &&
+        newClient.lastName
+      ) {
+        console.warn(
+          "ATTENTION: Le type de client devrait être INDIVIDUAL mais n'est pas défini!"
+        );
       }
 
       if (!quote) {
@@ -804,7 +840,9 @@ export const useQuoteForm = ({
       console.error("Erreur lors de la soumission du devis:", error);
 
       if (showNotifications) {
-        Notification.error("Une erreur est survenue lors de la création du devis");
+        Notification.error(
+          "Une erreur est survenue lors de la création du devis"
+        );
       }
     } finally {
       setIsSubmitting(false);

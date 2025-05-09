@@ -120,9 +120,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
       tempContainer.style.backgroundColor = "white";
       tempContainer.style.zIndex = "-9999";
 
-      // Trouver toutes les images dans le contenu
-      const images = Array.from(contentClone.querySelectorAll("img"));
-
       // Masquer les éléments qui ne doivent pas être dans le PDF
       const elementsToHide = contentClone.querySelectorAll(".no-print");
       elementsToHide.forEach((el) => {
@@ -251,7 +248,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
       // Si un footer est présent, le capturer séparément
       if (footerElement) {
-
         // Masquer temporairement pour la capture principale
         footerElement.style.display = "none"; // Masquer temporairement pour la capture principale
 
@@ -366,7 +362,7 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
           onGenerated(pdf);
         }
 
-
+       
         pdf.save(`${fileName}`);
       } catch (canvasError) {
         console.error("Erreur lors de la génération du canvas:", canvasError);

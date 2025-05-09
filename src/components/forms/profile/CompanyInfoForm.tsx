@@ -30,6 +30,8 @@ import {
 } from "../../../utils/validators";
 
 export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
+
+  // Le log nous permet de vérifier si la valeur est bien récupérée du backend
   // Utiliser react-hook-form
   const {
     register,
@@ -166,6 +168,14 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
   );
 
   const onSubmit = hookFormSubmit(async (data) => {
+    // Si le logo doit être supprimé
+    // if (logoToDelete) {
+    //   const deleted = await deleteLogoFromServer(false); // Ne pas afficher les notifications ici
+    //   if (deleted) {
+    //     console.log("Logo supprimé avec succès");
+    //     // Continuer avec la mise à jour du reste des informations
+    //   }
+    // }
 
     // Vérifier si tous les champs bancaires sont vides
     const allBankFieldsEmpty = !data.iban && !data.bic && !data.bankName;

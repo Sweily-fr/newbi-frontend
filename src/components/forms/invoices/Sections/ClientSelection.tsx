@@ -214,7 +214,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   }, [companyData, fillFormWithCompanyData]);
   
   // Effet qui s'exécute au montage ET lorsque invoice ou selectedClientData change
-  useEffect(() => {     
+  useEffect(() => {    
     if (!isNewClient) {
       // Si on modifie une facture existante (avec un client) et qu'aucun client n'est sélectionné
       if (invoice?.client?.id && !selectedClient) {
@@ -243,8 +243,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       if (invoice?.client?.id && !selectedClient) {
         setSelectedClient(invoice.client.id);
       }
-      // Pour une nouvelle facture, ne pas sélectionner automatiquement de client
-      // sauf si l'utilisateur en a déjà sélectionné un
     }
   }, [invoice, isNewClient, selectedClient, setSelectedClient]); // Dépendances minimales
   
@@ -417,7 +415,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                   resetSearch();
                   setSearchTerm("");
                 }
-                
               }}
               required={isNewClient}
               options={[

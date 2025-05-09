@@ -264,26 +264,31 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     // Vérifier les erreurs dans la section Informations générales
     if (!invoiceNumber || !issueDate || !dueDate) {
       errors.generalInfo = true;
+      console.error("Erreurs dans les informations générales");
     }
     
     // Vérifier la validité des dates avec validateInvoiceDates
     const datesValidation = validateInvoiceDates(issueDate, dueDate, executionDate);
     if (!datesValidation.isValid) {
       errors.generalInfo = true;
+      console.error("Erreurs dans les dates:", datesValidation);
     }
     
     // Vérifier les erreurs dans la section Client
     if (!selectedClient && !isNewClient) {
       errors.client = true;
+      console.error("Erreur: aucun client sélectionné");
     } else if (isNewClient) {
       if (!newClient.name || !newClient.email || !newClient.street || !newClient.city || !newClient.postalCode || !newClient.country) {
         errors.client = true;
+        console.error("Erreur: informations du nouveau client incomplètes");
       }
     }
     
     // Vérifier les erreurs dans la section Informations de l'entreprise
     if (!companyInfo.name || !companyInfo.email || !companyInfo.address.street || !companyInfo.address.city || !companyInfo.address.postalCode || !companyInfo.address.country) {
       errors.companyInfo = true;
+      console.error("Erreur: informations de l'entreprise incomplètes");
     }
     
     // Vérifier les erreurs dans la section Produits/Services
@@ -303,11 +308,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     // Vérifier les erreurs dans la section Remise et totaux
     if (discount < 0 || (discountType === 'PERCENTAGE' && discount > 100)) {
       errors.discountAndTotals = true;
+      console.error("Erreur: valeur de remise invalide");
     }
     
     // Vérifier les erreurs dans la section Notes de bas de page (coordonnées bancaires)
     if (useBankDetails && (!companyInfo.bankDetails?.iban || !companyInfo.bankDetails?.bic || !companyInfo.bankDetails?.bankName)) {
       errors.bankDetails = true;
+      console.error("Erreur: coordonnées bancaires incomplètes");
     }
     
    

@@ -100,8 +100,7 @@ export const useCompanyForm = ({ initialLogo = '', onLogoChange }: UseCompanyLog
 
   const deleteLogoFromServer = async () => {
     if (!logoToDelete) return false;
-    
-    try {
+      try {
       await deleteLogo();
       setLogoToDelete(false); // Réinitialiser l'état après la suppression
       return true;

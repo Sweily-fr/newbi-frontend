@@ -55,7 +55,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   
   if (networkError) {    
     // Marquer l'erreur comme traitée pour éviter les doublons
-    // @ts-ignore - Ajouter une propriété personnalisée à l'objet d'erreur
+    // @ts-expect-error - Ajouter une propriété personnalisée à l'objet d'erreur
     networkError.handled = true;
     
     // Détection plus précise du type d'erreur réseau

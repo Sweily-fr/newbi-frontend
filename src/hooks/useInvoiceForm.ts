@@ -412,8 +412,7 @@ export const useInvoiceForm = ({
     unitPrice?: number;
     vatRate?: number;
     unit?: string;
-  }) => {
-    
+  }) => {    
     // Créer une copie du tableau d'items
     const newItems = [...items];
     
@@ -544,7 +543,6 @@ export const useInvoiceForm = ({
     // Rechercher le client sélectionné dans la liste des clients
     // Utiliser une variable locale différente pour éviter toute confusion avec la variable globale
     const localSelectedClientData = !isNewClient ? (Array.isArray(clients) ? clients.find((c: Client) => c.id === effectiveSelectedClient) : null) : null;
-
       
       // Fonction pour récupérer les données complètes du client
       const getClientData = () => {
@@ -604,8 +602,7 @@ export const useInvoiceForm = ({
           }
           
           // Si un client existant est sélectionné, utiliser ses données
-          if (localSelectedClientData) {
-            
+          if (localSelectedClientData) {            
             // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
             let clientType = localSelectedClientData.type || 'COMPANY';
             // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
@@ -813,8 +810,7 @@ export const useInvoiceForm = ({
         // Creating new invoice
         try {
           // Récupérer une dernière fois le numéro de facture pour s'assurer qu'il est unique
-          const freshInvoiceNumber = invoiceNumber;
-          
+          const freshInvoiceNumber = invoiceNumber;          
           // Mettre à jour le numéro dans les données de la facture
           const finalInvoiceData = {
             ...invoiceData,

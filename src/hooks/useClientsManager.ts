@@ -262,8 +262,7 @@ export const useClientsManager = () => {
   
   // Fonction pour gérer la recherche
   const handleSearch = async (search: string) => {
-    try {
-      
+    try {      
       // Mettre à jour l'état local
       setSearchTerm(search);
       setCurrentPage(1); // Réinitialiser à la première page lors d'une nouvelle recherche

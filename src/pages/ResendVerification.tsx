@@ -38,13 +38,9 @@ const ResendVerification: React.FC = () => {
   const [resendVerificationEmail, { loading }] = useMutation(RESEND_VERIFICATION_EMAIL, {
     onCompleted: () => {
       setIsSubmitted(true);
-      // Pas de notification visible pour éviter de confirmer l'existence de l'email
-      // mais on peut logger pour des raisons de débogage
     },
     onError: (error) => {
       console.error('Erreur lors de l\'envoi de l\'email de vérification:', error);
-      // On affiche quand même le message de succès pour des raisons de sécurité
-      // (ne pas indiquer si l'email existe ou non)
       setIsSubmitted(true);
     }
   });

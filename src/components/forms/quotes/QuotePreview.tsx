@@ -496,7 +496,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               onGenerationStart={() => {
                 setIsGeneratingPDF(true);
               }}
-              onGenerated={(pdf) => {
+              onGenerated={() => {
                 setIsGeneratingPDF(false);
                 setPdfSuccess(true);
                 // Réinitialiser l'état de succès après 2 secondes

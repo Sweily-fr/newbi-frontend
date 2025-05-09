@@ -60,7 +60,6 @@ export const unitAbbreviations: Record<string, string> = {
  */
 export const getUnitAbbreviation = (unit?: string): string => {
   if (!unit) return "";
-
   
   // Vérifier si une abréviation existe pour cette unité (correspondance exacte)
   if (unitAbbreviations[unit]) {
@@ -88,5 +87,6 @@ export const getUnitAbbreviation = (unit?: string): string => {
       return value;
     }
   }
+  
   return unit;
 };

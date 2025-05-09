@@ -104,7 +104,6 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir la taille de police avec une valeur par défaut
   const signatureFontSize = fontSize || 14; // Taille par défaut: 14px
   
-
   // Style de base pour la signature
   const baseStyle = {
     fontFamily: signatureFontFamily,
@@ -137,7 +136,6 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir les couleurs des icônes des réseaux sociaux avec des valeurs par défaut
   const iconBgColor = socialLinksIconBgColor || primaryColor; // Couleur de fond par défaut: couleur primaire
   const iconColor = socialLinksIconColor || (iconStyle === 'plain' ? primaryColor : '#FFFFFF'); // Couleur du texte par défaut
-
 
   // Fonction pour rendre le template de signature approprié
   const renderSignatureTemplate = () => {
@@ -790,6 +788,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                       style={{ maxWidth: '150px' }} 
                       onError={(e) => {
                         console.error('Error loading logo image (Professional):', e);
+                        console.error('Failed URL:', e.currentTarget.src);
                       }}
                     />
                   </div>
@@ -847,6 +846,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                         style={{ maxWidth: '150px' }} 
                         onError={(e) => {
                           console.error('Error loading logo image (Professional):', e);
+                          console.error('Failed URL:', e.currentTarget.src);
                         }}
                       />
                     </div>
@@ -920,6 +920,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 style={{ maxWidth: '80px' }} 
                 onError={(e) => {
                   console.error('Error loading logo image (Modern):', e);
+                  console.error('Failed URL:', e.currentTarget.src);
                 }}
               />
             </div>
