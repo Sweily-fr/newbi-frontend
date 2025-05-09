@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui';
-import { useQuotes, TabType } from '../hooks/useQuotes';
+import { useQuotes, TabType } from '../features/devis/hooks';
 import { TabNavigation } from '../components/navigation/TabNavigation';
 import { SearchInput } from '../components/ui';
-import { QuoteSidebar } from '../components/business/quotes/QuoteSidebar';
-import { QuotesTable } from '../components/business/quotes/QuotesTable';
+import { QuoteSidebar } from '../features/devis/components/business/QuoteSidebar';
+import { QuotesTable } from '../features/devis/components/business/QuotesTable';
 import { Notification } from '../components/feedback';
 import { useQuery } from '@apollo/client';
 import { LogoLoader } from '../components/feedback/LogoLoader';
 import { GET_QUOTE_STATS } from '../graphql/quotes';
-import { QuoteFormModal } from '../components/forms/quotes/QuoteFormModal';
+import { QuoteFormModal } from '../features/devis/components/forms/QuoteFormModal';
 import { SEOHead } from '../components/SEO/SEOHead';
 import { SchemaMarkup } from '../components/SEO/SchemaMarkup';
 

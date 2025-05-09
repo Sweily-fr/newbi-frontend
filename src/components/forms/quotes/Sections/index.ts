@@ -1,10 +1,10 @@
 // Réutiliser les composants des factures pour les sections communes
-export { ClientSelection } from '../../invoices/Sections/ClientSelection';
-export { InvoiceItems as QuoteItems } from '../../invoices/Sections/InvoiceItems';
-export { InvoiceDiscountAndTotals as QuoteDiscountAndTotals } from '../../invoices/Sections/InvoiceDiscountAndTotals';
-export { InvoiceCompanyInfo as QuoteCompanyInfo } from '../../invoices/Sections/InvoiceCompanyInfo';
-export { InvoiceBankDetails as QuoteBankDetails } from '../../invoices/Sections/InvoiceBankDetails';
-export { InvoiceCustomFields as QuoteCustomFields } from '../../invoices/Sections/InvoiceDiscountAndTotals';
+export { ClientSelection } from '../../../../features/factures/components/forms/Sections/ClientSelection';
+export { InvoiceItems as QuoteItems } from '../../../../features/factures/components/forms/Sections/InvoiceItems';
+export { InvoiceDiscountAndTotals as QuoteDiscountAndTotals } from '../../../../features/factures/components/forms/Sections/InvoiceDiscountAndTotals';
+export { InvoiceCompanyInfo as QuoteCompanyInfo } from '../../../../features/factures/components/forms/Sections/InvoiceCompanyInfo';
+export { InvoiceBankDetails as QuoteBankDetails } from '../../../../features/factures/components/forms/Sections/InvoiceBankDetails';
+export { InvoiceCustomFields as QuoteCustomFields } from '../../../../features/factures/components/forms/Sections/InvoiceDiscountAndTotals';
 
 // Composants spécifiques aux devis
 export { QuoteGeneralInfo } from './QuoteGeneralInfo';
