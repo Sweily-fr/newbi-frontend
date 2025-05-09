@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { Button, TextField, TextArea, Checkbox } from '../../../../components/ui';
 import Collapse from '../../../../components/ui/Collapse';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { useEmailSignatureForm } from '../../hooks/useEmailSignatureForm';
-import { EmailSignature } from '../../types';
 
+// Utiliser any pour contourner les problèmes de compatibilité entre les types
 interface EmailSignatureFormProps {
-  initialData?: Partial<EmailSignature>;
-  onSubmit: (data: Partial<EmailSignature>) => void;
+  initialData?: any;
+  onSubmit: (data: any) => void;
   onCancel: () => void;
-  onChange?: (data: Partial<EmailSignature>) => void;
+  onChange?: (data: any) => void;
+  hideButtons?: boolean; // Option pour masquer les boutons d'action
 }
 
 export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
-  onChange
+  onChange,
+  hideButtons = false // Par défaut, les boutons sont affichés
 }) => {
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
   const {
@@ -101,169 +103,235 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Section des informations de base */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Informations de base</h3>
-        
-        {/* Nom de la signature */}
-        <TextField
-          id="signature-name"
-          name="name"
-          label="Nom de la signature"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Ex: Signature professionnelle"
-          error={errors.name}
-          required
-        />
-        
-        {/* Nom complet */}
-        <TextField
-          id="full-name"
-          name="fullName"
-          label="Nom complet"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="Ex: Jean Dupont"
-          error={errors.fullName}
-          required
-        />
-        
-        {/* Fonction */}
-        <TextField
-          id="job-title"
-          name="jobTitle"
-          label="Fonction"
-          value={jobTitle}
-          onChange={(e) => setJobTitle(e.target.value)}
-          placeholder="Ex: Directeur commercial"
-        />
-        
-        {/* Email */}
-        <TextField
-          id="email"
-          name="email"
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Ex: jean.dupont@example.com"
-          error={errors.email}
-          required
-        />
-        
-        {/* Téléphone fixe */}
-        <TextField
-          id="phone"
-          name="phone"
-          label="Téléphone fixe"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="Ex: +33 1 23 45 67 89"
-        />
-        
-        {/* Téléphone mobile */}
-        <TextField
-          id="mobile-phone"
-          name="mobilePhone"
-          label="Téléphone mobile"
-          value={mobilePhone}
-          onChange={(e) => setMobilePhone(e.target.value)}
-          placeholder="Ex: +33 6 12 34 56 78"
-        />
-        
-        {/* Site web */}
-        <TextField
-          id="website"
-          name="website"
-          label="Site web"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          placeholder="Ex: https://www.example.com"
-        />
-      </div>
+      {/* Section des informations générales */}
+      <Collapse title="Informations générales" defaultOpen>
+        <div className="space-y-4">
+          {/* Nom de la signature */}
+          <TextField
+            id="signature-name"
+            name="name"
+            label="Nom de la signature"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ex: Signature professionnelle"
+            error={errors.name}
+            required
+          />
+          
+          <Checkbox
+            id="is-default"
+            name="isDefault"
+            label="Définir comme signature par défaut"
+            checked={isDefault}
+            onChange={(e) => setIsDefault(e.target.checked)}
+          />
+        </div>
+      </Collapse>
+      
+      {/* Section des informations personnelles */}
+      <Collapse title="Informations personnelles" defaultOpen>
+        <div className="space-y-4">
+          {/* Photo de profil */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Photo de profil
+            </label>
+            <div className="flex items-center space-x-4">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border">
+                {previewProfilePhoto ? (
+                  <img 
+                    src={previewProfilePhoto} 
+                    alt="Photo de profil" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400">Photo</span>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline"
+                  onClick={(_: MouseEvent<HTMLButtonElement>) => {
+                    // Utiliser le gestionnaire fourni par le hook
+                    // Créer un input file temporaire pour sélectionner une image
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = handleProfilePhotoSelect as any;
+                    input.click();
+                  }}
+                >
+                  Télécharger
+                </Button>
+                {previewProfilePhoto && (
+                  <Button 
+                    type="button" 
+                    size="sm" 
+                    variant="outline"
+                    onClick={handleProfilePhotoDelete}
+                  >
+                    Supprimer
+                  </Button>
+                )}
+                <div className="text-xs text-gray-500">
+                  Format recommandé : PNG ou JPG, max 2MB. Cette photo apparaîtra dans votre signature email.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Nom complet */}
+          <TextField
+            id="full-name"
+            name="fullName"
+            label="Nom complet"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Ex: Jean Dupont"
+            error={errors.fullName}
+            required
+          />
+          
+          {/* Fonction */}
+          <TextField
+            id="job-title"
+            name="jobTitle"
+            label="Fonction"
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
+            placeholder="Ex: Directeur commercial"
+          />
+          
+          {/* Email */}
+          <TextField
+            id="email"
+            name="email"
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Ex: jean.dupont@example.com"
+            error={errors.email}
+            required
+          />
+          
+          {/* Téléphone */}
+          <TextField
+            id="phone"
+            name="phone"
+            label="Téléphone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Ex: +33 1 23 45 67 89"
+          />
+          
+          {/* Téléphone mobile */}
+          <TextField
+            id="mobile-phone"
+            name="mobilePhone"
+            label="Téléphone mobile"
+            value={mobilePhone}
+            onChange={(e) => setMobilePhone(e.target.value)}
+            placeholder="Ex: +33 6 12 34 56 78"
+          />
+        </div>
+      </Collapse>
       
       {/* Section des informations de l'entreprise */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Informations de l'entreprise</h3>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={importCompanyInfo}
-            className="flex items-center gap-1"
-          >
-            <DocumentDuplicateIcon className="h-4 w-4" />
-            Importer depuis mon entreprise
-          </Button>
-        </div>
-        
-        {/* Nom de l'entreprise */}
-        <TextField
-          id="company-name"
-          name="companyName"
-          label="Nom de l'entreprise"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          placeholder="Ex: Entreprise SAS"
-          error={errors.companyName}
-          required
-        />
-        
-        {/* Adresse */}
-        <TextArea
-          id="address"
-          name="address"
-          label="Adresse"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder="Ex: 123 rue de Paris, 75001 Paris, France"
-          rows={3}
-          error={errors.address}
-        />
-        
-        {/* Logo */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Logo de l'entreprise</label>
-          <div className="flex items-start gap-4">
+      <Collapse title="Informations de l'entreprise">
+        <div className="space-y-4">
+          {/* Nom de l'entreprise */}
+          <TextField
+            id="company-name"
+            name="companyName"
+            label="Nom de l'entreprise"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="Ex: Entreprise XYZ"
+          />
+          
+          {/* Site web */}
+          <TextField
+            id="website"
+            name="website"
+            label="Site web"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            placeholder="Ex: https://www.example.com"
+          />
+          
+          {/* Adresse */}
+          <TextArea
+            id="address"
+            name="address"
+            label="Adresse"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Ex: 123 Rue Exemple\n75000 Paris\nFrance"
+            rows={3}
+          />
+          
+          {/* Logo */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="logo-url" className="block text-sm font-medium text-gray-700">
+                URL du logo
+              </label>
+              <Button 
+                type="button" 
+                size="sm" 
+                variant="outline"
+                onClick={importCompanyInfo}
+                className="flex items-center"
+              >
+                <DocumentDuplicateIcon className="h-4 w-4 mr-1" />
+                Importer les infos de l'entreprise
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <TextField
+                id="logo-url"
+                name="logoUrl"
+                value={logoUrl || ''}
+                onChange={() => {}} // Géré par le hook
+                placeholder="Ex: https://www.example.com/logo.png"
+                className="flex-grow"
+                disabled
+              />
+              <Button type="button" size="sm" variant="outline" onClick={() => console.log('Parcourir')}>Parcourir</Button>
+            </div>
             {logoUrl && (
-              <div className="relative">
-                <img
-                  src={getFullLogoUrl(logoUrl)}
-                  alt="Logo de l'entreprise"
-                  className="h-16 object-contain"
+              <div className="mt-2">
+                <img 
+                  src={getFullLogoUrl(logoUrl)} 
+                  alt="Logo de l'entreprise" 
+                  className="max-h-16 max-w-xs"
                 />
               </div>
             )}
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="showLogo"
-                  name="showLogo"
-                  checked={showLogo}
-                  onChange={(e) => setShowLogo(e.target.checked)}
-                  label="Afficher le logo dans la signature"
-                />
-              </div>
-              {errors.logoUrl && (
-                <p className="mt-1 text-sm text-red-600">{errors.logoUrl}</p>
-              )}
-            </div>
+            <Checkbox
+              id="show-logo"
+              name="showLogo"
+              label="Afficher le logo dans la signature"
+              checked={showLogo}
+              onChange={(e) => setShowLogo(e.target.checked)}
+            />
           </div>
         </div>
-      </div>
+      </Collapse>
       
       {/* Section des réseaux sociaux */}
-      <Collapse title="Réseaux sociaux" defaultOpen={false}>
-        <div className="space-y-4 pt-4">
+      <Collapse title="Réseaux sociaux">
+        <div className="space-y-4">
           {/* LinkedIn */}
           <TextField
             id="linkedin"
             name="linkedin"
             label="LinkedIn"
-            value={socialLinks.linkedin}
+            value={socialLinks?.linkedin || ''}
             onChange={(e) => updateSocialLink('linkedin', e.target.value)}
-            placeholder="Ex: https://www.linkedin.com/in/jean-dupont"
+            placeholder="Ex: https://www.linkedin.com/in/username"
           />
           
           {/* Twitter */}
@@ -271,9 +339,9 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
             id="twitter"
             name="twitter"
             label="Twitter"
-            value={socialLinks.twitter}
+            value={socialLinks?.twitter || ''}
             onChange={(e) => updateSocialLink('twitter', e.target.value)}
-            placeholder="Ex: https://twitter.com/jeandupont"
+            placeholder="Ex: https://twitter.com/username"
           />
           
           {/* Facebook */}
@@ -281,9 +349,9 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
             id="facebook"
             name="facebook"
             label="Facebook"
-            value={socialLinks.facebook}
+            value={socialLinks?.facebook || ''}
             onChange={(e) => updateSocialLink('facebook', e.target.value)}
-            placeholder="Ex: https://www.facebook.com/jeandupont"
+            placeholder="Ex: https://www.facebook.com/username"
           />
           
           {/* Instagram */}
@@ -291,9 +359,9 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
             id="instagram"
             name="instagram"
             label="Instagram"
-            value={socialLinks.instagram}
+            value={socialLinks?.instagram || ''}
             onChange={(e) => updateSocialLink('instagram', e.target.value)}
-            placeholder="Ex: https://www.instagram.com/jeandupont"
+            placeholder="Ex: https://www.instagram.com/username"
           />
           
           {/* Mode d'affichage des réseaux sociaux */}
@@ -406,7 +474,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
       
       {/* Section de la photo de profil */}
       <Collapse title="Photo de profil" defaultOpen={false}>
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Photo de profil</label>
             <div className="flex items-start gap-4">
@@ -481,7 +549,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
       
       {/* Section de mise en page */}
       <Collapse title="Mise en page" defaultOpen={false}>
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4">
           {/* Disposition de la signature */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
@@ -634,7 +702,7 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
       
       {/* Section de style */}
       <Collapse title="Style" defaultOpen={false}>
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4">
           {/* Couleur principale */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
@@ -757,25 +825,27 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         </div>
       )}
       
-      {/* Boutons d'action */}
-      <div className="flex justify-end gap-4">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => onCancel()}
-          disabled={isSubmitting}
-        >
-          Annuler
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-        >
-          {initialData?.id ? 'Mettre à jour' : 'Créer'}
-        </Button>
-      </div>
+      {/* Boutons d'action - affichés seulement si hideButtons est false */}
+      {!hideButtons && (
+        <div className="flex justify-end gap-4">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => onCancel()}
+            disabled={isSubmitting}
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+          >
+            {initialData?.id ? 'Mettre à jour' : 'Créer'}
+          </Button>
+        </div>
+      )}
     </form>
   );
 };

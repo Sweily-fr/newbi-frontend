@@ -176,9 +176,9 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
   
   return (
     <>
-      <div className="fixed inset-0 bg-white z-[9999] flex flex-col h-screen w-screen">
+      <div className="fixed inset-0 bg-white z-[9999] flex flex-col h-screen w-screen overflow-hidden">
         {/* En-tête avec titre et bouton de fermeture */}
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between items-center p-4 border-b flex-shrink-0">
           <h2 className="text-xl font-semibold">
             {signature ? 'Modifier la signature' : 'Créer une signature'}
           </h2>
@@ -191,8 +191,8 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
           </button>
         </div>
         
-        {/* Contenu principal */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Contenu principal - sans scroll */}
+        <div className="flex-1 overflow-hidden">
           <EmailSignatureEditor
             initialData={formData}
             onSubmit={handleSubmit}
