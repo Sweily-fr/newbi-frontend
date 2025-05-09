@@ -33,6 +33,3 @@ dist-ssr
 
 # Makefile
 Makefile
-
-# Windsurf
-.windsurf/
