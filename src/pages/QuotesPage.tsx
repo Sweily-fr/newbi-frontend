@@ -8,7 +8,7 @@ import { QuotesTable } from '../features/devis/components/business/QuotesTable';
 import { Notification } from '../components/feedback';
 import { useQuery } from '@apollo/client';
 import { LogoLoader } from '../components/feedback/LogoLoader';
-import { GET_QUOTE_STATS } from '../graphql/quotes';
+import { GET_QUOTE_STATS } from '../features/devis/graphql/quotes';
 import { QuoteFormModal } from '../features/devis/components/forms/QuoteFormModal';
 import { SEOHead } from '../components/SEO/SEOHead';
 import { SchemaMarkup } from '../components/SEO/SchemaMarkup';

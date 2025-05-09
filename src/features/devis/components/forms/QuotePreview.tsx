@@ -20,14 +20,6 @@ interface QuotePreviewProps {
   useBankDetails?: boolean;
   // Prop pour contrôler l'affichage des boutons d'action
   showActionButtons?: boolean;
-  // Props pour l'adresse de livraison
-  hasDifferentShippingAddress?: boolean;
-  shippingAddress?: {
-    street?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-  };
 }
 
 export const QuotePreview: React.FC<QuotePreviewProps> = ({
@@ -39,8 +31,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   footerNotes,
   useBankDetails,
   showActionButtons = true,
-  hasDifferentShippingAddress = quote.hasDifferentShippingAddress || false,
-  shippingAddress = quote.shippingAddress || {},
 }) => {
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
@@ -159,7 +149,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         </div>
 
         <div className="flex justify-between mb-8" data-pdf-no-break="true">
-          <div className={hasDifferentShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
+          <div className="w-1/2 pr-4">
             <h3 className="font-normal mb-2">
               {companyInfo?.name || "Votre Entreprise"}
             </h3>

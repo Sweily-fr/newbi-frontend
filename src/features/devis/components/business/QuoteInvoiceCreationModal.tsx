@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal } from "../../../../components/feedback/Modal";
 import { Button } from "../../../../components/ui";
 import { useMutation, useQuery } from "@apollo/client";
-import { CONVERT_QUOTE_TO_INVOICE_MUTATION, GET_QUOTE } from "../../../../graphql/quotes";
+import { CONVERT_QUOTE_TO_INVOICE_MUTATION, GET_QUOTE } from "../../graphql/quotes";
 import { Notification } from "../../../../components/feedback";
 
 interface Invoice {

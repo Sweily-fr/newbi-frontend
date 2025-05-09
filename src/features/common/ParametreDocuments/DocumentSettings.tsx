@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField } from '../../ui';
+import { TextField } from '../../../components/ui';
 import { useQuery } from '@apollo/client';
 import { GET_USER_INFO } from '../../../graphql/queries';
 

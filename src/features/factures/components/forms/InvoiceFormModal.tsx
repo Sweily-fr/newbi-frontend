@@ -3,7 +3,7 @@ import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../.
 import { useInvoiceForm } from "../../hooks/useInvoiceForm";
 import { InvoiceFormModalProps } from "../../types/invoice";
 import { Button, Form } from "../../../../components/ui";
-import { DocumentSettings } from "../../../../components/forms/common/DocumentSettings";
+import { DocumentSettings } from "../../../common/ParametreDocuments/DocumentSettings";
 import Collapse from "../../../../components/ui/Collapse";
 import { validateInvoiceDates } from "../../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
@@ -17,7 +17,7 @@ import { InvoiceBankDetails } from "./Sections";
 import { InvoiceActionButtons } from "./Sections";
 import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
-import { GET_QUOTE } from "../../../../graphql/quotes";
+import { GET_QUOTE } from "../../../devis/graphql/quotes";
 import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
 import { Notification } from "../../../../components/feedback";
 

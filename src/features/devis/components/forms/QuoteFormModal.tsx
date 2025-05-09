@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
-import { useQuoteForm } from "../../../../hooks/useQuoteForm";
+import { useQuoteForm } from "../../hooks/useQuoteForm";
 import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
 import { QuoteFormModalProps } from "../../types";
 import { Button, Form } from "../../../../components/ui";
 import Collapse from "../../../../components/ui/Collapse";
-import { DocumentSettings } from "../../../../components/forms/common/DocumentSettings";
+import { DocumentSettings } from "../../../common/ParametreDocuments/DocumentSettings";
 import {
   ClientSelection,
   QuoteGeneralInfo,
