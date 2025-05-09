@@ -214,44 +214,13 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   }, [companyData, fillFormWithCompanyData]);
   
   // Effet qui s'exécute au montage ET lorsque invoice ou selectedClientData change
-  useEffect(() => {    
-    console.log('Effet déclenché - État actuel:', {
-      'invoice': invoice,
-      'invoice?.client?.id': invoice?.client?.id,
-      'invoice?.client?.name': invoice?.client?.name,
-      'selectedClient': selectedClient,
-      'selectedClientData': selectedClientData,
-      'isNewClient': isNewClient,
-      'isMounted': isMounted.current
-    });
-    
+  useEffect(() => {     
     if (!isNewClient) {
       // Si on modifie une facture existante (avec un client) et qu'aucun client n'est sélectionné
       if (invoice?.client?.id && !selectedClient) {
         // Initialiser le client de la facture
-        console.log('Initialisation - Facture existante avec client:', {
-          'invoice.client.id': invoice.client.id,
-          'invoice.client.name': invoice.client.name
-        });
         setSelectedClient(invoice.client.id);
       }
-      // Si on a un client sélectionné et que les données de ce client sont disponibles
-      else if (selectedClient && selectedClientData) {
-        // Conserver le client sélectionné manuellement
-        console.log('Initialisation - Client déjà sélectionné avec données:', {
-          'selectedClient': selectedClient,
-          'selectedClientData.name': selectedClientData.name
-        });
-      } 
-      // Si on a un client sélectionné mais pas de données (peut-être en cours de chargement)
-      else if (selectedClient) {
-        console.log('Initialisation - Client sélectionné mais données non disponibles:', selectedClient);
-      } 
-      // Aucun client sélectionné
-      else {
-        console.log('Initialisation - Nouvelle facture sans client sélectionné');
-      }
-      // Ne rien faire d'autre - laisser le client non sélectionné pour une nouvelle facture
     }
     
     // Marquer le composant comme monté
@@ -272,10 +241,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     if (!isNewClient) {
       // Si on a une facture avec un client et qu'aucun client n'est sélectionné
       if (invoice?.client?.id && !selectedClient) {
-        console.log('Mise à jour - Initialisation du client de la facture:', {
-          'invoice.client.id': invoice.client.id,
-          'invoice.client.name': invoice.client.name
-        });
         setSelectedClient(invoice.client.id);
       }
       // Pour une nouvelle facture, ne pas sélectionner automatiquement de client
@@ -287,10 +252,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   useEffect(() => {
     // Seulement au premier chargement ou changement de facture
     if (invoice?.client?.id && !isNewClient && !selectedClient) {
-      console.log('Initialisation du client pour une facture existante:', {
-        'invoice.client.id': invoice.client.id,
-        'invoice.client.name': invoice.client.name
-      });
       setSelectedClient(invoice.client.id);
     }
     
@@ -316,7 +277,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       
       // Initialiser le client seulement si aucun client n'est sélectionné
       if (!isNewClient && !selectedClient && invoice.client?.id) {
-        console.log('Initialisation du client de la facture:', invoice.client.id);
         // Mettre à jour selectedClient de manière asynchrone pour éviter les problèmes de rendu
         setTimeout(() => setSelectedClient(invoice.client.id), 0);
       }
@@ -400,16 +360,13 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                 // Vérifier si le client de la facture est dans les options
                 const invoiceClientOption = clientOptions.find(option => option.value === invoice.client?.id);
                 if (invoiceClientOption && invoice.client?.id) {
-                  console.log('Sélection du client de la facture:', invoice.client.id);
                   setSelectedClient(invoice.client.id);
                 } else {
                   // Si le client de la facture n'est pas dans les options, sélectionner le premier client
-                  console.log('Client de la facture non trouvé dans les options, sélection du premier client');
                   setSelectedClient(clientOptions[0].value);
                 }
               } else {
                 // Si pas de facture, sélectionner le premier client
-                console.log('Pas de facture, sélection du premier client');
                 setSelectedClient(clientOptions[0].value);
               }
             }
@@ -461,7 +418,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                   setSearchTerm("");
                 }
                 
-                console.log('Type de client mis à jour:', validType);
               }}
               required={isNewClient}
               options={[

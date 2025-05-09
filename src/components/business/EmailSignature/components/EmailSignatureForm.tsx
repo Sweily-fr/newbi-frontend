@@ -364,7 +364,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         socialLinksPosition,
       };
       
-      console.log('Soumission du formulaire avec les données:', signatureData);
       
       // Appel de la fonction de soumission passée en props
       await onSubmit(signatureData as EmailSignature);
@@ -402,7 +401,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
         // Vérifier si c'est une erreur de validation avec des détails
         if (graphQLError.extensions?.code === 'VALIDATION_ERROR' && graphQLError.extensions?.details) {
           const validationErrors = graphQLError.extensions.details;
-          console.log('Erreurs de validation brutes:', validationErrors);
           
           // Mappage des noms de champs entre le backend et le frontend
           const mappedErrors: Record<string, string> = {};
@@ -421,7 +419,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
             else mappedErrors[key] = value as string; // Conserver les autres erreurs telles quelles
           });
           
-          console.log('Erreurs de validation mappées:', mappedErrors);
           
           // Mettre à jour l'état des erreurs avec les erreurs de validation mappées
           setErrors(prev => ({
@@ -523,11 +520,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
     return newErrors;
   };
 
-  // Mise à jour des données pour la prévisualisation en temps réel
-  useEffect(() => {
-    console.log('Erreurs actuelles:', errors);
-  }, [errors]);
-
   useEffect(() => {
     // Passer un objet vide car la fonction utilise déjà les états actuels
     handleFormChange({});
@@ -596,7 +588,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                     setErrors(prev => ({ ...prev, name: 'Le nom de la signature est requis' }));
                   } else if (!NAME_REGEX.test(value)) {
                     setErrors(prev => ({ ...prev, name: 'Le nom contient des caractères non autorisés (<, > non autorisés)' }));
-                    console.log('Erreur de format détectée pour le nom:', value);
                   } else {
                     setErrors(prev => ({ ...prev, name: '' }));
                   }
@@ -713,7 +704,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                     setErrors(prev => ({ ...prev, fullName: 'Le nom complet est requis' }));
                   } else if (!NAME_REGEX.test(value)) {
                     setErrors(prev => ({ ...prev, fullName: 'Le nom complet contient des caractères non autorisés (<, > non autorisés)' }));
-                    console.log('Erreur de format détectée pour le nom complet:', value);
                   } else {
                     setErrors(prev => ({ ...prev, fullName: '' }));
                   }
@@ -737,7 +727,6 @@ export const EmailSignatureForm: React.FC<EmailSignatureFormProps> = ({
                   // Validation en temps réel
                   if (value && !NAME_REGEX.test(value)) {
                     setErrors(prev => ({ ...prev, jobTitle: 'La fonction contient des caractères non autorisés (<, > non autorisés)' }));
-                    console.log('Erreur de format détectée pour la fonction:', value);
                   } else {
                     setErrors(prev => ({ ...prev, jobTitle: '' }));
                   }

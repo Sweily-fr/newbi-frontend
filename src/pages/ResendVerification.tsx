@@ -40,7 +40,6 @@ const ResendVerification: React.FC = () => {
       setIsSubmitted(true);
       // Pas de notification visible pour éviter de confirmer l'existence de l'email
       // mais on peut logger pour des raisons de débogage
-      console.log('Email de vérification envoyé');
     },
     onError: (error) => {
       console.error('Erreur lors de l\'envoi de l\'email de vérification:', error);

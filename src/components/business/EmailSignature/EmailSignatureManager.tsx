@@ -52,10 +52,8 @@ export const EmailSignatureManager: React.FC = () => {
 
   // Fonction pour ouvrir le formulaire de création
   const handleAddSignature = () => {
-    console.log('handleAddSignature appelé');
     setSelectedSignature(null);
     setIsFormModalOpen(true);
-    console.log('isFormModalOpen après modification:', true);
   };
 
   // Fonction pour ouvrir le formulaire d'édition

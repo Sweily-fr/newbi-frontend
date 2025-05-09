@@ -30,13 +30,6 @@ import {
 } from "../../../utils/validators";
 
 export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
-  // Log pour vérifier la valeur du statut d'entreprise dans les données initiales
-  console.log(
-    "Statut d'entreprise dans les données initiales:",
-    initialData?.companyStatus
-  );
-
-  // Le log nous permet de vérifier si la valeur est bien récupérée du backend
   // Utiliser react-hook-form
   const {
     register,
@@ -88,10 +81,6 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
     // Cela garantit que le select affiche la bonne valeur, même si react-hook-form a déjà une valeur par défaut
     if (initialData?.companyStatus) {
       setValue("companyStatus", initialData.companyStatus);
-      console.log(
-        "Valeur du statut définie via useEffect:",
-        initialData.companyStatus
-      );
     } else {
       // Si aucun statut n'est défini, utiliser 'AUTRE' comme valeur par défaut
       setValue("companyStatus", "AUTRE");
@@ -177,15 +166,6 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
   );
 
   const onSubmit = hookFormSubmit(async (data) => {
-    // Si le logo doit être supprimé
-    if (logoToDelete) {
-      console.log("Suppression du logo demandée");
-      const deleted = await deleteLogoFromServer(false); // Ne pas afficher les notifications ici
-      if (deleted) {
-        console.log("Logo supprimé avec succès");
-        // Continuer avec la mise à jour du reste des informations
-      }
-    }
 
     // Vérifier si tous les champs bancaires sont vides
     const allBankFieldsEmpty = !data.iban && !data.bic && !data.bankName;
@@ -265,10 +245,6 @@ export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {
             onFileSelect={handleLogoUpload}
             onDelete={() => {
               if (formData.logo) {
-                console.log(
-                  "Marquage du logo pour suppression:",
-                  formData.logo
-                );
                 // Si un logo existe en BDD, marquer pour suppression
                 setLogoToDelete(true);
               }

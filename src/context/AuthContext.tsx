@@ -45,7 +45,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkTokenExpiration = () => {
       const currentToken = localStorage.getItem('token');
       if (currentToken && isTokenExpired(currentToken)) {
-        console.log('Token expiré, déconnexion automatique');
         logout();
       }
     };

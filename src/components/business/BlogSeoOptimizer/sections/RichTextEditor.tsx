@@ -1803,10 +1803,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ placeholder = 'Commence
                 if (editorRef.current) {
                   // Sélectionner toutes les images avec cette URL
                   const images = editorRef.current.querySelectorAll(`img[src="${imageUrl}"]`);
-                  
-                  if (images.length === 0) {
-                    console.log('Aucune image trouvée avec l\'URL:', imageUrl);
-                  }
+
                   images.forEach(img => {
                     // Ajouter l'attribut alt
                     img.setAttribute('alt', alt);

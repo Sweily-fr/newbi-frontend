@@ -99,7 +99,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
     }
 
     try {
-      console.log("Début de la génération du PDF");
 
       // Précharger les images avant de générer le PDF
       await preloadImages();
@@ -123,7 +122,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
       // Trouver toutes les images dans le contenu
       const images = Array.from(contentClone.querySelectorAll("img"));
-      console.log(`${images.length} images trouvées dans le contenu`);
 
       // Masquer les éléments qui ne doivent pas être dans le PDF
       const elementsToHide = contentClone.querySelectorAll(".no-print");
@@ -237,19 +235,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
       // Attendre que le DOM soit mis à jour et que toutes les images soient chargées
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Vérifier les images avant la capture
-      console.log("Vérification des images avant capture:");
-      Array.from(contentClone.querySelectorAll("img")).forEach((img, idx) => {
-        console.log(`Image ${idx}:`, {
-          src: img.src,
-          complete: img.complete,
-          naturalWidth: img.naturalWidth,
-          naturalHeight: img.naturalHeight,
-          visible: window.getComputedStyle(img).display !== "none",
-          opacity: window.getComputedStyle(img).opacity,
-        });
-      });
-
       // Créer le document PDF
       const pdf = new jsPDF({
         orientation,
@@ -266,7 +251,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
       // Si un footer est présent, le capturer séparément
       if (footerElement) {
-        console.log("Footer détecté, capture séparée");
 
         // Masquer temporairement pour la capture principale
         footerElement.style.display = "none"; // Masquer temporairement pour la capture principale
@@ -348,10 +332,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
               '[data-pdf-image="true"], .pdf-image'
             );
             pdfImages.forEach((img) => {
-              console.log(
-                "Forçage de la visibilité pour l'image PDF:",
-                (img as HTMLImageElement).src
-              );
               img.setAttribute(
                 "style",
                 "display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 9999 !important;"
@@ -360,11 +340,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
             return clonedDoc;
           },
-        });
-
-        console.log("Canvas généré avec succès", {
-          width: canvas.width,
-          height: canvas.height,
         });
 
         // Calculer le ratio pour adapter le contenu à la page
@@ -391,10 +366,8 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
           onGenerated(pdf);
         }
 
-        // Télécharger le PDF
-        console.log("Téléchargement du PDF", { fileName });
+
         pdf.save(`${fileName}`);
-        console.log("PDF téléchargé avec succès");
       } catch (canvasError) {
         console.error("Erreur lors de la génération du canvas:", canvasError);
         throw canvasError;
@@ -465,20 +438,12 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
         );
       }
     } else {
-      // Le contenu nécessite plusieurs pages
-      console.log("Contenu nécessitant plusieurs pages", {
-        contentHeightInMM,
-        availableHeight,
-        footerHeight,
-        ratio
-      });
       
       // Calculer le nombre de pixels à afficher par page
       const pixelsPerPage = Math.floor(availableHeight / ratio);
       
       // Nombre total de pages nécessaires
       const totalPages = Math.ceil(contentCanvas.height / pixelsPerPage);
-      console.log(`Pagination: ${totalPages} pages nécessaires`);
       
       // Créer un canvas temporaire pour chaque page
       const tempCanvas = document.createElement("canvas");
@@ -574,7 +539,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
     if (!contentRef.current) return;
 
     const images = Array.from(contentRef.current.querySelectorAll("img"));
-    console.log(`Préchargement de ${images.length} images...`);
 
     return Promise.all(
       images.map((img) => {
@@ -594,12 +558,10 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
         return new Promise((resolve, reject) => {
           // Si l'image est déjà chargée
           if (img.complete && img.naturalWidth > 0) {
-            console.log("Image déjà chargée:", img.src);
             resolve(img);
           } else {
             // Attendre le chargement
             img.onload = () => {
-              console.log("Image chargée avec succès:", img.src);
               resolve(img);
             };
             img.onerror = (e) => {
@@ -627,12 +589,8 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
 
       const tryLoad = () => {
         attempts++;
-        console.log(
-          `Tentative ${attempts} de chargement de l'image: ${originalSrc}`
-        );
 
         if (img.complete && img.naturalWidth > 0) {
-          console.log("Image chargée avec succès:", originalSrc);
           resolve();
           return;
         }
@@ -685,7 +643,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
         // Convertir en base64
         const dataUrl = canvas.toDataURL("image/png");
         if (dataUrl && dataUrl !== "data:,") {
-          console.log("Image convertie en base64 via Canvas");
           img.src = dataUrl;
           resolve();
         } else {
@@ -724,7 +681,6 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
             // Convertir le blob en base64
             const logoBase64 = reader.result as string;
             img.src = logoBase64;
-            console.log("Image convertie en base64 via Fetch");
             resolve();
           };
 

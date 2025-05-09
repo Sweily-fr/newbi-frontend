@@ -60,13 +60,10 @@ export const unitAbbreviations: Record<string, string> = {
  */
 export const getUnitAbbreviation = (unit?: string): string => {
   if (!unit) return "";
-  
-  // Log pour débogage
-  console.log('getUnitAbbreviation appelé avec:', unit);
+
   
   // Vérifier si une abréviation existe pour cette unité (correspondance exacte)
   if (unitAbbreviations[unit]) {
-    console.log('Abréviation trouvée (correspondance exacte):', unitAbbreviations[unit]);
     return unitAbbreviations[unit];
   }
   
@@ -74,7 +71,6 @@ export const getUnitAbbreviation = (unit?: string): string => {
   const unitLowerCase = unit.toLowerCase().trim();
   for (const [key, value] of Object.entries(unitAbbreviations)) {
     if (key.toLowerCase().trim() === unitLowerCase) {
-      console.log('Abréviation trouvée (insensible à la casse):', value);
       return value;
     }
   }
@@ -89,12 +85,8 @@ export const getUnitAbbreviation = (unit?: string): string => {
     const allWordsMatch = unitWords.every(word => keyWords.includes(word));
     
     if (allWordsMatch) {
-      console.log('Abréviation trouvée (correspondance de mots):', value);
       return value;
     }
   }
-  
-  // Aucune correspondance trouvée
-  console.log('Aucune abréviation trouvée pour:', unit);
   return unit;
 };

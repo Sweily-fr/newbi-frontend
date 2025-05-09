@@ -55,13 +55,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     unit?: string;
   }>>([]);
 
-  // Pour débogage
-  useEffect(() => {
-    if (searchResults.length > 0) {
-      console.log('Résultats de recherche mis à jour:', searchResults);
-    }
-  }, [searchResults]);
-
   // Initialiser le tableau d'erreurs avec la taille du tableau d'items
   useEffect(() => {
     setItemErrors(Array(items.length).fill({}));
@@ -161,7 +154,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
   // Effet pour filtrer les produits lorsque les données ou la recherche changent
   useEffect(() => {
     if (productsData?.products?.products && searchQuery) {
-      console.log('Données brutes reçues:', productsData.products.products.length, 'produits');
       
       // Filtrer les résultats côté client pour rechercher sur tous les champs
       const searchLower = searchQuery.toLowerCase();
@@ -178,21 +170,9 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
         const descriptionMatch = product.description ? product.description.toLowerCase().includes(searchLower) : false;
         const priceMatch = product.unitPrice !== undefined ? product.unitPrice.toString().includes(searchQuery) : false;
         
-        // Afficher les détails de correspondance pour le débogage
-        if (nameMatch || descriptionMatch || priceMatch) {
-          console.log('Correspondance trouvée:', {
-            produit: product.name,
-            recherche: searchQuery,
-            nameMatch,
-            descriptionMatch,
-            priceMatch
-          });
-        }
-        
         return nameMatch || descriptionMatch || priceMatch;
       });
       
-      console.log('Produits filtrés:', filteredResults.length, 'sur', productsData.products.products.length);
       setSearchResults(filteredResults);
     } else if (!searchQuery) {
       setSearchResults([]);
@@ -210,14 +190,12 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatRate?: number;
     unit?: string;
   }) => {
-    console.log('Sélection du produit:', product.name);
     
     try {
       // Si la prop handleProductSelect est fournie, l'utiliser pour mettre à jour l'item complet
       if (handleProductSelect) {
         // Utiliser la fonction fournie par le parent pour mettre à jour l'item complet
         handleProductSelect(index, product);
-        console.log('Mise à jour complète de l\'item via handleProductSelect');
         
         // Réinitialiser les erreurs pour cet item après la mise à jour
         setItemErrors(prev => {
@@ -229,7 +207,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
         // Fallback: mettre à jour uniquement le champ description
         // C'est le seul qui fonctionne de manière fiable
         handleItemChange(index, 'description', product.name);
-        console.log('Mise à jour de la description uniquement (fallback)');
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'item:', error);
@@ -250,7 +227,6 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     if (value && value.length >= 1) {
       setCurrentItemIndex(index);
       // Mettre à jour la requête de recherche
-      console.log('Recherche déclenchée pour:', value);
       setSearchQuery(value);
     } else {
       // Réinitialiser la recherche si le champ est vide

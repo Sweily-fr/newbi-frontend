@@ -65,13 +65,6 @@ const PrivacyPolicyGeneratorPage: React.FC = () => {
   const [copyFormat, setCopyFormat] = useState<'text' | 'html'>('text');
   const [errors, setErrors] = useState<Record<keyof PrivacyPolicyForm, string>>({} as Record<keyof PrivacyPolicyForm, string>);
   
-  // Effet pour charger les informations de l'entreprise si l'utilisateur est connecté
-  useEffect(() => {
-    if (company) {
-      console.log('Informations de l\'entreprise chargées:', company);
-    }
-  }, [company]);
-
   // Fonction pour remplir automatiquement les champs avec les informations de l'entreprise
   const fillCompanyInfo = () => {
     if (company) {

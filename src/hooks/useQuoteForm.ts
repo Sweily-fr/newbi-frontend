@@ -389,7 +389,6 @@ export const useQuoteForm = ({
     vatRate?: number;
     unit?: string;
   }) => {
-    console.log('handleProductSelect appelé avec le produit:', product.name);
     
     // Créer une copie du tableau d'items
     const newItems = [...items];
@@ -410,7 +409,6 @@ export const useQuoteForm = ({
     // Mettre à jour le tableau d'items en une seule fois
     setItems(newItems);
     
-    console.log('Item mis à jour avec succès via handleProductSelect');
   };
 
   // Fonction pour ajouter un champ personnalisé
@@ -451,7 +449,6 @@ export const useQuoteForm = ({
     
     // Utiliser le paramètre asDraft s'il est fourni, sinon utiliser l'état submitAsDraft
     const isDraft = asDraft !== undefined ? asDraft : submitAsDraft;
-    console.log("handleSubmit - asDraft:", asDraft, "isDraft:", isDraft);
 
     try {
       // Récupérer le numéro de devis le plus récent pour éviter les doublons
@@ -503,15 +500,8 @@ export const useQuoteForm = ({
             firstName: newClient.firstName || "",
             lastName: newClient.lastName || ""
           };
-          console.log("Returning new client data", clientData);
           return clientData;
         } else {
-          // Si c'est un client existant, on le récupère depuis les données
-          console.log("Looking for existing client", {
-            selectedClient,
-            clientsData,
-            'clientsData?.clients': clientsData?.clients,
-          });
 
           // Si on modifie un devis existant et que le client est déjà dans le devis
           if (quote && quote.client) {
@@ -540,21 +530,11 @@ export const useQuoteForm = ({
     // Utiliser items car clientsData.clients est un objet avec une propriété items qui contient le tableau des clients
     const clients = clientsData?.clients?.items || [];
     
-    // Log pour débogage
-    console.log('Client sélectionné (ID):', selectedClient);
-    console.log('Structure de clientsData:', {
-      'clientsData': clientsData,
-      'clientsData?.clients': clientsData?.clients,
-      'clientsData?.clients?.items': clientsData?.clients?.items,
-    });
-    
     // Rechercher le client sélectionné dans la liste des clients
     const selectedClientData = Array.isArray(clients) 
       ? clients.find((c) => c.id === selectedClient)
       : undefined;
     
-    // Log pour débogage
-    console.log('Client trouvé dans la liste:', selectedClientData);
           if (!selectedClientData) {
             console.warn("Client non trouvé", {
               selectedClient,
@@ -648,7 +628,6 @@ export const useQuoteForm = ({
           const needsSiretAndVat = clientType === 'COMPANY';
           const siret = selectedClientData.siret || (needsSiretAndVat ? "12345678901234" : "");
           const vatNumber = selectedClientData.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
-          console.log("jojo ", selectedClientData);
           
           return {
             id: selectedClientData.id,
@@ -690,13 +669,6 @@ export const useQuoteForm = ({
               },
               // Utiliser le type exact du client s'il existe, sinon déterminer en fonction des champs
               type: newClient.type || ((newClient.firstName && newClient.lastName) ? 'INDIVIDUAL' : (quote?.client?.type || 'COMPANY')),
-              // Log pour déboguer le type de client
-              ...(console.log("Type de client lors de la création:", {
-                'détecté': (newClient.firstName && newClient.lastName) ? 'INDIVIDUAL' : (newClient.type || quote?.client?.type || 'COMPANY'),
-                'newClient.type': newClient.type,
-                'quote?.client?.type': quote?.client?.type,
-                'hasFirstLastName': !!(newClient.firstName && newClient.lastName)
-              }), {}),
               // Champs spécifiques aux entreprises
               siret: newClient.siret,
               vatNumber: newClient.vatNumber,
@@ -709,10 +681,6 @@ export const useQuoteForm = ({
         clientId = clientData.createClient.id;
       }
 
-      // Calculer les totaux
-      // Variable non utilisée
-      // const totals = calculateTotals();
-      console.log("submitAsDraft", submitAsDraft);
       // Préparer les données communes du devis
       const commonQuoteData = {
         prefix: quotePrefix,
@@ -773,17 +741,6 @@ export const useQuoteForm = ({
 
       // Logs détaillés pour vérifier les données du client avant envoi
       const clientDataToSend = getClientData();
-      console.log("CLIENT DATA BEING SENT TO SERVER:", clientDataToSend);
-      console.log("CLIENT TYPE DETAILS (FINAL):", {
-        'newClient.type': newClient.type,
-        'quote?.client?.type': quote?.client?.type,
-        'isNewClient': isNewClient,
-        'hasFirstLastName': !!(newClient.firstName && newClient.lastName),
-        'finalType': clientDataToSend.type,
-        'typeInClientData': clientDataToSend.type,
-        'isTypeString': typeof clientDataToSend.type === 'string',
-        'isTypeUndefined': typeof clientDataToSend.type === 'undefined'
-      });
       
       // Alerte si le type n'est pas défini correctement
       if (!clientDataToSend.type && isNewClient && newClient.firstName && newClient.lastName) {

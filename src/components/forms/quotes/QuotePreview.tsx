@@ -284,7 +284,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                     </td>
                     <td className="p-2 text-xs text-right">
                       {item.quantity} {(() => {
-                        console.log('Quote Unit:', item.unit, 'Abbreviation:', getUnitAbbreviation(item.unit));
                         return getUnitAbbreviation(item.unit);
                       })()}
                     </td>
@@ -389,7 +388,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             <p className="text-xs font-medium text-gray-700">
               {(() => {
                 const displayText = getTransactionCategoryDisplayText(companyInfo.transactionCategory);
-                console.log('Display text:', displayText);
                 return displayText || `Catégorie de transaction : ${companyInfo.transactionCategory}`;
               })()}
             </p>
@@ -499,7 +497,6 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                 setIsGeneratingPDF(true);
               }}
               onGenerated={(pdf) => {
-                console.log("PDF généré avec succès", pdf);
                 setIsGeneratingPDF(false);
                 setPdfSuccess(true);
                 // Réinitialiser l'état de succès après 2 secondes

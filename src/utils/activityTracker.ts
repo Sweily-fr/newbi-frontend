@@ -41,7 +41,6 @@ class ActivityTracker {
       window.addEventListener(eventType, this.handleUserActivity);
     });
     
-    console.log('ActivityTracker initialisé avec un délai de', INACTIVITY_TIMEOUT / 60000, 'minutes');
   }
 
   /**
@@ -63,7 +62,6 @@ class ActivityTracker {
     });
     
     this.logoutCallback = null;
-    console.log('ActivityTracker nettoyé');
   }
 
   /**
