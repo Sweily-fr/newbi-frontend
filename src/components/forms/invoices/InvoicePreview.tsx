@@ -581,8 +581,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               onGenerationStart={() => {
                 setIsGeneratingPDF(true);
               }}
-              onGenerated={(pdf) => {
-                console.log("PDF généré avec succès", pdf);
+              onGenerated={() => {
                 setIsGeneratingPDF(false);
                 setPdfSuccess(true);
                 // Réinitialiser l'état de succès après 2 secondes

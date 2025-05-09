@@ -35,7 +35,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     graphQLErrors.forEach(({ message, extensions }) => {
       // Si l'erreur est liée à l'authentification (token expiré, invalide, etc.)
       if (extensions?.code === 'UNAUTHENTICATED') {
-        console.log('Erreur d\'authentification:', message);
+        console.error('Erreur d\'authentification:', message);
         // Supprimer le token
         localStorage.removeItem('token');
         
@@ -55,10 +55,10 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
   
   if (networkError) {
-    console.log(`[Network error]: ${networkError}`);
+    console.error(`[Network error]: ${networkError}`);
     
     // Marquer l'erreur comme traitée pour éviter les doublons
-    // @ts-ignore - Ajouter une propriété personnalisée à l'objet d'erreur
+    // @ts-expect-error - Ajouter une propriété personnalisée à l'objet d'erreur
     networkError.handled = true;
     
     // Détection plus précise du type d'erreur réseau

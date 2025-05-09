@@ -78,9 +78,6 @@ export const IntegrationsManager: React.FC = () => {
         // Sinon, on ouvre la modal de connexion
         setIsStripeModalOpen(true);
       }
-    } else {
-      console.log(`Connexion à l'outil ${toolId}`);
-      // Logique pour les autres outils
     }
   };
   
@@ -109,7 +106,6 @@ export const IntegrationsManager: React.FC = () => {
   
   // Fonction pour connecter Stripe avec la clé API
   const handleStripeConnect = () => {
-    console.log(`Connexion à Stripe avec la clé API réussie`);
     // Afficher une notification de succès
     Notification.success('Connexion à Stripe réussie', {
       position: 'bottom-left',
@@ -123,7 +119,6 @@ export const IntegrationsManager: React.FC = () => {
   const [disconnectStripe, { loading: disconnectLoading }] = useMutation(DISCONNECT_STRIPE, {
     onCompleted: (data) => {
       if (data.disconnectStripe.success) {
-        console.log('Déconnexion de Stripe réussie');
         // Afficher une notification de succès
         Notification.success('Déconnexion de Stripe réussie', {
           position: 'bottom-left',

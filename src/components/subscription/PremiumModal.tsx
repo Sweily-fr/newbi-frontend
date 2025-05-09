@@ -43,13 +43,6 @@ export const PremiumModal = ({ isOpen, onClose, onSubscribe }: PremiumModalProps
     }
   }, [isOpen, isStripeLoaded]);
 
-  // Afficher un message de debug en développement
-  useEffect(() => {
-    if (!isProduction) {
-      console.log(`Stripe initialized in TEST mode with pricing table ID: ${pricingTableId}`);
-    }
-  }, [isProduction, pricingTableId]);
-
   return (
     <Modal
       isOpen={isOpen}

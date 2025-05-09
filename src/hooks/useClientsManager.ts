@@ -262,9 +262,7 @@ export const useClientsManager = () => {
   
   // Fonction pour gérer la recherche
   const handleSearch = async (search: string) => {
-    try {
-      console.log("Début de la recherche pour:", search);
-      
+    try {      
       // Mettre à jour l'état local
       setSearchTerm(search);
       setCurrentPage(1); // Réinitialiser à la première page lors d'une nouvelle recherche
@@ -275,10 +273,6 @@ export const useClientsManager = () => {
         limit: itemsPerPage,
         search: search || undefined
       });
-      
-      console.log("Requête terminée avec succès");
-      console.log("Terme de recherche:", search);
-      console.log("Résultats:", result.data?.clients?.items);
       
       return result;
     } catch (error) {

@@ -34,7 +34,6 @@ export const useCompanyForm = ({ initialLogo = '', onLogoChange }: UseCompanyLog
 
   const [deleteLogo, { loading: deleteLoading }] = useMutation(DELETE_COMPANY_LOGO, {
     onCompleted: (data) => {
-      console.log('Logo supprimé avec succès:', data);
       setLogoUrl('');
       setLogoToDelete(false);
       
@@ -101,9 +100,7 @@ export const useCompanyForm = ({ initialLogo = '', onLogoChange }: UseCompanyLog
 
   const deleteLogoFromServer = async () => {
     if (!logoToDelete) return false;
-    
-    console.log('Tentative de suppression du logo...');
-    try {
+      try {
       await deleteLogo();
       setLogoToDelete(false); // Réinitialiser l'état après la suppression
       return true;

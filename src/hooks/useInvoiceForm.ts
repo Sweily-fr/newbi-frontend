@@ -26,11 +26,6 @@ export const useInvoiceForm = ({
 }: UseInvoiceFormProps) => {
   // États du formulaire
   const [selectedClient, setSelectedClient] = useState<string>(() => {
-    // Log pour débogage de l'initialisation
-    console.log('Initialisation de selectedClient dans useInvoiceForm:', {
-      'invoice?.client?.id': invoice?.client?.id,
-      'valeur initiale': invoice?.client?.id || ''
-    });
     return invoice?.client?.id || '';
   });
   const [isNewClient, setIsNewClient] = useState(false);
@@ -61,11 +56,9 @@ export const useInvoiceForm = ({
   
   // Fonction personnalisée pour gérer le changement de mode client
   const handleClientModeChange = (isNew: boolean) => {
-    console.log('🔄 handleClientModeChange appelé avec:', { isNew, 'précédent': isNewClient });
     
     // Prévenir les appels inutiles si l'état ne change pas
     if (isNew === isNewClient) {
-      console.log('⏭️ Pas de changement d\'état, ignoré');
       return;
     }
     
@@ -74,10 +67,7 @@ export const useInvoiceForm = ({
     
     // Si on passe à nouveau client, réinitialiser les données du nouveau client
     if (isNew) {
-      console.log('🔄 Passage à "nouveau client", réinitialisation des données');
       resetNewClient();
-    } else {
-      console.log('🔄 Passage à "client existant"');
     }
   };
   const [items, setItems] = useState<Item[]>(
@@ -422,9 +412,7 @@ export const useInvoiceForm = ({
     unitPrice?: number;
     vatRate?: number;
     unit?: string;
-  }) => {
-    console.log('handleProductSelect appelé avec le produit:', product.name);
-    
+  }) => {    
     // Créer une copie du tableau d'items
     const newItems = [...items];
     
@@ -444,7 +432,6 @@ export const useInvoiceForm = ({
     // Mettre à jour le tableau d'items en une seule fois
     setItems(newItems);
     
-    console.log('Item mis à jour avec succès via handleProductSelect');
   };
 
   const handleAddCustomField = () => {
@@ -525,15 +512,12 @@ export const useInvoiceForm = ({
     if (isDraft) {
       // Si on demande explicitement un brouillon, utiliser DRAFT
       status = 'DRAFT';
-      console.log('Statut défini à DRAFT car isDraft est true (asDraft =', asDraft, ', submitAsDraft =', submitAsDraft, ')');
     } else if (invoice && invoice.status === 'DRAFT') {
       // Si on met à jour une facture existante qui est en brouillon, conserver son statut DRAFT
       status = 'DRAFT';
-      console.log('Conservation du statut DRAFT pour la mise à jour de la facture');
     } else {
       // Sinon (nouvelle facture ou facture non-brouillon), utiliser PENDING
       status = 'PENDING';
-      console.log('Statut défini à PENDING car isDraft est false et ce n\'est pas une mise à jour de brouillon');
     }
 
     try {
@@ -559,10 +543,6 @@ export const useInvoiceForm = ({
     // Rechercher le client sélectionné dans la liste des clients
     // Utiliser une variable locale différente pour éviter toute confusion avec la variable globale
     const localSelectedClientData = !isNewClient ? (Array.isArray(clients) ? clients.find((c: Client) => c.id === effectiveSelectedClient) : null) : null;
-    
-    // Log pour débogage
-    console.log('Client sélectionné (ID):', effectiveSelectedClient);
-    console.log('Client trouvé dans la liste:', localSelectedClientData);
       
       // Fonction pour récupérer les données complètes du client
       const getClientData = () => {
@@ -603,12 +583,6 @@ export const useInvoiceForm = ({
             const siret = invoice.client.siret || (needsSiretAndVat ? "12345678901234" : "");
             const vatNumber = invoice.client.vatNumber || (needsSiretAndVat ? "FR12345678901" : "");
             
-            console.log("Mise à jour d'une facture avec client existant:", {
-              type: clientType,
-              siret: siret,
-              vatNumber: vatNumber
-            });
-            
             return {
               id: invoice.client.id,
               type: clientType,
@@ -628,9 +602,7 @@ export const useInvoiceForm = ({
           }
           
           // Si un client existant est sélectionné, utiliser ses données
-          if (localSelectedClientData) {
-            console.log("Client sélectionné trouvé, utilisation des données du client:", localSelectedClientData);
-            
+          if (localSelectedClientData) {            
             // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
             let clientType = localSelectedClientData.type || 'COMPANY';
             // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
@@ -838,9 +810,7 @@ export const useInvoiceForm = ({
         // Creating new invoice
         try {
           // Récupérer une dernière fois le numéro de facture pour s'assurer qu'il est unique
-          const freshInvoiceNumber = invoiceNumber;
-          console.log('Création de facture avec le numéro:', freshInvoiceNumber);
-          
+          const freshInvoiceNumber = invoiceNumber;          
           // Mettre à jour le numéro dans les données de la facture
           const finalInvoiceData = {
             ...invoiceData,

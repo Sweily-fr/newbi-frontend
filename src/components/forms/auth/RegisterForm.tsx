@@ -70,8 +70,6 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
     // Réinitialiser les erreurs GraphQL et les erreurs du formulaire
     setGraphQLErrors({});
 
-    console.log("Analyse des erreurs GraphQL:", error);
-
     // Analyser le message d'erreur pour déterminer à quel champ il est associé
     if (
       errorMessage.includes("email") &&
@@ -81,7 +79,6 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
       const emailError = "Cette adresse email est déjà utilisée";
       newErrors.email = emailError;
       setFormError("email", { type: "manual", message: emailError });
-      console.log("Erreur email détectée:", emailError);
     } else if (
       errorMessage.includes("mot de passe") ||
       errorMessage.includes("password")
@@ -90,16 +87,14 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
         "Le mot de passe ne respecte pas les exigences de sécurité";
       newErrors.password = passwordError;
       setFormError("password", { type: "manual", message: passwordError });
-      console.log("Erreur mot de passe détectée:", passwordError);
     } else {
       // Erreur générale
       newErrors.general = error.message;
-      console.log("Erreur générale détectée:", error.message);
+      console.error("Erreur générale détectée:", error.message);
     }
 
     // Mettre à jour l'état des erreurs GraphQL
     setGraphQLErrors(newErrors);
-    console.log("GraphQL errors mis à jour:", newErrors);
     return newErrors;
   };
 

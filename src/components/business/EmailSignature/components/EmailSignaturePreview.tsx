@@ -15,10 +15,6 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const signatureRef = useRef<HTMLDivElement>(null);
   // URL de base de l'API pour les images - essayer différentes façons d'accéder aux variables d'environnement
   const apiUrl = import.meta.env.VITE_API_URL + '/' || "http://localhost:4000";
-  
-  console.log('API URL from env:', apiUrl);
-  console.log('All env variables:', import.meta.env);
-  console.log('Logo URL original:', signature.logoUrl);
 
   // Fonction pour préfixer l'URL du logo ou de la photo de profil avec l'URL de l'API si nécessaire
   const getFullImageUrl = (imagePath: string | undefined) => {
@@ -108,12 +104,6 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir la taille de police avec une valeur par défaut
   const signatureFontSize = fontSize || 14; // Taille par défaut: 14px
   
-  // Log pour déboguer
-  console.log('Police sélectionnée:', fontFamily);
-  console.log('Police utilisée:', signatureFontFamily);
-  console.log('Taille de police sélectionnée:', fontSize);
-  console.log('Taille de police utilisée:', signatureFontSize);
-  
   // Style de base pour la signature
   const baseStyle = {
     fontFamily: signatureFontFamily,
@@ -146,9 +136,6 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir les couleurs des icônes des réseaux sociaux avec des valeurs par défaut
   const iconBgColor = socialLinksIconBgColor || primaryColor; // Couleur de fond par défaut: couleur primaire
   const iconColor = socialLinksIconColor || (iconStyle === 'plain' ? primaryColor : '#FFFFFF'); // Couleur du texte par défaut
-  
-  console.log('showLogo value:', showLogo);
-  console.log('displayLogo calculated:', displayLogo);
 
   // Fonction pour rendre le template de signature approprié
   const renderSignatureTemplate = () => {
@@ -801,7 +788,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                       style={{ maxWidth: '150px' }} 
                       onError={(e) => {
                         console.error('Error loading logo image (Professional):', e);
-                        console.log('Failed URL:', e.currentTarget.src);
+                        console.error('Failed URL:', e.currentTarget.src);
                       }}
                     />
                   </div>
@@ -859,7 +846,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                         style={{ maxWidth: '150px' }} 
                         onError={(e) => {
                           console.error('Error loading logo image (Professional):', e);
-                          console.log('Failed URL:', e.currentTarget.src);
+                          console.error('Failed URL:', e.currentTarget.src);
                         }}
                       />
                     </div>
@@ -933,7 +920,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
                 style={{ maxWidth: '80px' }} 
                 onError={(e) => {
                   console.error('Error loading logo image (Modern):', e);
-                  console.log('Failed URL:', e.currentTarget.src);
+                  console.error('Failed URL:', e.currentTarget.src);
                 }}
               />
             </div>

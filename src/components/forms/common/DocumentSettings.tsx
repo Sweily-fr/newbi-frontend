@@ -38,7 +38,6 @@ const CompanyInfoAutoComplete: React.FC<{
 
   useEffect(() => {
     if (data?.me?.company) {
-      console.log('Données de l\'entreprise récupérées:', data.me.company);
       setCompanyInfo(data.me.company);
     }
   }, [data]);
@@ -46,9 +45,7 @@ const CompanyInfoAutoComplete: React.FC<{
   const handleAutoComplete = () => {
     if (!companyInfo) return;
 
-    console.log('Informations de l\'entreprise pour l\'autocomplétion:', companyInfo);
     const { name, rcs, capitalSocial, companyStatus } = companyInfo;
-    console.log('Valeurs extraites:', { name, rcs, capitalSocial, companyStatus });
     
     // Formater le statut de l'entreprise pour l'affichage
     let statusText = '';

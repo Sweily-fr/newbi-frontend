@@ -79,7 +79,6 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
 
   // Gestionnaire pour la soumission du formulaire
   const handleSubmit = (data: Partial<EmailSignature>) => {
-    console.log('Données reçues du formulaire:', data);
     
     // Fonction pour extraire le chemin relatif d'une URL
     const extractRelativePath = (url: string | undefined): string | undefined => {
@@ -184,7 +183,6 @@ export const EmailSignatureFormModal: React.FC<EmailSignatureFormModalProps> = (
         updatedData.profilePhotoUrl = getFullLogoUrl(updatedData.profilePhotoUrl);
       }
       
-      console.log('Mise à jour des données de prévisualisation:', updatedData);
       return updatedData;
     });
   }, [getFullLogoUrl]);
