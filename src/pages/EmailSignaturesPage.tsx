@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmailSignatureManager } from '../components/business/EmailSignature/EmailSignatureManager';
+import { EmailSignatureManager } from '../features/email-signatures/components/EmailSignatureManager';
 import { PageHeader } from '../components/layout/PageHeader';
 import { SEOHead } from '../components/SEO/SEOHead';
 

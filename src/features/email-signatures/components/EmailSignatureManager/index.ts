@@ -1,0 +1,1 @@
+export { EmailSignatureManager } from './EmailSignatureManager';
