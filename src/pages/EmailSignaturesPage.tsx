@@ -1,10 +1,11 @@
 import React from 'react';
-import { EmailSignatureManager } from '../features/email-signatures/components/EmailSignatureManager';
+// Import du nouveau composant avec la disposition sur deux colonnes
+import { EmailSignatureFormLayout } from '../features/email-signatures/components/EmailSignatureFormLayout';
+//import { EmailSignatureFormLayout } from '../features/email-signatures/components/EmailSignatureFormLayout/EmailSignatureFormLayout';
 import { PageHeader } from '../components/layout/PageHeader';
 import { SEOHead } from '../components/SEO/SEOHead';
 
 const EmailSignaturesPage: React.FC = () => {
-  // Le gestionnaire de signatures gère maintenant l'état et les actions
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -28,8 +29,19 @@ const EmailSignaturesPage: React.FC = () => {
         description="Créez et gérez vos signatures email professionnelles"
       />
 
+      {/* Composant original commenté 
       <main className="mt-6" role="main" aria-label="Gestionnaire de signatures email">
         <EmailSignatureManager />
+      </main>
+      */}
+      
+      {/* Nouvelle disposition sur deux colonnes */}
+      <main className="mt-6" role="main" aria-label="Éditeur de signatures email">
+        <div className="container mx-auto">
+          <EmailSignatureFormLayout
+            defaultNewbiLogoUrl="/images/logo_newbi/SVG/Logo_Texte_Purple.svg"
+          />
+        </div>
       </main>
 
       {/* Le formulaire est maintenant géré par le composant EmailSignatureManager */}
