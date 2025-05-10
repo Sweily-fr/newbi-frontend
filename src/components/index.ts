@@ -35,7 +35,7 @@ export * from './forms/profile/PersonalInfoForm';
 export * from './forms/clients/ClientForm';
 
 // Export des formulaires de factures
-export * from './forms/invoices/InvoiceFormModal';
+export * from '../features/factures/components/forms/InvoiceFormModal';
 
 // Export des composants d'affichage de données
 // /src/components/data-display/index.ts
@@ -54,7 +54,7 @@ export * from './feedback/Modal';
 
 // Export des composants métier
 export * from './business/Tools/ToolCard';
-export * from './business/invoices/InvoiceSidebar';
+export * from '../features/factures/components/business/InvoiceSidebar';
 export * from './business/clients/ClientsManager';
 // export * from './business/InvoiceItem';
 

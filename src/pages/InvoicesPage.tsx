@@ -1,13 +1,13 @@
-import { InvoiceFormModal } from '../components/forms/invoices/InvoiceFormModal';
+import { InvoiceFormModal } from '../features/factures/components/forms/InvoiceFormModal';
 import { Button } from '../components/ui';
-import { useInvoices, TabType } from '../hooks/useInvoices';
+import { useInvoices, TabType } from '../features/factures/hooks/useInvoices';
 import { TabNavigation } from '../components/navigation/TabNavigation';
 import { SearchInput } from '../components/ui';
-import { InvoiceSidebar } from '../components/business/invoices/InvoiceSidebar';
-import { InvoicesTable } from '../components/business/invoices/InvoicesTable';
+import { InvoiceSidebar } from '../features/factures/components/business/InvoiceSidebar';
+import { InvoicesTable } from '../features/factures/components/business/InvoicesTable';
 import { useQuery } from '@apollo/client';
 import { LogoLoader } from '../components/feedback/LogoLoader';
-import { GET_INVOICES } from '../graphql/queries';
+import { GET_INVOICES } from '../features/factures/graphql/invoices';
 import { Notification } from '../components/feedback';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';

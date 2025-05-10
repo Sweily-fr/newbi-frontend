@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useInvoiceForm, useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../hooks";
-import { InvoiceFormModalProps } from "../../../types";
-import { Button, Form } from "../../ui";
-import { DocumentSettings } from "../../../features/common/ParametreDocuments/DocumentSettings";
-import Collapse from "../../ui/Collapse";
-import { validateInvoiceDates } from "../../../constants/formValidations";
+import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
+import { useInvoiceForm } from "../../hooks/useInvoiceForm";
+import { InvoiceFormModalProps } from "../../types/invoice";
+import { Button, Form } from "../../../../components/ui";
+import { DocumentSettings } from "../../../common/ParametreDocuments/DocumentSettings";
+import Collapse from "../../../../components/ui/Collapse";
+import { validateInvoiceDates } from "../../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
 import { InvoiceItems } from "./Sections";
 import { InvoiceDiscountAndTotals } from "./Sections";
@@ -16,9 +17,9 @@ import { InvoiceBankDetails } from "./Sections";
 import { InvoiceActionButtons } from "./Sections";
 import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
-import { GET_QUOTE } from "../../../graphql/quotes";
-import { ConfirmationModal } from "../../feedback/ConfirmationModal";
-import { Notification } from "../../feedback";
+import { GET_QUOTE } from "../../../devis/graphql/quotes";
+import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
+import { Notification } from "../../../../components/feedback";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,
@@ -28,6 +29,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
 }) => {
   // Verrouiller le défilement du body lorsque la modale est ouverte
   useBodyScrollLock(true);
+  
   // Vérifier si la facture est en statut PENDING, dans ce cas empêcher l'édition
   if (invoice && invoice.status === 'PENDING') {
     // Utiliser setTimeout pour permettre au composant de se monter avant de fermer
@@ -121,6 +123,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     }
   };
 
+
+
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
   const {
     selectedClient,
@@ -182,7 +186,9 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     handleCustomFieldChange,
     handleSubmit,
     
-    
+    // Variables manquantes
+    setItems,
+    setCustomFields,
 
     // Constantes
     apiUrl,
@@ -218,7 +224,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   }, [invoice, applyDefaultSettingsToForm]);
 
   // Récupérer les données du devis si quoteId est fourni
-  const { data: quoteData, loading: quoteLoading } = useQuery(GET_QUOTE, {
+  const { data: quoteData } = useQuery(GET_QUOTE, {
     variables: { id: quoteId },
     skip: !quoteId,
   });
@@ -243,7 +249,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       setBankDetailsReadOnly(quote.bankDetailsReadOnly);
      
     }
-  }, [quoteData]);
+  }, [quoteData, setNewClient, setSelectedClient, setItems, setDiscount, setDiscountType, setHeaderNotes, setFooterNotes, setTermsAndConditions, setTermsAndConditionsLinkTitle, setTermsAndConditionsLink, setCompanyInfo, setUseBankDetails, setBankDetailsReadOnly, setCustomFields]);
 
   // Fonction pour valider le formulaire et gérer la soumission
   const onValidateForm = async (asDraft: boolean) => {
@@ -448,12 +454,12 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     isNewClient={isNewClient}
                     setIsNewClient={handleClientModeChange}
                     newClient={newClient}
-                    setNewClient={setNewClient}
+                    setNewClient={setNewClient as any}
                     selectedClient={selectedClient}
                     setSelectedClient={setSelectedClient}
                     clientsData={clientsData}
                     invoice={invoice}
-                    selectedClientData={clientsData?.clients?.items?.find(c => c.id === selectedClient)}
+                    selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient) || null}
                   />
                 </Collapse>
 
@@ -482,9 +488,9 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                 >
                   <InvoiceItems
                     items={items}
-                    handleItemChange={handleItemChange}
-                    handleRemoveItem={handleRemoveItem}
                     handleAddItem={handleAddItem}
+                    handleRemoveItem={handleRemoveItem}
+                    handleItemChange={handleItemChange as any}
                     handleProductSelect={handleProductSelect}
                   />
                 </Collapse>
