@@ -28,9 +28,9 @@ const Collapse: React.FC<CollapseProps> = ({
   title,
   children,
   defaultOpen = true,
-  titleClassName = 'font-semibold text-gray-900 text-lg',
-  contentClassName = 'pt-4 bg-white',
-  containerClassName = 'mb-6 overflow-hidden',
+  titleClassName = 'font-semibold text-grey-800',
+  contentClassName = 'pt-4 px-4 bg-white rounded-b-lg',
+  containerClassName = 'mb-6 rounded-lg overflow-hidden',
   headerClassName = 'flex justify-between items-center p-4 cursor-pointer',
   onToggle,
   hasError = false,
@@ -84,8 +84,8 @@ const Collapse: React.FC<CollapseProps> = ({
     >
       <div 
         className={`${headerClassName} ${isOpen 
-          ? 'border-b border-gray-200' 
-          : ''} ${hasError 
+          ? 'border border-gray-200 border-b-0 rounded-t-lg' 
+          : 'border border-gray-200 rounded-lg'} ${hasError 
             ? 'bg-[#f0eeff] border-[#5b50ff]' 
             : ''}`}
         onClick={handleToggle}
@@ -101,7 +101,7 @@ const Collapse: React.FC<CollapseProps> = ({
                   {getIcon()}
                 </span>
               )}
-              <h3 className={`${titleClassName} ${hasError ? 'text-[#5b50ff]' : ''}`}>{title}</h3>
+              <h3 className={`${titleClassName} ${isOpen ? 'text-xl' : 'text-lg'} ${hasError ? 'text-[#5b50ff]' : ''} transition-all duration-300 ease-in-out`}>{title}</h3>
             </div>
           </div>
           {description && !isOpen && (
@@ -112,24 +112,33 @@ const Collapse: React.FC<CollapseProps> = ({
           type="button"
           className={`${hasError 
             ? 'text-[#5b50ff] hover:text-[#4a41e0]' 
-            : 'text-gray-400 hover:text-gray-600'} focus:outline-none transition-transform duration-300`}
+            : 'text-gray-500 hover:text-gray-700'} focus:outline-none transition-transform duration-300`}
           aria-expanded={isOpen}
           aria-label={isOpen ? 'Réduire la section' : 'Développer la section'}
         >
           {isOpen ? (
-            <ChevronUpIcon className="h-5 w-5 transform transition-transform duration-300" />
+            <ChevronUpIcon className="h-6 w-6 transform transition-transform duration-300" />
           ) : (
-            <ChevronDownIcon className="h-5 w-5 transform transition-transform duration-300" />
+            <ChevronDownIcon className="h-6 w-6 transform transition-transform duration-300" />
           )}
         </button>
       </div>
       <div 
         ref={contentRef}
-        className={`overflow-hidden pb-4 ${contentClassName}`}
+        className={`overflow-hidden border border-gray-200 pb-4 ${contentClassName} ${hasError 
+          ? 'border-[#5b50ff] border-t-0 bg-white/95' 
+          : ''}`}
         style={{
           display: isOpen ? 'block' : 'none',
+          animation: isOpen ? 'collapseIn 0.3s ease-out' : 'none',
         }}
       >
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes collapseIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}} />
         {children}
       </div>
     </div>
