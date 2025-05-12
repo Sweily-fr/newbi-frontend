@@ -42,6 +42,7 @@ export * from './common/SearchInput';
 export * from './common/Avatar';
 export * from './common/PDFGenerator';
 export * from './common/PasswordStrengthIndicator';
+export * from './common/Card';
 
 // export * from './common/Input';
 
