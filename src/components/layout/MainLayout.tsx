@@ -23,6 +23,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     
   // Vérifier si c'est la page mobile ou si l'utilisateur est sur mobile/tablette
   const isMobilePage = location.pathname === ROUTES.MOBILE;
+  // Vérifier si on est sur la page des signatures email
+  const isEmailSignaturesPage = location.pathname === ROUTES.EMAIL_SIGNATURES;
   const shouldHideNavAndFooter = isAuthPage || isMobilePage || isMobile || isTablet;
   
   // Vérifier si la page actuelle est une page d'outils
@@ -42,7 +44,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         {children}
         {isToolsPage && <CommunityButton />}
       </main>
-      {!shouldHideNavAndFooter && <Footer />}
+      {!shouldHideNavAndFooter && !isEmailSignaturesPage && <Footer />}
     </div>
   );
 };

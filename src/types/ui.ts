@@ -122,6 +122,23 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
   variant?: 'default' | 'blue' | 'minus';
 }
 
+// Radio
+export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  id: string;
+  name: string;
+  label: string;
+  value: string;
+  // React Hook Form props (optionnelles)
+  register?: UseFormRegister<any>;
+  error?: FieldError;
+  // Props standard pour utilisation sans React Hook Form
+  checked?: boolean;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+  className?: string;
+  helpText?: string;
+}
+
 // ImageUploader
 export interface ImageUploaderProps {
   /**

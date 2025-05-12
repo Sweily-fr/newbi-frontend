@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Import } from 'iconsax-react';
 import { SignatureData } from '../../types';
+import { useCompany } from '../../../../hooks';
+import { Notification } from '../../../../components/feedback/Notification';
 
 interface CompanyInfoSectionProps {
   signatureData: SignatureData;
@@ -13,9 +16,47 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   signatureData,
   updateSignatureData,
 }) => {
-  const handleInputChange = (field: keyof SignatureData, value: string) => {
-    updateSignatureData(field, value);
+  // Récupérer les informations de l'entreprise de l'utilisateur
+  const { company, loading } = useCompany();
+  
+  // Fonction simplifiée pour importer les informations de l'entreprise
+  const importCompanyInfo = () => {
+    if (!company) {
+      Notification.warning('Aucune information d\'entreprise disponible');
+      return;
+    }
+    
+    console.log('Données d\'entreprise disponibles:', company);
+    console.log('Données de signature avant mise à jour:', signatureData);
+    
+    // Créer un objet avec toutes les mises à jour
+    const updates = {
+      companyName: company.name || signatureData.companyName,
+      companyWebsite: company.website || signatureData.companyWebsite,
+      companyAddress: company.address ? 
+        `${company.address.street || ''}, ${company.address.postalCode || ''} ${company.address.city || ''}, ${company.address.country || ''}` : 
+        signatureData.companyAddress
+    };
+    
+    // Appliquer chaque mise à jour individuellement
+    Object.entries(updates).forEach(([key, value]) => {
+      console.log(`Mise à jour de ${key}:`, value);
+      updateSignatureData(key as keyof SignatureData, value);
+    });
+    
+    // Afficher une notification de succès
+    Notification.success('Informations de l\'entreprise importées avec succès', {
+      duration: 3000,
+      position: 'bottom-left'
+    });
   };
+  
+  // Surveiller les changements dans les données de l'entreprise
+  useEffect(() => {
+    if (company) {
+      console.log('Données d\'entreprise chargées:', company);
+    }
+  }, [company]);
 
   return (
     <>
@@ -26,14 +67,11 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                 <button 
                   type="button"
                   className="text-sm text-[#5b50ff] hover:text-[#4a41e0] font-medium flex items-center"
-                  onClick={() => {
-                    // Fonction pour remplir les champs avec des données de démo
-                    updateSignatureData('companyName', 'Newbi');
-                    updateSignatureData('companyWebsite', 'https://newbi.fr');
-                    updateSignatureData('companyAddress', '123 Avenue des Entrepreneurs, 75000 Paris, France');
-                  }}
+                  onClick={importCompanyInfo}
+                  disabled={loading}
                 >
-                  Démo
+                  <Import size="16" color="#5b50ff" variant="Bold" className="mr-1" />
+                  {loading ? 'Chargement...' : 'Importer info entreprise'}
                 </button>
               </div>
             </div>

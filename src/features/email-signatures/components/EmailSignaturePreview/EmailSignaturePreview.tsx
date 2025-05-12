@@ -2,12 +2,25 @@ import React, { useRef, useState } from 'react';
 import { EmailSignature } from '../../types';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../../../components/ui';
+import { SignatureLayout } from './SignatureLayout';
+import { getFullImageUrl, getFullProfilePhotoUrl } from './utils';
+import { SocialLinksComponent } from './SocialLinks';
 
 interface EmailSignaturePreviewProps {
   signature: Partial<EmailSignature>;
+  showEmailIcon?: boolean;
+  showPhoneIcon?: boolean;
+  showAddressIcon?: boolean;
+  showWebsiteIcon?: boolean;
 }
 
-export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ signature }) => {
+export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ 
+  signature, 
+  showEmailIcon = false,
+  showPhoneIcon = false,
+  showAddressIcon = false,
+  showWebsiteIcon = false
+}) => {
   // État pour afficher un message de confirmation après la copie
   const [copySuccess, setCopySuccess] = useState(false);
   
@@ -15,36 +28,40 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const signatureRef = useRef<HTMLDivElement>(null);
   // URL de base de l'API pour les images
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
-  // Déstructuration des propriétés de la signature
+  
+  // Extraction des données de la signature avec valeurs par défaut
   const {
     fullName,
     jobTitle,
     email,
     phone,
-    mobilePhone,
     website,
     address,
     companyName,
-    primaryColor,
+    primaryColor = '#5b50ff',
     secondaryColor,
     logoUrl,
-    showLogo,
     socialLinks,
+    mobilePhone,
+    showLogo,
     profilePhotoUrl,
     profilePhotoBase64,
-    profilePhotoSize,
-    layout,
-    horizontalSpacing,
-    verticalSpacing,
-    verticalAlignment,
-    imagesLayout,
-    fontFamily,
-    fontSize,
-    socialLinksDisplayMode,
-    socialLinksPosition,
-    socialLinksIconStyle
+    profilePhotoSize = 80,
+    layout = 'horizontal',
+    horizontalSpacing = 20,
+    verticalSpacing = 10,
+    verticalAlignment = 'left',
+    imagesLayout = 'vertical',
+    fontFamily = 'Arial, sans-serif',
+    fontSize = 14,
+    style = 'normal', // Style de texte par défaut: normal
+    socialLinksDisplayMode = 'icons',
+    socialLinksPosition = 'bottom',
+    socialLinksIconStyle = 'plain'
   } = signature;
-
+  
+  // Remarque: les propriétés d'affichage des icônes sont maintenant passées directement comme props
+  
   // Fonction pour préfixer l'URL du logo ou de la photo de profil avec l'URL de l'API si nécessaire
   const getFullImageUrl = (imagePath: string | undefined) => {
     if (!imagePath) {
@@ -86,46 +103,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     return getFullImageUrl(photoPath);
   };
 
-  // Fonction pour générer les styles CSS pour les réseaux sociaux
-  const getSocialIconStyle = () => {
-    const baseStyle = {
-      display: 'inline-block',
-      margin: '0 5px',
-      textDecoration: 'none'
-    };
-
-    switch (socialLinksIconStyle) {
-      case 'rounded':
-        return {
-          ...baseStyle,
-          padding: '6px',
-          borderRadius: '5px',
-          backgroundColor: primaryColor,
-          color: '#ffffff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        };
-      case 'circle':
-        return {
-          ...baseStyle,
-          padding: '6px',
-          borderRadius: '50%',
-          backgroundColor: primaryColor,
-          color: '#ffffff',
-          width: '26px',
-          height: '26px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        };
-      default:
-        return {
-          ...baseStyle,
-          color: primaryColor
-        };
-    }
-  };
+  // Nous utilisons maintenant le composant SocialLinksComponent qui gère ses propres styles
 
   // Définir explicitement showLogo avec une valeur par défaut à true
   const displayLogo = showLogo !== false; // Si showLogo est undefined ou null, on affiche le logo
@@ -139,23 +117,27 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   // Définir la taille de police avec une valeur par défaut
   const signatureFontSize = fontSize || 14; // Taille par défaut: 14px
   
-  // Style de base pour la signature
+  // Style de base pour la signature - utiliser une couleur fixe pour le texte
   const baseStyle = {
     fontFamily: signatureFontFamily,
     fontSize: `${signatureFontSize}px`,
-    color: '#333'
+    color: '#333333' // Couleur fixe pour le texte, indépendante de la couleur secondaire
   };
   
-  // Définir le mode d'affichage des réseaux sociaux avec une valeur par défaut
-  // Le mode d'affichage des réseaux sociaux (texte ou icônes)
-  const displayMode = socialLinksDisplayMode || 'text'; // Mode par défaut: texte
-  // Utiliser cette variable dans le rendu des liens sociaux
+  // Le mode d'affichage des réseaux sociaux (texte ou icônes) est géré par le composant SocialLinksComponent
   
   // Définir la position des réseaux sociaux avec une valeur par défaut
   const socialPosition = socialLinksPosition || 'bottom'; // Position par défaut: en bas
   
   // Définir l'alignement du texte en mode vertical avec une valeur par défaut
-  const textAlignment = verticalAlignment || 'left'; // Alignement par défaut: gauche
+  const effectiveAlignment = verticalAlignment || 'left'; // Alignement par défaut: gauche
+  
+  // Convertir l'alignement en valeur valide pour textAlign (seulement 'left', 'center', 'right')
+  const effectiveTextAlign = (
+    effectiveAlignment === 'left' || 
+    effectiveAlignment === 'center' || 
+    effectiveAlignment === 'right'
+  ) ? effectiveAlignment : 'left'; // Valeur par défaut si non valide
   
   // Définir la disposition des images en mode vertical avec une valeur par défaut
   const imageLayout = imagesLayout || 'vertical'; // Disposition par défaut: verticale
@@ -174,16 +156,24 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const signatureStyle = {
     ...baseStyle,
     lineHeight: '1.5',
-    maxWidth: '600px'
+    maxWidth: '600px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: signatureLayout === 'vertical' ? (
+      effectiveAlignment === 'center' ? 'center' : 
+      effectiveAlignment === 'right' ? 'flex-end' : 'flex-start'
+    ) : 'flex-start',
+    width: '100%',
+    gap: `${effectiveVerticalSpacing/2}px`
   };
 
   // Styles pour le conteneur principal
   const containerStyle = {
     display: 'flex',
     flexDirection: signatureLayout === 'horizontal' ? 'row' as const : 'column' as const,
-    alignItems: signatureLayout === 'horizontal' ? 'center' : 
-                textAlignment === 'center' ? 'center' : 
-                textAlignment === 'right' ? 'flex-end' : 'flex-start',
+    alignItems: signatureLayout === 'horizontal' ? 'flex-start' : 
+                effectiveTextAlignment === 'center' ? 'center' : 
+                effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start',
     gap: signatureLayout === 'horizontal' ? `${effectiveHorizontalSpacing}px` : `${effectiveVerticalSpacing}px`
   };
 
@@ -192,43 +182,88 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: signatureLayout === 'horizontal' ? 'flex-start' : 
-                textAlignment === 'center' ? 'center' : 
-                textAlignment === 'right' ? 'flex-end' : 'flex-start',
-    gap: '5px'
+                effectiveTextAlignment === 'center' ? 'center' : 
+                effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start',
+    gap: '5px',
+    // En mode horizontal, nous voulons que le contenu principal occupe l'espace disponible
+    flex: signatureLayout === 'horizontal' ? '1' : 'initial'
   };
+
+  // Fonction pour appliquer le style de texte sélectionné
+  const getTextDecorationStyle = (textStyle: string) => {
+    switch (textStyle) {
+      case 'underline':
+        return { textDecoration: 'underline' };
+      case 'overline':
+        return { textDecoration: 'overline' };
+      case 'strikethrough':
+        return { textDecoration: 'line-through' };
+      default:
+        return {};
+    }
+  };
+
+  // Style de décoration de texte basé sur le style sélectionné
+  const textDecorationStyle = getTextDecorationStyle(style);
 
   // Styles pour le nom complet
   const nameStyle = {
     color: primaryColor,
     fontWeight: 'bold',
     margin: '0',
-    fontSize: `${(fontSize || 12) + 2}px`
+    fontSize: `${(fontSize || 12) + 2}px`,
+    textAlign: effectiveTextAlign,
+    width: '100%',
+    marginBottom: `${effectiveVerticalSpacing/2}px`,
+    ...textDecorationStyle
   };
 
-  // Styles pour le titre du poste
+  // Styles pour le titre du poste - utiliser une couleur fixe pour le texte
   const jobTitleStyle = {
-    color: '#666666',
+    color: '#666666', // Couleur fixe pour le texte, indépendante de la couleur secondaire
     margin: '0',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    textAlign: effectiveTextAlign,
+    width: '100%',
+    marginBottom: `${effectiveVerticalSpacing}px`,
+    ...textDecorationStyle
   };
 
-  // Styles pour les informations de contact
+  // Styles pour les informations de contact - utiliser une couleur fixe pour le texte
   const contactStyle = {
-    margin: '5px 0',
-    color: '#666666'
+    margin: '0',
+    color: '#666666', // Couleur fixe pour le texte, indépendante de la couleur secondaire
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: effectiveAlignment === 'center' ? 'center' : 
+               effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+    width: '100%',
+    gap: `${Math.max(5, effectiveVerticalSpacing/2)}px`,
+    ...textDecorationStyle
   };
 
-  // Styles pour les liens
+  // Styles pour les liens - utiliser la couleur primaire uniquement
   const linkStyle = {
-    color: primaryColor,
+    color: primaryColor || '#5b50ff', // Utiliser uniquement la couleur primaire pour les liens, pas la couleur secondaire
     textDecoration: 'none'
   };
 
-  // Styles pour le séparateur
+  // Style commun pour les éléments de contact individuels
+  const contactItemStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    justifyContent: effectiveAlignment === 'center' ? 'center' : 
+                  effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+    width: '100%',
+    ...textDecorationStyle
+  };
+
+  // Styles pour le séparateur - utiliser une couleur neutre pour ne pas être affecté par la couleur secondaire
   const separatorStyle = {
     width: signatureLayout === 'horizontal' ? '1px' : '100%',
     height: signatureLayout === 'horizontal' ? '100%' : '1px',
-    backgroundColor: secondaryColor || '#f5f5f5',
+    backgroundColor: '#f5f5f5', // Couleur neutre fixe pour le séparateur
     margin: signatureLayout === 'horizontal' ? `0 ${effectiveHorizontalSpacing / 2}px` : `${effectiveVerticalSpacing / 2}px 0`
   };
 
@@ -236,16 +271,20 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   const imagesContainerStyle = {
     display: 'flex',
     flexDirection: imageLayout === 'horizontal' ? 'row' as const : 'column' as const,
-    alignItems: 'center',
-    gap: '10px'
+    alignItems: effectiveAlignment === 'center' ? 'center' : 
+               effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+    gap: '10px',
+    marginBottom: signatureLayout === 'horizontal' ? '0' : '10px'
   };
 
   // Styles pour les réseaux sociaux
   const socialLinksContainerStyle = {
     display: 'flex',
     flexDirection: socialPosition === 'bottom' ? 'row' as const : 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    alignItems: effectiveAlignment === 'center' ? 'center' : 
+               effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+    justifyContent: effectiveTextAlign === 'center' ? 'center' : 
+                   effectiveTextAlign === 'right' ? 'flex-end' : 'flex-start',
     flexWrap: 'wrap' as const,
     marginTop: '10px'
   };
@@ -259,50 +298,28 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
   );
   
   // Utiliser profilePhotoBase64 s'il est disponible, sinon utiliser profilePhotoUrl
-  const profilePhotoSource = profilePhotoBase64 || profilePhotoUrl;
+  // S'assurer que l'image par défaut n'est pas utilisée si une photo a été téléchargée
+  const profilePhotoSource = profilePhotoBase64 || (profilePhotoUrl && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg' ? profilePhotoUrl : null);
+  
 
   // Rendu des réseaux sociaux
   const renderSocialLinks = () => {
     if (!hasSocialLinks) return null;
 
+    // Créer une couleur dédiée pour les icônes des réseaux sociaux
+    // Cette couleur est indépendante de la couleur secondaire pour éviter d'affecter les textes
+    const socialIconColor = secondaryColor || primaryColor;
+    
     return (
       <div style={socialLinksContainerStyle}>
-        {socialLinks?.linkedin && (
-          <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" style={getSocialIconStyle()}>
-            {displayMode === 'icons' ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-              </svg>
-            ) : 'LinkedIn'}
-          </a>
-        )}
-        {socialLinks?.twitter && (
-          <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" style={getSocialIconStyle()}>
-            {displayMode === 'icons' ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-              </svg>
-            ) : 'Twitter'}
-          </a>
-        )}
-        {socialLinks?.facebook && (
-          <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" style={getSocialIconStyle()}>
-            {displayMode === 'icons' ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
-              </svg>
-            ) : 'Facebook'}
-          </a>
-        )}
-        {socialLinks?.instagram && (
-          <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" style={getSocialIconStyle()}>
-            {displayMode === 'icons' ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-            ) : 'Instagram'}
-          </a>
-        )}
+        <SocialLinksComponent
+          socialLinks={socialLinks}
+          displayMode={socialLinksDisplayMode}
+          socialLinksIconStyle={socialLinksIconStyle}
+          primaryColor={primaryColor}
+          iconColor={socialIconColor} // Couleur pour le SVG (l'icône elle-même) en mode "plain" ou pour le texte
+          backgroundColor={primaryColor} // Couleur de fond pour les styles "carré arrondi" et "cercle"
+        />
       </div>
     );
   };
@@ -392,77 +409,262 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ si
             
             {/* Signature */}
             <div ref={signatureRef} style={signatureStyle} className="border-t pt-4">
-              <div style={containerStyle as React.CSSProperties}>
-                {(logoUrl || profilePhotoSource) && (
-                  <div style={imagesContainerStyle as React.CSSProperties}>
-                    {logoUrl && displayLogo && (
+              {/* Disposition de la signature */}
+              {signatureLayout === 'horizontal' && (
+                <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
+                  {/* Partie gauche - Photo de profil */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                    padding: '10px'
+                  }}>
+                    {profilePhotoSource ? (
+                      <div style={{ 
+                        width: `${photoSize}px`, 
+                        height: `${photoSize}px`, 
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        backgroundColor: '#f0eeff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <img 
+                          src={getFullProfilePhotoUrl(profilePhotoSource)} 
+                          alt="Profile" 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover'
+                          }} 
+                        />
+                      </div>
+                    ) : logoUrl && displayLogo && (
                       <img 
                         src={getFullLogoUrl(logoUrl)} 
                         alt="Logo" 
                         style={{ maxWidth: '120px', maxHeight: '60px' }} 
                       />
                     )}
-                    {profilePhotoSource && (
-                      <img 
-                        src={getFullProfilePhotoUrl(profilePhotoSource)} 
-                        alt="Profile" 
-                        style={{ 
-                          width: `${photoSize}px`, 
-                          height: `${photoSize}px`, 
-                          borderRadius: '50%', 
-                          objectFit: 'cover' as const
-                        }} 
-                      />
+                  </div>
+                  
+                  {/* Partie centrale - Informations personnelles */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    padding: '0 20px 0 0'
+                  }}>
+                    {fullName && <h3 style={{...nameStyle, margin: '0 0 5px 0'}}>{fullName}</h3>}
+                    {jobTitle && <p style={{...jobTitleStyle, margin: '0 0 5px 0'}}>{jobTitle}</p>}
+                    {companyName && <p style={{margin: '0 0 5px 0', color: primaryColor}}>{companyName}</p>}
+                  </div>
+                  
+                  {/* Séparateur vertical */}
+                  <div style={{
+                    width: '1px',
+                    backgroundColor: '#e0e0e0', // Même couleur que le séparateur horizontal
+                    alignSelf: 'stretch',
+                    margin: '0'
+                  }}></div>
+                  
+                  {/* Partie droite - Informations de contact */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    padding: '0 0 0 20px',
+                    gap: `${effectiveVerticalSpacing}px`
+                  }}>
+                    {phone && (
+                      <div style={{...contactItemStyle, margin: '0'}}>
+                        <span style={{ color: '#5b50ff' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <span style={{marginLeft: '5px'}}>{phone} {mobilePhone && `| ${mobilePhone}`}</span>
+                      </div>
+                    )}
+                    {email && (
+                      <div style={{...contactItemStyle, margin: '0'}}>
+                        <span style={{ color: '#5b50ff' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+                          </svg>
+                        </span>
+                        <a href={`mailto:${email}`} style={{...linkStyle, marginLeft: '5px'}}>{email}</a>
+                      </div>
+                    )}
+                    {website && (
+                      <div style={{...contactItemStyle, margin: '0'}}>
+                        <span style={{ color: '#5b50ff' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM6.262 6.072a8.25 8.25 0 1010.562-.766 4.5 4.5 0 01-1.318 1.357L14.25 7.5l.165.33a.809.809 0 01-1.086 1.085l-.604-.302a1.125 1.125 0 00-1.298.21l-.132.131c-.439.44-.439 1.152 0 1.591l.296.296c.256.257.622.374.98.314l1.17-.195c.323-.054.654.036.905.245l1.33 1.108c.32.267.46.694.358 1.1a8.7 8.7 0 01-2.288 4.04l-.723.724a1.125 1.125 0 01-1.298.21l-.153-.076a1.125 1.125 0 01-.622-1.006v-1.089c0-.298-.119-.585-.33-.796l-1.347-1.347a1.125 1.125 0 01-.21-1.298L9.75 12l-1.64-1.64a6 6 0 01-1.676-3.257l-.172-1.03z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <a href={website.startsWith('http') ? website : `https://${website}`} target="_blank" rel="noopener noreferrer" style={{...linkStyle, marginLeft: '5px'}}>
+                          {website.replace(/^https?:\/\//i, '')}
+                        </a>
+                      </div>
+                    )}
+                    {address && (
+                      <div style={{...contactItemStyle, margin: '0'}}>
+                        <span style={{ color: '#5b50ff' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <span style={{marginLeft: '5px'}}>{address}</span>
+                      </div>
                     )}
                   </div>
-                )}
-                
-                {signatureLayout === 'horizontal' && <div style={separatorStyle}></div>}
-                
-                <div style={infoStyle as React.CSSProperties}>
-                  {fullName && <h3 style={nameStyle}>{fullName || 'Votre Nom'}</h3>}
-                  {jobTitle && <p style={jobTitleStyle}>{jobTitle || 'Votre Poste'}</p>}
+                </div>
+              )}
+              
+              {/* Disposition verticale - code existant */}
+              {signatureLayout !== 'horizontal' && (
+                <div style={containerStyle as React.CSSProperties}>
+                  {/* Conteneur d'images - n'afficher que si nécessaire */}
+                  <div style={imagesContainerStyle as React.CSSProperties}>
+                    {/* N'afficher le logo que s'il est défini et qu'il ne s'agit pas du logo Newbi par défaut 
+                        lorsqu'une photo de profil est présente */}
+                    {logoUrl && displayLogo && 
+                     !(profilePhotoSource && logoUrl === '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') && (
+                      <img 
+                        src={getFullLogoUrl(logoUrl)} 
+                        alt="Logo" 
+                        style={{ maxWidth: '120px', maxHeight: '60px' }} 
+                      />
+                    )}
+                    {/* Conteneur de la photo de profil - uniquement affiché si une photo est téléchargée */}
+                    {profilePhotoSource && (
+                      <div style={{ 
+                        width: `${photoSize}px`, 
+                        height: `${photoSize}px`, 
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        backgroundColor: '#f0eeff', // Couleur de fond légère Newbi
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <img 
+                          src={getFullProfilePhotoUrl(profilePhotoSource)} 
+                          alt="Profile" 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover'
+                          }} 
+                        />
+                      </div>
+                    )}
+                  </div> {/* Fermeture du conteneur d'images */}
+                  
+                  {/* En mode horizontal, afficher le nom et le titre dans le conteneur d'images */}
+                  {signatureLayout === 'horizontal' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      {fullName && <h3 style={nameStyle}>{fullName || 'Votre Nom'}</h3>}
+                      {jobTitle && <p style={jobTitleStyle}>{jobTitle || 'Votre Poste'}</p>}
+                    </div>
+                  )}
+                  {/* En mode vertical, afficher le nom et le titre après les images */}
+                  {signatureLayout === 'vertical' && fullName && <h3 style={nameStyle}>{fullName || 'Votre Nom'}</h3>}
+                  {signatureLayout === 'vertical' && jobTitle && <p style={jobTitleStyle}>{jobTitle || 'Votre Poste'}</p>}
+                  
+                  {/* Trait séparateur supérieur - uniquement en mode vertical */}
+                  <div style={{
+                    height: '1px',
+                    backgroundColor: '#e0e0e0',
+                    margin: `${effectiveVerticalSpacing/2}px 0`,
+                    alignSelf: effectiveAlignment === 'center' ? 'center' : 
+                              effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+                    width: effectiveAlignment === 'center' ? '80%' : '100%'
+                  }}></div>
                   
                   <div style={contactStyle}>
                     {email && (
-                      <div>
+                      <div style={contactItemStyle}>
+                        {showEmailIcon && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={primaryColor || '#5b50ff'}>
+                            <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+                          </svg>
+                        )}
                         <a href={`mailto:${email}`} style={linkStyle}>{email}</a>
                       </div>
                     )}
                     {phone && (
-                      <div>
+                      <div style={contactItemStyle}>
+                        {showPhoneIcon && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={primaryColor || '#5b50ff'}>
+                            <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clipRule="evenodd" />
+                          </svg>
+                        )}
                         <a href={`tel:${phone}`} style={linkStyle}>{phone}</a>
                       </div>
                     )}
                     {mobilePhone && (
-                      <div>
+                      <div style={contactItemStyle}>
+                        {showPhoneIcon && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={primaryColor || '#5b50ff'}>
+                            <path d="M10.5 18.75a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" />
+                            <path fillRule="evenodd" d="M8.625.75A3.375 3.375 0 005.25 4.125v15.75a3.375 3.375 0 003.375 3.375h6.75a3.375 3.375 0 003.375-3.375V4.125A3.375 3.375 0 0015.375.75h-6.75zM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75A1.125 1.125 0 017.5 19.875V4.125z" clipRule="evenodd" />
+                          </svg>
+                        )}
                         <a href={`tel:${mobilePhone}`} style={linkStyle}>{mobilePhone}</a>
                       </div>
                     )}
                     {website && (
-                      <div>
+                      <div style={contactItemStyle}>
+                        {showWebsiteIcon && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={primaryColor || '#5b50ff'}>
+                            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM6.262 6.072a8.25 8.25 0 1010.562-.766 4.5 4.5 0 01-1.318 1.357L14.25 7.5l.165.33a.809.809 0 01-1.086 1.085l-.604-.302a1.125 1.125 0 00-1.298.21l-.132.131c-.439.44-.439 1.152 0 1.591l.296.296c.256.257.622.374.98.314l1.17-.195c.323-.054.654.036.905.245l1.33 1.108c.32.267.46.694.358 1.1a8.7 8.7 0 01-2.288 4.04l-.723.724a1.125 1.125 0 01-1.298.21l-.153-.076a1.125 1.125 0 01-.622-1.006v-1.089c0-.298-.119-.585-.33-.796l-1.347-1.347a1.125 1.125 0 01-.21-1.298L9.75 12l-1.64-1.64a6 6 0 01-1.676-3.257l-.172-1.03z" clipRule="evenodd" />
+                          </svg>
+                        )}
                         <a href={website} target="_blank" rel="noopener noreferrer" style={linkStyle}>
                           {website.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       </div>
                     )}
                     {address && (
-                      <div style={{ whiteSpace: 'pre-line' }}>
-                        {address}
+                      <div style={{...contactItemStyle, alignItems: 'flex-start'}}>
+                        {showAddressIcon && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={primaryColor || '#5b50ff'} style={{ marginTop: '3px' }}>
+                            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span style={{ whiteSpace: 'pre-line' }}>
+                          {address}
+                        </span>
                       </div>
                     )}
                     {companyName && (
-                      <div>
+                      <div style={contactItemStyle}>
                         <strong>{companyName}</strong>
                       </div>
                     )}
                   </div>
                   
+                  {/* Trait séparateur inférieur */}
+                  <div style={{
+                    height: '1px',
+                    backgroundColor: '#e0e0e0',
+                    margin: `${effectiveVerticalSpacing/2}px 0 ${effectiveVerticalSpacing/2}px 0`,
+                    alignSelf: effectiveAlignment === 'center' ? 'center' : 
+                              effectiveAlignment === 'right' ? 'flex-end' : 'flex-start',
+                    width: effectiveAlignment === 'center' ? '80%' : '100%'
+                  }}></div>
+                  
                   {socialPosition === 'bottom' && renderSocialLinks()}
+                  
+                  {/* Afficher les liens sociaux à droite si nécessaire */}
+                  {socialPosition === 'right' && renderSocialLinks()}
                 </div>
-                
-                {socialPosition === 'right' && renderSocialLinks()}
-              </div>
+              )}
             </div>
           </div>
         </div>

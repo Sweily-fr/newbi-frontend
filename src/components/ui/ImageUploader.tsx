@@ -176,14 +176,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
         {!hasImage && (
           <div className="relative">
-            <div 
-              className={`${roundedStyle === 'full' ? 'rounded-full' : roundedStyle === 'rounded' ? 'rounded-lg' : 'rounded-none'} bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm`}
-              style={{ width: `${imageSize}px`, height: `${imageSize}px` }}>
-
-              <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`${roundedStyle === 'full' ? 'rounded-full' : roundedStyle === 'rounded' ? 'rounded-lg' : 'rounded-none'} bg-[#f0eeff] flex items-center justify-center border border-[#e6e3ff] shadow-sm hover:bg-[#e6e3ff] transition-colors`}
+              style={{ width: `${imageSize}px`, height: `${imageSize}px` }}
+            >
+              <svg className="w-10 h-10 text-[#5b50ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-            </div>
+            </button>
           </div>
         )}
         <div className="flex flex-col gap-2">

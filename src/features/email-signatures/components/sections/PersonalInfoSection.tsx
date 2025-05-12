@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { SignatureData } from '../../types';
+import { Checkbox } from '../../../../components/common';
+import { ImageUploader } from '../../../../components/ui/ImageUploader';
 
 interface PersonalInfoSectionProps {
   signatureData: SignatureData;
@@ -30,15 +32,13 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
               </div>
               
               <div className="col-span-2">
-                <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                    checked={signatureData.isDefault}
-                    onChange={(e) => updateSignatureData('isDefault', e.target.checked)}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Définir comme signature par défaut</span>
-                </label>
+                <Checkbox 
+                  id="isDefault"
+                  name="isDefault"
+                  label="Définir comme signature par défaut"
+                  checked={signatureData.isDefault}
+                  onChange={(e) => updateSignatureData('isDefault', e.target.checked)}
+                />
               </div>
             </div>
           </div>
@@ -54,30 +54,33 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Photo de profil
                 </label>
-                <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border">
-                    {signatureData.profilePhotoUrl ? (
-                      <img 
-                        src={signatureData.profilePhotoUrl} 
-                        alt="Photo de profil" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-400">Photo</span>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                    >
-                      Télécharger
-                    </button>
-                    <div className="text-xs text-gray-500">
-                      Format recommandé : PNG ou JPG, max 2MB
-                    </div>
-                  </div>
-                </div>
+                <ImageUploader
+                  imageUrl={signatureData.profilePhotoUrl || ''}
+                  previewImage={signatureData.profilePhotoBase64 || null}
+                  isLoading={false}
+                  roundedStyle="full"
+                  imageSize={80}
+                  objectFit="cover"
+                  onFileSelect={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Convertir l'image en base64 pour la prévisualisation
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const base64 = event.target?.result as string;
+                        // Mettre à jour les données de signature avec l'image en base64
+                        updateSignatureData('profilePhotoBase64' as any, base64);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  onDelete={() => {
+                    // Supprimer la photo de profil
+                    updateSignatureData('profilePhotoBase64' as any, null);
+                    updateSignatureData('profilePhotoUrl' as any, '');
+                    updateSignatureData('profilePhotoToDelete' as any, true);
+                  }}
+                />
               </div>
               
               {/* Nom complet */}
@@ -148,6 +151,63 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   value={signatureData.mobilePhone}
                   onChange={(e) => updateSignatureData('mobilePhone', e.target.value)}
                 />
+              </div>
+              
+              {/* Section pour les options d'affichage des icônes */}
+              <div className="col-span-2 mt-4">
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Options d'affichage des icônes</h4>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Checkbox 
+                        id="showEmailIcon"
+                        name="showEmailIcon"
+                        label="Afficher l'icône pour l'email"
+                        checked={Boolean(signatureData.showEmailIcon)}
+                        onChange={(e) => {
+                          const field = 'showEmailIcon';
+                          updateSignatureData(field as any, e.target.checked);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Checkbox 
+                        id="showPhoneIcon"
+                        name="showPhoneIcon"
+                        label="Afficher l'icône pour le téléphone"
+                        checked={Boolean(signatureData.showPhoneIcon)}
+                        onChange={(e) => {
+                          const field = 'showPhoneIcon';
+                          updateSignatureData(field as any, e.target.checked);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Checkbox 
+                        id="showAddressIcon"
+                        name="showAddressIcon"
+                        label="Afficher l'icône pour l'adresse"
+                        checked={Boolean(signatureData.showAddressIcon)}
+                        onChange={(e) => {
+                          const field = 'showAddressIcon';
+                          updateSignatureData(field as any, e.target.checked);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Checkbox 
+                        id="showWebsiteIcon"
+                        name="showWebsiteIcon"
+                        label="Afficher l'icône pour le site web"
+                        checked={Boolean(signatureData.showWebsiteIcon)}
+                        onChange={(e) => {
+                          const field = 'showWebsiteIcon';
+                          updateSignatureData(field as any, e.target.checked);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

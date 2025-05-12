@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { CheckboxProps } from '../../types/ui';
+import { RadioProps } from '../../types/ui';
 
 /**
- * Composant Checkbox réutilisable
+ * Composant Radio réutilisable
  * Compatible avec React Hook Form ou utilisable de manière standard
- * Design épuré avec la couleur principale de Newbi (#5b50ff)
  */
-export const Checkbox: React.FC<CheckboxProps> = ({
+export const Radio: React.FC<RadioProps> = ({
   id,
   name,
   label,
+  value,
   register,
   error,
   disabled = false,
@@ -17,10 +17,9 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   helpText,
   checked,
   onChange,
-  variant = 'default',
   ...rest
 }) => {
-  // État local pour suivre l'état de la checkbox
+  // État local pour suivre l'état du radio
   const [isCheckedState, setIsCheckedState] = useState(checked || false);
   
   // Mettre à jour l'état local lorsque la prop checked change
@@ -31,7 +30,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   }, [checked]);
   
   // Déterminer les props à passer à l'input en fonction du mode d'utilisation
-  const checkboxProps = register 
+  const radioProps = register 
     ? { ...register(name) } // Mode React Hook Form
     : { // Mode standard
         name,
@@ -47,31 +46,27 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       <div className="relative inline-flex">
         <input
           id={id}
-          type="checkbox"
-          {...checkboxProps}
+          type="radio"
+          value={value}
+          {...radioProps}
           {...rest}
           className="absolute opacity-0 w-0 h-0"
           disabled={disabled}
         />
         <label 
           htmlFor={id} 
-          className={`flex items-center justify-center w-5 h-5 border rounded-sm cursor-pointer transition-colors ${
+          className={`flex items-center justify-center w-5 h-5 border border-gray-300 rounded-full cursor-pointer transition-colors ${
             isCheckedState 
-              ? 'bg-[#5b50ff] border-[#5b50ff]' 
+              ? 'border-[#5b50ff]' 
               : disabled 
                 ? 'bg-gray-100 border-gray-200 cursor-not-allowed' 
-                : 'bg-white border-gray-300 hover:border-[#4a41e0]'
+                : 'bg-white hover:border-[#4a41e0]'
           }`}
         >
           {isCheckedState && (
-            <svg className="w-3 h-3 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          )}
-          {isCheckedState === false && variant === 'minus' && (
-            <svg className="w-3 h-3 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
+            <span className={`w-2.5 h-2.5 rounded-full ${
+              disabled ? 'bg-gray-400' : 'bg-[#5b50ff]'
+            }`}></span>
           )}
         </label>
       </div>
@@ -91,3 +86,5 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     </div>
   );
 };
+
+export default Radio;

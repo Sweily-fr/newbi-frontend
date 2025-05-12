@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HexColorPicker } from 'react-colorful';
+import { RowHorizontal, RowVertical, InfoCircle } from 'iconsax-react';
 import { SignatureData } from '../../types';
 
 interface AppearanceSectionProps {
@@ -94,11 +95,12 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
         
         {/* Barre d'outils moderne */}
         <div className="mb-6">
-          <div className="flex items-center p-2 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between p-2 bg-white rounded-2xl border border-[#E3E2E5] shadow-sm">
+            <div className="flex items-center">
             {/* Sélecteur de police */}
             <div className="relative mr-2">
               <select
-                className="h-10 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-sm appearance-none bg-white"
+                className="h-9 px-3 py-2 border border-[#E3E2E5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-sm appearance-none bg-white"
                 value={signatureData.fontFamily}
                 onChange={(e) => updateSignatureData('fontFamily', e.target.value)}
               >
@@ -114,18 +116,18 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
             </div>
 
             {/* Séparateur vertical */}
-            <div className="h-8 w-px bg-gray-300 mx-2"></div>
+            <div className="h-7 w-px bg-[#E3E2E5] mx-2"></div>
             
             {/* Taille de police */}
-            <div className="flex items-center space-x-1 mr-2">
+            <div className="flex bg-white border border-[#E3E2E5] rounded-xl h-9 items-center px-1 space-x-1 mr-2">
               {fontSizeOptions.map(option => (
                 <button
                   key={option.value}
                   type="button"
-                  className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs transition-all ${
+                  className={`flex items-center justify-center w-7 h-7 rounded-lg text-xs transition-all ${
                     signatureData.fontSize === option.value 
-                      ? 'bg-[#5b50ff] text-white' 
-                      : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                      ? 'border border-[#5b50ff] bg-[#f0eeff] text-[#5b50ff]' 
+                      : 'text-[#838796]'
                   }`}
                   onClick={() => updateSignatureData('fontSize', option.value)}
                 >
@@ -135,13 +137,13 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
             </div>
 
             {/* Séparateur vertical */}
-            <div className="h-8 w-px bg-gray-300 mx-2"></div>
+            <div className="h-7 w-px bg-[#E3E2E5] mx-2"></div>
             
             {/* Menu déroulant pour le style de texte */}
-            <div className="relative">
+            <div className="relative flex bg-white border border-[#E3E2E5] rounded-xl h-9 items-center px-1">
               <button 
                 type="button" 
-                className="flex items-center justify-center h-8 px-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#5b50ff] text-xs"
+                className="flex items-center justify-center h-7 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b50ff] text-xs text-[#838796]"
                 onClick={() => setShowTextStyleDropdown(!showTextStyleDropdown)}
               >
                 {signatureData.textStyle === 'normal' && 'T'}
@@ -174,7 +176,184 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                 </div>
               )}
             </div>
+            
+            {/* Séparateur vertical */}
+            <div className="h-7 w-px bg-[#E3E2E5] mx-2"></div>
+            
+            {/* Contrôles de disposition */}
+            <div className="flex items-center relative">
+              <div className="absolute -top-1 -right-1 group z-10">
+                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                  Choisissez l'orientation de votre signature : verticale ou horizontale
+                  <div className="absolute top-full right-2 transform border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </div>
+              <div className="flex bg-white border border-[#E3E2E5] rounded-xl h-9 items-center px-1 relative group">
+                <button
+                  type="button"
+                  className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${signatureData.layout === 'vertical' ? 'border border-[#5b50ff] bg-[#f0eeff]' : 'text-[#838796]'}`}
+                  onClick={() => updateSignatureData('layout', 'vertical')}
+                  aria-label="Disposition verticale"
+                >
+                  <RowVertical size="16" color={signatureData.layout === 'vertical' ? '#5b50ff' : '#838796'} />
+                </button>
+                <button
+                  type="button"
+                  className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${signatureData.layout === 'horizontal' ? 'border border-[#5b50ff] bg-[#f0eeff]' : 'text-[#838796]'}`}
+                  onClick={() => updateSignatureData('layout', 'horizontal')}
+                  aria-label="Disposition horizontale"
+                >
+                  <RowHorizontal size="16" color={signatureData.layout === 'horizontal' ? '#5b50ff' : '#838796'} />
+                </button>
+              </div>
+              <div className="hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 text-white text-xs rounded-lg py-1 px-2 whitespace-nowrap z-10">
+                *Choisissez comment organiser les éléments de votre signature
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
+              </div>
+            </div>
+            
+            </div>
+            
+            {/* Contrôles d'alignement du texte - masqués en mode horizontal - positionnés à droite */}
+            {signatureData.layout !== 'horizontal' && (
+              <div className="flex items-center ml-auto self-end relative">
+                <div className="absolute -top-1 -right-1 group">
+                  <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                    Choisissez l'alignement du texte de votre signature
+                    <div className="absolute top-full right-2 transform border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+                <div className="flex bg-white border border-[#E3E2E5] rounded-xl h-9 items-center px-1">
+                  <button
+                    type="button"
+                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${signatureData.textAlignment === 'left' ? 'border border-[#5b50ff] bg-[#f0eeff]' : 'text-[#838796]'}`}
+                    onClick={() => updateSignatureData('textAlignment', 'left')}
+                    aria-label="Aligner à gauche"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 4.5H21" stroke={signatureData.textAlignment === 'left' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 9.5H12.5" stroke={signatureData.textAlignment === 'left' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 14.5H21" stroke={signatureData.textAlignment === 'left' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 19.5H12.5" stroke={signatureData.textAlignment === 'left' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${signatureData.textAlignment === 'center' ? 'border border-[#5b50ff] bg-[#f0eeff]' : 'text-[#838796]'}`}
+                    onClick={() => updateSignatureData('textAlignment', 'center')}
+                    aria-label="Centrer"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 4.5H21" stroke={signatureData.textAlignment === 'center' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M7.26001 9.5H16.74" stroke={signatureData.textAlignment === 'center' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 14.5H21" stroke={signatureData.textAlignment === 'center' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M7.26001 19.5H16.74" stroke={signatureData.textAlignment === 'center' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${signatureData.textAlignment === 'right' ? 'border border-[#5b50ff] bg-[#f0eeff]' : 'text-[#838796]'}`}
+                    onClick={() => updateSignatureData('textAlignment', 'right')}
+                    aria-label="Aligner à droite"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 4.5H21" stroke={signatureData.textAlignment === 'right' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M11.5 9.5H21" stroke={signatureData.textAlignment === 'right' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 14.5H21" stroke={signatureData.textAlignment === 'right' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M11.5 19.5H21" stroke={signatureData.textAlignment === 'right' ? '#5b50ff' : '#838796'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+        
+        {/* Espacements - affichés en fonction du mode sélectionné */}
+        <div className="mb-6">
+          {signatureData.layout === 'vertical' ? (
+            <div className="mt-6">
+              <h4 className="text-base font-medium text-gray-800 mb-3">Espacement vertical ({signatureData.verticalSpacing}px)</h4>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="range"
+                  min="5"
+                  max="20"
+                  step="1"
+                  value={signatureData.verticalSpacing}
+                  onChange={(e) => updateSignatureData('verticalSpacing', parseInt(e.target.value))}
+                  className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
+                />
+                <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">
+                  {signatureData.verticalSpacing}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6 space-y-5">
+              {/* Position des réseaux sociaux - mode horizontal */}
+              <div>
+                <h4 className="text-base font-medium text-gray-800 mb-3">Position des réseaux sociaux</h4>
+                <div className="flex items-center">
+                  <div className="relative w-1/2">
+                    <select
+                      value={signatureData.socialLinksPosition}
+                      onChange={(e) => updateSignatureData('socialLinksPosition', e.target.value as 'bottom' | 'right')}
+                      className="w-full h-10 px-3 pr-8 border border-[#E3E2E5] rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#5b50ff] appearance-none"
+                    >
+                      <option value="bottom">En bas de la signature</option>
+                      <option value="right">A droite avec les informations de contact</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Espacement entre colonnes - mode horizontal */}
+              <div>
+                <h4 className="text-base font-medium text-gray-800 mb-3">Espacement entre les colonnes ({signatureData.horizontalSpacing}px)</h4>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="range"
+                    min="10"
+                    max="50"
+                    step="1"
+                    value={signatureData.horizontalSpacing}
+                    onChange={(e) => updateSignatureData('horizontalSpacing', parseInt(e.target.value))}
+                    className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
+                  />
+                  <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">
+                    {signatureData.horizontalSpacing}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Espacement vertical - mode horizontal */}
+              <div>
+                <h4 className="text-base font-medium text-gray-800 mb-3">Espacement vertical ({signatureData.verticalSpacing}px)</h4>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="range"
+                    min="5"
+                    max="20"
+                    step="1"
+                    value={signatureData.verticalSpacing}
+                    onChange={(e) => updateSignatureData('verticalSpacing', parseInt(e.target.value))}
+                    className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
+                  />
+                  <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">
+                    {signatureData.verticalSpacing}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
           
         {/* Couleurs */}
@@ -192,7 +371,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                   <button
                     key={color}
                     type="button"
-                    className={`w-6 h-6 rounded-full border ${signatureData.primaryColor === color ? 'border-gray-800' : 'border-transparent'}`}
+                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.primaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
                     style={{ backgroundColor: color }}
                     onClick={() => updateSignatureData('primaryColor', color)}
                     aria-label={`Couleur ${color}`}
@@ -201,7 +380,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
               </div>
               
               <div 
-                className="flex items-center border border-gray-300 rounded-md overflow-hidden cursor-pointer" 
+                className="flex items-center border border-gray-300 rounded-xl overflow-hidden cursor-pointer" 
                 onClick={() => setShowPrimaryColorPicker(!showPrimaryColorPicker)}
               >
                 <div 
@@ -212,8 +391,8 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                   {formatColorCode(signatureData.primaryColor || '#5b50ff')}
                 </div>
                 {showPrimaryColorPicker && (
-                  <div className="absolute z-10 mt-2 right-0 top-12" ref={primaryColorPickerRef}>
-                    <div className="p-2 bg-white rounded-md shadow-lg border border-gray-200">
+                  <div className="absolute z-10 mt-2 left-0" ref={primaryColorPickerRef}>
+                    <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
                       <HexColorPicker
                         color={signatureData.primaryColor || '#5b50ff'}
                         onChange={(color) => updateSignatureData('primaryColor', color)}
@@ -221,7 +400,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                       <div className="flex justify-between mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 text-xs bg-gray-100 rounded hover:bg-gray-200"
+                          className="px-2 py-1 text-xs bg-gray-100 rounded-lg hover:bg-gray-200"
                           onClick={(e) => {
                             e.stopPropagation();
                             setShowPrimaryColorPicker(false);
@@ -231,7 +410,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                         </button>
                         <button
                           type="button"
-                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded hover:bg-[#4a41e0]"
+                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded-lg hover:bg-[#4a41e0]"
                           onClick={(e) => {
                             e.stopPropagation();
                             updateSignatureData('primaryColor', '#5b50ff');
@@ -258,7 +437,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                   <button
                     key={color}
                     type="button"
-                    className={`w-6 h-6 rounded-full border ${signatureData.secondaryColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.secondaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
                     style={{ backgroundColor: color }}
                     onClick={() => updateSignatureData('secondaryColor', color)}
                     aria-label={`Couleur ${color}`}
@@ -267,7 +446,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
               </div>
               
               <div 
-                className="flex items-center border border-gray-300 rounded-md overflow-hidden cursor-pointer" 
+                className="flex items-center border border-gray-300 rounded-xl overflow-hidden cursor-pointer" 
                 onClick={() => setShowSecondaryColorPicker(!showSecondaryColorPicker)}
               >
                 <div 
@@ -278,8 +457,8 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                   {formatColorCode(signatureData.secondaryColor || '#ffffff')}
                 </div>
                 {showSecondaryColorPicker && (
-                  <div className="absolute z-10 mt-2 right-0 top-12" ref={secondaryColorPickerRef}>
-                    <div className="p-2 bg-white rounded-md shadow-lg border border-gray-200">
+                  <div className="absolute z-10 mt-2 left-0" ref={secondaryColorPickerRef}>
+                    <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
                       <HexColorPicker
                         color={signatureData.secondaryColor || '#ffffff'}
                         onChange={(color) => updateSignatureData('secondaryColor', color)}
@@ -287,7 +466,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                       <div className="flex justify-between mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 text-xs bg-gray-100 rounded hover:bg-gray-200"
+                          className="px-2 py-1 text-xs bg-gray-100 rounded-lg hover:bg-gray-200"
                           onClick={(e) => {
                             e.stopPropagation();
                             setShowSecondaryColorPicker(false);
@@ -297,7 +476,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                         </button>
                         <button
                           type="button"
-                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded hover:bg-[#4a41e0]"
+                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded-lg hover:bg-[#4a41e0]"
                           onClick={(e) => {
                             e.stopPropagation();
                             updateSignatureData('secondaryColor', '#ffffff');

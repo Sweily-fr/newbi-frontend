@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import './animations.css';
 import { HexColorPicker } from 'react-colorful';
-import { EmailSignaturePreview } from '../components/EmailSignaturePreview';
+// Import uniquement du nouveau composant de prévisualisation
+import { EmailSignaturePreview } from '../components/EmailSignaturePreview/EmailSignaturePreviewNew';
 import { PersonalInfoSection } from './sections/PersonalInfoSection';
 import { SignatureData, EmailSignature } from '../types';
 import { CompanyInfoSection } from './sections/CompanyInfoSection';
 import { SocialLinksSection } from './sections/SocialLinksSection';
 import { AppearanceSection } from './sections/AppearanceSection';
+import { TemplatesSection } from './sections/TemplatesSection';
 
 /**
  * Composant avec une disposition sur deux colonnes pour l'éditeur de signature email
@@ -16,12 +20,18 @@ const formatColorCode = (color: string) => color.replace('#', '');
 
 interface EmailSignatureFormLayoutProps {
   defaultNewbiLogoUrl: string;
+  activeSection: 'info' | 'social' | 'appearance' | 'settings';
+  onSignatureDataChange?: (data: SignatureData) => void;
 }
 
 export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> = ({
-  defaultNewbiLogoUrl
+  defaultNewbiLogoUrl,
+  activeSection,
+  onSignatureDataChange
 }) => {
 
+  // La section active est maintenant fournie par le composant parent
+  
   // États pour contrôler l'affichage des sélecteurs de couleur
   const [showPrimaryColorPicker, setShowPrimaryColorPicker] = useState(false);
   const [showSecondaryColorPicker, setShowSecondaryColorPicker] = useState(false);
@@ -29,6 +39,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   // Références pour les sélecteurs de couleur
   const primaryColorPickerRef = useRef<HTMLDivElement>(null);
   const secondaryColorPickerRef = useRef<HTMLDivElement>(null);
+  
+  // Référence pour la transition CSS
+  const nodeRef = useRef(null);
   
   // Fermer les sélecteurs de couleur lors d'un clic à l'extérieur
   useEffect(() => {
@@ -66,17 +79,15 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     
     // Informations personnelles
     fullName: 'Jean Dupont',
-    jobTitle: 'Directeur Commercial',
+    jobTitle: 'Fondateur & CEO',
     email: 'jean.dupont@newbi.fr',
-    phone: '+33 1 23 45 67 89',
-    mobilePhone: '+33 6 12 34 56 78',
-    profilePhotoUrl: '',
+    phone: '+33 6 12 34 56 78',
     primaryColor: '#5b50ff',
     secondaryColor: '#f0eeff',
     
     // Informations entreprise
     companyName: 'Newbi',
-    companyWebsite: 'https://newbi.fr',
+    companyWebsite: 'https://www.newbi.fr',
     companyAddress: '123 Avenue des Entrepreneurs, 75000 Paris, France',
     
     // Réseaux sociaux
@@ -94,15 +105,58 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     customLogoUrl: defaultNewbiLogoUrl,
     fontFamily: 'Arial',
     fontSize: 14,
-    textStyle: 'normal'
+    textStyle: 'normal',
+    textAlignment: 'left', // Alignement par défaut: gauche
+    layout: 'vertical', // Disposition par défaut: verticale
+    verticalSpacing: 10, // Espacement vertical par défaut: 10px
+    horizontalSpacing: 20, // Espacement horizontal par défaut: 20px
+    
+    // Options d'affichage des icônes pour les coordonnées
+    showEmailIcon: true,
+    showPhoneIcon: true,
+    showAddressIcon: true,
+    showWebsiteIcon: true,
+    
+    // Modèle
+    templateId: 1
   });
+  
+  // Notifier le composant parent des données initiales
+  useEffect(() => {
+    if (onSignatureDataChange) {
+      onSignatureDataChange(signatureData);
+    }
+  }, []);
 
   // Fonction pour mettre à jour les données de la signature
   const updateSignatureData = <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => {
-    setSignatureData(prev => ({
-      ...prev,
+    const updatedData = {
+      ...signatureData,
       [field]: value
-    }));
+    };
+    
+    // Si on change le layout en horizontal, forcer l'alignement à gauche
+    if (field === 'layout' && value === 'horizontal') {
+      updatedData.textAlignment = 'left';
+    }
+    
+    // Si on change l'alignement du texte mais qu'on est en mode horizontal, ignorer
+    if (field === 'textAlignment' && signatureData.layout === 'horizontal') {
+      // Ne pas changer l'alignement en mode horizontal
+      updatedData.textAlignment = 'left';
+    }
+    
+    setSignatureData(updatedData);
+    
+    // Notifier le composant parent du changement
+    if (onSignatureDataChange) {
+      onSignatureDataChange(updatedData);
+    }
+  };
+  
+  // Fonction pour sélectionner un modèle
+  const handleSelectTemplate = (templateId: number) => {
+    updateSignatureData('templateId', templateId);
   };
 
   /**
@@ -111,11 +165,19 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
    * @returns Les données au format EmailSignature
    */
   const convertSignatureDataToEmailSignature = (data: SignatureData): Partial<EmailSignature> => {
+    // Ajouter des logs pour déboguer les valeurs
+    console.log('Conversion des données de signature:', {
+      socialLinksDisplayMode: data.socialLinksDisplayMode,
+      socialLinksIconStyle: data.socialLinksIconStyle
+    });
+    
     return {
       name: data.name,
       isDefault: data.isDefault,
       primaryColor: data.primaryColor,
       secondaryColor: data.secondaryColor,
+      // Couleur pour les textes (utiliser la couleur secondaire)
+      textColor: data.secondaryColor,
       fullName: data.fullName,
       jobTitle: data.jobTitle,
       email: data.email,
@@ -124,40 +186,61 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       website: data.companyWebsite,
       address: data.companyAddress,
       socialLinks: data.socialLinks,
+      // Utiliser les deux formats pour assurer la compatibilité
+      socialLinksDisplayMode: data.socialLinksDisplayMode,
       displayMode: data.socialLinksDisplayMode,
+      socialLinksIconStyle: data.socialLinksIconStyle,
       iconStyle: data.socialLinksIconStyle,
       hasLogo: data.useNewbiLogo,
       logoUrl: data.customLogoUrl,
       fontFamily: data.fontFamily,
       fontSize: data.fontSize,
-      style: data.textStyle
+      style: data.textStyle,
+      textStyle: data.textStyle, // Ajout de la propriété textStyle pour assurer la compatibilité
+      // Ajout des propriétés d'affichage des icônes
+      showEmailIcon: data.showEmailIcon,
+      showPhoneIcon: data.showPhoneIcon,
+      showAddressIcon: data.showAddressIcon,
+      showWebsiteIcon: data.showWebsiteIcon,
+      // Ajout des propriétés liées à la photo de profil
+      profilePhotoUrl: data.profilePhotoUrl,
+      profilePhotoBase64: data.profilePhotoBase64,
+      profilePhotoSize: data.profilePhotoSize,
+      // Transmettre les propriétés de mise en page et d'espacement
+      verticalAlignment: data.textAlignment,
+      textAlignment: data.textAlignment,
+      layout: data.layout,
+      verticalSpacing: data.verticalSpacing,
+      horizontalSpacing: data.horizontalSpacing
     };
   };
 
-  return (
-    <div className="w-full">      
-      {/* Disposition en deux colonnes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x">
-        {/* Colonne gauche: formulaire */}
-        <div className="space-y-8 pr-8">
-          {/* Section Informations générales */}
-          <PersonalInfoSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
-          <div className="border-t border-gray-200 my-6"></div>
-    
-          {/* Section Informations de l'entreprise */}
-         <CompanyInfoSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
-
-          <div className="border-t border-gray-200 my-6"></div>
-          
-          {/* Section Réseaux sociaux */}
-          <div>
+  // Fonction pour rendre le contenu en fonction de la section active
+  const renderContent = () => {
+    // Contenu pour chaque section
+    switch (activeSection) {
+      case 'info':
+        return (
+          <>
+            {/* Section Informations générales */}
+            <PersonalInfoSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
+            <div className="border-t border-gray-200 my-6"></div>
+            
+            {/* Section Informations de l'entreprise */}
+            <CompanyInfoSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
+          </>
+        );
+      case 'social':
+        return (
+          <>
+            {/* Section Réseaux sociaux */}
             <SocialLinksSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
-          </div>
-
-          <div className="border-t border-gray-200 my-6"></div>
-          
-          {/* Section Apparence */}
-          <div>
+          </>
+        );
+      case 'appearance':
+        return (
+          <>
+            {/* Section Apparence */}
             <AppearanceSection 
               signatureData={signatureData} 
               updateSignatureData={updateSignatureData}
@@ -169,8 +252,44 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
               secondaryColorPickerRef={secondaryColorPickerRef}
               formatColorCode={formatColorCode}
             />
-          </div>
-            
+          </>
+        );
+      case 'settings':
+        return (
+          <>
+            {/* Section Modèles */}
+            <TemplatesSection 
+              signatureData={signatureData} 
+              updateSignatureData={updateSignatureData}
+              onSelectTemplate={handleSelectTemplate}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x">
+        {/* Colonne gauche: formulaire */}
+        <div className="space-y-8 pr-8">
+          {/* Animation de transition entre les sections */}
+          <SwitchTransition mode="out-in">
+            <CSSTransition
+              key={activeSection}
+              nodeRef={nodeRef}
+              timeout={300}
+              classNames="section"
+              unmountOnExit
+            >
+              <div ref={nodeRef} className="transition-container">
+                {renderContent()}
+              </div>
+            </CSSTransition>
+          </SwitchTransition>
+          
           {/* Boutons d'action */}
           <div className="flex justify-end space-x-4 pt-4 mt-8">
             <button 
@@ -192,7 +311,13 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
         <div className="pl-8 h-fit sticky top-28">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Aperçu</h3>
           <div className="flex items-center justify-center">
-            <EmailSignaturePreview signature={convertSignatureDataToEmailSignature(signatureData)} />
+            <EmailSignaturePreview 
+              signature={convertSignatureDataToEmailSignature(signatureData)} 
+              showEmailIcon={Boolean(signatureData?.showEmailIcon)}
+              showPhoneIcon={Boolean(signatureData?.showPhoneIcon)}
+              showAddressIcon={Boolean(signatureData?.showAddressIcon)}
+              showWebsiteIcon={Boolean(signatureData?.showWebsiteIcon)}
+            />
           </div>
         </div>
       </div>

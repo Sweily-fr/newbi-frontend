@@ -55,7 +55,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         />
         <label 
           htmlFor={id} 
-          className={`flex items-center justify-center w-5 h-5 border rounded-sm cursor-pointer transition-colors ${
+          className={`flex items-center justify-center w-5 h-5 border rounded-md cursor-pointer transition-colors ${
             isCheckedState 
               ? 'bg-[#5b50ff] border-[#5b50ff]' 
               : disabled 
@@ -91,3 +91,5 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     </div>
   );
 };
+
+export default Checkbox;
