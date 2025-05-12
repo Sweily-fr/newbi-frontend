@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from './Modal';
-import { Button } from '../';
+import { Button } from '..';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface ConfirmationModalProps {

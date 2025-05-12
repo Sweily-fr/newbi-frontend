@@ -6,7 +6,7 @@ import {
   GET_QUOTES,
   GET_QUOTE_STATS
 } from '../graphql/quotes';
-import { Notification } from '../../../components/feedback';
+import { Notification } from '../../../components/';
 import { Quote } from '../../../types';
 
 // Type pour les onglets de filtrage

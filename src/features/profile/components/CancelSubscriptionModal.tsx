@@ -1,5 +1,5 @@
 
-import { Modal } from '../../../components/feedback/Modal';
+import { Modal } from '../../../components/';
 import { Button } from '../../../components/';
 
 interface CancelSubscriptionModalProps {

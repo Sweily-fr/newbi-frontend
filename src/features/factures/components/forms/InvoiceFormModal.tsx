@@ -18,8 +18,8 @@ import { InvoiceActionButtons } from "./Sections";
 import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
 import { GET_QUOTE } from "../../../devis/graphql/quotes";
-import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
-import { Notification } from "../../../../components/feedback";
+import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
+import { Notification } from "../../../../components/";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,

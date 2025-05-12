@@ -7,8 +7,8 @@ import { CookieConsentProvider } from './context/CookieConsentContext';
 import { AppRoutes } from './routes/AppRoutes';
 import { Toaster } from 'react-hot-toast';
 import { SessionExpiredNotification } from './features/auth/components/';
-import { CookieBanner } from './components/feedback/CookieBanner';
-import { ScrollToTop } from './components/utils/ScrollToTop';
+import { CookieBanner } from './components/specific/CookieBanner';
+import { ScrollToTop } from './utils/ScrollToTop';
 
 function App() {
   return (

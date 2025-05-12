@@ -5,7 +5,7 @@ import {
   CHANGE_INVOICE_STATUS_MUTATION 
 } from '../graphql/invoices';
 import { GET_INVOICES } from '../../../graphql/queries';
-import { Notification } from '../../../components/feedback';
+import { Notification } from '../../../components/';
 import { formatDateShort } from '../../../utils/date';
 import { useLocation } from 'react-router-dom';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CLIENTS, CREATE_CLIENT, UPDATE_CLIENT, DELETE_CLIENT } from '../graphql';
-import { Notification } from '../../../components/feedback/';
+import { Notification } from '../../../components/';
 import { ClientFormData, Client } from '../types';
 
 /**

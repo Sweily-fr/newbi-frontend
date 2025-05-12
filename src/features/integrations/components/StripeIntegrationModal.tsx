@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { Modal } from '../../../components/feedback/Modal';
+import { Modal } from '../../../components/common/Modal';
 import { TextField } from '../../../components/';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
-import { CONNECT_STRIPE } from '../graphql';
-import { Notification } from '../../../components/feedback/Notification';
+import { CONNECT_STRIPE } from '../graphql/integrations';
+import { Notification } from '../../../components/common/Notification';
 
 interface StripeIntegrationModalProps {
   isOpen: boolean;

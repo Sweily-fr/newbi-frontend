@@ -4,7 +4,7 @@ import { GET_PROFILE, PersonalInfoForm, CompanyInfoForm } from "../features/prof
 import { ClientsManager } from "../features/clients";
 import { ProductsManager } from "../features/products";
 import { IntegrationsManager } from "../features/integrations";
-import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";
+import { TabNavigation, TabItem } from "../components/specific/navigation/TabNavigation";
 import {
   UserIcon,
   BuildingOfficeIcon,
@@ -16,10 +16,10 @@ import {
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { SubscriptionContext } from "../context/SubscriptionContext.context";
 import { Button } from "../components/";
-import { PremiumModal } from "../components/subscription/PremiumModal";
+import { PremiumModal } from "../components/specific/subscription/PremiumModal";
 import axios from "axios";
-import { SEOHead } from "../components/SEO/SEOHead";
-import { LogoLoader } from "../components/feedback/LogoLoader";
+import { SEOHead } from "../components/specific/SEO/SEOHead";
+import { LogoLoader } from "../components/common/LogoLoader";
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);

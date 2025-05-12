@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_EMAIL_SIGNATURES } from '../../../../graphql/emailSignatures';
-import { Table, Column } from '../../../data-display/Table';
+import { Table, Column } from '../../../common/Table';
 import { Button, SearchInput } from '../../..';
 import { PlusIcon, EnvelopeIcon, PencilIcon, TrashIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
 import { formatDateShort } from '../../../../utils/date';
-import { Spinner } from '../../../feedback/Spinner';
+import { Spinner } from '../../../common/Spinner';
 
 // Type pour une signature email
 export interface EmailSignature {

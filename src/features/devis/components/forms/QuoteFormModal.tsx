@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
+import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { useQuoteForm } from "../../hooks/useQuoteForm";
 import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
 import { QuoteFormModalProps } from "../../types";

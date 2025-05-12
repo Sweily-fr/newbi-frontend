@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTE } from '../../graphql/quotes';
-import { Notification } from '../../../../components/feedback';
+import { Notification } from '../../../../components/';
 
 interface Invoice {
   id: string;

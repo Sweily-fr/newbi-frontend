@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../graphql/products';
-import { Table, Column } from '../../../../components/data-display/Table';
+import { Table, Column } from '../../../../components/common/Table';
 import { Button, SearchInput } from '../../../../components/';
 import { PlusIcon, DocumentTextIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatPrice } from '../../../../utils/formatters';
-import { Spinner } from '../../../../components/feedback/Spinner';
+import { Spinner } from '../../../../components/common/Spinner';
 
 // Type pour un produit
 export interface Product {

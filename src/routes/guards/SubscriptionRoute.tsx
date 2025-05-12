@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSubscription } from '../../hooks/useSubscription';
 import { ROUTES } from '../constants';
-import { LogoLoader } from '../../components/feedback/LogoLoader';
+import { LogoLoader } from '../../components/common/LogoLoader';
 
 interface SubscriptionRouteProps {
   children: React.ReactElement;

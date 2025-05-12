@@ -4,7 +4,7 @@ import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { Sidebar } from "../../../../components/layout/Sidebar";
 import { Button } from "../../../../components/";
 import { InvoicePreview } from "../forms/InvoicePreview";
-import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
+import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 
 interface InvoiceSidebarProps {
   invoice: {

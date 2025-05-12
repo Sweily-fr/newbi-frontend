@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDeviceDetection } from '../../hooks/useDeviceDetection';
-import { ROUTES } from '../../routes/constants';
+import { useDeviceDetection } from '../hooks/useDeviceDetection';
+import { ROUTES } from '../routes/constants';
 
 // Définition d'une route pour la page mobile
 const MOBILE_ROUTE = '/mobile';

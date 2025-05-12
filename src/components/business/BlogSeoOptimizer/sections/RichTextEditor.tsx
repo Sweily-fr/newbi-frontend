@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useBlogSeo } from '../context';
 import { Modal } from '../../../common/Modal';
 import { ContentAnalysisResult } from '../types';
-import { Notification } from '../../../feedback/Notification';
+import { Notification } from '../../../common/Notification';
 // Importation de l'éditeur CKEditor (à installer via npm)
 // npm install @ckeditor/ckeditor5-react @ckeditor/ckeditor5-build-classic
 // Note: Dans un environnement réel, vous devriez importer CKEditor comme ceci:

@@ -3,8 +3,8 @@ import { ProductsTable, Product } from './ProductsTable';
 import { ProductFormModal } from '../forms';
 import { useApolloClient, useMutation } from '@apollo/client';
 import { DELETE_PRODUCT } from '../../graphql';
-import { ConfirmationModal } from '../../../../components/feedback/ConfirmationModal';
-import { Notification } from '../../../../components/feedback/Notification';
+import { ConfirmationModal } from '../../../../components/common/ConfirmationModal';
+import { Notification } from '../../../../components/common/Notification';
 
 export const ProductsManager: React.FC = () => {
   // États pour le formulaire d'ajout/modification

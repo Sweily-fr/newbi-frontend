@@ -1,7 +1,6 @@
-// /src/components/data-display/Table.tsx
 import { ReactNode } from 'react';
-import { Pagination } from '../navigation/Pagination';
-import { TruncatedText } from './TruncatedText';
+import { Pagination } from '../specific/navigation/Pagination';
+import { TruncatedText } from '../specific/TruncatedText';
 
 // Types pour les colonnes
 export interface Column<T> {

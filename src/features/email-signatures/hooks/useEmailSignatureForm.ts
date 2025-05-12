@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCompany } from '../../../hooks/useCompany';
 import { EMAIL_PATTERN, NAME_REGEX } from '../../../constants/formValidations';
-import { Notification } from '../../../components/feedback/Notification';
+import { Notification } from '../../../components/common/Notification';
 
 // Nous importerons les types depuis le dossier types une fois qu'ils seront créés
 interface SocialLinks {

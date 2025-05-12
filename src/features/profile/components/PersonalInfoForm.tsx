@@ -10,7 +10,7 @@ import {
   ImageUploader,
   Button
 } from '../../../components';
-import { Notification } from '../../../components/feedback';
+import { Notification } from '../../../components/';
 import { getNameValidationRules, getPhoneValidationRules } from '../../../utils/validators';
 import { DisableAccountModal } from './DisableAccountModal';
 import { CancelSubscriptionModal } from './CancelSubscriptionModal';

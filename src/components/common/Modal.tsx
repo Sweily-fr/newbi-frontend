@@ -21,6 +21,8 @@ export interface ModalProps {
     | "7xl";
   showCloseButton?: boolean;
   className?: string;
+  footer?: ReactNode;
+  maxHeight?: string;
 }
 
 export const Modal = ({
@@ -32,6 +34,8 @@ export const Modal = ({
   size = "md",
   showCloseButton = true,
   className = "",
+  footer,
+  maxHeight,
 }: ModalProps) => {
   // Définir la largeur du modal en fonction de la taille
   const sizeClasses = {
@@ -75,12 +79,15 @@ export const Modal = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle transition-all`}
-                style={{ boxShadow: "0 4px 20px rgba(91, 80, 255, 0.15)" }}
+                className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white flex flex-col transition-all`}
+                style={{ 
+                  boxShadow: "0 4px 20px rgba(91, 80, 255, 0.15)",
+                  maxHeight: maxHeight || 'calc(100vh - 2rem)'
+                }}
               >
                 {/* En-tête avec titre et bouton de fermeture */}
                 {(title || showCloseButton) && (
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between p-6 pb-4">
                     {title && (
                       <Dialog.Title
                         as="h3"
@@ -93,7 +100,7 @@ export const Modal = ({
                     {showCloseButton && (
                       <button
                         type="button"
-                        className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:ring-offset-2"
                         onClick={onClose}
                       >
                         <span className="sr-only">Fermer</span>
@@ -103,8 +110,17 @@ export const Modal = ({
                   </div>
                 )}
 
-                {/* Contenu du modal */}
-                <div>{children}</div>
+                {/* Contenu du modal avec défilement si nécessaire */}
+                <div className="flex-1 overflow-y-auto p-6 pt-2">
+                  {children}
+                </div>
+
+                {/* Pied de modal (optionnel) */}
+                {footer && (
+                  <div className="border-t border-gray-200 p-6 bg-gray-50 mt-auto">
+                    {footer}
+                  </div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

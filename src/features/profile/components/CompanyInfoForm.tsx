@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { UPDATE_COMPANY } from "../graphql";
 import { CompanyInfoFormProps } from "../types";
 import { useCompanyForm } from "../hooks";
-import { Notification } from "../../../components/feedback";
+import { Notification } from "../../../components/";
 import {
   Form,
   TextField,

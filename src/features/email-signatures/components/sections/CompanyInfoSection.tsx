@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Import } from 'iconsax-react';
 import { SignatureData } from '../../types';
 import { useCompany } from '../../../profile/hooks';
-import { Notification } from '../../../../components/feedback';
+import { Notification } from '../../../../components/';
 
 interface CompanyInfoSectionProps {
   signatureData: SignatureData;

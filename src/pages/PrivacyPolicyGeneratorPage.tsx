@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useCompany } from '../features/profile/hooks';
 import { Button } from '../components';
-import { Spinner } from '../components/feedback';
-import { Notification } from '../components/feedback';
+import { Spinner, Notification } from '../components';
 import { NotificationComponent } from '../components/';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 // Types pour le formulaire
 interface PrivacyPolicyForm {

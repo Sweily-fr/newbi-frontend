@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCompany } from '../features/profile/hooks';
-import { Button } from '../components';
-import { Spinner } from '../components/feedback';
-import { Notification } from '../components/feedback';
+import { Button, Spinner } from '../components';
+import { Notification } from '../components/common/Notification';
 import { NotificationComponent } from '../components/';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 // Types pour le formulaire
 interface LegalNoticeForm {
