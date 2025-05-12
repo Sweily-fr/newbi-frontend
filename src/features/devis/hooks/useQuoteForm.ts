@@ -7,7 +7,7 @@ import {
   GET_NEXT_QUOTE_NUMBER,
 } from "../graphql/quotes";
 import { GET_QUOTES } from "../graphql/quotes";
-import { GET_CLIENTS, CREATE_CLIENT } from "../../../graphql/client";
+import { GET_CLIENTS, CREATE_CLIENT } from "../../../features/clients/graphql/";
 import { GET_USER_INFO } from "../../../graphql/queries";
 import {
   /* Quote, */ Item,

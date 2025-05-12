@@ -3,7 +3,7 @@ import { useState, useContext, useEffect } from "react";
 import { GET_PROFILE } from "../graphql/profile";
 import { PersonalInfoForm } from "../components/forms/profile/PersonalInfoForm";
 import { CompanyInfoForm } from "../components/forms/profile/CompanyInfoForm";
-import { ClientsManager } from "../components/business/clients/ClientsManager";
+import { ClientsManager } from "../features/clients/components";
 import { ProductsManager } from "../components/business/products/ProductsManager";
 import { IntegrationsManager } from "../components/business/integrations/IntegrationsManager";
 import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";
@@ -13,7 +13,6 @@ import {
   CreditCardIcon,
   ShoppingBagIcon,
   LockClosedIcon,
-  PuzzlePieceIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";

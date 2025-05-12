@@ -67,7 +67,7 @@ export * from './forms/profile/CompanyInfoForm';
 export * from './forms/profile/PersonalInfoForm';
 
 // Export des formulaires de clients
-export * from './forms/clients/ClientForm';
+// export * from './forms/clients/ClientForm';
 
 // Export des formulaires de factures
 export * from '../features/factures/components/forms/InvoiceFormModal';
@@ -90,7 +90,7 @@ export * from './feedback/Modal';
 // Export des composants métier
 export * from './business/Tools/ToolCard';
 export * from '../features/factures/components/business/InvoiceSidebar';
-export * from './business/clients/ClientsManager';
+// export * from './business/clients/ClientsManager';
 // export * from './business/InvoiceItem';
 
 // Note: Décommentez les lignes au fur et à mesure que vous créez les composants

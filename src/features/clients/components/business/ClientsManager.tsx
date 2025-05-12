@@ -1,18 +1,16 @@
-import { Modal } from "../../feedback/Modal";
-import { ConfirmationModal } from "../../feedback/ConfirmationModal";
-import { ClientForm } from "../../forms/clients/ClientForm";
+import { Modal } from "../../../../components/feedback/Modal";
+import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
+import { ClientForm } from "../forms/";
 import {
   TrashIcon,
   PencilIcon,
   UserGroupIcon,
   ExclamationTriangleIcon,
-  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { Table, Column } from "../../../components/data-display/Table";
-import { Button } from "../../common/Button";
-import { SearchInput } from "../../common/SearchInput";
-import { useClientsManager } from "../../../hooks/useClientsManager";
-import { Client } from "../../../types/client";
+import { Table, Column } from "../../../../components/data-display/Table";
+import { Button, SearchInput } from "../../../../components/";
+import { useClientsManager } from "../../hooks";
+import { Client } from "../../../../types/client";
 import { useState, useRef } from "react";
 
 export const ClientsManager = () => {

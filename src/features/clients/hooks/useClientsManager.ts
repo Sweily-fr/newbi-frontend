@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_CLIENTS, CREATE_CLIENT, UPDATE_CLIENT, DELETE_CLIENT } from '../graphql/client';
-import { Notification } from '../components/feedback/Notification';
-import { ClientFormData, Client } from '../types/client';
+import { GET_CLIENTS, CREATE_CLIENT, UPDATE_CLIENT, DELETE_CLIENT } from '../graphql';
+import { Notification } from '../../../components/feedback/';
+import { ClientFormData, Client } from '../types';
 
 /**
  * Fonction utilitaire pour nettoyer un objet des champs __typename ajoutés par Apollo

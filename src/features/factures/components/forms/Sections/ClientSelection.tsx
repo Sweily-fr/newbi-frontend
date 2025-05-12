@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Client } from '../../../../../types/client';
-import { ClientType } from '../../../../../types/client';
+import { Client } from '../../../../clients/types';
+import { ClientType } from '../../../../clients/types';
 import { TabNavigation } from '../../../../../components/navigation';
 import { Select, TextField, FieldGroup, Button } from '../../../../../components/';
 import useCompanySearch, { CompanySearchResult, CompanyNameResult } from '../../../../../hooks/useCompanySearch';

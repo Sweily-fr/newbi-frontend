@@ -4,7 +4,7 @@ import {
   ClientFormData,
   ClientFormProps,
   ClientType,
-} from "../../../types/client";
+} from "../../types";
 import {
   Form,
   TextField,
@@ -12,11 +12,11 @@ import {
   FormActions,
   Select,
   Button,
-} from "../../";
+} from "../../../../components";
 import useCompanySearch, {
   CompanySearchResult,
   CompanyNameResult,
-} from "../../../hooks/useCompanySearch";
+} from "../../../../hooks/useCompanySearch";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import {
   EMAIL_PATTERN,
@@ -33,7 +33,7 @@ import {
   CITY_ERROR_MESSAGE,
   POSTAL_CODE_ERROR_MESSAGE,
   COUNTRY_ERROR_MESSAGE,
-} from "../../../constants/formValidations";
+} from "../../../../constants/formValidations";
 
 export const ClientForm: React.FC<ClientFormProps> = ({
   initialData,

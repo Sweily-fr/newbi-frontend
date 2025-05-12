@@ -7,7 +7,7 @@ import {
   GET_NEXT_INVOICE_NUMBER
 } from '../graphql/invoices';
 import { GET_INVOICES } from '../../../graphql/queries';
-import { GET_CLIENTS, CREATE_CLIENT } from '../../../graphql/client';
+import { GET_CLIENTS, CREATE_CLIENT } from '../../../features/clients/graphql/';
 import { GET_USER_INFO } from '../../../graphql/queries';
 import { Item, CustomField, Client, CompanyInfo } from '../types/invoice';
 
