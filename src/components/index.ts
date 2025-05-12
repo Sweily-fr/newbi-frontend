@@ -33,7 +33,7 @@ export * from './common/InfoBox';
 export * from './common/ImageUploader';
 export * from './common/Collapse';
 export * from './common/Dropdown';
-export * from './common/Modal';
+export { default as CommonModal } from './common/Modal';
 export * from './common/Select';
 export * from './common/TextField';
 export * from './common/TextFieldURL';

@@ -4,7 +4,7 @@ import { GET_PROFILE } from "../graphql/profile";
 import { PersonalInfoForm } from "../components/forms/profile/PersonalInfoForm";
 import { CompanyInfoForm } from "../components/forms/profile/CompanyInfoForm";
 import { ClientsManager } from "../features/clients/components";
-import { ProductsManager } from "../components/business/products/ProductsManager";
+import { ProductsManager } from "../features/products";
 import { IntegrationsManager } from "../features/integrations";
 import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";
 import {

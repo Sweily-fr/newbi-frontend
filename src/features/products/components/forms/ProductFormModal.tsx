@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { CREATE_PRODUCT, UPDATE_PRODUCT } from '../../../graphql/products';
-import { Modal } from '../../feedback/Modal';
-import { ConfirmationModal } from '../../feedback/ConfirmationModal';
-import { Button, TextField, TextArea, Select } from '../../';
-import { Product } from '../../business/products/ProductsTable';
-import { Notification } from '../../feedback/Notification';
+import { CREATE_PRODUCT, UPDATE_PRODUCT } from '../../graphql';
+import { CommonModal as Modal } from '../../../../components';
+import { ConfirmationModal } from '../../../../components/feedback/ConfirmationModal';
+import { Button, TextField, TextArea, Select } from '../../../../components';
+import { Product } from '../business/ProductsTable';
+import { Notification } from '../../../../components/feedback/Notification';
 
 interface ProductFormModalProps {
   isOpen: boolean;
