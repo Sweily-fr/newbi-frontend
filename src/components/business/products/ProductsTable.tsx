@@ -155,6 +155,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
     <div>
       <div className="mb-2">
         <h2 className="text-lg font-medium text-gray-900">Catalogue de produits et services</h2>
+        
       </div>
       
       <div className="mb-4 flex justify-between items-center">

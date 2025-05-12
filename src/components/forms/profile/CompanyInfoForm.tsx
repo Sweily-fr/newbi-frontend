@@ -13,7 +13,7 @@ import {
   FormActions,
   ImageUploader,
   Select,
-} from "../../../components/ui";
+} from "../../ui";
 import {
   getNameValidationRules,
   getPhoneValidationRules,

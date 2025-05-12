@@ -9,7 +9,7 @@ import {
   FieldGroup,
   ImageUploader,
   Button
-} from '../../../components/ui';
+} from '../../ui';
 import { Notification } from '../../../components/feedback';
 import { getNameValidationRules, getPhoneValidationRules } from '../../../utils/validators';
 import { DisableAccountModal } from './DisableAccountModal';

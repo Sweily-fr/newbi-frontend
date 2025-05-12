@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { Notification } from '../../../components/feedback/Notification';
 import { REQUEST_PASSWORD_RESET_MUTATION } from '../../../graphql/auth';
-import { Form, TextField, Button } from '../../../components/ui';
+import { Form, TextField, Button } from '../../ui';
 import { EMAIL_PATTERN, EMAIL_ERROR_MESSAGE } from '../../../constants/formValidations';
 
 export const ForgotPasswordForm = () => {
