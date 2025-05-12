@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_PROFILE } from '../graphql/profile';
-import { useAuth } from '../context/AuthContext';
+import { GET_PROFILE } from '../graphql';
+import { useAuth } from '../../../context/AuthContext';
 
 interface CompanyAddress {
   street: string;

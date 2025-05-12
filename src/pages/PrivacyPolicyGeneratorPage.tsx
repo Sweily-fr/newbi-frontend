@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCompany } from '../hooks';
+import { useCompany } from '../features/profile/hooks';
 import { Button } from '../components';
 import { Spinner } from '../components/feedback';
 import { Notification } from '../components/feedback';

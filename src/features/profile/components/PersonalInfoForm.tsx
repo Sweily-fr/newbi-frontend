@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { UPDATE_PROFILE, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE, GET_PROFILE } from '../../../graphql/profile';
+import { UPDATE_PROFILE, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE, GET_PROFILE } from '../graphql';
 import { 
   Form, 
   TextField, 
@@ -9,7 +9,7 @@ import {
   FieldGroup,
   ImageUploader,
   Button
-} from '../../';
+} from '../../../components';
 import { Notification } from '../../../components/feedback';
 import { getNameValidationRules, getPhoneValidationRules } from '../../../utils/validators';
 import { DisableAccountModal } from './DisableAccountModal';

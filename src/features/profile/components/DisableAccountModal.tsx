@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { DISABLE_ACCOUNT } from '../../../graphql/profile';
-import { Modal } from '../../feedback/Modal';
-import { Form, PasswordField, Button } from '../../';
-import { Notification } from '../../feedback';
+import { DISABLE_ACCOUNT } from '../graphql';
+import { Modal } from '../../../components/feedback/Modal';
+import { Form, PasswordField, Button } from '../../../components/';
+import { Notification } from '../../../components/feedback';
 
 interface DisableAccountModalProps {
   isOpen: boolean;

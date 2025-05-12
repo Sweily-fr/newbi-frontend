@@ -1,9 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { useState, useContext, useEffect } from "react";
-import { GET_PROFILE } from "../graphql/profile";
-import { PersonalInfoForm } from "../components/forms/profile/PersonalInfoForm";
-import { CompanyInfoForm } from "../components/forms/profile/CompanyInfoForm";
-import { ClientsManager } from "../features/clients/components";
+import { GET_PROFILE, PersonalInfoForm, CompanyInfoForm } from "../features/profile";
+import { ClientsManager } from "../features/clients";
 import { ProductsManager } from "../features/products";
 import { IntegrationsManager } from "../features/integrations";
 import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";

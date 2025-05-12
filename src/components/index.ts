@@ -64,8 +64,8 @@ export * from './layout/ToolLayout';
 // export * from './forms/auth/ResetPasswordForm';
 
 // Export des formulaires de profil
-export * from './forms/profile/CompanyInfoForm';
-export * from './forms/profile/PersonalInfoForm';
+// export * from './forms/profile/CompanyInfoForm';
+// export * from './forms/profile/PersonalInfoForm';
 
 // Export des formulaires de clients
 // export * from './forms/clients/ClientForm';
@@ -82,7 +82,7 @@ export * from './data-display/Table';
 
 // Export des composants de feedback
 //export * from './feedback/Alert';
-export * from './feedback/Modal';
+// export * from './feedback/Modal';
 
 // Export des composants de navigation
 // export * from './navigation/Breadcrumb';

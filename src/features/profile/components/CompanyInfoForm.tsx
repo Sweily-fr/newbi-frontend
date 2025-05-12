@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
-import { UPDATE_COMPANY } from "../../../graphql/profile";
-import { CompanyInfoFormProps } from "../../../types/company";
-import { useCompanyForm } from "../../../hooks";
+import { UPDATE_COMPANY } from "../graphql";
+import { CompanyInfoFormProps } from "../types";
+import { useCompanyForm } from "../hooks";
 import { Notification } from "../../../components/feedback";
 import {
   Form,
@@ -13,7 +13,7 @@ import {
   FormActions,
   ImageUploader,
   Select,
-} from "../../";
+} from "../../../components";
 import {
   getNameValidationRules,
   getPhoneValidationRules,

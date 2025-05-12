@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useMutation } from '@apollo/client';
-import { UPLOAD_COMPANY_LOGO, DELETE_COMPANY_LOGO } from '../graphql/profile';
-import { Notification } from '../components/feedback';
+import { UPLOAD_COMPANY_LOGO, DELETE_COMPANY_LOGO } from '../graphql';
+import { Notification } from '../../../components/feedback';
 
 interface UseCompanyLogoProps {
   initialLogo?: string;
