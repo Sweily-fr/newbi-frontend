@@ -5,7 +5,7 @@ import { PersonalInfoForm } from "../components/forms/profile/PersonalInfoForm";
 import { CompanyInfoForm } from "../components/forms/profile/CompanyInfoForm";
 import { ClientsManager } from "../features/clients/components";
 import { ProductsManager } from "../components/business/products/ProductsManager";
-import { IntegrationsManager } from "../components/business/integrations/IntegrationsManager";
+import { IntegrationsManager } from "../features/integrations";
 import { TabNavigation, TabItem } from "../components/navigation/TabNavigation";
 import {
   UserIcon,

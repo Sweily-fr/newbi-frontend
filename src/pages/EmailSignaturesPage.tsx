@@ -12,8 +12,8 @@ import { DELETE_EMAIL_SIGNATURE, SET_DEFAULT_EMAIL_SIGNATURE, GET_EMAIL_SIGNATUR
 import { EmailSignaturesTable, EmailSignature } from '../components/business/EmailSignature/components/EmailSignaturesTable';
 import { Notification } from '../components/feedback/Notification';
 import { ConfirmationModal } from '../components/feedback/ConfirmationModal';
-import { Button } from '../components/ui';
-import { SearchInput } from '../components/ui';
+import { Button } from '../components/';
+import { SearchInput } from '../components/';
 import { Footer } from '../components/layout/Footer';
 
 const EmailSignaturesPage: React.FC = () => {
