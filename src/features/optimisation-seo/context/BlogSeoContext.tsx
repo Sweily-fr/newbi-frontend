@@ -1,4 +1,4 @@
-import React, { useContext, useState, ReactNode } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { 
   BlogSeoContextType, 
   BlogSeoState, 
@@ -7,42 +7,14 @@ import {
   MetaTagsData
 } from '../types/seo';
 
-// Fonctions utilitaires importées temporairement
-// Ces fonctions devraient être définies dans un fichier utils.ts séparé
-const analyzeContent = (content: string, keywords: KeywordData, metaTags: MetaTagsData, contentStats: ContentStats) => [];
-const calculateContentStats = (content: string, keywords: KeywordData) => ({
-  wordCount: 0,
-  paragraphCount: 0,
-  sentenceCount: 0,
-  avgSentenceLength: 0,
-  readingTime: 0,
-  fleschScore: 0,
-  keywordDensity: {
-    main: 0,
-    secondary: {},
-    longTail: {}
-  },
-  headingCount: {
-    h1: 0,
-    h2: 0,
-    h3: 0,
-    h4: 0
-  },
-  linksCount: {
-    internal: 0,
-    external: 0
-  },
-  imagesCount: 0,
-  imagesWithAlt: 0,
-  imagesWithKeywordInAlt: 0
-});
-const calculateOverallScore = (analysisResults: any[]) => ({ value: 0, label: 'Non évalué', color: 'red' as const });
-const exportContentUtil = (content: string, format: 'html' | 'markdown' | 'text') => '';
-const getInitialState = () => ({
-  content: '',
-  keywords: { main: '', secondary: [], longTail: [] },
-  metaTags: { title: '', description: '' }
-});
+// Import des fonctions utilitaires depuis le module utils
+import { 
+  analyzeContent, 
+  calculateContentStats, 
+  calculateOverallScore, 
+  exportContent as exportContentUtil,
+  getInitialState 
+} from '../utils';
 
 // Import du contexte
 import { BlogSeoContext } from './BlogSeoContextDefinition';
@@ -119,11 +91,24 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
   };
   
   // Fonction pour analyser le contenu
-  const analyzeContentHandler = () => {
+  // Ajout d'un paramètre optionnel pour permettre de passer directement le contenu à analyser
+  const analyzeContentHandler = (contentToAnalyze?: string) => {
     setIsAnalyzing(true);
+    
+    // Utiliser le contenu passé en paramètre s'il existe, sinon utiliser le contenu du state
+    const currentContent = contentToAnalyze !== undefined ? contentToAnalyze : state.content;
+    
+    // Si le contenu a été passé en paramètre, mettre à jour le state avec ce contenu
+    if (contentToAnalyze !== undefined && contentToAnalyze !== state.content) {
+      setState(prevState => ({
+        ...prevState,
+        content: contentToAnalyze
+      }));
+    }
+    
     // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
     const defaultContent = '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>';
-    const isContentEmpty = !state.content || state.content === '' || state.content === defaultContent;
+    const isContentEmpty = !currentContent || currentContent === '' || currentContent === defaultContent;
     
     // Vérifier si les métadonnées sont vides
     const isMetaTagsEmpty = !state.metaTags.title && !state.metaTags.description;
@@ -138,15 +123,16 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
         overallScore: { value: 0, label: 'Non évalué', color: 'red' },
         history: [...prevState.history, { timestamp: Date.now(), score: 0 }]
       }));
+      setIsAnalyzing(false);
       return;
     }
     
-    // Calcul des statistiques du contenu
-    const contentStats = calculateContentStats(state.content, state.keywords);
+    // Calcul des statistiques du contenu avec le contenu actuel
+    const contentStats = calculateContentStats(currentContent, state.keywords);
     
     // Analyse du contenu
     const analysisResults = analyzeContent(
-      state.content, 
+      currentContent, 
       state.keywords, 
       state.metaTags, 
       contentStats
@@ -199,15 +185,4 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
       {children}
     </BlogSeoContext.Provider>
   );
-};
-
-// Hook personnalisé pour utiliser le contexte
-export const useBlogSeo = (): BlogSeoContextType => {
-  const context = useContext(BlogSeoContext);
-  
-  if (context === undefined) {
-    throw new Error('useBlogSeo doit être utilisé à l\'intérieur d\'un BlogSeoProvider');
-  }
-  
-  return context;
 };

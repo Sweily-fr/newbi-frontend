@@ -70,10 +70,11 @@ export interface BlogSeoState {
 
 export interface BlogSeoContextType {
   state: BlogSeoState;
+  isAnalyzing: boolean;
   setContent: (content: string) => void;
   setKeywords: (keywords: KeywordData) => void;
   setMetaTags: (metaTags: MetaTagsData) => void;
-  analyzeContent: () => void;
+  analyzeContent: (contentToAnalyze?: string) => void;
   exportContent: (format: 'html' | 'markdown' | 'text') => string;
   resetState: () => void;
 }

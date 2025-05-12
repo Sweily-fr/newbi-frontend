@@ -376,16 +376,20 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
   const handleAnalyzeContent = () => {
     setIsAnalyzing(true);
     
-    // Mettre à jour le contenu avant de lancer l'analyse
+    // Obtenir le contenu actuel de l'éditeur
     if (editorRef.current) {
-      setContent(editorRef.current.innerHTML);
+      const currentContent = editorRef.current.innerHTML;
+      
+      // Passer directement le contenu actuel à la fonction analyzeContent du contexte
+      // Cela évite le problème de timing avec les mises à jour d'état asynchrones
+      analyzeContent(currentContent);
+    } else {
+      // Si editorRef.current n'existe pas, appeler quand même analyzeContent
+      // avec le contenu actuel du state
+      analyzeContent();
     }
     
-    // Lancer l'analyse du contenu après un court délai pour s'assurer que le contenu est mis à jour
-    setTimeout(() => {
-      analyzeContent();
-      setIsAnalyzing(false);
-    }, 300);
+    // Note: setIsAnalyzing(false) est géré par la fonction analyzeContent du contexte
   };
 
   return {

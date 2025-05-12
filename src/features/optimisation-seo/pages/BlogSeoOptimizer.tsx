@@ -39,9 +39,9 @@ const BlogSeoOptimizerContent: React.FC = () => {
           {/* Recommandations (droite) */}
           <div className="lg:col-span-4">
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Recommandations</h2>
-                {state.analysisResults.length === 0 ? (
+              {state.analysisResults.length === 0 ? (
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Recommandations</h2>
                   <div className="flex flex-col items-center justify-center p-6 text-center">
                     <div className="text-gray-400 mb-3">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,14 +50,14 @@ const BlogSeoOptimizerContent: React.FC = () => {
                     </div>
                     <p className="text-gray-600">Commencez à rédiger votre contenu et ajoutez un mot-clé principal pour obtenir des recommandations.</p>
                   </div>
-                ) : (
-                  <RecommendationsPanel 
-                    analysisResults={state.analysisResults}
-                    expandedCategories={expandedCategories}
-                    setExpandedCategories={setExpandedCategories}
-                  />
-                )}
-              </div>
+                </div>
+              ) : (
+                <RecommendationsPanel 
+                  analysisResults={state.analysisResults}
+                  expandedCategories={expandedCategories}
+                  setExpandedCategories={setExpandedCategories}
+                />
+              )}
             </div>
           </div>
         </div>

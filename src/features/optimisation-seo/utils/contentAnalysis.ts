@@ -220,12 +220,27 @@ export const analyzeContent = (
   // Vérification de la présence du mot-clé principal dans le titre H1
   let h1Content = '';
   if (hasH1) {
-    // Extraire le contenu du H1
-    const h1Match = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    h1Content = h1Match ? h1Match[1].replace(/<[^>]*>/g, '') : '';
+    // Extraire le contenu de tous les H1 (même s'il ne devrait y en avoir qu'un)
+    // Utiliser une expression régulière plus robuste qui capture le contenu HTML complet
+    const h1Regex = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
+    let h1Match;
+    const allH1Contents = [];
     
-    if (keywords.main) {
-      const keywordInH1 = h1Content.toLowerCase().includes(keywords.main.toLowerCase());
+    // Récupérer tous les H1 du contenu
+    while ((h1Match = h1Regex.exec(content)) !== null) {
+      // Nettoyer le contenu HTML en supprimant toutes les balises
+      const cleanedContent = h1Match[1].replace(/<[^>]*>/g, '');
+      allH1Contents.push(cleanedContent);
+    }
+    
+    // Joindre tous les contenus H1 pour la recherche
+    h1Content = allH1Contents.join(' ');
+    
+    if (keywords.main && h1Content) {
+      // Vérifier si le mot-clé principal est présent dans le contenu H1
+      // Utiliser une recherche insensible à la casse
+      const keywordRegex = new RegExp(`\\b${keywords.main.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+      const keywordInH1 = keywordRegex.test(h1Content);
       
       results.push({
         id: 'keyword-in-h1',
