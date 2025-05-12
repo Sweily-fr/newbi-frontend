@@ -89,7 +89,7 @@ export * from './data-display/Table';
 // export * from './navigation/Tabs';
 
 // Export des composants métier
-export * from './business/Tools/ToolCard';
+// export * from './business/Tools/ToolCard';
 export * from '../features/factures/components/business/InvoiceSidebar';
 // export * from './business/clients/ClientsManager';
 // export * from './business/InvoiceItem';

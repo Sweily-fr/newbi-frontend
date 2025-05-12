@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { TOOLS } from "../constants/tools";
-import { ToolCard } from "../components/business/Tools/ToolCard";
-import { Button } from "../components";
-import { SearchInput } from "../components/";
+import { ToolCard } from "../features/outils/components";
+import { Button, SearchInput } from "../components";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
 import { PremiumModal } from "../components/subscription/PremiumModal";
