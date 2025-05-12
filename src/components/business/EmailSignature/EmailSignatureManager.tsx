@@ -4,7 +4,7 @@ import { EmailSignaturesTable, EmailSignature } from './components/EmailSignatur
 import { DELETE_EMAIL_SIGNATURE, SET_DEFAULT_EMAIL_SIGNATURE } from '../../../graphql/emailSignatures';
 import { Notification } from '../../feedback/Notification';
 import { ConfirmationModal } from '../../feedback/ConfirmationModal';
-import { EmailSignatureFormModal } from './components/EmailSignatureFormModal';
+import { EmailSignatureFormLayout } from '../../../features/email-signatures/components/EmailSignatureFormLayout';
 
 export const EmailSignatureManager: React.FC = () => {
 
@@ -68,6 +68,11 @@ export const EmailSignatureManager: React.FC = () => {
     setSelectedSignature(null);
   };
 
+  const handleSaveSignature = async (signature: Partial<EmailSignature>) => {
+    // TODO: Implémenter la sauvegarde avec GraphQL
+    console.log('Saving signature:', signature);
+  };
+
   // Fonction pour gérer la suppression d'une signature
   const handleDeleteSignature = (signature: EmailSignature) => {
     setSignatureToDelete(signature);
@@ -97,10 +102,12 @@ export const EmailSignatureManager: React.FC = () => {
       />
 
       {/* Modale de formulaire de signature */}
-      <EmailSignatureFormModal
+      <EmailSignatureFormLayout
         isOpen={isFormModalOpen}
         onClose={handleCloseForm}
+        onSave={handleSaveSignature}
         signature={selectedSignature || undefined}
+        defaultNewbiLogoUrl="/images/logo_newbi/SVG/Logo_Texte_Purple.svg"
       />
 
       {/* Modale de confirmation */}

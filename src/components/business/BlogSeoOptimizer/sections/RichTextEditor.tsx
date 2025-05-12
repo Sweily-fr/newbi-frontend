@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useBlogSeo } from '../context';
-import { Modal } from '../../../ui/Modal';
+import { Modal } from '../../../common/Modal';
 import { ContentAnalysisResult } from '../types';
 import { Notification } from '../../../feedback/Notification';
 // Importation de l'éditeur CKEditor (à installer via npm)

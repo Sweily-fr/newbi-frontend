@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ROUTES } from '../routes/constants';
-import { LoginForm } from '../components/forms/auth/LoginForm';
-import { RegisterForm } from '../components/forms/auth/RegisterForm';
+import { LoginForm, RegisterForm } from '../features/auth/components/';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../assets/logo';
 import { SEOHead } from '../components/SEO/SEOHead';

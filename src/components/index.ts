@@ -1,14 +1,50 @@
-// Export des composants UI
-export * from './ui/TextField';
-export * from './ui/Button';
-export * from './ui/Form';
-export * from './ui/FormActions';
-export * from './ui/FieldGroup';
-export * from './ui/Select';
-export * from './ui/Checkbox';
-export * from './ui/TextArea';
-export * from './ui/CommunityButton';
-// export * from './ui/Input';
+// Export des composants Common
+export * from './common/TextField';
+export * from './common/Button';
+export * from './common/Form';
+export * from './common/FormActions';
+export * from './common/FieldGroup';
+export * from './common/Select';
+export * from './common/Checkbox';
+export * from './common/TextArea';
+export * from './common/CommunityButton';
+export * from './common/TextFieldURL';
+export * from './common/Tooltip';
+export * from './common/ButtonLink';
+export * from './common/Loader';
+export * from './common/Progress';
+export * from './common/NotificationComponent';
+export * from './common/PasswordField';
+export * from './common/InfoBox';
+export * from './common/ImageUploader';
+export * from './common/Collapse';
+export * from './common/Dropdown';
+export * from './common/Modal';
+export * from './common/Select';
+export * from './common/TextField';
+export * from './common/TextFieldURL';
+export * from './common/Tooltip';
+export * from './common/ButtonLink';
+export * from './common/Loader';
+export * from './common/Progress';
+export * from './common/NotificationComponent';
+export * from './common/PasswordField';
+export * from './common/InfoBox';
+export * from './common/ImageUploader';
+export * from './common/Collapse';
+export * from './common/Dropdown';
+export * from './common/Modal';
+export * from './common/Select';
+export * from './common/TextField';
+export * from './common/TextFieldURL';
+export * from './common/Tooltip';
+export * from './common/SearchInput';
+export * from './common/Avatar';
+export * from './common/PDFGenerator';
+export * from './common/PasswordStrengthIndicator';
+export * from './common/Card';
+
+// export * from './common/Input';
 
 // Export des composants de mise en page
 // export * from './layout/Header';
@@ -22,20 +58,20 @@ export * from './layout/ToolLayout';
 // export * from './forms/Checkbox';
 
 // Export des formulaires d'authentification
-export * from './forms/auth/LoginForm';
-export * from './forms/auth/RegisterForm';
-export * from './forms/auth/ForgotPasswordForm';
-export * from './forms/auth/ResetPasswordForm';
+// export * from './forms/auth/LoginForm';
+// export * from './forms/auth/RegisterForm';
+// export * from './forms/auth/ForgotPasswordForm';
+// export * from './forms/auth/ResetPasswordForm';
 
 // Export des formulaires de profil
 export * from './forms/profile/CompanyInfoForm';
 export * from './forms/profile/PersonalInfoForm';
 
 // Export des formulaires de clients
-export * from './forms/clients/ClientForm';
+// export * from './forms/clients/ClientForm';
 
 // Export des formulaires de factures
-export * from './forms/invoices/InvoiceFormModal';
+export * from '../features/factures/components/forms/InvoiceFormModal';
 
 // Export des composants d'affichage de données
 // /src/components/data-display/index.ts
@@ -54,8 +90,8 @@ export * from './feedback/Modal';
 
 // Export des composants métier
 export * from './business/Tools/ToolCard';
-export * from './business/invoices/InvoiceSidebar';
-export * from './business/clients/ClientsManager';
+export * from '../features/factures/components/business/InvoiceSidebar';
+// export * from './business/clients/ClientsManager';
 // export * from './business/InvoiceItem';
 
 // Note: Décommentez les lignes au fur et à mesure que vous créez les composants

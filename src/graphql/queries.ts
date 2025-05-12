@@ -119,5 +119,3 @@ export const GET_INVOICES = gql`
     }
   }
 `;
-
-export { GET_CLIENTS } from './client';

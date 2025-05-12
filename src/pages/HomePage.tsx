@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ButtonLink } from "../components/ui/ButtonLink";
+import { ButtonLink } from "../components/";
 import { SEOHead } from "../components/SEO/SEOHead";
 import { SchemaMarkup, FAQSchema } from "../components/SEO/SchemaMarkup";
 import {

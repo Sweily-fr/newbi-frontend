@@ -1,7 +1,6 @@
-import { Modal } from "../ui/Modal";
+import { Modal } from "../common/Modal";
 import {
   CheckCircleIcon,
-  CreditCardIcon,
   CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";

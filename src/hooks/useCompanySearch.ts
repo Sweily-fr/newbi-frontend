@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLazyQuery, ApolloError } from '@apollo/client';
-import { SEARCH_COMPANY_BY_SIRET, SEARCH_COMPANIES_BY_NAME } from '../graphql/client';
+import { SEARCH_COMPANY_BY_SIRET, SEARCH_COMPANIES_BY_NAME } from '../features/clients/graphql/client';
 import useNotification from './useNotification';
 
 // Types pour les résultats de recherche

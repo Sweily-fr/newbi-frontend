@@ -1,9 +1,10 @@
 import React from "react";
 import { Tool } from "../../../constants/tools";
 import { CheckBadgeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
-import { ButtonLink } from "../../../components/ui/ButtonLink";
+import { Button } from "../../common/Button";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
+import { Link } from "react-router-dom";
 
 interface ToolCardProps {
   tool: Tool;
@@ -11,19 +12,22 @@ interface ToolCardProps {
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
-
   const { isAuthenticated } = useAuth();
   const { hasActiveSubscription } = useSubscription();
 
-
+  // Vérifier si l'utilisateur a accès à l'outil
+  const hasAccess = !tool.premium || (isAuthenticated && hasActiveSubscription);
 
   return (
-    <div
-      className={`relative group bg-white rounded-2xl shadow-md border transition-all duration-200 overflow-hidden cursor-pointer
+    <Link
+      to={tool.href}
+      className={`relative group bg-white rounded-2xl shadow-md border transition-all duration-200 overflow-hidden block
         hover:shadow-lg hover:border-[#5b50ff] hover:bg-[#f0eeff]/30
         ${tool.premium ? 'border-[#5b50ff]/40 bg-[#f0eeff]/20' : 'border-gray-100'}
         ${tool.comingSoon ? 'opacity-70 grayscale pointer-events-none' : ''}
+        ${!tool.comingSoon && hasAccess ? 'cursor-pointer' : ''}
       `}
+      onClick={onClick}
     >
       <div className="p-4 flex flex-col h-full justify-between">
         {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
@@ -66,23 +70,16 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
             : <span className={`${tool.premium ? 'text-gray-600' : 'text-gray-500'}`}>{tool.description}</span>}
         </div>
 
-        {/* Statut et badges - Uniquement pour les outils à venir */}
-        {tool.comingSoon && (
-          <div className="flex items-start gap-2 mb-4">
-            <div className="text-xs px-2.5 py-0.5 rounded-full bg-[#f0eeff] border border-[#5b50ff] text-[#5b50ff] font-medium animate-pulse">
-              Bientôt disponible
-            </div>
-          </div>
-        )}
-
-        {/* Bouton Visit */}
+        {/* Bouton décoratif (n'est pas un vrai lien, juste visuel) */}
         <div className="mt-auto pt-3">
-          <ButtonLink
-            to={tool.href}
+          <Button
             variant="outline"
-            className={`rounded-lg font-medium text-sm py-2.5 px-5 w-full transition-all duration-300 hover:!bg-[#5b50ff] hover:text-white hover:border-transparent hover:shadow-md hover:transform hover:translate-y-[-2px] ${tool.premium ? 'border-[#5b50ff] text-[#5b50ff]' : ''}`}
+            className={`rounded-lg font-medium text-sm py-2.5 px-5 w-full transition-all duration-300 
+              ${tool.premium ? 'border-[#5b50ff] text-[#5b50ff]' : ''}
+              group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:transform group-hover:translate-y-[-2px]
+              pointer-events-none
+            `}
             disabled={tool.comingSoon}
-            onClick={onClick}
           >
             {tool.comingSoon ? (
               "Vous serez notifié au lancement"
@@ -94,9 +91,9 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
                 <span>{tool.name}</span>
               </div>
             )}
-          </ButtonLink>
+          </Button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

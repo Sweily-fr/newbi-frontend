@@ -1,6 +1,6 @@
 
 import { Modal } from '../../feedback/Modal';
-import { Button } from '../../ui';
+import { Button } from '../../';
 
 interface CancelSubscriptionModalProps {
   isOpen: boolean;

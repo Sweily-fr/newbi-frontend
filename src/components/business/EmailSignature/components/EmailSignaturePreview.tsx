@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { EmailSignature } from './EmailSignaturesTable';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
-import { Button } from '../../../ui';
+import { Button } from '../../..';
 
 interface EmailSignaturePreviewProps {
   signature: Partial<EmailSignature>;

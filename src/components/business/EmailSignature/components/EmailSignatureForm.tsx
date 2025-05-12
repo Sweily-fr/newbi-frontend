@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, TextField, TextArea, ImageUploader, Checkbox } from '../../../ui';
-import Collapse from '../../../ui/Collapse';
+import Collapse from '../../../common/Collapse';
 import { EmailSignature } from './EmailSignaturesTable';
 import { EMAIL_PATTERN, NAME_REGEX } from '../../../../constants/formValidations';
 import { useCompany } from '../../../../hooks/useCompany';

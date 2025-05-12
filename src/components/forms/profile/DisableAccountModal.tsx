@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { DISABLE_ACCOUNT } from '../../../graphql/profile';
 import { Modal } from '../../feedback/Modal';
-import { Form, PasswordField, Button } from '../../ui';
+import { Form, PasswordField, Button } from '../../';
 import { Notification } from '../../feedback';
 
 interface DisableAccountModalProps {

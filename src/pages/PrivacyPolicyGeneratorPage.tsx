@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCompany } from '../hooks';
 import { Button } from '../components';
 import { Spinner } from '../components/feedback';
 import { Notification } from '../components/feedback';
-import { NotificationComponent } from '../components/ui/NotificationComponent';
+import { NotificationComponent } from '../components/';
 import { SEOHead } from '../components/SEO/SEOHead';
 
 // Types pour le formulaire

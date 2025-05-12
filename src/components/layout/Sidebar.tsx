@@ -1,6 +1,6 @@
 // src/components/layout/Sidebar.tsx
 import React, { ReactNode, useEffect } from 'react';
-import { Button } from '../ui';
+import { Button } from '../';
 
 export interface SidebarProps {
   /**

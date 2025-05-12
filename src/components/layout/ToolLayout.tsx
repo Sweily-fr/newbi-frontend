@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { CommunityButton } from '../ui/CommunityButton';
+import { CommunityButton } from '../';
 
 interface ToolLayoutProps {
   children: ReactNode;

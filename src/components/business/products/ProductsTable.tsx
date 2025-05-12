@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../graphql/products';
 import { Table, Column } from '../../data-display/Table';
-import { Button, SearchInput } from '../../ui';
+import { Button, SearchInput } from '../../';
 import { PlusIcon, DocumentTextIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatPrice } from '../../../utils/formatters';
 import { Spinner } from '../../feedback/Spinner';
@@ -155,6 +155,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
     <div>
       <div className="mb-2">
         <h2 className="text-lg font-medium text-gray-900">Catalogue de produits et services</h2>
+        
       </div>
       
       <div className="mb-4 flex justify-between items-center">
