@@ -18,7 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { SubscriptionContext } from "../context/SubscriptionContext.context";
-import { Button } from "../components/ui";
+import { Button } from "../components/";
 import { PremiumModal } from "../components/subscription/PremiumModal";
 import axios from "axios";
 import { SEOHead } from "../components/SEO/SEOHead";

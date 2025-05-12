@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Sidebar } from '../../../../components/layout/Sidebar';
-import { Button } from '../../../../components/ui';
+import { Button } from '../../../../components/';
 import { formatDate } from '../../../../utils/date';
 import { QuoteInvoiceCreationModal } from './QuoteInvoiceCreationModal';
 import { QuoteInvoiceProgress } from './QuoteInvoiceProgress';

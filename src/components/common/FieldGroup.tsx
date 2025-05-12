@@ -27,3 +27,5 @@ export const FieldGroup: React.FC<FieldGroupProps> = ({
     </div>
   );
 };
+
+export default FieldGroup;

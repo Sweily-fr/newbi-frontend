@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PDFGenerator, Loader } from "../../ui";
+import { PDFGenerator, Loader } from "../../";
 import { Client, CompanyInfo, Invoice, Item } from "../../../types";
 import { getUnitAbbreviation } from "../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../utils/transactionCategoryUtils";

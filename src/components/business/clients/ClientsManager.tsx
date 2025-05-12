@@ -9,8 +9,8 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Table, Column } from "../../../components/data-display/Table";
-import { Button } from "../../ui/Button";
-import { SearchInput } from "../../ui/SearchInput";
+import { Button } from "../../common/Button";
+import { SearchInput } from "../../common/SearchInput";
 import { useClientsManager } from "../../../hooks/useClientsManager";
 import { Client } from "../../../types/client";
 import { useState, useRef } from "react";

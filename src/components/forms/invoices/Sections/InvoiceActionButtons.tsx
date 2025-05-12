@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../../../ui";
+import { Button } from "../../../";
 
 interface InvoiceActionButtonsProps {
   onValidateForm: (asDraft: boolean) => void;

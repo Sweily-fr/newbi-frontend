@@ -3,7 +3,7 @@ import { Footer } from './Footer';
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../routes/constants';
 import { useDeviceDetection } from '../../hooks/useDeviceDetection';
-import { CommunityButton } from '../ui/CommunityButton';
+import { CommunityButton } from '../common/CommunityButton';
 
 interface MainLayoutProps {
   children: React.ReactNode;

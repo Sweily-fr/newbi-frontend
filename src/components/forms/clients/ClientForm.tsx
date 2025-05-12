@@ -12,7 +12,7 @@ import {
   FormActions,
   Select,
   Button,
-} from "../../ui";
+} from "../../";
 import useCompanySearch, {
   CompanySearchResult,
   CompanyNameResult,

@@ -13,7 +13,7 @@ import {
   FormActions,
   ImageUploader,
   Select,
-} from "../../ui";
+} from "../../";
 import {
   getNameValidationRules,
   getPhoneValidationRules,
@@ -26,7 +26,6 @@ import {
   IBAN_REGEX,
   BIC_REGEX,
   isFieldRequiredForCompanyStatus,
-  REQUIRED_FIELDS_BY_COMPANY_STATUS
 } from "../../../utils/validators";
 
 export const CompanyInfoForm = ({ initialData }: CompanyInfoFormProps) => {

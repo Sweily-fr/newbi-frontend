@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useMutation, ApolloError } from "@apollo/client";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { REGISTER_MUTATION } from "../../../graphql/auth";
-import { Form, TextField, Button, Checkbox } from "../../../components/ui";
-import { PasswordField } from "../../../components/ui/PasswordField";
+import { Form, TextField, Button, Checkbox } from "../../";
+import { PasswordField } from "../../common/PasswordField";
 import {
   PasswordStrengthIndicator,
   PasswordRequirement,
-} from "../../../components/ui/PasswordStrengthIndicator";
+} from "../../common/PasswordStrengthIndicator";
 import { getEmailValidationRules } from "../../../constants/formValidations";
 import CryptoJS from "crypto-js";
 
@@ -90,7 +90,6 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
     } else {
       // Erreur générale
       newErrors.general = error.message;
-      console.error("Erreur générale détectée:", error.message);
     }
 
     // Mettre à jour l'état des erreurs GraphQL

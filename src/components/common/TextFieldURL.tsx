@@ -113,3 +113,5 @@ export const TextFieldURL: React.FC<Omit<TextFieldProps, 'type'>> = ({
     />
   );
 };
+
+export default TextFieldURL;

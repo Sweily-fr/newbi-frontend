@@ -1,6 +1,6 @@
-import { Fragment, ReactNode } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Fragment, ReactNode } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -8,7 +8,17 @@ export interface ModalProps {
   title?: string;
   titleIcon?: ReactNode;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
+  size?:
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl"
+    | "7xl";
   showCloseButton?: boolean;
   className?: string;
 }
@@ -19,22 +29,22 @@ export const Modal = ({
   title,
   titleIcon,
   children,
-  size = 'md',
+  size = "md",
   showCloseButton = true,
-  className = '',
+  className = "",
 }: ModalProps) => {
   // Définir la largeur du modal en fonction de la taille
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    '2xl': 'max-w-2xl',
-    '3xl': 'max-w-3xl',
-    '4xl': 'max-w-4xl',
-    '5xl': 'max-w-5xl',
-    '6xl': 'max-w-6xl',
-    '7xl': 'max-w-7xl',
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    "2xl": "max-w-2xl",
+    "3xl": "max-w-3xl",
+    "4xl": "max-w-4xl",
+    "5xl": "max-w-5xl",
+    "6xl": "max-w-6xl",
+    "7xl": "max-w-7xl",
   };
 
   return (
@@ -64,7 +74,10 @@ export const Modal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle transition-all`} style={{ boxShadow: '0 4px 20px rgba(91, 80, 255, 0.15)' }}>
+              <Dialog.Panel
+                className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle transition-all`}
+                style={{ boxShadow: "0 4px 20px rgba(91, 80, 255, 0.15)" }}
+              >
                 {/* En-tête avec titre et bouton de fermeture */}
                 {(title || showCloseButton) && (
                   <div className="flex items-center justify-between mb-4">
@@ -100,3 +113,5 @@ export const Modal = ({
     </Transition>
   );
 };
+
+export default Modal;

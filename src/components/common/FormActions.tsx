@@ -40,3 +40,5 @@ export const FormActions: React.FC<FormActionsProps> = ({
     </div>
   );
 };
+
+export default FormActions;

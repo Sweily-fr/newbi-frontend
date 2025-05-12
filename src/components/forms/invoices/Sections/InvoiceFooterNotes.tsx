@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextArea } from '../../../ui';
+import { TextArea } from '../../../';
 import { FOOTER_NOTES_PATTERN, FOOTER_NOTES_ERROR_MESSAGE } from '../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_INVOICES } from '../../../../graphql/queries';

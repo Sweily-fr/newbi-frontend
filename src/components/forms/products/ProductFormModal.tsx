@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { CREATE_PRODUCT, UPDATE_PRODUCT } from '../../../graphql/products';
 import { Modal } from '../../feedback/Modal';
 import { ConfirmationModal } from '../../feedback/ConfirmationModal';
-import { Button, TextField, TextArea, Select } from '../../ui';
+import { Button, TextField, TextArea, Select } from '../../';
 import { Product } from '../../business/products/ProductsTable';
 import { Notification } from '../../feedback/Notification';
 

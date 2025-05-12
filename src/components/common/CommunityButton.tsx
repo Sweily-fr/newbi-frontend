@@ -35,3 +35,5 @@ export const CommunityButton: React.FC<CommunityButtonProps> = ({ className = ''
     </div>
   );
 };
+
+export default CommunityButton;

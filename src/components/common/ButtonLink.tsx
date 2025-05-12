@@ -81,3 +81,6 @@ export const ButtonLink: React.FC<ButtonLinkProps> = ({
     </Link>
   );
 };
+
+export default ButtonLink;
+

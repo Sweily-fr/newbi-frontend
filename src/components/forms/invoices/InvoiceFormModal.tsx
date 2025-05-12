@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useInvoiceForm, useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../hooks";
 import { InvoiceFormModalProps } from "../../../types";
-import { Button, Form } from "../../ui";
-import { DocumentSettings } from "../../../features/common/ParametreDocuments/DocumentSettings";
-import Collapse from "../../ui/Collapse";
+import { Button, Form } from "../../";
+import { DocumentSettings } from "../../specific/DocumentSettings";
+import Collapse from "../../common/Collapse";
 import { validateInvoiceDates } from "../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
 import { InvoiceItems } from "./Sections";

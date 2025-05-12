@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { Modal } from '../../ui/Modal';
-import { TextField } from '../../ui/TextField';
+import { Modal } from '../../common/Modal';
+import { TextField } from '../../common/TextField';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
 import { CONNECT_STRIPE } from '../../../graphql/integrations';
 import { Notification } from '../../feedback/Notification';

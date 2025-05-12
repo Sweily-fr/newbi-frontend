@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { EmailSignature } from '../../types';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
-import { Button } from '../../../../components/ui';
+import { Button } from '../../../../components/';
 import { SignatureLayout } from './SignatureLayout';
 import { getFullImageUrl, getFullProfilePhotoUrl } from './utils';
 import { SocialLinksComponent } from './SocialLinks';

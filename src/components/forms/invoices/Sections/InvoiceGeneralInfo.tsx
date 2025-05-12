@@ -6,7 +6,7 @@ import {
   TextField,
   TextArea,
   Tooltip,
-} from "../../../ui";
+} from "../../../";
 import {
   INVOICE_PREFIX_PATTERN,
   INVOICE_NUMBER_PATTERN,

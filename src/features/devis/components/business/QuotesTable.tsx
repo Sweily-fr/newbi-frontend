@@ -4,7 +4,7 @@ import { GET_QUOTES } from '../../graphql/quotes';
 import { Table } from '../../../../components/data-display/Table';
 import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../../components/feedback/Spinner';
-import { Button } from '../../../../components/ui';
+import { Button } from '../../../../components/';
 import { Notification } from '../../../../components/feedback';
 
 // Type pour les onglets de filtrage

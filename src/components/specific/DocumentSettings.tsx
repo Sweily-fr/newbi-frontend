@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { TextField } from '../../../components/ui';
+import { TextField } from '../';
 import { useQuery } from '@apollo/client';
-import { GET_USER_INFO } from '../../../graphql/queries';
+import { GET_USER_INFO } from '../../graphql/queries';
 
 export interface DocumentSettingsProps {
   documentType: 'INVOICE' | 'QUOTE';

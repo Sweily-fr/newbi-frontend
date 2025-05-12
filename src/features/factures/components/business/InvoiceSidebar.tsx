@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { formatDate } from "../../../../utils/date";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { Sidebar } from "../../../../components/layout/Sidebar";
-import { Button } from "../../../../components/ui";
+import { Button } from "../../../../components/";
 import { InvoicePreview } from "../forms/InvoicePreview";
 import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Select, TextField, Button } from "../../../ui";
+import { Select, TextField, Button } from "../../../";
 import {
   DISCOUNT_PERCENTAGE_ERROR_MESSAGE,
   DISCOUNT_FIXED_ERROR_MESSAGE,

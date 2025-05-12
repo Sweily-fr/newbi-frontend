@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, InfoBox } from "../../../ui";
+import { Checkbox, InfoBox } from "../../../";
 
 interface UserData {
   me?: {

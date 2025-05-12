@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { TextField, TextArea, Tooltip, Button } from '../../../../../components/ui';
+import { TextField, TextArea, Tooltip, Button } from '../../../../../components/';
 import {
   INVOICE_PREFIX_PATTERN,
   INVOICE_NUMBER_PATTERN,

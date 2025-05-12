@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { SignatureData } from '../../types';
 import { Checkbox } from '../../../../components/common';
-import { ImageUploader } from '../../../../components/ui/ImageUploader';
+import { ImageUploader } from '../../../../components/common/ImageUploader';
 
 interface PersonalInfoSectionProps {
   signatureData: SignatureData;

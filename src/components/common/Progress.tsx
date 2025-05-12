@@ -75,3 +75,5 @@ export const Progress: React.FC<ProgressProps> = ({ steps, currentStepId }) => {
     </div>
   );
 };
+
+export default Progress;

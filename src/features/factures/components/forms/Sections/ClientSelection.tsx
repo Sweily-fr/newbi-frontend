@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Client } from '../../../../../types/client';
 import { ClientType } from '../../../../../types/client';
 import { TabNavigation } from '../../../../../components/navigation';
-import { Select, TextField, FieldGroup, Button } from '../../../../../components/ui';
+import { Select, TextField, FieldGroup, Button } from '../../../../../components/';
 import useCompanySearch, { CompanySearchResult, CompanyNameResult } from '../../../../../hooks/useCompanySearch';
 import { PlusCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import {

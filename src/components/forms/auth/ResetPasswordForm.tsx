@@ -3,9 +3,9 @@ import { useMutation } from '@apollo/client';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { RESET_PASSWORD_MUTATION } from '../../../graphql/auth';
-import { Form, TextField, Button } from '../../ui';
-import { PasswordField } from '../../ui/PasswordField';
-import { PasswordStrengthIndicator, PasswordRequirement } from '../../ui/PasswordStrengthIndicator';
+import { Form, TextField, Button } from '../../';
+import { PasswordField } from '../../common/PasswordField';
+import { PasswordStrengthIndicator, PasswordRequirement } from '../../common/PasswordStrengthIndicator';
 import { getEmailValidationRules } from '../../../constants/formValidations';
 import CryptoJS from 'crypto-js';
 

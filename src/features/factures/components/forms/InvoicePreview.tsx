@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PDFGenerator, Loader } from "../../../../components/ui";
+import { PDFGenerator, Loader } from "../../../../components/";
 import { Client, CompanyInfo } from "../../../../types/client";
 import { Item } from "../../types/invoice";
 import { Invoice } from "../../types/invoice";

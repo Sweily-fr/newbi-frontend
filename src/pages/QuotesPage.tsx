@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../components/ui';
+import { Button } from '../components/common/Button';
 import { useQuotes, TabType } from '../features/devis/hooks';
 import { TabNavigation } from '../components/navigation/TabNavigation';
-import { SearchInput } from '../components/ui';
+import { SearchInput } from '../components/';
 import { QuoteSidebar } from '../features/devis/components/business/QuoteSidebar';
 import { QuotesTable } from '../features/devis/components/business/QuotesTable';
 import { Notification } from '../components/feedback';

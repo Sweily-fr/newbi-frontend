@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Item } from '../../../../types';
-import { TextField, Select, Button, TextArea } from '../../../ui';
+import { TextField, Select, Button, TextArea } from '../../../';
 import { validateInvoiceItem } from '../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../../graphql/products';

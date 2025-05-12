@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextArea, TextField } from '../../../../../components/ui';
+import { TextArea, TextField } from '../../../../../components/';
 import { 
   getTermsAndConditionsValidationRules, 
   getTermsAndConditionsLinkTitleValidationRules, 

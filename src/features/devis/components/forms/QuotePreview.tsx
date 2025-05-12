@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Quote, CompanyInfo, Client } from "../../../../types";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../../utils/transactionCategoryUtils";
-import { PDFGenerator, Loader } from "../../../../components/ui";
+import { PDFGenerator, Loader } from "../../../../components/";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;

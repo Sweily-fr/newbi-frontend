@@ -1,8 +1,8 @@
 import { InvoiceFormModal } from '../features/factures/components/forms/InvoiceFormModal';
-import { Button } from '../components/ui';
+import { Button } from '../components/';
 import { useInvoices, TabType } from '../features/factures/hooks/useInvoices';
 import { TabNavigation } from '../components/navigation/TabNavigation';
-import { SearchInput } from '../components/ui';
+import { SearchInput } from '../components/';
 import { InvoiceSidebar } from '../features/factures/components/business/InvoiceSidebar';
 import { InvoicesTable } from '../features/factures/components/business/InvoicesTable';
 import { useQuery } from '@apollo/client';

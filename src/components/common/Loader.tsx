@@ -28,3 +28,6 @@ export const Loader: React.FC<LoaderProps> = ({ className = "h-5 w-5" }) => {
     </svg>
   );
 };
+
+export default Loader;
+

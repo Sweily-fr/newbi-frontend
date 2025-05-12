@@ -92,3 +92,5 @@ export const PasswordField: React.FC<TextFieldProps> = ({
     </div>
   );
 };
+
+export default PasswordField;

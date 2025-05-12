@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
-import { Form, TextField, Button } from '../components/ui';
+import { Form, TextField, Button } from '../components/';
 
 
 // Définition de la mutation GraphQL

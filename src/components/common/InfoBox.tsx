@@ -23,7 +23,7 @@ interface InfoBoxProps {
 /**
  * Composant InfoBox pour afficher des notes d'information avec différentes variantes de style
  */
-const InfoBox: React.FC<InfoBoxProps> = ({
+export const InfoBox: React.FC<InfoBoxProps> = ({
   children,
   actionLink,
   variant = "default",

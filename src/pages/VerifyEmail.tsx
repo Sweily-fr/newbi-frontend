@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { Button } from '../components/ui';
+import { Button } from '../components/';
 import { VERIFY_EMAIL } from '../graphql/auth';
 
 

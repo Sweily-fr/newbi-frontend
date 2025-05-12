@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_PROFILE } from '../../../graphql/profile';
 import { GET_CLIENTS } from '../../../graphql/clients';
-import { Progress, ProgressStep } from '../../ui/Progress';
+import { Progress, ProgressStep } from '../../common/Progress';
 import { ROUTES } from '../../../routes/constants';
 import { Card } from '../../ui';
 

@@ -3,9 +3,9 @@ import { ConfirmationModal } from "../../../../components/feedback/ConfirmationM
 import { useQuoteForm } from "../../hooks/useQuoteForm";
 import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
 import { QuoteFormModalProps } from "../../types";
-import { Button, Form } from "../../../../components/ui";
-import Collapse from "../../../../components/ui/Collapse";
-import { DocumentSettings } from "../../../common/ParametreDocuments/DocumentSettings";
+import { Button, Form } from "../../../../components/";
+import Collapse from "../../../../components/common/Collapse";
+import { DocumentSettings } from "../../../../components/specific/DocumentSettings";
 import {
   ClientSelection,
   QuoteGeneralInfo,

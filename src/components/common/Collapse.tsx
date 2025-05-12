@@ -24,7 +24,7 @@ interface CollapseProps {
   icon?: 'document' | 'user' | 'company' | 'products' | 'calculator' | 'notes' | React.ReactNode;
 }
 
-const Collapse: React.FC<CollapseProps> = ({
+export const Collapse: React.FC<CollapseProps> = ({
   title,
   children,
   defaultOpen = true,

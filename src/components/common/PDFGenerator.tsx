@@ -768,3 +768,5 @@ export const PDFGenerator: React.FC<PDFGeneratorProps> = ({
     </>
   );
 };
+
+export default PDFGenerator;
