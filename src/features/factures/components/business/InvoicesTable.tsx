@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_INVOICES } from '../../graphql/invoices';
-import { Table } from '../../../../components/data-display/Table';
+import { Table } from '../../../../components/common/Table';
 import { formatDateShort } from '../../../../utils/date';
-import { Spinner } from '../../../../components/feedback/Spinner';
+import { Spinner } from '../../../../components/common/Spinner';
 import { Button } from '../../../../components/';
-import { Notification } from '../../../../components/feedback';
+import { Notification } from '../../../../components/';
 
 // Type pour les onglets de filtrage
 export type TabType = 'DRAFT' | 'PENDING' | 'COMPLETED' | null;

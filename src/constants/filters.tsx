@@ -1,4 +1,4 @@
-import { FilterOption } from '../components/business/Filters/FilterBar';
+import { FilterOption } from '../components/common/Filters/FilterBar';
 import { Tool } from './tools';
 
 export const TOOL_FILTERS: FilterOption[] = [

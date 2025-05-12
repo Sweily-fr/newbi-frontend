@@ -6,10 +6,10 @@ import { Dropdown, Avatar } from '../';
 import { Logo } from '../../assets/logo';
 import { ButtonLink } from '../';
 import { useQuery } from '@apollo/client';
-import { GET_PROFILE } from '../../graphql/profile';
+import { GET_PROFILE } from '../../features/profile/graphql';
 import axios from 'axios';
 import { UserCircleIcon, CreditCardIcon, ArrowRightOnRectangleIcon, QuestionMarkCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
-import { PremiumModal } from '../subscription/PremiumModal';
+import { PremiumModal } from '../specific/subscription/PremiumModal';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
 export const Navbar = () => {

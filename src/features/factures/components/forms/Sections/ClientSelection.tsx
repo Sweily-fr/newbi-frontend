@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Client } from '../../../../clients/types';
 import { ClientType } from '../../../../clients/types';
-import { TabNavigation } from '../../../../../components/navigation';
+import { TabNavigation } from '../../../../../components/specific/navigation';
 import { Select, TextField, FieldGroup, Button } from '../../../../../components/';
 import useCompanySearch, { CompanySearchResult, CompanyNameResult } from '../../../../../hooks/useCompanySearch';
 import { PlusCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';

@@ -1,18 +1,18 @@
 import { InvoiceFormModal } from '../features/factures/components/forms/InvoiceFormModal';
 import { Button } from '../components/';
 import { useInvoices, TabType } from '../features/factures/hooks/useInvoices';
-import { TabNavigation } from '../components/navigation/TabNavigation';
+import { TabNavigation } from '../components/specific/navigation/TabNavigation';
 import { SearchInput } from '../components/';
 import { InvoiceSidebar } from '../features/factures/components/business/InvoiceSidebar';
 import { InvoicesTable } from '../features/factures/components/business/InvoicesTable';
 import { useQuery } from '@apollo/client';
-import { LogoLoader } from '../components/feedback/LogoLoader';
+import { LogoLoader } from '../components/common/LogoLoader';
 import { GET_INVOICES } from '../features/factures/graphql/invoices';
-import { Notification } from '../components/feedback';
+import { Notification } from '../components/common/Notification';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { SEOHead } from '../components/SEO/SEOHead';
-import { SchemaMarkup } from '../components/SEO/SchemaMarkup';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { SchemaMarkup } from '../components/specific/SEO/SchemaMarkup';
 
 export const InvoicesPage = () => {
   const { quoteId } = useParams();

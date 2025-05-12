@@ -3,7 +3,7 @@ import { Item } from '../../../types/invoice';
 import { TextField, Select, Button, TextArea } from '../../../../../components/';
 import { validateInvoiceItem } from '../../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
-import { GET_PRODUCTS } from '../../../../../graphql/products';
+import { GET_PRODUCTS } from '../../../../products/graphql';
 
 interface InvoiceItemsProps {
   items: Item[];

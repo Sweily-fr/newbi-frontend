@@ -98,6 +98,7 @@ const initializeGoogleAnalytics = (): void => {
   gtag('js', new Date());
   gtag('config', process.env.REACT_APP_GA_TRACKING_ID);
   */
+  
 };
 
 /**
@@ -123,4 +124,5 @@ const initializeMarketingScripts = (): void => {
   `;
   document.head.appendChild(script);
   */
+  
 };

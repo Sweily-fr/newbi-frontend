@@ -1,5 +1,5 @@
-import { Modal } from "../../../../components/feedback/Modal";
-import { ConfirmationModal } from "../../../../components/feedback/ConfirmationModal";
+import { Modal } from "../../../../components/";
+import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { ClientForm } from "../forms/";
 import {
   TrashIcon,
@@ -7,10 +7,10 @@ import {
   UserGroupIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { Table, Column } from "../../../../components/data-display/Table";
+import { Table, Column } from "../../../../components/common/Table";
 import { Button, SearchInput } from "../../../../components/";
 import { useClientsManager } from "../../hooks";
-import { Client } from "../../../../types/client";
+import { Client } from "../../types";
 import { useState, useRef } from "react";
 
 export const ClientsManager = () => {

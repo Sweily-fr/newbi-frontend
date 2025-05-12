@@ -25,7 +25,7 @@ import {
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
 import { MainLayout } from '../components/layout/MainLayout';
-import { DeviceRedirect } from '../components/utils/DeviceRedirect';
+import { DeviceRedirect } from '../utils/DeviceRedirect';
 
 export const AppRoutes = () => {
   return (

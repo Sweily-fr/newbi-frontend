@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({

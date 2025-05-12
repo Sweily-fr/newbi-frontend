@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PDFGenerator, Loader } from "../../../../components/";
-import { Client, CompanyInfo } from "../../../../types/client";
+import { Client, CompanyInfo } from "../../../clients/types";
 import { Item } from "../../types/invoice";
 import { Invoice } from "../../types/invoice";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";

@@ -1,13 +1,12 @@
 import { useState, useMemo } from "react";
 import { TOOLS } from "../constants/tools";
-import { ToolCard } from "../components/business/Tools/ToolCard";
-import { Button } from "../components";
-import { SearchInput } from "../components/";
+import { ToolCard } from "../features/outils/components";
+import { Button, SearchInput } from "../components";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
-import { PremiumModal } from "../components/subscription/PremiumModal";
+import { PremiumModal } from "../components/specific/subscription/PremiumModal";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { SEOHead } from "../components/SEO/SEOHead";
+import { SEOHead } from "../components/specific/SEO/SEOHead";
 
 export const ToolsPage = () => {
   // État pour le tri et la recherche

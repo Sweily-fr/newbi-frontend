@@ -3,7 +3,7 @@
  * après une période d'inactivité.
  */
 
-import { Notification } from '../components/feedback/Notification';
+import { Notification } from '../components/common/Notification';
 
 // Durée d'inactivité avant déconnexion (30 minutes en millisecondes)
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
@@ -40,6 +40,7 @@ class ActivityTracker {
     ACTIVITY_EVENTS.forEach(eventType => {
       window.addEventListener(eventType, this.handleUserActivity);
     });
+    
   }
 
   /**

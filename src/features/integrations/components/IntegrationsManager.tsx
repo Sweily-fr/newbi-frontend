@@ -3,8 +3,8 @@ import { useQuery, useMutation } from '@apollo/client';
 import { CreditCardIcon, CubeIcon, ArrowsRightLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { StripeIntegrationModal } from './StripeIntegrationModal';
 import { GET_INTEGRATIONS, DISCONNECT_STRIPE } from '../graphql';
-import { ConfirmationModal } from '../../../components/feedback/ConfirmationModal';
-import { Notification } from '../../../components/feedback/Notification';
+import { ConfirmationModal } from '../../../components/common/ConfirmationModal';
+import { Notification } from '../../../components/common/Notification';
 
 // Interface pour les outils d'intégration
 interface IntegrationTool {

@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/clien
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { isTokenExpired } from '../utils/auth';
-import { Notification } from '../components/feedback';
+import { Notification } from '../components/common/Notification';
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/graphql` : 'http://localhost:4000/graphql',
@@ -35,7 +35,6 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     graphQLErrors.forEach(({ message, extensions }) => {
       // Si l'erreur est liée à l'authentification (token expiré, invalide, etc.)
       if (extensions?.code === 'UNAUTHENTICATED') {
-        console.error('Erreur d\'authentification:', message);
         // Supprimer le token
         localStorage.removeItem('token');
         
@@ -54,9 +53,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     });
   }
   
-  if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
-    
+  if (networkError) {    
     // Marquer l'erreur comme traitée pour éviter les doublons
     // @ts-expect-error - Ajouter une propriété personnalisée à l'objet d'erreur
     networkError.handled = true;

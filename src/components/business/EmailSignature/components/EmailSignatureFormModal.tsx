@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
-import { ConfirmationModal } from '../../../feedback/ConfirmationModal';
+import { ConfirmationModal } from '../../../common/ConfirmationModal';
 import { EmailSignatureForm } from './EmailSignatureForm';
 import { EmailSignaturePreview } from './EmailSignaturePreview';
 import { EmailSignature } from './EmailSignaturesTable';
 import { CREATE_EMAIL_SIGNATURE, UPDATE_EMAIL_SIGNATURE } from '../../../../graphql/emailSignatures';
-import { Notification } from '../../../feedback/Notification';
+import { Notification } from '../../../common/Notification';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface EmailSignatureFormModalProps {

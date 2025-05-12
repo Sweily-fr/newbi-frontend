@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useCompany } from '../hooks';
+import { useCompany } from '../features/profile/hooks';
 import { Button } from '../components';
-import { Spinner } from '../components/feedback';
-import { Notification } from '../components/feedback';
+import { Spinner, Notification } from '../components';
 import { NotificationComponent } from '../components/';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 // Types pour le formulaire
 interface PrivacyPolicyForm {
@@ -64,7 +63,7 @@ const PrivacyPolicyGeneratorPage: React.FC = () => {
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [copyFormat, setCopyFormat] = useState<'text' | 'html'>('text');
   const [errors, setErrors] = useState<Record<keyof PrivacyPolicyForm, string>>({} as Record<keyof PrivacyPolicyForm, string>);
-
+  
   // Fonction pour remplir automatiquement les champs avec les informations de l'entreprise
   const fillCompanyInfo = () => {
     if (company) {
