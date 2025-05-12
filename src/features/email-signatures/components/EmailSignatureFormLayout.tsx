@@ -110,6 +110,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     layout: 'vertical', // Disposition par défaut: verticale
     verticalSpacing: 10, // Espacement vertical par défaut: 10px
     horizontalSpacing: 20, // Espacement horizontal par défaut: 20px
+    iconTextSpacing: 5, // Espacement entre icônes et texte par défaut: 5px
     
     // Options d'affichage des icônes pour les coordonnées
     showEmailIcon: true,
@@ -211,7 +212,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       textAlignment: data.textAlignment,
       layout: data.layout,
       verticalSpacing: data.verticalSpacing,
-      horizontalSpacing: data.horizontalSpacing
+      horizontalSpacing: data.horizontalSpacing,
+      // Transmettre l'espacement entre icônes et texte
+      iconTextSpacing: data.iconTextSpacing
     };
   };
 

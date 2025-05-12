@@ -58,7 +58,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
     showLogo = true,
     fontSize = 14,
     textStyle = 'normal',
-    fontFamily = 'Arial, sans-serif'
+    fontFamily = 'Arial, sans-serif',
+    iconTextSpacing = 5 // Espacement entre icônes et texte
   } = signature;
 
   // Définir la taille de la photo de profil avec une valeur par défaut
@@ -206,6 +207,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
                 effectiveTextAlignment={effectiveTextAlignment}
                 effectiveHorizontalSpacing={effectiveHorizontalSpacing}
                 effectiveVerticalSpacing={effectiveVerticalSpacing}
+                iconTextSpacing={iconTextSpacing}
                 fontSize={fontSize}
                 textStyle={textStyle}
                 fontFamily={fontFamily}
