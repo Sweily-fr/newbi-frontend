@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBlogSeo } from '../context';
+import { useBlogSeo } from '../../hooks/useBlogSeo';
 
 const SeoScorePanel: React.FC = () => {
   const { state } = useBlogSeo();
@@ -37,8 +37,6 @@ const SeoScorePanel: React.FC = () => {
       return { label: 'Médiocre', color: 'bg-[#f0eeff] text-[#5b50ff]' };
     }
   };
-
-
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">

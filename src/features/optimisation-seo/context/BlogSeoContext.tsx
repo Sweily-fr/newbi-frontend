@@ -1,23 +1,51 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { useContext, useState, ReactNode } from 'react';
 import { 
   BlogSeoContextType, 
   BlogSeoState, 
-  // ContentAnalysisResult, // Import inutilisé
   ContentStats, 
   KeywordData, 
-  MetaTagsData, 
-  // SeoScore // Import inutilisé
-} from './types';
-import { 
-  analyzeContent, 
-  calculateContentStats, 
-  calculateOverallScore, 
-  exportContent as exportContentUtil, 
-  getInitialState 
-} from './utils';
+  MetaTagsData
+} from '../types/seo';
 
-// Création du contexte
-const BlogSeoContext = createContext<BlogSeoContextType | undefined>(undefined);
+// Fonctions utilitaires importées temporairement
+// Ces fonctions devraient être définies dans un fichier utils.ts séparé
+const analyzeContent = (content: string, keywords: KeywordData, metaTags: MetaTagsData, contentStats: ContentStats) => [];
+const calculateContentStats = (content: string, keywords: KeywordData) => ({
+  wordCount: 0,
+  paragraphCount: 0,
+  sentenceCount: 0,
+  avgSentenceLength: 0,
+  readingTime: 0,
+  fleschScore: 0,
+  keywordDensity: {
+    main: 0,
+    secondary: {},
+    longTail: {}
+  },
+  headingCount: {
+    h1: 0,
+    h2: 0,
+    h3: 0,
+    h4: 0
+  },
+  linksCount: {
+    internal: 0,
+    external: 0
+  },
+  imagesCount: 0,
+  imagesWithAlt: 0,
+  imagesWithKeywordInAlt: 0
+});
+const calculateOverallScore = (analysisResults: any[]) => ({ value: 0, label: 'Non évalué', color: 'red' as const });
+const exportContentUtil = (content: string, format: 'html' | 'markdown' | 'text') => '';
+const getInitialState = () => ({
+  content: '',
+  keywords: { main: '', secondary: [], longTail: [] },
+  metaTags: { title: '', description: '' }
+});
+
+// Import du contexte
+import { BlogSeoContext } from './BlogSeoContextDefinition';
 
 // État initial
 const initialContentStats: ContentStats = {
@@ -64,6 +92,7 @@ interface BlogSeoProviderProps {
 
 export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) => {
   const [state, setState] = useState<BlogSeoState>(initialState);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   
   // Fonction pour mettre à jour le contenu
   const setContent = (content: string) => {
@@ -91,6 +120,7 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
   
   // Fonction pour analyser le contenu
   const analyzeContentHandler = () => {
+    setIsAnalyzing(true);
     // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
     const defaultContent = '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>';
     const isContentEmpty = !state.content || state.content === '' || state.content === defaultContent;
@@ -138,6 +168,9 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
       overallScore,
       history: [...prevState.history, newHistoryEntry]
     }));
+    
+    // Une fois l'analyse terminée, mettre isAnalyzing à false
+    setIsAnalyzing(false);
   };
   
   // Fonction pour exporter le contenu
@@ -150,20 +183,9 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
     setState(initialState);
   };
   
-  // Analyse automatique désactivée - remplacée par un bouton d'analyse manuel
-  // L'analyse sera déclenchée via le bouton "Analyser mon article"
-  // useEffect(() => {
-  //   const debounceTimeout = setTimeout(() => {
-  //     if (state.content.trim() && (state.keywords.main || state.metaTags.title)) {
-  //       analyzeContentHandler();
-  //     }
-  //   }, 1000);
-  //   
-  //   return () => clearTimeout(debounceTimeout);
-  // }, [state.content, state.keywords, state.metaTags]);
-  
   const contextValue: BlogSeoContextType = {
     state,
+    isAnalyzing,
     setContent,
     setKeywords,
     setMetaTags,

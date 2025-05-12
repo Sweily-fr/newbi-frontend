@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { useBlogSeo } from '../context';
+import { useBlogSeo } from '../../hooks/useBlogSeo';
 
 const KeywordsMetaForm: React.FC = () => {
   const { state, setKeywords, setMetaTags } = useBlogSeo();
