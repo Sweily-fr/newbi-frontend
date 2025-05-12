@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ResetPasswordForm } from '../components/forms/auth/ResetPasswordForm';
+import { ResetPasswordForm } from '../features/auth/components/';
 import { Logo } from '../assets/logo';
 import { ROUTES } from '../routes/constants';
 

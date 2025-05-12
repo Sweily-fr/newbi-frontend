@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useMutation, ApolloError } from "@apollo/client";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { REGISTER_MUTATION } from "../../../graphql/auth";
-import { Form, TextField, Button, Checkbox } from "../../";
-import { PasswordField } from "../../common/PasswordField";
+import { REGISTER_MUTATION } from "../../graphql/";
+import { Form, TextField, Button, Checkbox, PasswordField } from "../../../../components/";
 import {
   PasswordStrengthIndicator,
   PasswordRequirement,
-} from "../../common/PasswordStrengthIndicator";
-import { getEmailValidationRules } from "../../../constants/formValidations";
+} from "../../../../components/common/PasswordStrengthIndicator";
+import { getEmailValidationRules } from "../../../../constants/formValidations";
 import CryptoJS from "crypto-js";
 
 interface RegisterFormInputs {

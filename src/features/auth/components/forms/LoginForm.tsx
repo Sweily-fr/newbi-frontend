@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { LOGIN_MUTATION } from "../../../graphql/auth";
-import { Form, TextField, Button, Checkbox } from "../../";
-import { PasswordField } from "../../common/PasswordField";
-import { Notification } from "../../../components/feedback/Notification";
+import { LOGIN_MUTATION } from "../../graphql/";
+import { Form, TextField, Button, Checkbox, PasswordField } from "../../../../components/";
+import { Notification } from "../../../../components/feedback/";
 import { ReactivateAccountModal } from "./ReactivateAccountModal";
 import CryptoJS from "crypto-js";
 

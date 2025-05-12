@@ -6,7 +6,7 @@ import { SubscriptionProvider } from './context/SubscriptionContext';
 import { CookieConsentProvider } from './context/CookieConsentContext';
 import { AppRoutes } from './routes/AppRoutes';
 import { Toaster } from 'react-hot-toast';
-import { SessionExpiredNotification } from './components/business/auth/SessionExpiredNotification';
+import { SessionExpiredNotification } from './features/auth/components/';
 import { CookieBanner } from './components/feedback/CookieBanner';
 import { ScrollToTop } from './components/utils/ScrollToTop';
 

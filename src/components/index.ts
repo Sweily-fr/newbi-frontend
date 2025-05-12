@@ -41,6 +41,7 @@ export * from './common/Tooltip';
 export * from './common/SearchInput';
 export * from './common/Avatar';
 export * from './common/PDFGenerator';
+export * from './common/PasswordStrengthIndicator';
 
 // export * from './common/Input';
 
@@ -56,10 +57,10 @@ export * from './layout/ToolLayout';
 // export * from './forms/Checkbox';
 
 // Export des formulaires d'authentification
-export * from './forms/auth/LoginForm';
-export * from './forms/auth/RegisterForm';
-export * from './forms/auth/ForgotPasswordForm';
-export * from './forms/auth/ResetPasswordForm';
+// export * from './forms/auth/LoginForm';
+// export * from './forms/auth/RegisterForm';
+// export * from './forms/auth/ForgotPasswordForm';
+// export * from './forms/auth/ResetPasswordForm';
 
 // Export des formulaires de profil
 export * from './forms/profile/CompanyInfoForm';

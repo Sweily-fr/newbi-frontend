@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
-import { isTokenExpired } from '../../../utils/auth';
-import { Notification } from '../../../components/feedback';
+import { useAuth } from '../../../../context/AuthContext';
+import { isTokenExpired } from '../../../../utils/auth';
+import { Notification } from '../../../../components/feedback/';
 
 /**
  * Composant qui surveille l'expiration de la session et affiche une notification

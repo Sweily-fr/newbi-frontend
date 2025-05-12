@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { REACTIVATE_ACCOUNT } from '../../../graphql/profile';
-import { Modal } from '../../feedback/Modal';
-import { Form, TextField, PasswordField, Button } from '../../';
-import { Notification } from '../../feedback';
+import { REACTIVATE_ACCOUNT } from '../../graphql/';
+import { Modal, Notification } from '../../../../components/feedback/';
+import { Form, TextField, PasswordField, Button } from '../../../../components/';
 
 interface ReactivateAccountModalProps {
   isOpen: boolean;

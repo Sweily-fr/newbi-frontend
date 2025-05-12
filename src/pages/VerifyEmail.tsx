@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '../components/';
-import { VERIFY_EMAIL } from '../graphql/auth';
+import { VERIFY_EMAIL } from '../features/auth/graphql/auth';
 
 
 const VerifyEmail: React.FC = () => {

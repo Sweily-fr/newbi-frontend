@@ -48,3 +48,20 @@ export const VERIFY_EMAIL = gql`
     }
   }
 `;
+
+export const REACTIVATE_ACCOUNT = gql`
+  mutation ReactivateAccount($email: String!, $password: String!) {
+    reactivateAccount(email: $email, password: $password) {
+      success
+      message
+      user {
+        id
+        email
+        profile {
+          firstName
+          lastName
+        }
+      }
+    }
+  }
+`;
