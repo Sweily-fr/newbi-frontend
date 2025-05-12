@@ -31,6 +31,7 @@ interface SignatureLayoutProps {
   effectiveTextAlignment: 'left' | 'center' | 'right';
   effectiveHorizontalSpacing: number;
   effectiveVerticalSpacing: number;
+  iconTextSpacing?: number; // Espacement entre icônes et texte
   fontSize?: number;
   textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
   fontFamily?: string;
@@ -61,6 +62,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   effectiveTextAlignment,
   effectiveHorizontalSpacing,
   effectiveVerticalSpacing,
+  iconTextSpacing = 5, // Valeur par défaut pour l'espacement entre icônes et texte
   fontSize = 14,
   textStyle = 'normal',
   fontFamily = 'Arial, sans-serif'
@@ -229,6 +231,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
             textAlignment="left"
             isHorizontalLayout={true}
             verticalSpacing={effectiveVerticalSpacing}
+            iconTextSpacing={iconTextSpacing}
           />
         </div>
       </div>
@@ -281,6 +284,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         textStyle={textStyle}
         fontFamily={fontFamily}
         verticalSpacing={effectiveVerticalSpacing}
+        iconTextSpacing={iconTextSpacing}
       />
       
       {/* Liens sociaux en bas si nécessaire */}

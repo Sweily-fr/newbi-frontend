@@ -40,6 +40,8 @@ export interface EmailSignature {
   socialLinksIconBgColor?: string;
   socialLinksIconColor?: string;
   socialLinksIconSize?: number;
+  // Espacement entre les icônes et leur texte
+  iconTextSpacing?: number;
   // Options d'affichage des icônes pour les coordonnées
   showEmailIcon?: boolean;
   showPhoneIcon?: boolean;
@@ -81,6 +83,8 @@ export interface SignatureData {
   showPhoneIcon: boolean;
   showAddressIcon: boolean;
   showWebsiteIcon: boolean;
+  // Espacement entre les icônes et leur texte
+  iconTextSpacing?: number;
   // Propriétés optionnelles pour la rétrocompatibilité
   socialLinksPosition?: 'bottom' | 'right';
   layout?: 'horizontal' | 'vertical';
