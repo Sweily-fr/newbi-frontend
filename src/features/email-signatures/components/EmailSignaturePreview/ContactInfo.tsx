@@ -16,6 +16,7 @@ interface ContactInfoProps {
   textAlignment?: 'left' | 'center' | 'right';
   isHorizontalLayout?: boolean;
   verticalSpacing?: number;
+  iconTextSpacing?: number;
   fontSize?: number;
   textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
   fontFamily?: string;
@@ -36,6 +37,7 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
   textAlignment = 'left',
   isHorizontalLayout = false,
   verticalSpacing = 10,
+  iconTextSpacing = 5,
   fontSize = 14,
   textStyle = 'normal',
   fontFamily = 'Arial, sans-serif'
@@ -44,7 +46,7 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
   const contactItemStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '5px',
+    gap: `${iconTextSpacing}px`, // Utiliser l'espacement configurable entre icône et texte
     margin: '0',
     // Appliquer l'alignement horizontal en fonction de textAlignment
     justifyContent: isHorizontalLayout ? 'flex-start' : 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { BlogSeoOptimizer } from '../features/optimisation-seo';
 
 const BlogSeoOptimizerPage: React.FC = () => {

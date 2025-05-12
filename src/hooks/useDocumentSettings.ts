@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
-import { Notification } from '../components/feedback';
+import { Notification } from '../components/';
 
 // Définir les requêtes GraphQL
 const GET_DOCUMENT_SETTINGS = gql`

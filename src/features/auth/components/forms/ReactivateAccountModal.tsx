@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { REACTIVATE_ACCOUNT } from '../../graphql/';
-import { Modal, Notification } from '../../../../components/feedback/';
+import { Modal, Notification } from '../../../../components/';
 import { Form, TextField, PasswordField, Button } from '../../../../components/';
 
 interface ReactivateAccountModalProps {

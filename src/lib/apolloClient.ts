@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/clien
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { isTokenExpired } from '../utils/auth';
-import { Notification } from '../components/feedback';
+import { Notification } from '../components/common/Notification';
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/graphql` : 'http://localhost:4000/graphql',

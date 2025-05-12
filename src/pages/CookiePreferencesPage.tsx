@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { useCookieConsent } from '../hooks/useCookieConsent';
 import { COOKIE_CATEGORIES, CookieCategory } from '../types/cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routes/constants';
-import { Notification } from '../components/feedback';
+import { Notification } from '../components/common/Notification';
 
 export const CookiePreferencesPage: React.FC = () => {
   const navigate = useNavigate();

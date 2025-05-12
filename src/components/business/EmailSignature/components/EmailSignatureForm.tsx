@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, TextField, TextArea, ImageUploader, Checkbox } from '../../../ui';
+import { Button, TextField, TextArea, ImageUploader, Checkbox } from '../../../';
 import Collapse from '../../../common/Collapse';
 import { EmailSignature } from './EmailSignaturesTable';
 import { EMAIL_PATTERN, NAME_REGEX } from '../../../../constants/formValidations';
 import { useCompany } from '../../../../hooks/useCompany';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
-import { Notification } from '../../../feedback/Notification';
+import { Notification } from '../../../common/Notification';
 
 interface EmailSignatureFormProps {
   initialData?: Partial<EmailSignature>;

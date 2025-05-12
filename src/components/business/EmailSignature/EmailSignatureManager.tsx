@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { EmailSignaturesTable, EmailSignature } from './components/EmailSignaturesTable';
 import { DELETE_EMAIL_SIGNATURE, SET_DEFAULT_EMAIL_SIGNATURE } from '../../../graphql/emailSignatures';
-import { Notification } from '../../feedback/Notification';
-import { ConfirmationModal } from '../../feedback/ConfirmationModal';
+import { Notification } from '../../common/Notification';
+import { ConfirmationModal } from '../../common/ConfirmationModal';
 import { EmailSignatureFormLayout } from '../../../features/email-signatures/components/EmailSignatureFormLayout';
 
 export const EmailSignatureManager: React.FC = () => {

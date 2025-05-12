@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { Notification } from '../../../components/feedback/Notification';
+import { Notification } from '../../../components/common/Notification';
 import { 
   CREATE_INVOICE_MUTATION, 
   UPDATE_INVOICE_MUTATION,

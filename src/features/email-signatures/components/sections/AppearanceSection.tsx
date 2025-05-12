@@ -273,6 +273,34 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
         
         {/* Espacements - affichés en fonction du mode sélectionné */}
         <div className="mb-6">
+          {/* Espacement entre icônes et texte - commun aux deux modes */}
+          <div className="mt-6 mb-5">
+            <h4 className="text-base font-medium text-gray-800 mb-3">
+              Espacement entre icônes et texte ({signatureData.iconTextSpacing || 5}px)
+              <span className="ml-2 inline-flex items-center group relative">
+                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                  Ajustez l'espace entre les icônes et leur texte associé
+                  <div className="absolute top-full left-2 transform border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </span>
+            </h4>
+            <div className="flex items-center space-x-3">
+              <input
+                type="range"
+                min="2"
+                max="15"
+                step="1"
+                value={signatureData.iconTextSpacing || 5}
+                onChange={(e) => updateSignatureData('iconTextSpacing', parseInt(e.target.value))}
+                className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
+              />
+              <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">
+                {signatureData.iconTextSpacing || 5}
+              </div>
+            </div>
+          </div>
+          
           {signatureData.layout === 'vertical' ? (
             <div className="mt-6">
               <h4 className="text-base font-medium text-gray-800 mb-3">Espacement vertical ({signatureData.verticalSpacing}px)</h4>

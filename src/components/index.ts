@@ -33,7 +33,7 @@ export * from './common/InfoBox';
 export * from './common/ImageUploader';
 export * from './common/Collapse';
 export * from './common/Dropdown';
-export * from './common/Modal';
+export { default as Modal } from './common/Modal';
 export * from './common/Select';
 export * from './common/TextField';
 export * from './common/TextFieldURL';
@@ -43,6 +43,8 @@ export * from './common/Avatar';
 export * from './common/PDFGenerator';
 export * from './common/PasswordStrengthIndicator';
 export * from './common/Card';
+export * from './common/Spinner';
+export * from './common/Notification';
 
 // export * from './common/Input';
 
@@ -64,8 +66,8 @@ export * from './layout/ToolLayout';
 // export * from './forms/auth/ResetPasswordForm';
 
 // Export des formulaires de profil
-export * from './forms/profile/CompanyInfoForm';
-export * from './forms/profile/PersonalInfoForm';
+// export * from './forms/profile/CompanyInfoForm';
+// export * from './forms/profile/PersonalInfoForm';
 
 // Export des formulaires de clients
 // export * from './forms/clients/ClientForm';
@@ -76,20 +78,20 @@ export * from '../features/factures/components/forms/InvoiceFormModal';
 // Export des composants d'affichage de données
 // /src/components/data-display/index.ts
 // Dans /src/components/index.ts, décommentez la ligne suivante :
-export * from './data-display/Table';
+export * from './common/Table';
 // export * from './data-display/Table';
 // export * from './data-display/List';
 
 // Export des composants de feedback
 //export * from './feedback/Alert';
-export * from './feedback/Modal';
+// Le Modal de feedback/ a été remplacé par celui de common/
 
 // Export des composants de navigation
 // export * from './navigation/Breadcrumb';
 // export * from './navigation/Tabs';
 
 // Export des composants métier
-export * from './business/Tools/ToolCard';
+// export * from './business/Tools/ToolCard';
 export * from '../features/factures/components/business/InvoiceSidebar';
 // export * from './business/clients/ClientsManager';
 // export * from './business/InvoiceItem';

@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client';
 import { GET_QUOTE } from '../../graphql/quotes';
 import { QuotePreview } from '../forms/QuotePreview';
 import { Quote } from '../../../../types';
-import { ConfirmationModal } from '../../../../components/feedback/ConfirmationModal';
+import { ConfirmationModal } from '../../../../components/common/ConfirmationModal';
 
 interface Invoice {
   id: string;

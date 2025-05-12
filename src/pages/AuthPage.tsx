@@ -4,7 +4,7 @@ import { ROUTES } from '../routes/constants';
 import { LoginForm, RegisterForm } from '../features/auth/components/';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../assets/logo';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);

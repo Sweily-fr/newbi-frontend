@@ -1,5 +1,5 @@
 import React from 'react';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 export const TermsPage: React.FC = () => {
   return (

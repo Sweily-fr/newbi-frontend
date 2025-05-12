@@ -8,7 +8,7 @@ import EditorStyles from './EditorStyles';
 import { useEditorHandlers } from './useEditorHandlers';
 import { getWordCountRating, calculateWordCount } from './utils';
 // Le hook useBlogSeo sera réintégré après la refactorisation complète
-import { Notification } from '../../../../../components/feedback/Notification';
+import { Notification } from '../../../../../components/common/Notification';
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ 
   placeholder = 'Commencez à rédiger votre contenu ici...' 
