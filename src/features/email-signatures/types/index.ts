@@ -38,7 +38,7 @@ export interface EmailSignature {
   socialLinksPosition?: 'bottom' | 'right';
   socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
   socialLinksIconBgColor?: string;
-  socialLinksIconColor?: string;
+  socialLinksIconColor?: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
   socialLinksIconSize?: number;
   // Espacement entre les icônes et leur texte
   iconTextSpacing?: number;
@@ -72,6 +72,7 @@ export interface SignatureData {
   socialLinks: SocialLinks;
   socialLinksDisplayMode: 'icons' | 'text';
   socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
+  socialLinksIconColor: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
   useNewbiLogo: boolean;
   customLogoUrl: string;
   fontFamily: string;

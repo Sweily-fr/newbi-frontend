@@ -290,24 +290,28 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
             </div>
           )}
           
-          {/* Couleur des icônes - toujours visible */}
+          {/* Couleur des icônes SVG - nouvelle option */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Couleur d'icône
+              Couleur des icônes
+              <span className="ml-1 inline-flex items-center group relative">
+                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                  Couleur des icônes SVG dans les réseaux sociaux
+                  <div className="absolute top-full left-2 transform border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </span>
             </label>
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap gap-2">
-                {/* Palette de couleurs différente selon le style */}
-                {(signatureData.socialLinksIconStyle === 'plain' 
-                  ? ['#5b50ff', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#000000', '#6b7280'] 
-                  : ['#ffffff', '#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af', '#6b7280']
-                ).map((color) => (
+                {/* Palette de couleurs pour les icônes SVG */}
+                {['#5b50ff', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#000000', '#ffffff'].map((color) => (
                   <button
                     key={color}
                     type="button"
-                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.secondaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
+                    className={`rounded-lg border ${color === '#ffffff' ? 'border-gray-300' : 'border-transparent'} transition-all duration-200 ease-in-out ${signatureData.socialLinksIconColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
                     style={{ backgroundColor: color }}
-                    onClick={() => updateSignatureData('secondaryColor', color)}
+                    onClick={() => updateSignatureData('socialLinksIconColor', color)}
                     aria-label={`Couleur ${color}`}
                   ></button>
                 ))}
@@ -319,17 +323,17 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
               >
                 <div 
                   className="w-8 h-8" 
-                  style={{ backgroundColor: signatureData.secondaryColor || (signatureData.socialLinksIconStyle === 'plain' ? '#5b50ff' : '#ffffff') }}
+                  style={{ backgroundColor: signatureData.socialLinksIconColor || (signatureData.socialLinksIconStyle === 'plain' ? '#333333' : '#ffffff') }}
                 ></div>
                 <div className="px-3 py-1 text-sm font-medium">
-                  {formatColorCode(signatureData.secondaryColor || (signatureData.socialLinksIconStyle === 'plain' ? '#5b50ff' : '#ffffff'))}
+                  {formatColorCode(signatureData.socialLinksIconColor || (signatureData.socialLinksIconStyle === 'plain' ? '#333333' : '#ffffff'))}
                 </div>
                 {showSecondaryColorPicker && (
                   <div className="absolute z-10 mt-2 left-0" ref={secondaryColorPickerRef}>
                     <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
                       <HexColorPicker
-                        color={signatureData.secondaryColor || (signatureData.socialLinksIconStyle === 'plain' ? '#5b50ff' : '#ffffff')}
-                        onChange={(color) => updateSignatureData('secondaryColor', color)}
+                        color={signatureData.socialLinksIconColor || (signatureData.socialLinksIconStyle === 'plain' ? '#333333' : '#ffffff')}
+                        onChange={(color) => updateSignatureData('socialLinksIconColor', color)}
                       />
                       <div className="flex justify-between mt-2">
                         <button
@@ -347,7 +351,7 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
                           className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded-xl hover:bg-[#4a41e0]"
                           onClick={(e) => {
                             e.stopPropagation();
-                            updateSignatureData('secondaryColor', signatureData.socialLinksIconStyle === 'plain' ? '#5b50ff' : '#ffffff');
+                            updateSignatureData('socialLinksIconColor', signatureData.socialLinksIconStyle === 'plain' ? '#333333' : '#ffffff');
                           }}
                         >
                           Réinitialiser
@@ -356,6 +360,35 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Couleur du texte - toujours visible */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Couleur du texte
+              <span className="ml-1 inline-flex items-center group relative">
+                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                  Couleur du texte des liens sociaux en mode texte
+                  <div className="absolute top-full left-2 transform border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </span>
+            </label>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-wrap gap-2">
+                {/* Palette de couleurs pour le texte */}
+                {['#333333', '#5b50ff', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'].map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.secondaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => updateSignatureData('secondaryColor', color)}
+                    aria-label={`Couleur ${color}`}
+                  ></button>
+                ))}
               </div>
             </div>
           </div>
