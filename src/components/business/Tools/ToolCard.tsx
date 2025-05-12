@@ -1,7 +1,7 @@
 import React from "react";
 import { Tool } from "../../../constants/tools";
 import { CheckBadgeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
-import { Button } from "../../../components/ui/Button";
+import { Button } from "../../ui/Button";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { Link } from "react-router-dom";
