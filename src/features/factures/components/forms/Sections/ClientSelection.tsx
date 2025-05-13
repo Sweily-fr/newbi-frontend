@@ -75,6 +75,68 @@ interface ClientSelectionProps {
     };
     [key: string]: any;
   };
+  quote?: {
+    client?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    [key: string]: any;
+  };
+  selectedClientData?: Client | null;
+  isNewClient: boolean;
+  setIsNewClient: (isNew: boolean) => void;
+  selectedClient: string;
+  setSelectedClient: (clientId: string) => void;
+  newClient: {
+    name: string;
+    email: string;
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+    siret: string;
+    vatNumber: string;
+    type: ClientType;
+    firstName?: string;
+    lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
+  };
+  setNewClient: (client: Partial<{
+    name: string;
+    email: string;
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+    siret: string;
+    vatNumber: string;
+    type: ClientType;
+    firstName?: string;
+    lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
+  }>) => void;
+  clientsData?: { clients: { items: Client[], totalItems: number, currentPage: number, totalPages: number } };
+  invoice?: {
+    client?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    [key: string]: any;
+  };
   selectedClientData?: Client | null;
 }
 
@@ -87,6 +149,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   setNewClient,
   clientsData,
   invoice,
+  quote,
   selectedClientData
 }) => {
   // Référence pour suivre si le composant a été monté
@@ -227,13 +290,18 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     }
   }, [companyData, fillFormWithCompanyData]);
   
-  // Effet qui s'exécute au montage ET lorsque invoice ou selectedClientData change
+  // Effet qui s'exécute au montage ET lorsque invoice/quote ou selectedClientData change
   useEffect(() => {    
     if (!isNewClient) {
       // Si on modifie une facture existante (avec un client) et qu'aucun client n'est sélectionné
       if (invoice?.client?.id && !selectedClient) {
         // Initialiser le client de la facture
         setSelectedClient(invoice.client.id);
+      }
+      // Si on modifie un devis existant (avec un client) et qu'aucun client n'est sélectionné
+      else if (quote?.client?.id && !selectedClient) {
+        // Initialiser le client du devis
+        setSelectedClient(quote.client.id);
       }
     }
     
@@ -244,7 +312,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       // Nettoyer lors du démontage
       isMounted.current = false;
     };
-  }, [invoice, selectedClient, selectedClientData, isNewClient, setSelectedClient]); // Exécuter l'effet lorsque invoice, selectedClient, selectedClientData ou isNewClient change
+  }, [invoice, quote, selectedClient, selectedClientData, isNewClient, setSelectedClient]); // Exécuter l'effet lorsque invoice, quote, selectedClient, selectedClientData ou isNewClient change
   
   // Effet pour réagir aux changements de données après le montage initial
   useEffect(() => {
@@ -257,21 +325,28 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       if (invoice?.client?.id && !selectedClient) {
         setSelectedClient(invoice.client.id);
       }
+      // Si on a un devis avec un client et qu'aucun client n'est sélectionné
+      else if (quote?.client?.id && !selectedClient) {
+        setSelectedClient(quote.client.id);
+      }
     }
-  }, [invoice, isNewClient, selectedClient, setSelectedClient]); // Dépendances minimales
+  }, [invoice, quote, isNewClient, selectedClient, setSelectedClient]); // Dépendances minimales
   
-  // Effet pour initialiser le client lors du premier chargement d'une facture existante
+  // Effet pour initialiser le client lors du premier chargement d'une facture ou d'un devis existant
   useEffect(() => {
-    // Seulement au premier chargement ou changement de facture
+    // Seulement au premier chargement ou changement de facture/devis
     if (invoice?.client?.id && !isNewClient && !selectedClient) {
       setSelectedClient(invoice.client.id);
+    }
+    else if (quote?.client?.id && !isNewClient && !selectedClient) {
+      setSelectedClient(quote.client.id);
     }
     
     // Initialiser showManualEntry en fonction du type de client
     if (isNewClient) {
       setShowManualEntry(newClient.type === ClientType.INDIVIDUAL);
     }
-  }, [invoice, isNewClient, selectedClient, setSelectedClient, newClient.type]);
+  }, [invoice, quote, isNewClient, selectedClient, setSelectedClient, newClient.type]);
   
   // Générer les options de clients
   const clientOptions = React.useMemo(() => {
@@ -280,7 +355,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     
     // Si on a une facture avec un client, s'assurer qu'il est toujours inclus en premier
     if (invoice?.client?.id) {
-      
       // Ajouter le client de la facture en premier
       options.push({
         value: invoice.client.id,
@@ -293,13 +367,27 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         setTimeout(() => setSelectedClient(invoice.client.id), 0);
       }
     }
+    // Si on a un devis avec un client, s'assurer qu'il est toujours inclus en premier
+    else if (quote?.client?.id) {
+      // Ajouter le client du devis en premier
+      options.push({
+        value: quote.client.id,
+        label: `${quote.client.name} (${quote.client.email})`
+      });
+      
+      // Initialiser le client seulement si aucun client n'est sélectionné
+      if (!isNewClient && !selectedClient && quote.client?.id) {
+        // Mettre à jour selectedClient de manière asynchrone pour éviter les problèmes de rendu
+        setTimeout(() => setSelectedClient(quote.client.id), 0);
+      }
+    }
     
     // Si on a des clients dans les données
     if (clientsData?.clients?.items) {
-      // Ajouter tous les clients sauf celui de la facture (déjà ajouté)
+      // Ajouter tous les clients sauf celui de la facture/devis (déjà ajouté)
       clientsData.clients.items.forEach((client: Client) => {
-        // Ne pas ajouter le client de la facture (déjà ajouté plus haut)
-        if (client.id !== invoice?.client?.id) {
+        // Ne pas ajouter le client de la facture ou du devis (déjà ajouté plus haut)
+        if (client.id !== invoice?.client?.id && client.id !== quote?.client?.id) {
           options.push({
             value: client.id,
             label: `${client.name} (${client.email})`
@@ -316,6 +404,14 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         options.push({
           value: invoice.client.id,
           label: `${invoice.client.name} (${invoice.client.email})`
+        });
+      }
+      // Si le client sélectionné n'est pas dans les options mais que nous avons les données du devis,
+      // ajouter le client du devis aux options
+      else if (quote?.client?.id && quote.client.id === selectedClient) {
+        options.push({
+          value: quote.client.id,
+          label: `${quote.client.name} (${quote.client.email})`
         });
       }
       // Si le client sélectionné n'est toujours pas dans les options, chercher dans clientsData
@@ -377,8 +473,17 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                   // Si le client de la facture n'est pas dans les options, sélectionner le premier client
                   setSelectedClient(clientOptions[0].value);
                 }
+              } else if (quote?.client?.id) {
+                // Vérifier si le client du devis est dans les options
+                const quoteClientOption = clientOptions.find(option => option.value === quote.client?.id);
+                if (quoteClientOption && quote.client?.id) {
+                  setSelectedClient(quote.client.id);
+                } else {
+                  // Si le client du devis n'est pas dans les options, sélectionner le premier client
+                  setSelectedClient(clientOptions[0].value);
+                }
               } else {
-                // Si pas de facture, sélectionner le premier client
+                // Si pas de facture ni de devis, sélectionner le premier client
                 setSelectedClient(clientOptions[0].value);
               }
             }
