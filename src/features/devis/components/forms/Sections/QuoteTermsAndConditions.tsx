@@ -68,7 +68,10 @@ export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = (
     { keyword: "Acompte", text: "Un acompte de 30% est demandé à la signature du devis." },
     { keyword: "Annulation", text: "Toute annulation après signature du devis entraînera la facturation des travaux déjà réalisés." },
     { keyword: "Litige", text: "En cas de litige, le tribunal de commerce de [Ville] sera seul compétent." },
-    { keyword: "Propriété", text: "Les éléments produits restent la propriété de l'entreprise jusqu'au paiement intégral du prix." }
+    { keyword: "Propriété", text: "Les éléments produits restent la propriété de l'entreprise jusqu'au paiement intégral du prix." },
+    { keyword: "Escompte", text: "Pas d'escompte accordé pour paiement anticipé." },
+    { keyword: "Pénalités", text: "En cas de non-paiement à la date d'échéance, des pénalités seront appliquées. Tout montant non réglé à l'échéance sera majoré d'un intérêt annuel de 11,13 %." },
+    { keyword: "Retard", text: "Tout retard de paiement entraînera une indemnité forfaitaire pour frais de recouvrement de 40€." }
   ];
 
   // Fonction pour insérer une suggestion dans le textarea
