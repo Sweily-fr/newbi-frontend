@@ -402,19 +402,60 @@ export const useQuoteForm = ({
   };
 
   // Fonction pour sélectionner un produit et remplir automatiquement les champs de l'item
-  const handleProductSelect = (index: number, product: any) => {
-    if (!product) return;
+  const handleProductSelect = (index: number, product: {
+    id: string;
+    name: string;
+    description?: string;
+    unitPrice?: number;
+    vatRate?: number;
+    unit?: string;
+  }) => {
+    try {
+      // Vérifier si le produit a un prix unitaire valide
+      if (product.unitPrice === undefined || product.unitPrice === null) {
+        console.warn('Le produit n\'a pas de prix unitaire valide:', product);
+      }
 
-    const newItems = [...items];
-    newItems[index] = {
-      ...newItems[index],
-      description: product.name,
-      unitPrice: product.price,
-      vatRate: product.vatRate || 20,
-      unit: product.unit || "unité",
-      details: product.description || "",
-    };
-    setItems(newItems);
+      // Extraire les valeurs du produit avec des valeurs par défaut sécurisées
+      const {
+        name,
+        description = '',
+        unitPrice = 0,
+        vatRate = 20,
+        unit = 'unité'
+      } = product;
+      
+      // Approche directe : mettre à jour l'item directement dans le tableau
+      const newItems = [...items];
+      
+      // Conserver la quantité et le discount existants
+      const existingQuantity = newItems[index]?.quantity || 1;
+      const existingDiscount = newItems[index]?.discount || 0;
+      const existingDiscountType = newItems[index]?.discountType || 'PERCENTAGE';
+      
+      // Créer un nouvel objet item complet
+      newItems[index] = {
+        description: name,
+        details: description,
+        unitPrice: unitPrice,
+        vatRate: vatRate,
+        unit: unit,
+        quantity: existingQuantity,
+        discount: existingDiscount,
+        discountType: existingDiscountType
+      };
+      
+      // Mettre à jour le tableau d'items en une seule fois
+      setItems(newItems);
+      
+      console.log('Produit importé avec succès:', {
+        index,
+        product,
+        updatedItem: newItems[index]
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'importation du produit:', error);
+    }
   };
 
   // Fonction pour ajouter un champ personnalisé
