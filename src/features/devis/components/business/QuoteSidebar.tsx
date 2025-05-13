@@ -7,7 +7,7 @@ import { QuoteInvoiceProgress } from './QuoteInvoiceProgress';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTE } from '../../graphql/quotes';
 import { QuotePreview } from '../forms/QuotePreview';
-import { Quote } from '../../../../types';
+import { Quote } from '../../types';
 import { ConfirmationModal } from '../../../../components/common/ConfirmationModal';
 
 interface Invoice {
@@ -182,7 +182,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   const statusActions = getStatusActions();
 
 
-
+console.log("quote", quote);
   return (
     <>
       {/* Prévisualisation du devis */}

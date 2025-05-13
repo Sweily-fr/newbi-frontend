@@ -2,9 +2,9 @@
  * Types liés aux devis et à leurs formulaires
  */
 
-import { Client } from '../../../types/client';
-import { CompanyInfo } from '../../../types/company';
-import { Item, CustomField } from '../../../types/invoice';
+import { Client } from '../../clients/types';
+import { CompanyInfo } from '../../profile/types';
+import { Item, CustomField } from '../../factures/types';
 
 /**
  * Structure d'un devis
@@ -34,13 +34,6 @@ export interface Quote {
   termsAndConditionsLinkTitle?: string;
   termsAndConditionsLink?: string;
   customFields?: CustomField[];
-  hasDifferentShippingAddress?: boolean;
-  shippingAddress?: {
-    street?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-  };
   convertedToInvoice?: {
     id: string;
     number: string;

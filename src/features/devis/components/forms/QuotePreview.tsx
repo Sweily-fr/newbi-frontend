@@ -90,6 +90,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
     ? newClient
     : selectedClient || quote.client || {};
     
+  // Déterminer si le client a une adresse de livraison différente
+  const hasShippingAddress = clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
+    
   // Détermination des informations client terminée
 
   const documentContent = (
@@ -149,15 +152,16 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         </div>
 
         <div className="flex justify-between mb-8" data-pdf-no-break="true">
-          <div className="w-1/2 pr-4">
+          <div className={hasShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
             <h3 className="font-normal mb-2">
               {companyInfo?.name || "Votre Entreprise"}
             </h3>
             <p className="text-xs">{quote.companyInfo?.email}</p>
             <p className="text-xs">{quote.companyInfo?.phone}</p>
             <p className="text-xs">{quote.companyInfo?.address?.street}</p>
-            <p className="text-xs">{quote.companyInfo?.address?.city}</p>
-            <p className="text-xs">{quote.companyInfo?.address?.postalCode}</p>
+            <p className="text-xs">
+              {quote.companyInfo?.address?.postalCode} {quote.companyInfo?.address?.city}
+            </p>
             <p className="text-xs">{quote.companyInfo?.address?.country}</p>
             {quote.companyInfo?.siret && (
               <p className="text-xs">SIRET: {quote.companyInfo.siret}</p>
@@ -166,7 +170,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {quote.companyInfo.vatNumber}</p>
             )}
           </div>
-          <div className="w-1/2 pl-4">
+          <div className={hasShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
             <h3 className="font-normal mb-2">
               Facturer à :
             </h3>
@@ -184,6 +188,17 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
+          {hasShippingAddress && (
+            <div className="w-1/3 pl-2">
+              <h3 className="font-normal mb-2">Livrer à :</h3>
+              <p className="text-xs">{clientInfo.name}</p>
+              <p className="text-xs">{clientInfo.shippingAddress?.street}</p>
+              <p className="text-xs">
+                {clientInfo.shippingAddress?.postalCode} {clientInfo.shippingAddress?.city}
+              </p>
+              <p className="text-xs">{clientInfo.shippingAddress?.country}</p>
+            </div>
+          )}
         </div>
 
         {quote.headerNotes && (

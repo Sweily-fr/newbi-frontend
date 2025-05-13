@@ -920,7 +920,26 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                 className="h-4 w-4 text-[#5b50ff] focus:ring-[#4a41e0] border-gray-300 rounded"
                 checked={newClient.hasDifferentShippingAddress || false}
                 onChange={(e) => {
-                  setNewClient({ ...newClient, hasDifferentShippingAddress: e.target.checked });
+                  // Si on décoche la case, on efface l'adresse de livraison
+                  if (!e.target.checked) {
+                    setNewClient({ 
+                      ...newClient, 
+                      hasDifferentShippingAddress: false,
+                      shippingAddress: undefined // Réinitialiser l'adresse de livraison
+                    });
+                  } else {
+                    // Si on coche la case, on initialise une adresse de livraison vide
+                    setNewClient({ 
+                      ...newClient, 
+                      hasDifferentShippingAddress: true,
+                      shippingAddress: newClient.shippingAddress || {
+                        street: '',
+                        city: '',
+                        postalCode: '',
+                        country: ''
+                      }
+                    });
+                  }
                 }}
               />
               <label htmlFor="hasDifferentShippingAddress" className="ml-2 block text-sm text-gray-700">

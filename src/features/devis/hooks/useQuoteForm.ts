@@ -449,6 +449,19 @@ export const useQuoteForm = ({
     // Utiliser le paramètre asDraft s'il est fourni, sinon utiliser l'état submitAsDraft
     const isDraft = asDraft !== undefined ? asDraft : submitAsDraft;
 
+    // Fonction utilitaire pour nettoyer les objets d'adresse (supprimer __typename)
+    const cleanAddressObject = (address: any) => {
+      if (!address) return undefined;
+      
+      // Créer un nouvel objet sans le champ __typename
+      return {
+        street: address.street || "",
+        city: address.city || "",
+        postalCode: address.postalCode || "",
+        country: address.country || ""
+      };
+    };
+
     // Fonction pour obtenir les données du client
     const getClientData = () => {
       // Si c'est un nouveau client, retourner les données du formulaire
@@ -465,7 +478,7 @@ export const useQuoteForm = ({
             country: newClient.country,
           },
           hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
-          shippingAddress: newClient.hasDifferentShippingAddress ? newClient.shippingAddress : undefined,
+          shippingAddress: newClient.hasDifferentShippingAddress ? cleanAddressObject(newClient.shippingAddress) : undefined,
           siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
           vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
         };
@@ -483,15 +496,15 @@ export const useQuoteForm = ({
             country: quote.client.address?.country || "",
           },
           hasDifferentShippingAddress: quote.client.hasDifferentShippingAddress || false,
-          shippingAddress: quote.client.hasDifferentShippingAddress ? quote.client.shippingAddress : undefined,
+          shippingAddress: quote.client.hasDifferentShippingAddress ? cleanAddressObject(quote.client.shippingAddress) : undefined,
           siret: quote.client.siret || "",
           vatNumber: quote.client.vatNumber || "",
           firstName: quote.client.firstName || "",
           lastName: quote.client.lastName || "",
         };
-      } else if (selectedClient && clientsData?.clients) {
+      } else if (selectedClient && clientsData?.clients?.items) {
         // Si un client existant est sélectionné
-        const selectedClientData = clientsData.clients.find(
+        const selectedClientData = clientsData.clients.items.find(
           (client: any) => client.id === selectedClient
         );
 
@@ -570,7 +583,7 @@ export const useQuoteForm = ({
             country: selectedClientData.address?.country || "",
           },
           hasDifferentShippingAddress: selectedClientData.hasDifferentShippingAddress || false,
-          shippingAddress: selectedClientData.hasDifferentShippingAddress ? selectedClientData.shippingAddress : undefined,
+          shippingAddress: selectedClientData.hasDifferentShippingAddress ? cleanAddressObject(selectedClientData.shippingAddress) : undefined,
           siret: siret,
           vatNumber: vatNumber,
           firstName: selectedClientData.firstName || "",
@@ -613,7 +626,7 @@ export const useQuoteForm = ({
                 country: newClient.country,
               },
               hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
-              shippingAddress: newClient.hasDifferentShippingAddress ? newClient.shippingAddress : undefined,
+              shippingAddress: newClient.hasDifferentShippingAddress ? cleanAddressObject(newClient.shippingAddress) : undefined,
               // Utiliser le type exact du client s'il existe, sinon déterminer en fonction des champs
               type:
                 newClient.type ||
@@ -726,11 +739,99 @@ export const useQuoteForm = ({
       } else {
         // Mise à jour d'un devis existant
         try {
-          // Pour la mise à jour, on inclut le numéro
+          // Pour la mise à jour, nous devons toujours envoyer un objet client complet avec tous les champs requis
+          
+          // Préparer les données du client pour la mise à jour
+          let clientForUpdate;
+          
+          if (isNewClient) {
+            // Si c'est un nouveau client, utiliser les données du nouveau client
+            clientForUpdate = getClientData();
+          } else if (selectedClient && clientsData?.clients?.items) {
+            // Si un client existant est sélectionné, utiliser ses données complètes
+            const selectedClientData = clientsData.clients.items.find(
+              (client: any) => client.id === selectedClient
+            );
+            
+            if (selectedClientData) {
+              clientForUpdate = {
+                id: selectedClient,
+                type: selectedClientData.type || 'COMPANY',
+                name: selectedClientData.name || '',
+                email: selectedClientData.email || '',
+                address: cleanAddressObject(selectedClientData.address) || {
+                  street: '',
+                  city: '',
+                  postalCode: '',
+                  country: ''
+                },
+                // Utiliser les données d'adresse de livraison du client sélectionné
+                hasDifferentShippingAddress: selectedClientData.hasDifferentShippingAddress || false,
+                shippingAddress: selectedClientData.hasDifferentShippingAddress && selectedClientData.shippingAddress ? 
+                  cleanAddressObject(selectedClientData.shippingAddress) : undefined,
+                siret: selectedClientData.siret || '',
+                vatNumber: selectedClientData.vatNumber || '',
+                firstName: selectedClientData.firstName || '',
+                lastName: selectedClientData.lastName || ''
+              };
+            } else {
+              // Si le client sélectionné n'est pas trouvé, utiliser le client du devis existant
+              clientForUpdate = {
+                id: quote?.client?.id,
+                type: quote?.client?.type || 'COMPANY',
+                name: quote?.client?.name || '',
+                email: quote?.client?.email || '',
+                address: cleanAddressObject(quote?.client?.address) || {
+                  street: '',
+                  city: '',
+                  postalCode: '',
+                  country: ''
+                },
+                // Utiliser les données d'adresse de livraison du client existant
+                hasDifferentShippingAddress: quote?.client?.hasDifferentShippingAddress || false,
+                shippingAddress: quote?.client?.hasDifferentShippingAddress && quote?.client?.shippingAddress ? 
+                  cleanAddressObject(quote?.client?.shippingAddress) : undefined,
+                siret: quote?.client?.siret || '',
+                vatNumber: quote?.client?.vatNumber || '',
+                firstName: quote?.client?.firstName || '',
+                lastName: quote?.client?.lastName || ''
+              };
+            }
+          } else {
+            // Si aucun client n'est sélectionné, utiliser le client du devis existant
+            clientForUpdate = {
+              id: quote?.client?.id,
+              type: quote?.client?.type || 'COMPANY',
+              name: quote?.client?.name || '',
+              email: quote?.client?.email || '',
+              address: cleanAddressObject(quote?.client?.address) || {
+                street: '',
+                city: '',
+                postalCode: '',
+                country: ''
+              },
+              // Utiliser les données d'adresse de livraison du client existant
+              hasDifferentShippingAddress: quote?.client?.hasDifferentShippingAddress || false,
+              shippingAddress: quote?.client?.hasDifferentShippingAddress && quote?.client?.shippingAddress ? 
+                cleanAddressObject(quote?.client?.shippingAddress) : undefined,
+              siret: quote?.client?.siret || '',
+              vatNumber: quote?.client?.vatNumber || '',
+              firstName: quote?.client?.firstName || '',
+              lastName: quote?.client?.lastName || ''
+            };
+          }
+          
+          // Créer l'objet de données pour la mise à jour avec le client correctement formaté
           const updateQuoteData = {
             ...commonQuoteData,
             number: quoteNumber,
+            client: clientForUpdate
           };
+          
+          // Ajouter des logs pour déboguer
+          console.log('Mise à jour du devis avec les données:', updateQuoteData);
+          console.log('Client sélectionné ID:', selectedClient);
+          console.log('Client pour mise à jour:', clientForUpdate);
 
           result = await updateQuote({
             variables: {
