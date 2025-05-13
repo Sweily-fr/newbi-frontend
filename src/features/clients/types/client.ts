@@ -22,6 +22,14 @@ export interface ClientFormData {
     postalCode: string;
     country: string;
   };
+  // Adresse de livraison
+  hasDifferentShippingAddress?: boolean;
+  shippingAddress?: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
   type: ClientType;
   // Champs spécifiques aux entreprises
   siret?: string;

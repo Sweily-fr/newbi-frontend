@@ -41,6 +41,13 @@ interface InvoiceSidebarProps {
         postalCode: string;
         country: string;
       };
+      hasDifferentShippingAddress?: boolean;
+      shippingAddress?: {
+        street: string;
+        city: string;
+        postalCode: string;
+        country: string;
+      };
       siret?: string;
       vatNumber?: string;
     };

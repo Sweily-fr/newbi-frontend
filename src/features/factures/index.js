@@ -1,6 +1,6 @@
 // Exporter les composants de formulaires
 export * from './components/forms';
-
+export * from './types';
 // Exporter les composants business
 export * from './components/business';
 

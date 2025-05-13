@@ -33,6 +33,19 @@ export const CREATE_INVOICE_MUTATION = gql`
         id
         name
         email
+        address {
+          street
+          city
+          postalCode
+          country
+        }
+        hasDifferentShippingAddress
+        shippingAddress {
+          street
+          city
+          postalCode
+          country
+        }
       }
       items {
         description
@@ -81,6 +94,19 @@ export const UPDATE_INVOICE_MUTATION = gql`
         id
         name
         email
+        address {
+          street
+          city
+          postalCode
+          country
+        }
+        hasDifferentShippingAddress
+        shippingAddress {
+          street
+          city
+          postalCode
+          country
+        }
       }
       items {
         description
@@ -178,6 +204,13 @@ export const GET_INVOICES = gql`
           name
           email
           address {
+            street
+            city
+            postalCode
+            country
+          }
+          hasDifferentShippingAddress
+          shippingAddress {
             street
             city
             postalCode

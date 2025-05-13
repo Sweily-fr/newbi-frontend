@@ -38,6 +38,13 @@ interface ClientSelectionProps {
     type: ClientType;
     firstName?: string;
     lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
   };
   setNewClient: (client: Partial<{
     name: string;
@@ -51,6 +58,75 @@ interface ClientSelectionProps {
     type: ClientType;
     firstName?: string;
     lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
+  }>) => void;
+  clientsData?: { clients: { items: Client[], totalItems: number, currentPage: number, totalPages: number } };
+  invoice?: {
+    client?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    [key: string]: any;
+  };
+  quote?: {
+    client?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    [key: string]: any;
+  };
+  selectedClientData?: Client | null;
+  isNewClient: boolean;
+  setIsNewClient: (isNew: boolean) => void;
+  selectedClient: string;
+  setSelectedClient: (clientId: string) => void;
+  newClient: {
+    name: string;
+    email: string;
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+    siret: string;
+    vatNumber: string;
+    type: ClientType;
+    firstName?: string;
+    lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
+  };
+  setNewClient: (client: Partial<{
+    name: string;
+    email: string;
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+    siret: string;
+    vatNumber: string;
+    type: ClientType;
+    firstName?: string;
+    lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
   }>) => void;
   clientsData?: { clients: { items: Client[], totalItems: number, currentPage: number, totalPages: number } };
   invoice?: {
@@ -73,6 +149,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   setNewClient,
   clientsData,
   invoice,
+  quote,
   selectedClientData
 }) => {
   // Référence pour suivre si le composant a été monté
@@ -213,13 +290,18 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     }
   }, [companyData, fillFormWithCompanyData]);
   
-  // Effet qui s'exécute au montage ET lorsque invoice ou selectedClientData change
+  // Effet qui s'exécute au montage ET lorsque invoice/quote ou selectedClientData change
   useEffect(() => {    
     if (!isNewClient) {
       // Si on modifie une facture existante (avec un client) et qu'aucun client n'est sélectionné
       if (invoice?.client?.id && !selectedClient) {
         // Initialiser le client de la facture
         setSelectedClient(invoice.client.id);
+      }
+      // Si on modifie un devis existant (avec un client) et qu'aucun client n'est sélectionné
+      else if (quote?.client?.id && !selectedClient) {
+        // Initialiser le client du devis
+        setSelectedClient(quote.client.id);
       }
     }
     
@@ -230,7 +312,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       // Nettoyer lors du démontage
       isMounted.current = false;
     };
-  }, [invoice, selectedClient, selectedClientData, isNewClient, setSelectedClient]); // Exécuter l'effet lorsque invoice, selectedClient, selectedClientData ou isNewClient change
+  }, [invoice, quote, selectedClient, selectedClientData, isNewClient, setSelectedClient]); // Exécuter l'effet lorsque invoice, quote, selectedClient, selectedClientData ou isNewClient change
   
   // Effet pour réagir aux changements de données après le montage initial
   useEffect(() => {
@@ -243,21 +325,28 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
       if (invoice?.client?.id && !selectedClient) {
         setSelectedClient(invoice.client.id);
       }
+      // Si on a un devis avec un client et qu'aucun client n'est sélectionné
+      else if (quote?.client?.id && !selectedClient) {
+        setSelectedClient(quote.client.id);
+      }
     }
-  }, [invoice, isNewClient, selectedClient, setSelectedClient]); // Dépendances minimales
+  }, [invoice, quote, isNewClient, selectedClient, setSelectedClient]); // Dépendances minimales
   
-  // Effet pour initialiser le client lors du premier chargement d'une facture existante
+  // Effet pour initialiser le client lors du premier chargement d'une facture ou d'un devis existant
   useEffect(() => {
-    // Seulement au premier chargement ou changement de facture
+    // Seulement au premier chargement ou changement de facture/devis
     if (invoice?.client?.id && !isNewClient && !selectedClient) {
       setSelectedClient(invoice.client.id);
+    }
+    else if (quote?.client?.id && !isNewClient && !selectedClient) {
+      setSelectedClient(quote.client.id);
     }
     
     // Initialiser showManualEntry en fonction du type de client
     if (isNewClient) {
       setShowManualEntry(newClient.type === ClientType.INDIVIDUAL);
     }
-  }, [invoice, isNewClient, selectedClient, setSelectedClient, newClient.type]);
+  }, [invoice, quote, isNewClient, selectedClient, setSelectedClient, newClient.type]);
   
   // Générer les options de clients
   const clientOptions = React.useMemo(() => {
@@ -266,7 +355,6 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
     
     // Si on a une facture avec un client, s'assurer qu'il est toujours inclus en premier
     if (invoice?.client?.id) {
-      
       // Ajouter le client de la facture en premier
       options.push({
         value: invoice.client.id,
@@ -279,13 +367,27 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         setTimeout(() => setSelectedClient(invoice.client.id), 0);
       }
     }
+    // Si on a un devis avec un client, s'assurer qu'il est toujours inclus en premier
+    else if (quote?.client?.id) {
+      // Ajouter le client du devis en premier
+      options.push({
+        value: quote.client.id,
+        label: `${quote.client.name} (${quote.client.email})`
+      });
+      
+      // Initialiser le client seulement si aucun client n'est sélectionné
+      if (!isNewClient && !selectedClient && quote.client?.id) {
+        // Mettre à jour selectedClient de manière asynchrone pour éviter les problèmes de rendu
+        setTimeout(() => setSelectedClient(quote.client.id), 0);
+      }
+    }
     
     // Si on a des clients dans les données
     if (clientsData?.clients?.items) {
-      // Ajouter tous les clients sauf celui de la facture (déjà ajouté)
+      // Ajouter tous les clients sauf celui de la facture/devis (déjà ajouté)
       clientsData.clients.items.forEach((client: Client) => {
-        // Ne pas ajouter le client de la facture (déjà ajouté plus haut)
-        if (client.id !== invoice?.client?.id) {
+        // Ne pas ajouter le client de la facture ou du devis (déjà ajouté plus haut)
+        if (client.id !== invoice?.client?.id && client.id !== quote?.client?.id) {
           options.push({
             value: client.id,
             label: `${client.name} (${client.email})`
@@ -302,6 +404,14 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         options.push({
           value: invoice.client.id,
           label: `${invoice.client.name} (${invoice.client.email})`
+        });
+      }
+      // Si le client sélectionné n'est pas dans les options mais que nous avons les données du devis,
+      // ajouter le client du devis aux options
+      else if (quote?.client?.id && quote.client.id === selectedClient) {
+        options.push({
+          value: quote.client.id,
+          label: `${quote.client.name} (${quote.client.email})`
         });
       }
       // Si le client sélectionné n'est toujours pas dans les options, chercher dans clientsData
@@ -363,8 +473,17 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
                   // Si le client de la facture n'est pas dans les options, sélectionner le premier client
                   setSelectedClient(clientOptions[0].value);
                 }
+              } else if (quote?.client?.id) {
+                // Vérifier si le client du devis est dans les options
+                const quoteClientOption = clientOptions.find(option => option.value === quote.client?.id);
+                if (quoteClientOption && quote.client?.id) {
+                  setSelectedClient(quote.client.id);
+                } else {
+                  // Si le client du devis n'est pas dans les options, sélectionner le premier client
+                  setSelectedClient(clientOptions[0].value);
+                }
               } else {
-                // Si pas de facture, sélectionner le premier client
+                // Si pas de facture ni de devis, sélectionner le premier client
                 setSelectedClient(clientOptions[0].value);
               }
             }
@@ -389,6 +508,45 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
               options={clientOptions}
             />
           </div>
+          
+          {/* Affichage des informations du client sélectionné */}
+          {selectedClientData && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Informations du client sélectionné</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-500">Nom</p>
+                  <p className="text-sm">{selectedClientData.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p className="text-sm">{selectedClientData.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Adresse</p>
+                  <p className="text-sm">{selectedClientData.address?.street}, {selectedClientData.address?.postalCode} {selectedClientData.address?.city}, {selectedClientData.address?.country}</p>
+                </div>
+                {selectedClientData.siret && (
+                  <div>
+                    <p className="text-xs text-gray-500">SIRET</p>
+                    <p className="text-sm">{selectedClientData.siret}</p>
+                  </div>
+                )}
+                {selectedClientData.vatNumber && (
+                  <div>
+                    <p className="text-xs text-gray-500">Numéro de TVA</p>
+                    <p className="text-sm">{selectedClientData.vatNumber}</p>
+                  </div>
+                )}
+                {selectedClientData.hasDifferentShippingAddress && selectedClientData.shippingAddress && (
+                  <div className="col-span-1 md:col-span-2 mt-2 p-3 bg-[#f0eeff] rounded-md">
+                    <p className="text-xs font-medium text-[#5b50ff] mb-1">Adresse de livraison</p>
+                    <p className="text-sm">{selectedClientData.shippingAddress.street}, {selectedClientData.shippingAddress.postalCode} {selectedClientData.shippingAddress.city}, {selectedClientData.shippingAddress.country}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <FieldGroup spacing="tight" className="space-y-3">
@@ -857,6 +1015,239 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
             className="w-full"
             error={validationErrors.country}
           />
+          
+          {/* Section pour l'adresse de livraison */}
+          <div className="mt-6 mb-4">
+            <div className="flex items-center">
+              <input
+                id="hasDifferentShippingAddress"
+                type="checkbox"
+                className="h-4 w-4 text-[#5b50ff] focus:ring-[#4a41e0] border-gray-300 rounded"
+                checked={newClient.hasDifferentShippingAddress || false}
+                onChange={(e) => {
+                  // Si on décoche la case, on efface l'adresse de livraison
+                  if (!e.target.checked) {
+                    setNewClient({ 
+                      ...newClient, 
+                      hasDifferentShippingAddress: false,
+                      shippingAddress: undefined // Réinitialiser l'adresse de livraison
+                    });
+                  } else {
+                    // Si on coche la case, on initialise une adresse de livraison vide
+                    setNewClient({ 
+                      ...newClient, 
+                      hasDifferentShippingAddress: true,
+                      shippingAddress: newClient.shippingAddress || {
+                        street: '',
+                        city: '',
+                        postalCode: '',
+                        country: ''
+                      }
+                    });
+                  }
+                }}
+              />
+              <label htmlFor="hasDifferentShippingAddress" className="ml-2 block text-sm text-gray-700">
+                Adresse de livraison différente
+              </label>
+            </div>
+          </div>
+
+          {newClient.hasDifferentShippingAddress && (
+            <FieldGroup title="Adresse de livraison" spacing="normal" className="mt-4 p-4 bg-[#f0eeff] rounded-md">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-street"
+                  name="shippingAddress.street"
+                  label="Rue"
+                  value={newClient.shippingAddress?.street || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        street: newValue
+                      }
+                    });
+                    
+                    // Validation de la rue
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-street': "La rue est requise"
+                      }));
+                    } else if (newValue && !STREET_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-street': STREET_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-street': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-street']}
+                />
+
+                <TextField
+                  id="shipping-city"
+                  name="shippingAddress.city"
+                  label="Ville"
+                  value={newClient.shippingAddress?.city || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        city: newValue
+                      }
+                    });
+                    
+                    // Validation de la ville
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-city': "La ville est requise"
+                      }));
+                    } else if (newValue && !CITY_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-city': CITY_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-city': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-city']}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-postalCode"
+                  name="shippingAddress.postalCode"
+                  label="Code postal"
+                  value={newClient.shippingAddress?.postalCode || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        postalCode: newValue
+                      }
+                    });
+                    
+                    // Validation du code postal
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-postalCode': "Le code postal est requis"
+                      }));
+                    } else if (newValue && !POSTAL_CODE_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-postalCode': POSTAL_CODE_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-postalCode': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-postalCode']}
+                />
+
+                <TextField
+                  id="shipping-country"
+                  name="shippingAddress.country"
+                  label="Pays"
+                  value={newClient.shippingAddress?.country || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        country: newValue
+                      }
+                    });
+                    
+                    // Validation du pays
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-country': "Le pays est requis"
+                      }));
+                    } else if (newValue && !COUNTRY_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-country': COUNTRY_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-country': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-country']}
+                />
+              </div>
+            </FieldGroup>
+          )}
             </>
           )}
         </FieldGroup>
