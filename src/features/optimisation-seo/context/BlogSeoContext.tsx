@@ -107,8 +107,7 @@ export const BlogSeoProvider: React.FC<BlogSeoProviderProps> = ({ children }) =>
     }
     
     // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
-    const defaultContent = '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>';
-    const isContentEmpty = !currentContent || currentContent === '' || currentContent === defaultContent;
+    const isContentEmpty = !currentContent || currentContent === '';
     
     // Vérifier si les métadonnées sont vides
     const isMetaTagsEmpty = !state.metaTags.title && !state.metaTags.description;

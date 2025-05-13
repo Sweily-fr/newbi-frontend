@@ -9,7 +9,7 @@ export const getInitialState = (): {
   metaTags: MetaTagsData;
 } => {
   return {
-    content: '<h1>Titre de votre article</h1><p>Commencez à rédiger votre contenu ici...</p>',
+    content: '',
     keywords: {
       main: '',
       secondary: [],
