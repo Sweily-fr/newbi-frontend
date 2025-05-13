@@ -64,9 +64,9 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
   // Suggestions pour les conditions de vente avec un mot clé pour l'affichage
   const termsAndConditionsSuggestions = [
     { keyword: "Paiement", text: "Les factures sont payables à réception, sauf accord préalable." },
-    { keyword: "Pénalités", text: "Tout retard de paiement entraînera des pénalités de retard calculées sur la base de trois fois le taux d'intérêt légal en vigueur." },
-    { keyword: "Indemnité", text: "Conformément aux articles 441-6 c. com. et D. 441-5 c. com., tout retard de paiement entraîne de plein droit, outre les pénalités de retard, une obligation pour le débiteur de payer une indemnité forfaitaire de 40€ pour frais de recouvrement." },
-    { keyword: "Escompte", text: "Aucun escompte n'est accordé pour paiement anticipé." },
+    { keyword: "Escompte", text: "Pas d'escompte accordé pour paiement anticipé." },
+    { keyword: "Pénalités", text: "En cas de non-paiement à la date d'échéance, des pénalités seront appliquées. Tout montant non réglé à l'échéance sera majoré d'un intérêt annuel de 11,13 %." },
+    { keyword: "Retard", text: "Tout retard de paiement entraînera une indemnité forfaitaire pour frais de recouvrement de 40€." },
     { keyword: "Litige", text: "En cas de litige, le tribunal de commerce de [Ville] sera seul compétent." }
   ];
 

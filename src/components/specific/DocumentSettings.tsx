@@ -186,6 +186,11 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
             placeholder="Saisissez les notes de bas de page qui apparaîtront par défaut sur tous vos documents"
             className="block w-full border border-gray-300 rounded-lg bg-white py-3 px-4 text-base focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 focus:ring-2 transition-all duration-300 ease-in-out"
           />
+          <div className="mt-1 mb-2">
+            <p className="text-xs text-gray-600 italic">
+              <span className="text-[#5b50ff] font-medium">Rappel important :</span> La mention des informations légales de votre entreprise (nom, forme juridique, capital social, RCS) est obligatoire sur tous vos documents commerciaux conformément à l'article R.123-237 du Code de commerce.
+            </p>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             <button 
               type="button" 
@@ -220,20 +225,148 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
             className="block w-full border border-gray-300 rounded-lg bg-white py-3 px-4 text-base focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 focus:ring-2 transition-all duration-300 ease-in-out"
           />
           <div className="mt-2 flex flex-wrap gap-2">
-            <button 
-              type="button" 
-              onClick={() => setDefaultTermsAndConditions(documentType === 'INVOICE' ? "1. Paiement exigible sous 30 jours.\n2. Tout retard de paiement entraînera des pénalités de 3 fois le taux d'intérêt légal.\n3. Une indemnité forfaitaire de 40€ pour frais de recouvrement sera due en cas de retard." : "1. Ce devis est valable 30 jours à compter de sa date d'émission.\n2. Un acompte de 30% est demandé à la signature.\n3. Les travaux débuteront après réception de l'acompte.")}
-              className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
-            >
-              {documentType === 'INVOICE' ? "Conditions de paiement" : "Conditions standard devis"}
-            </button>
-            <button 
-              type="button" 
-              onClick={() => setDefaultTermsAndConditions("1. Tous les prix sont indiqués hors taxes.\n2. Nos produits et services sont fournis conformément à nos conditions générales de vente.\n3. Tout litige relatif à ce document sera soumis à la juridiction compétente de notre siège social.")}
-              className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
-            >
-              Mentions légales
-            </button>
+            {/* Suggestions pour les conditions générales - identiques à celles des formulaires */}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {documentType === 'INVOICE' ? (
+                // Suggestions pour les factures
+                <>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Les factures sont payables à réception, sauf accord préalable.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Paiement
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Pas d'escompte accordé pour paiement anticipé.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Escompte
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "En cas de non-paiement à la date d'échéance, des pénalités seront appliquées. Tout montant non réglé à l'échéance sera majoré d'un intérêt annuel de 11,13 %.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Pénalités
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Tout retard de paiement entraînera une indemnité forfaitaire pour frais de recouvrement de 40€.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Retard
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "En cas de litige, le tribunal de commerce de [Ville] sera seul compétent.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Litige
+                  </button>
+                </>
+              ) : (
+                // Suggestions pour les devis
+                <>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Les devis sont valables 30 jours à compter de leur date d'émission.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Paiement
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Un acompte de 30% est demandé à la signature du devis.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Acompte
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Toute annulation après signature du devis entraînera la facturation des travaux déjà réalisés.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Annulation
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "En cas de litige, le tribunal de commerce de [Ville] sera seul compétent.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Litige
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Les éléments produits restent la propriété de l'entreprise jusqu'au paiement intégral du prix.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Propriété
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Pas d'escompte accordé pour paiement anticipé.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Escompte
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "En cas de non-paiement à la date d'échéance, des pénalités seront appliquées. Tout montant non réglé à l'échéance sera majoré d'un intérêt annuel de 11,13 %.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Pénalités
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const currentText = defaultTermsAndConditions || "";
+                      setDefaultTermsAndConditions(currentText + (currentText ? "\n" : "") + "Tout retard de paiement entraînera une indemnité forfaitaire pour frais de recouvrement de 40€.");
+                    }}
+                    className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors"
+                  >
+                    Retard
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
         

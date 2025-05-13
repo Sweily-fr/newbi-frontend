@@ -400,7 +400,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         ) : null}
 
         {quote.termsAndConditions && (
-          <div className="mb-6 w-4/6 print:w-4/6" data-pdf-keep-together="true">
+          <div className="mb-6 w-6/6 print:w-6/6" data-pdf-keep-together="true">
             <p className="whitespace-pre-line text-xs">
               {quote.termsAndConditions}
             </p>

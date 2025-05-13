@@ -478,7 +478,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         )}
 
         {(termsAndConditions || invoice?.termsAndConditions) && (
-          <div className="mb-6 w-4/6 print:w-4/6" data-pdf-keep-together="true">
+          <div className="mb-6 w-full print:w-full" data-pdf-keep-together="true">
             <p className="whitespace-pre-line text-xs">
               {termsAndConditions || invoice?.termsAndConditions}
             </p>

@@ -791,13 +791,38 @@ export const useInvoiceForm = ({
         }
       }
 
-      // Utiliser les valeurs actuelles des champs bancaires
-      // Si la case est cochée et qu'au moins un champ est rempli, envoyer les coordonnées bancaires
-      const bankDetails = useBankDetails ? {
-        iban: companyInfo.bankDetails?.iban,
-        bic: companyInfo.bankDetails?.bic,
-        bankName: companyInfo.bankDetails?.bankName
-      } : {iban: "", bic: "", bankName: ""};
+      // Vérification des coordonnées bancaires si l'option est activée
+      // S'assurer que les coordonnées bancaires sont complètes si l'option est activée
+      if (useBankDetails) {
+        // Utiliser les coordonnées bancaires de l'entreprise si disponibles
+        if (!companyInfo.bankDetails && userData?.me?.company?.bankDetails) {
+          // Si les coordonnées bancaires ne sont pas déjà dans companyInfo, les prendre du profil
+          const { iban, bic, bankName } = userData.me.company.bankDetails;
+          if (iban && bic && bankName) {
+            // Mettre à jour companyInfo avec les coordonnées bancaires du profil
+            companyInfo.bankDetails = { iban, bic, bankName };
+          }
+        }
+        
+        // Vérifier que les coordonnées bancaires sont complètes
+        const bankDetailsComplete = 
+          companyInfo.bankDetails?.iban && 
+          companyInfo.bankDetails?.bic && 
+          companyInfo.bankDetails?.bankName;
+          
+        if (!bankDetailsComplete) {
+          // Si l'option est activée mais les données sont incomplètes
+          if (showNotifications) {
+            Notification.error(
+              'Les coordonnées bancaires sont incomplètes. ' +
+              'Veuillez fournir l\'IBAN, le BIC et le nom de la banque dans votre profil d\'entreprise.', 
+              { position: 'bottom-left' }
+            );
+          }
+          setIsSubmitting(false);
+          return;
+        }
+      }
       
       // S'assurer que les adresses de livraison sont correctement formatées
       // et que les valeurs null/undefined sont gérées de manière cohérente comme dans useQuoteForm
@@ -867,7 +892,14 @@ export const useInvoiceForm = ({
             postalCode: companyInfo.address.postalCode,
             country: companyInfo.address.country
           },
-          bankDetails
+          // Utiliser la même approche que dans useQuoteForm.ts
+          bankDetails: useBankDetails
+            ? {
+                iban: companyInfo.bankDetails?.iban,
+                bic: companyInfo.bankDetails?.bic,
+                bankName: companyInfo.bankDetails?.bankName,
+              }
+            : null
         },
         customFields: cleanCustomFields,
         isDeposit,
