@@ -16,6 +16,13 @@ export const GET_CLIENTS = gql`
           postalCode
           country
         }
+        hasDifferentShippingAddress
+        shippingAddress {
+          street
+          city
+          postalCode
+          country
+        }
         siret
         vatNumber
       }
@@ -41,6 +48,13 @@ export const CREATE_CLIENT = gql`
         postalCode
         country
       }
+      hasDifferentShippingAddress
+      shippingAddress {
+        street
+        city
+        postalCode
+        country
+      }
       siret
       vatNumber
     }
@@ -57,6 +71,13 @@ export const UPDATE_CLIENT = gql`
       firstName
       lastName
       address {
+        street
+        city
+        postalCode
+        country
+      }
+      hasDifferentShippingAddress
+      shippingAddress {
         street
         city
         postalCode

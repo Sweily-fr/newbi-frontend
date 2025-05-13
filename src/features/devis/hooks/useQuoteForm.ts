@@ -43,6 +43,14 @@ export const useQuoteForm = ({
     city: "",
     country: "",
     postalCode: "",
+    // Adresse de livraison
+    hasDifferentShippingAddress: false,
+    shippingAddress: {
+      street: "",
+      city: "",
+      postalCode: "",
+      country: ""
+    },
     // Champs spécifiques aux entreprises
     siret: "",
     vatNumber: "",
@@ -136,9 +144,9 @@ export const useQuoteForm = ({
     if (quote?.prefix) {
       return quote.prefix;
     } else {
-      // Générer le préfixe au format D-AAAAMM-
+      // Générer un préfixe par défaut basé sur la date
       const now = new Date();
-      const year = now.getFullYear();
+      const year = now.getFullYear().toString();
       const month = String(now.getMonth() + 1).padStart(2, "0");
       return `D-${year}${month}-`;
     }
@@ -184,13 +192,20 @@ export const useQuoteForm = ({
     );
   });
 
-  // État pour les coordonnées bancaires
+  // État pour l'utilisation des coordonnées bancaires
   const [useBankDetails, setUseBankDetails] = useState<boolean>(() => {
-    return quote?.companyInfo?.bankDetails?.iban ? true : false;
+    return quote?.companyInfo?.bankDetails ? true : false;
   });
 
-  const [bankDetailsReadOnly, setBankDetailsReadOnly] =
-    useState<boolean>(false);
+  // État pour les coordonnées bancaires en lecture seule
+  const [bankDetailsReadOnly, setBankDetailsReadOnly] = useState<boolean>(true);
+
+  // Fonction pour vérifier si les coordonnées bancaires sont complètes
+  const bankDetailsComplete =
+    useBankDetails &&
+    companyInfo.bankDetails?.iban &&
+    companyInfo.bankDetails?.bic &&
+    companyInfo.bankDetails?.bankName;
 
   // État pour la soumission du formulaire
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -203,21 +218,21 @@ export const useQuoteForm = ({
   // Mettre à jour les informations de l'entreprise avec les données du profil utilisateur
   useEffect(() => {
     if (userData?.me?.company && !quote?.companyInfo) {
-      // Si nous avons des données utilisateur et qu'il s'agit d'un nouveau devis
+      const company = userData.me.company;
       setCompanyInfo({
-        name: userData.me.company.name || "",
-        email: userData.me.company.email || "",
-        phone: userData.me.company.phone || "",
-        website: userData.me.company.website || "",
-        siret: userData.me.company.siret || "",
-        vatNumber: userData.me.company.vatNumber || "",
-        logo: userData.me.company.logo || "",
-        transactionCategory: userData.me.company.transactionCategory || "",
+        name: company.name || "",
+        email: company.email || "",
+        phone: company.phone || "",
+        website: company.website || "",
+        siret: company.siret || "",
+        vatNumber: company.vatNumber || "",
+        logo: company.logo || "",
+        transactionCategory: company.transactionCategory || "",
         address: {
-          street: userData.me.company.address?.street || "",
-          city: userData.me.company.address?.city || "",
-          postalCode: userData.me.company.address?.postalCode || "",
-          country: userData.me.company.address?.country || "",
+          street: company.address?.street || "",
+          city: company.address?.city || "",
+          postalCode: company.address?.postalCode || "",
+          country: company.address?.country || "",
         },
         bankDetails: {
           iban: userData.me.company.bankDetails?.iban || "",
@@ -274,7 +289,7 @@ export const useQuoteForm = ({
     }
   }, [userData, quote]);
 
-  // Effet pour initialiser le numéro de devis
+  // Effet pour initialiser le numéro de devis à partir des données du serveur
   useEffect(() => {
     if (nextQuoteNumberData?.nextQuoteNumber && !quote) {
       setQuoteNumber(nextQuoteNumberData.nextQuoteNumber);
@@ -283,59 +298,61 @@ export const useQuoteForm = ({
 
   // Fonction pour calculer les totaux
   const calculateTotals = () => {
-    // Calcul du total HT
-    const totalHT = items.reduce((acc, item) => {
-      const itemTotal = item.quantity * item.unitPrice;
-      // Appliquer la remise sur l'article si elle existe
-      if (item.discount && item.discount > 0) {
-        if (item.discountType === "PERCENTAGE") {
-          return acc + itemTotal * (1 - item.discount / 100);
-        } else {
-          return acc + (itemTotal - item.discount);
-        }
-      }
-      return acc + itemTotal;
-    }, 0);
+    let subtotal = 0;
+    let totalVAT = 0;
+    let totalWithoutVAT = 0;
+    let totalWithVAT = 0;
+    let totalDiscount = 0;
 
-    // Calcul de la TVA
-    const totalVAT = items.reduce((acc, item) => {
-      const itemTotal = item.quantity * item.unitPrice;
-      // Appliquer la remise sur l'article si elle existe
-      let itemHT = itemTotal;
-      if (item.discount && item.discount > 0) {
-        if (item.discountType === "PERCENTAGE") {
-          itemHT = itemTotal * (1 - item.discount / 100);
-        } else {
-          itemHT = itemTotal - item.discount;
-        }
-      }
-      return acc + itemHT * (item.vatRate / 100);
-    }, 0);
+    // Calculer les totaux pour chaque élément
+    items.forEach((item) => {
+      const quantity = item.quantity || 0;
+      const unitPrice = item.unitPrice || 0;
+      const vatRate = item.vatRate || 0;
+      const itemDiscount = item.discount || 0;
+      const discountType = item.discountType || "PERCENTAGE";
 
-    // Calcul du total TTC
-    const totalTTC = totalHT + totalVAT;
+      // Calculer le montant avant remise
+      let itemTotal = quantity * unitPrice;
 
-    // Calcul du montant de la remise globale
-    let discountAmount = 0;
-    if (discount > 0) {
+      // Appliquer la remise sur l'élément
+      let itemDiscountAmount = 0;
       if (discountType === "PERCENTAGE") {
-        discountAmount = totalHT * (discount / 100);
+        itemDiscountAmount = (itemTotal * itemDiscount) / 100;
       } else {
-        discountAmount = discount;
+        itemDiscountAmount = itemDiscount;
       }
-    }
+      itemTotal -= itemDiscountAmount;
+      totalDiscount += itemDiscountAmount;
 
-    // Calcul des totaux finaux après remise globale
-    const finalTotalHT = Math.max(0, totalHT - discountAmount);
-    const finalTotalTTC = finalTotalHT + totalVAT;
+      // Ajouter au sous-total
+      subtotal += itemTotal;
+
+      // Calculer la TVA
+      const itemVAT = (itemTotal * vatRate) / 100;
+      totalVAT += itemVAT;
+    });
+
+    // Appliquer la remise globale
+    let globalDiscountAmount = 0;
+    if (discountType === "PERCENTAGE") {
+      globalDiscountAmount = (subtotal * discount) / 100;
+    } else {
+      globalDiscountAmount = discount;
+    }
+    subtotal -= globalDiscountAmount;
+    totalDiscount += globalDiscountAmount;
+
+    // Calculer les totaux finaux
+    totalWithoutVAT = subtotal;
+    totalWithVAT = subtotal + totalVAT;
 
     return {
-      totalHT,
-      totalVAT,
-      totalTTC,
-      discountAmount,
-      finalTotalHT,
-      finalTotalTTC,
+      subtotal: subtotal,
+      totalVAT: totalVAT,
+      totalWithoutVAT: totalWithoutVAT,
+      totalWithVAT: totalWithVAT,
+      totalDiscount: totalDiscount,
     };
   };
 
@@ -385,40 +402,18 @@ export const useQuoteForm = ({
   };
 
   // Fonction pour sélectionner un produit et remplir automatiquement les champs de l'item
-  const handleProductSelect = (
-    index: number,
-    product: {
-      id: string;
-      name: string;
-      description?: string;
-      unitPrice?: number;
-      vatRate?: number;
-      unit?: string;
-    }
-  ) => {
-    // Créer une copie du tableau d'items
-    const newItems = [...items];
+  const handleProductSelect = (index: number, product: any) => {
+    if (!product) return;
 
-    // Créer un nouvel objet item en conservant les propriétés existantes
-    // qui ne doivent pas être modifiées
+    const newItems = [...items];
     newItems[index] = {
       ...newItems[index],
       description: product.name,
-      details: product.description || "",
-      unitPrice:
-        product.unitPrice !== undefined && product.unitPrice !== null
-          ? product.unitPrice
-          : 0,
-      vatRate:
-        product.vatRate !== undefined && product.vatRate !== null
-          ? product.vatRate
-          : 20,
+      unitPrice: product.price,
+      vatRate: product.vatRate || 20,
       unit: product.unit || "unité",
-      // Conserver la quantité existante ou initialiser à 1
-      quantity: newItems[index].quantity || 1,
+      details: product.description || "",
     };
-
-    // Mettre à jour le tableau d'items en une seule fois
     setItems(newItems);
   };
 
@@ -435,7 +430,7 @@ export const useQuoteForm = ({
   // Fonction pour gérer les changements dans un champ personnalisé
   const handleCustomFieldChange = (
     index: number,
-    field: keyof CustomField,
+    field: "key" | "value",
     value: string
   ) => {
     const newCustomFields = [...customFields];
@@ -446,13 +441,6 @@ export const useQuoteForm = ({
     setCustomFields(newCustomFields);
   };
 
-  // Fonction pour vérifier si les coordonnées bancaires sont complètes
-  const bankDetailsComplete =
-    useBankDetails &&
-    companyInfo.bankDetails?.iban &&
-    companyInfo.bankDetails?.bic &&
-    companyInfo.bankDetails?.bankName;
-
   // Fonction pour soumettre le formulaire
   const handleSubmit = async (e: React.FormEvent, asDraft?: boolean) => {
     e.preventDefault();
@@ -461,225 +449,157 @@ export const useQuoteForm = ({
     // Utiliser le paramètre asDraft s'il est fourni, sinon utiliser l'état submitAsDraft
     const isDraft = asDraft !== undefined ? asDraft : submitAsDraft;
 
-    try {
-      // Récupérer le numéro de devis le plus récent pour éviter les doublons
-      await refetchNextQuoteNumber();
-      const freshQuoteNumber = quote
-        ? quoteNumber
-        : nextQuoteNumberData?.nextQuoteNumber || quoteNumber;
+    // Fonction pour obtenir les données du client
+    const getClientData = () => {
+      // Si c'est un nouveau client, retourner les données du formulaire
+      if (isNewClient) {
+        return {
+          id: "", // ID vide, sera géré côté serveur
+          type: newClient.type,
+          firstName: newClient.type === "INDIVIDUAL" ? newClient.firstName : undefined,
+          lastName: newClient.type === "INDIVIDUAL" ? newClient.lastName : undefined,
+          address: {
+            street: newClient.street,
+            city: newClient.city,
+            postalCode: newClient.postalCode,
+            country: newClient.country,
+          },
+          hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+          shippingAddress: newClient.hasDifferentShippingAddress ? newClient.shippingAddress : undefined,
+          siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
+          vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
+        };
+      } else if (quote && quote.client) {
+        // Si on modifie un devis existant et que le client est déjà dans le devis
+        return {
+          id: quote.client.id,
+          type: quote.client.type, // Utiliser le type exact du client sans valeur par défaut
+          name: quote.client.name,
+          email: quote.client.email,
+          address: {
+            street: quote.client.address?.street || "",
+            city: quote.client.address?.city || "",
+            postalCode: quote.client.address?.postalCode || "",
+            country: quote.client.address?.country || "",
+          },
+          hasDifferentShippingAddress: quote.client.hasDifferentShippingAddress || false,
+          shippingAddress: quote.client.hasDifferentShippingAddress ? quote.client.shippingAddress : undefined,
+          siret: quote.client.siret || "",
+          vatNumber: quote.client.vatNumber || "",
+          firstName: quote.client.firstName || "",
+          lastName: quote.client.lastName || "",
+        };
+      } else if (selectedClient && clientsData?.clients) {
+        // Si un client existant est sélectionné
+        const selectedClientData = clientsData.clients.find(
+          (client: any) => client.id === selectedClient
+        );
 
-      // S'assurer que nous avons un numéro de devis valide
-      if (!freshQuoteNumber && !quote) {
-        console.error("Impossible de récupérer un numéro de devis valide");
-        if (showNotifications) {
-          Notification.error(
-            "Erreur: impossible de générer un numéro de devis valide"
-          );
-        }
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Fonction pour récupérer les données complètes du client
-      const getClientData = () => {
-        // Forcer le type à COMPANY par défaut si aucun type n'est spécifié
-        // C'est nécessaire car le type est requis par le serveur
-
-        if (isNewClient) {
-          // Déterminer le type de client en fonction des champs remplis
-          let clientType = newClient.type || "COMPANY";
-          // Si firstName et lastName sont remplis, c'est un particulier
-          if (newClient.firstName && newClient.lastName) {
-            clientType = "INDIVIDUAL";
-          }
-
-          // Si c'est un nouveau client, on utilise les données saisies
-          const clientData = {
-            type: clientType,
-            name: newClient.name,
-            email: newClient.email,
-            address: {
-              street: newClient.street,
-              city: newClient.city,
-              postalCode: newClient.postalCode,
-              country: newClient.country,
-            },
-            // Champs spécifiques aux entreprises
-            siret: newClient.siret || "",
-            vatNumber: newClient.vatNumber || "",
-            // Champs spécifiques aux particuliers
-            firstName: newClient.firstName || "",
-            lastName: newClient.lastName || "",
-          };
-          return clientData;
-        } else {
-          // Si on modifie un devis existant et que le client est déjà dans le devis
-          if (quote && quote.client) {
+        if (!selectedClientData) {
+          // Si le client n'est pas trouvé, utiliser les données de l'utilisateur connecté
+          const userCompany = userData?.me?.company || {};
+          if (userData?.me?.firstName && userData?.me?.lastName) {
+            // Créer un client de type particulier avec les données de l'utilisateur
             return {
-              id: quote.client.id,
-              type: quote.client.type, // Utiliser le type exact du client sans valeur par défaut
-              name: quote.client.name,
-              email: quote.client.email,
+              id: "", // ID vide, sera géré côté serveur
+              type: "INDIVIDUAL",
+              name: `${userData.me.firstName} ${userData.me.lastName}`,
+              email: userData.me.email || "client@example.com", // Email obligatoire
               address: {
-                street: quote.client.address.street,
-                city: quote.client.address.city,
-                postalCode: quote.client.address.postalCode,
-                country: quote.client.address.country,
+                street:
+                  userCompany.address?.street || "Adresse non spécifiée",
+                city: userCompany.address?.city || "Ville non spécifiée",
+                postalCode: userCompany.address?.postalCode || "00000",
+                country: userCompany.address?.country || "France",
               },
-              // Champs spécifiques aux entreprises
-              siret: quote.client.siret || "",
-              vatNumber: quote.client.vatNumber || "",
-              // Champs spécifiques aux particuliers
-              firstName: quote.client.firstName || "",
-              lastName: quote.client.lastName || "",
+              hasDifferentShippingAddress: false,
+              siret: "", // Pas obligatoire pour un particulier
+              vatNumber: "", // Pas obligatoire pour un particulier
+              firstName: userData.me.firstName || "Prénom",
+              lastName: userData.me.lastName || "Nom",
+            };
+          } else {
+            // Créer un client de type entreprise avec les données de l'entreprise de l'utilisateur
+            return {
+              id: "", // ID vide, sera géré côté serveur
+              type: "COMPANY",
+              name: userCompany.name || "Entreprise par défaut",
+              email: userCompany.email || "entreprise@example.com", // Email obligatoire
+              address: {
+                street:
+                  userCompany.address?.street || "Adresse non spécifiée",
+                city: userCompany.address?.city || "Ville non spécifiée",
+                postalCode: userCompany.address?.postalCode || "00000",
+                country: userCompany.address?.country || "France",
+              },
+              hasDifferentShippingAddress: false,
+              siret: userCompany.siret || "12345678901234", // Obligatoire pour une entreprise
+              vatNumber: userCompany.vatNumber || "FR12345678901", // Obligatoire pour une entreprise
+              firstName: "",
+              lastName: "",
             };
           }
-
-          // Rechercher le client par ID
-          // Vérifier que clientsData et clients existent et que clients est un tableau
-          // Utiliser items car clientsData.clients est un objet avec une propriété items qui contient le tableau des clients
-          const clients = clientsData?.clients?.items || [];
-
-          // Rechercher le client sélectionné dans la liste des clients
-          const selectedClientData = Array.isArray(clients)
-            ? clients.find((c) => c.id === selectedClient)
-            : undefined;
-
-          if (!selectedClientData) {
-            console.warn("Client non trouvé", {
-              selectedClient,
-              clients: Array.isArray(clients)
-                ? clients.map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                    type: c.type,
-                  }))
-                : [],
-            });
-
-            // Si aucun client n'est trouvé mais qu'il y a des clients disponibles, utiliser le premier
-            if (Array.isArray(clients) && clients.length > 0) {
-              return {
-                id: clients[0].id,
-                type: clients[0].type, // Utiliser le type exact du client sans valeur par défaut
-                name: clients[0].name,
-                email: clients[0].email,
-                address: {
-                  street: clients[0].address.street,
-                  city: clients[0].address.city,
-                  postalCode: clients[0].address.postalCode,
-                  country: clients[0].address.country,
-                },
-                // Champs spécifiques aux entreprises
-                siret: clients[0].siret || "",
-                vatNumber: clients[0].vatNumber || "",
-                // Champs spécifiques aux particuliers
-                firstName: clients[0].firstName || "",
-                lastName: clients[0].lastName || "",
-              };
-            }
-          }
-          // Vérifier que selectedClientData existe
-          if (!selectedClientData) {
-            console.error(
-              "Aucun client sélectionné trouvé et aucun client par défaut disponible"
-            );
-
-            // Vérifier si nous avons des données utilisateur pour pré-remplir les champs
-            const userCompany = userData?.me?.company || {};
-
-            // Si nous avons des données de l'utilisateur avec firstName et lastName, créer un client de type INDIVIDUAL
-            // sinon créer un client de type COMPANY avec les données de l'entreprise
-            const isIndividual =
-              userData?.me?.firstName && userData?.me?.lastName;
-
-            if (isIndividual) {
-              // Créer un client de type particulier avec les données de l'utilisateur
-              return {
-                id: "", // ID vide, sera géré côté serveur
-                type: "INDIVIDUAL",
-                name: `${userData.me.firstName} ${userData.me.lastName}`,
-                email: userData.me.email || "client@example.com", // Email obligatoire
-                address: {
-                  street:
-                    userCompany.address?.street || "Adresse non spécifiée",
-                  city: userCompany.address?.city || "Ville non spécifiée",
-                  postalCode: userCompany.address?.postalCode || "00000",
-                  country: userCompany.address?.country || "France",
-                },
-                siret: "", // Pas obligatoire pour un particulier
-                vatNumber: "", // Pas obligatoire pour un particulier
-                firstName: userData.me.firstName || "Prénom",
-                lastName: userData.me.lastName || "Nom",
-              };
-            } else {
-              // Créer un client de type entreprise avec les données de l'entreprise de l'utilisateur
-              return {
-                id: "", // ID vide, sera géré côté serveur
-                type: "COMPANY",
-                name: userCompany.name || "Entreprise par défaut",
-                email: userCompany.email || "entreprise@example.com", // Email obligatoire
-                address: {
-                  street:
-                    userCompany.address?.street || "Adresse non spécifiée",
-                  city: userCompany.address?.city || "Ville non spécifiée",
-                  postalCode: userCompany.address?.postalCode || "00000",
-                  country: userCompany.address?.country || "France",
-                },
-                siret: userCompany.siret || "12345678901234", // SIRET obligatoire pour une entreprise
-                vatNumber: userCompany.vatNumber || "FR12345678901", // TVA obligatoire pour une entreprise
-                firstName: "",
-                lastName: "",
-              };
-            }
-          }
-
-          // Déterminer le type de client en fonction des champs remplis ou utiliser le type existant
-          let clientType = selectedClientData.type || "COMPANY";
-          // Si firstName et lastName sont remplis et qu'il n'y a pas de type défini, c'est un particulier
-          if (
-            !selectedClientData.type &&
-            selectedClientData.firstName &&
-            selectedClientData.lastName
-          ) {
-            clientType = "INDIVIDUAL";
-          }
-
-          // Si le type est COMPANY, vérifier que nous avons les champs obligatoires
-          const needsSiretAndVat = clientType === "COMPANY";
-          const siret =
-            selectedClientData.siret ||
-            (needsSiretAndVat ? "12345678901234" : "");
-          const vatNumber =
-            selectedClientData.vatNumber ||
-            (needsSiretAndVat ? "FR12345678901" : "");
-
-          return {
-            id: selectedClientData.id,
-            type: clientType, // Utiliser le type calculé ou par défaut
-            name: selectedClientData.name,
-            email: selectedClientData.email || "client@example.com", // Email obligatoire
-            address: {
-              street: selectedClientData.address?.street || "",
-              city: selectedClientData.address?.city || "",
-              postalCode: selectedClientData.address?.postalCode || "",
-              country: selectedClientData.address?.country || "",
-            },
-            // Champs spécifiques aux entreprises
-            siret: siret,
-            vatNumber: vatNumber,
-            // Champs spécifiques aux particuliers
-            firstName: selectedClientData.firstName || "",
-            lastName: selectedClientData.lastName || "",
-          };
         }
-      };
 
+        // Déterminer le type de client en fonction des champs disponibles
+        let clientType = selectedClientData.type;
+        if (!clientType) {
+          clientType = selectedClientData.firstName && selectedClientData.lastName
+            ? "INDIVIDUAL"
+            : "COMPANY";
+        }
+
+        // Vérifier si les champs SIRET et TVA sont nécessaires
+        const needsSiretAndVat = clientType === "COMPANY";
+        const siret =
+          selectedClientData.siret ||
+          (needsSiretAndVat ? "12345678901234" : "");
+        const vatNumber =
+          selectedClientData.vatNumber ||
+          (needsSiretAndVat ? "FR12345678901" : "");
+
+        return {
+          id: selectedClientData.id,
+          type: clientType, // Utiliser le type calculé ou par défaut
+          name: selectedClientData.name,
+          email: selectedClientData.email || "client@example.com", // Email obligatoire
+          address: {
+            street: selectedClientData.address?.street || "",
+            city: selectedClientData.address?.city || "",
+            postalCode: selectedClientData.address?.postalCode || "",
+            country: selectedClientData.address?.country || "",
+          },
+          hasDifferentShippingAddress: selectedClientData.hasDifferentShippingAddress || false,
+          shippingAddress: selectedClientData.hasDifferentShippingAddress ? selectedClientData.shippingAddress : undefined,
+          siret: siret,
+          vatNumber: vatNumber,
+          firstName: selectedClientData.firstName || "",
+          lastName: selectedClientData.lastName || "",
+        };
+      }
+      
+      // Cas par défaut si aucune condition n'est remplie
+      return {
+        id: "",
+        type: "COMPANY",
+        name: "",
+        email: "",
+        address: {
+          street: "",
+          city: "",
+          postalCode: "",
+          country: "",
+        },
+        hasDifferentShippingAddress: false,
+        siret: "",
+        vatNumber: "",
+        firstName: "",
+        lastName: "",
+      };
+    };
+      
+    try {
       // Créer un nouveau client si nécessaire
-      // Variable utilisée pour stocker l'ID du client
-      // Si un nouveau client est créé, cette variable sera mise à jour
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      let clientId = selectedClient;
       if (isNewClient) {
         const { data: clientData } = await createClient({
           variables: {
@@ -692,6 +612,8 @@ export const useQuoteForm = ({
                 postalCode: newClient.postalCode,
                 country: newClient.country,
               },
+              hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+              shippingAddress: newClient.hasDifferentShippingAddress ? newClient.shippingAddress : undefined,
               // Utiliser le type exact du client s'il existe, sinon déterminer en fonction des champs
               type:
                 newClient.type ||
@@ -707,7 +629,6 @@ export const useQuoteForm = ({
             },
           },
         });
-        clientId = clientData.createClient.id;
       }
 
       // Préparer les données communes du devis
@@ -787,7 +708,7 @@ export const useQuoteForm = ({
         // Pour la création, on laisse le backend générer un numéro unique
         const createQuoteData = {
           ...commonQuoteData,
-          number: freshQuoteNumber,
+          number: quoteNumber,
         };
 
         result = await createQuote({
@@ -808,7 +729,7 @@ export const useQuoteForm = ({
           // Pour la mise à jour, on inclut le numéro
           const updateQuoteData = {
             ...commonQuoteData,
-            number: freshQuoteNumber,
+            number: quoteNumber,
           };
 
           result = await updateQuote({

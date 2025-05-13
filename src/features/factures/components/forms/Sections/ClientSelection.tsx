@@ -38,6 +38,13 @@ interface ClientSelectionProps {
     type: ClientType;
     firstName?: string;
     lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
   };
   setNewClient: (client: Partial<{
     name: string;
@@ -51,6 +58,13 @@ interface ClientSelectionProps {
     type: ClientType;
     firstName?: string;
     lastName?: string;
+    hasDifferentShippingAddress?: boolean;
+    shippingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
   }>) => void;
   clientsData?: { clients: { items: Client[], totalItems: number, currentPage: number, totalPages: number } };
   invoice?: {
@@ -389,6 +403,45 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
               options={clientOptions}
             />
           </div>
+          
+          {/* Affichage des informations du client sélectionné */}
+          {selectedClientData && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Informations du client sélectionné</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-gray-500">Nom</p>
+                  <p className="text-sm">{selectedClientData.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p className="text-sm">{selectedClientData.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Adresse</p>
+                  <p className="text-sm">{selectedClientData.address?.street}, {selectedClientData.address?.postalCode} {selectedClientData.address?.city}, {selectedClientData.address?.country}</p>
+                </div>
+                {selectedClientData.siret && (
+                  <div>
+                    <p className="text-xs text-gray-500">SIRET</p>
+                    <p className="text-sm">{selectedClientData.siret}</p>
+                  </div>
+                )}
+                {selectedClientData.vatNumber && (
+                  <div>
+                    <p className="text-xs text-gray-500">Numéro de TVA</p>
+                    <p className="text-sm">{selectedClientData.vatNumber}</p>
+                  </div>
+                )}
+                {selectedClientData.hasDifferentShippingAddress && selectedClientData.shippingAddress && (
+                  <div className="col-span-1 md:col-span-2 mt-2 p-3 bg-[#f0eeff] rounded-md">
+                    <p className="text-xs font-medium text-[#5b50ff] mb-1">Adresse de livraison</p>
+                    <p className="text-sm">{selectedClientData.shippingAddress.street}, {selectedClientData.shippingAddress.postalCode} {selectedClientData.shippingAddress.city}, {selectedClientData.shippingAddress.country}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <FieldGroup spacing="tight" className="space-y-3">
@@ -857,6 +910,220 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
             className="w-full"
             error={validationErrors.country}
           />
+          
+          {/* Section pour l'adresse de livraison */}
+          <div className="mt-6 mb-4">
+            <div className="flex items-center">
+              <input
+                id="hasDifferentShippingAddress"
+                type="checkbox"
+                className="h-4 w-4 text-[#5b50ff] focus:ring-[#4a41e0] border-gray-300 rounded"
+                checked={newClient.hasDifferentShippingAddress || false}
+                onChange={(e) => {
+                  setNewClient({ ...newClient, hasDifferentShippingAddress: e.target.checked });
+                }}
+              />
+              <label htmlFor="hasDifferentShippingAddress" className="ml-2 block text-sm text-gray-700">
+                Adresse de livraison différente
+              </label>
+            </div>
+          </div>
+
+          {newClient.hasDifferentShippingAddress && (
+            <FieldGroup title="Adresse de livraison" spacing="normal" className="mt-4 p-4 bg-[#f0eeff] rounded-md">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-street"
+                  name="shippingAddress.street"
+                  label="Rue"
+                  value={newClient.shippingAddress?.street || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        street: newValue
+                      }
+                    });
+                    
+                    // Validation de la rue
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-street': "La rue est requise"
+                      }));
+                    } else if (newValue && !STREET_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-street': STREET_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-street': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-street']}
+                />
+
+                <TextField
+                  id="shipping-city"
+                  name="shippingAddress.city"
+                  label="Ville"
+                  value={newClient.shippingAddress?.city || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        city: newValue
+                      }
+                    });
+                    
+                    // Validation de la ville
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-city': "La ville est requise"
+                      }));
+                    } else if (newValue && !CITY_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-city': CITY_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-city': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-city']}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-postalCode"
+                  name="shippingAddress.postalCode"
+                  label="Code postal"
+                  value={newClient.shippingAddress?.postalCode || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        postalCode: newValue
+                      }
+                    });
+                    
+                    // Validation du code postal
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-postalCode': "Le code postal est requis"
+                      }));
+                    } else if (newValue && !POSTAL_CODE_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-postalCode': POSTAL_CODE_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-postalCode': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-postalCode']}
+                />
+
+                <TextField
+                  id="shipping-country"
+                  name="shippingAddress.country"
+                  label="Pays"
+                  value={newClient.shippingAddress?.country || ''}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    // Initialiser l'objet shippingAddress avec toutes les propriétés requises
+                    const currentShippingAddress = newClient.shippingAddress || {
+                      street: '',
+                      city: '',
+                      postalCode: '',
+                      country: ''
+                    };
+                    
+                    setNewClient({
+                      ...newClient,
+                      shippingAddress: {
+                        ...currentShippingAddress,
+                        country: newValue
+                      }
+                    });
+                    
+                    // Validation du pays
+                    if (newClient.hasDifferentShippingAddress && newValue.trim() === '') {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-country': "Le pays est requis"
+                      }));
+                    } else if (newValue && !COUNTRY_PATTERN.test(newValue)) {
+                      setValidationErrors(prev => ({
+                        ...prev,
+                        'shipping-country': COUNTRY_ERROR_MESSAGE
+                      }));
+                    } else {
+                      setValidationErrors(prev => {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { 'shipping-country': unused, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  required={newClient.hasDifferentShippingAddress}
+                  className="w-full"
+                  error={validationErrors['shipping-country']}
+                />
+              </div>
+            </FieldGroup>
+          )}
             </>
           )}
         </FieldGroup>

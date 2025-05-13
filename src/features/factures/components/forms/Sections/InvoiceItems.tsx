@@ -190,32 +190,52 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatRate?: number;
     unit?: string;
   }) => {
-    
     try {
+      // S'assurer que le prix unitaire est défini
+      const productWithPrice = {
+        ...product,
+        unitPrice: product.unitPrice !== undefined && product.unitPrice !== null ? product.unitPrice : 0
+      };
+      
       // Si la prop handleProductSelect est fournie, l'utiliser pour mettre à jour l'item complet
       if (handleProductSelect) {
-        // Utiliser la fonction fournie par le parent pour mettre à jour l'item complet
-        handleProductSelect(index, product);
-        
-        // Réinitialiser les erreurs pour cet item après la mise à jour
-        setItemErrors(prev => {
-          const newErrors = [...prev];
-          newErrors[index] = {}; // Réinitialiser les erreurs pour cet item
-          return newErrors;
-        });
+        // Appeler la fonction du parent qui mettra à jour l'item complet en une seule fois
+        handleProductSelect(index, productWithPrice);
       } else {
-        // Fallback: mettre à jour uniquement le champ description
-        // C'est le seul qui fonctionne de manière fiable
+        // Fallback: mettre à jour manuellement tous les champs importants
+        // Cette partie ne devrait pas être utilisée si handleProductSelect est fourni correctement
         handleItemChange(index, 'description', product.name);
+        handleItemChange(index, 'unitPrice', productWithPrice.unitPrice);
+        
+        if (product.description) {
+          handleItemChange(index, 'details', product.description);
+        }
+        
+        if (product.vatRate !== undefined && product.vatRate !== null) {
+          handleItemChange(index, 'vatRate', product.vatRate);
+        }
+        
+        if (product.unit) {
+          handleItemChange(index, 'unit', product.unit);
+        }
       }
+      
+      // Réinitialiser les erreurs pour cet item
+      setItemErrors(prev => {
+        const newErrors = [...prev];
+        newErrors[index] = {};
+        return newErrors;
+      });
+      
+      // Attendre 500ms avant de réinitialiser la recherche pour s'assurer que les mises à jour sont terminées
+      setTimeout(() => {
+        setSearchResults([]);
+        setSearchQuery('');
+        setCurrentItemIndex(null);
+      }, 500);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'item:', error);
     }
-    
-    // Réinitialiser les résultats de recherche après avoir mis à jour les valeurs
-    setSearchResults([]);
-    setSearchQuery('');
-    setCurrentItemIndex(null);
   };
 
   // Fonction pour gérer la saisie dans le champ description
@@ -440,11 +460,12 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                 name={`item-unit-price-${index}`}
                 label=""
                 type="number"
-                value={item.unitPrice.toString()}
+                value={(item.unitPrice !== undefined && item.unitPrice !== null) ? item.unitPrice.toString() : '0'}
+                key={`unitPrice-${index}-${JSON.stringify(item)}`} // Forcer le rendu quand n'importe quelle propriété de l'item change
                 onChange={(e) => validateItem(index, 'unitPrice', parseFloat(e.target.value))}
                 placeholder="0.00"
                 min="0"
-                step="1"
+                step="0.01" // Utiliser 0.01 pour permettre les décimales
                 required
                 className="w-full"
                 prefix="EUR"

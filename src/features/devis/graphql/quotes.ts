@@ -54,6 +54,13 @@ export const QUOTE_FRAGMENT = gql`
         postalCode
         country
       }
+      hasDifferentShippingAddress
+      shippingAddress {
+        street
+        city
+        postalCode
+        country
+      }
       siret
       vatNumber
       firstName

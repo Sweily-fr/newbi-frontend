@@ -39,6 +39,14 @@ export const useInvoiceForm = ({
     city: '',
     country: '',
     postalCode: '',
+    // Adresse de livraison
+    hasDifferentShippingAddress: false,
+    shippingAddress: {
+      street: '',
+      city: '',
+      postalCode: '',
+      country: ''
+    },
     // Champs spécifiques aux entreprises
     siret: '',
     vatNumber: '',
@@ -139,8 +147,10 @@ export const useInvoiceForm = ({
   const [issueDate, setIssueDate] = useState(formatDate(invoice?.issueDate));
   const [executionDate, setExecutionDate] = useState(formatDate(invoice?.executionDate));
   const [dueDate, setDueDate] = useState(formatDate(invoice?.dueDate));
-  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || false);
-  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || {
+  // Nous n'utilisons plus ces états car l'adresse de livraison est maintenant gérée au niveau du client
+  // Ces variables sont conservées pour la compatibilité avec le code existant, mais elles sont désactivées dans l'interface
+  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState({
     street: '',
     city: '',
     postalCode: '',
@@ -413,25 +423,55 @@ export const useInvoiceForm = ({
     vatRate?: number;
     unit?: string;
   }) => {    
-    // Créer une copie du tableau d'items
-    const newItems = [...items];
-    
-    // Créer un nouvel objet item en conservant les propriétés existantes
-    // qui ne doivent pas être modifiées
-    newItems[index] = {
-      ...newItems[index],
-      description: product.name,
-      details: product.description || '',
-      unitPrice: product.unitPrice !== undefined && product.unitPrice !== null ? product.unitPrice : 0,
-      vatRate: product.vatRate !== undefined && product.vatRate !== null ? product.vatRate : 20,
-      unit: product.unit || 'unité',
-      // Conserver la quantité existante ou initialiser à 1
-      quantity: newItems[index].quantity || 1
-    };
-    
-    // Mettre à jour le tableau d'items en une seule fois
-    setItems(newItems);
-    
+    try {
+      // Vérifier si le produit a un prix unitaire valide
+      if (product.unitPrice === undefined || product.unitPrice === null) {
+        console.warn('Le produit n\'a pas de prix unitaire valide:', product);
+      }
+
+      // Extraire les valeurs du produit avec des valeurs par défaut sécurisées
+      const {
+        name,
+        description = '',
+        unitPrice = 0,
+        vatRate = 20,
+        unit = 'unité'
+      } = product;
+      
+      // Approche directe : mettre à jour l'item directement dans le tableau
+      const newItems = [...items];
+      
+      // Conserver la quantité et le discount existants
+      const existingQuantity = newItems[index]?.quantity || 1;
+      const existingDiscount = newItems[index]?.discount || 0;
+      const existingDiscountType = newItems[index]?.discountType || 'PERCENTAGE';
+      
+      // Créer un nouvel objet item complet
+      newItems[index] = {
+        description: name,
+        details: description,
+        unitPrice: unitPrice,
+        vatRate: vatRate,
+        unit: unit,
+        quantity: existingQuantity,
+        discount: existingDiscount,
+        discountType: existingDiscountType
+      };
+      
+      // Mettre à jour le tableau d'items en une seule fois et attendre que la mise à jour soit terminée
+      setItems(newItems);
+      
+      // Aucune mise à jour individuelle n'est nécessaire car nous avons déjà mis à jour l'objet complet
+      // Cela évite les problèmes de synchronisation et de réinitialisation
+      
+      console.log('Produit importé avec succès:', {
+        index,
+        product,
+        updatedItem: newItems[index]
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'importation du produit:', error);
+    }
   };
 
   const handleAddCustomField = () => {
@@ -706,6 +746,8 @@ export const useInvoiceForm = ({
                   postalCode: newClient.postalCode,
                   country: newClient.country
                 },
+                hasDifferentShippingAddress: newClient.hasDifferentShippingAddress,
+                shippingAddress: newClient.hasDifferentShippingAddress ? newClient.shippingAddress : undefined,
                 siret: newClient.siret,
                 vatNumber: newClient.vatNumber
               }

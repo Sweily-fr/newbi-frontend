@@ -584,6 +584,92 @@ export const ClientForm: React.FC<ClientFormProps> = ({
               />
             </div>
           </FieldGroup>
+          
+          <div className="mt-6 mb-4">
+            <div className="flex items-center">
+              <input
+                id="hasDifferentShippingAddress"
+                type="checkbox"
+                className="h-4 w-4 text-[#5b50ff] focus:ring-[#4a41e0] border-gray-300 rounded"
+                {...register("hasDifferentShippingAddress")}
+              />
+              <label htmlFor="hasDifferentShippingAddress" className="ml-2 block text-sm text-gray-700">
+                Adresse de livraison différente
+              </label>
+            </div>
+          </div>
+
+          {watch("hasDifferentShippingAddress") && (
+            <FieldGroup title="Adresse de livraison" spacing="normal" className="mt-4 p-4 bg-[#f0eeff] rounded-md">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-street"
+                  label="Rue"
+                  name="shippingAddress.street"
+                  register={register}
+                  error={errors.shippingAddress?.street}
+                  required
+                  validation={{
+                    required: "La rue est requise",
+                    pattern: {
+                      value: STREET_PATTERN,
+                      message: STREET_ERROR_MESSAGE,
+                    },
+                  }}
+                />
+
+                <TextField
+                  id="shipping-city"
+                  label="Ville"
+                  name="shippingAddress.city"
+                  register={register}
+                  error={errors.shippingAddress?.city}
+                  required
+                  validation={{
+                    required: "La ville est requise",
+                    pattern: {
+                      value: CITY_PATTERN,
+                      message: CITY_ERROR_MESSAGE,
+                    },
+                  }}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+                <TextField
+                  id="shipping-postalCode"
+                  label="Code postal"
+                  name="shippingAddress.postalCode"
+                  register={register}
+                  error={errors.shippingAddress?.postalCode}
+                  required
+                  validation={{
+                    required: "Le code postal est requis",
+                    pattern: {
+                      value: POSTAL_CODE_PATTERN,
+                      message: POSTAL_CODE_ERROR_MESSAGE,
+                    },
+                  }}
+                />
+
+                <TextField
+                  id="shipping-country"
+                  label="Pays"
+                  name="shippingAddress.country"
+                  register={register}
+                  error={errors.shippingAddress?.country}
+                  required
+                  validation={{
+                    required: "Le pays est requis",
+                    pattern: {
+                      value: COUNTRY_PATTERN,
+                      message: COUNTRY_ERROR_MESSAGE,
+                    },
+                  }}
+                />
+              </div>
+            </FieldGroup>
+          )}
         </>
       )}
 
