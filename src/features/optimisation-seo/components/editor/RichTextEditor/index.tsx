@@ -102,7 +102,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
       };
       
-      // Gérer le collage de contenu pour nettoyer automatiquement les espaces et supprimer la mise en forme
+      // Gérer le collage de contenu pour préserver la structure des titres tout en nettoyant le formatage inutile
       const handlePaste = (e: ClipboardEvent) => {
         // Empêcher le comportement par défaut du navigateur
         e.preventDefault();
@@ -121,11 +121,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = htmlContent;
           
+          // Préserver les titres (h1, h2, h3, etc.)
+          const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+          headings.forEach(heading => {
+            // S'assurer que le contenu des titres est préservé sans formatage superflu
+            const headingLevel = heading.tagName.toLowerCase();
+            const headingText = heading.textContent || '';
+            // Conserver la structure du titre mais nettoyer les attributs
+            heading.outerHTML = `<${headingLevel}>${headingText}</${headingLevel}>`;
+          });
+          
           // Extraire les images du HTML
           const images = tempDiv.querySelectorAll('img');
           const imageHtml: string[] = [];
           
-          // Conserver les images avec leurs attributs
+          // Conserver les images avec leurs attributs essentiels
           images.forEach(img => {
             // Créer une copie de l'image sans styles inline
             const cleanImg = document.createElement('img');
@@ -137,58 +147,42 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             
             // Ajouter l'image au contenu final
             imageHtml.push(cleanImg.outerHTML);
+            // Remplacer l'image originale par un marqueur pour la réinsérer plus tard
+            img.outerHTML = '{{IMG_PLACEHOLDER}}';
           });
           
-          // Obtenir le texte brut
-          const plainText = clipboardData.getData('text/plain');
-          
-          // Traiter le texte brut
-          const paragraphs = plainText.split(/\n{2,}/);
-          
-          // Convertir chaque paragraphe en balise <p>
-          let textContent = paragraphs
-            .map(para => {
-              if (!para.trim()) return '';
-              return '<p>' + para.trim().replace(/\n/g, '<br>') + '</p>';
-            })
-            .filter(Boolean)
-            .join('');
-          
-          // Si aucun paragraphe n'a été trouvé, créer un paragraphe simple
-          if (!textContent) {
-            textContent = '<p>' + plainText.trim() + '</p>';
-          }
-          
-          // Réinsérer les images dans le contenu aux positions approximatives
-          if (imageHtml.length > 0) {
-            // Diviser le contenu en paragraphes
-            const contentParts = textContent.split('</p>');
-            
-            // Répartir les images dans le contenu
-            let imageIndex = 0;
-            finalContent = contentParts.map((part, index) => {
-              if (!part.trim()) return '';
-              
-              // Ajouter l'image après certains paragraphes
-              let result = part + '</p>';
-              
-              // Ajouter une image après chaque 2-3 paragraphes environ
-              if (imageIndex < imageHtml.length && (index + 1) % 3 === 0) {
-                result += '<p>' + imageHtml[imageIndex] + '</p>';
-                imageIndex++;
-              }
-              
-              return result;
-            }).join('');
-            
-            // Ajouter les images restantes à la fin
-            while (imageIndex < imageHtml.length) {
-              finalContent += '<p>' + imageHtml[imageIndex] + '</p>';
-              imageIndex++;
+          // Nettoyer les éléments indésirables et conserver uniquement la structure essentielle
+          // Supprimer tous les attributs de style, class, id, etc.
+          const allElements = tempDiv.querySelectorAll('*');
+          allElements.forEach(el => {
+            // Ne pas traiter les images qui ont déjà été traitées
+            if (el.tagName !== 'IMG') {
+              // Supprimer tous les attributs sauf le href pour les liens
+              const attrs = Array.from(el.attributes);
+              attrs.forEach(attr => {
+                if (el.tagName === 'A' && attr.name === 'href') {
+                  // Conserver l'attribut href pour les liens
+                  return;
+                }
+                el.removeAttribute(attr.name);
+              });
             }
-          } else {
-            finalContent = textContent;
-          }
+          });
+          
+          // Obtenir le HTML nettoyé avec la structure préservée
+          let cleanedHtml = tempDiv.innerHTML;
+          
+          // Réinsérer les images
+          let imageIndex = 0;
+          cleanedHtml = cleanedHtml.replace(/\{\{IMG_PLACEHOLDER\}\}/g, () => {
+            if (imageIndex < imageHtml.length) {
+              return imageHtml[imageIndex++];
+            }
+            return '';
+          });
+          
+          // Utiliser le HTML nettoyé comme contenu final
+          finalContent = cleanedHtml;
         } else {
           // Si pas de HTML, utiliser simplement le texte brut
           const plainText = clipboardData.getData('text/plain');
@@ -311,9 +305,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {/* Zone d'édition */}
         <div
           ref={editorRef}
-          className="p-4 min-h-[200px] max-h-[400px] overflow-y-auto focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 empty:before:italic"
+          className="p-6 min-h-[400px] max-h-[800px] overflow-y-auto focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 empty:before:italic"
           data-placeholder={placeholder}
           contentEditable="true"
+          style={{ minHeight: '400px', maxHeight: '800px' }}
           onClick={() => {
             // Mettre le focus uniquement lors du clic dans l'éditeur
             if (editorRef.current) {
