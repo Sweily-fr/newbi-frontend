@@ -2,7 +2,9 @@ import React from 'react';
 import { ImageContainer } from './ImageContainer';
 import { ContactInfo } from './ContactInfo';
 import { SocialLinksComponent } from './SocialLinks';
-import { SocialLinks } from '../../types';
+import { SignatureData } from '../../types';
+
+type SocialLinks = NonNullable<SignatureData['socialLinks']>;
 
 interface SignatureLayoutProps {
   signatureLayout: 'horizontal' | 'vertical';
@@ -28,6 +30,8 @@ interface SignatureLayoutProps {
   socialLinksDisplayMode: 'icons' | 'text';
   socialLinksIconStyle: string;
   primaryColor: string;
+  secondaryColor?: string; // Couleur secondaire pour les textes d'informations de contact
+  socialLinksIconColor?: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
   effectiveTextAlignment: 'left' | 'center' | 'right';
   effectiveHorizontalSpacing: number;
   effectiveVerticalSpacing: number;
@@ -59,6 +63,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   socialLinksDisplayMode,
   socialLinksIconStyle,
   primaryColor,
+  secondaryColor,
+  socialLinksIconColor,
   effectiveTextAlignment,
   effectiveHorizontalSpacing,
   effectiveVerticalSpacing,
@@ -134,7 +140,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         socialLinksIconStyle={socialLinksIconStyle}
         primaryColor={primaryColor}
         backgroundColor={primaryColor} // Couleur de fond pour les icônes (carrés arrondis et cercles)
-        iconColor="#333333" // Couleur pour les icônes en mode plain et les textes
+        iconColor={socialLinksIconColor} // Couleur spécifique pour les icônes SVG
+        textColor={secondaryColor} // Couleur pour le texte des liens sociaux
       />
     );
   };
@@ -225,6 +232,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
             showAddressIcon={showAddressIcon}
             showWebsiteIcon={showWebsiteIcon}
             primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
             fontSize={fontSize}
             textStyle={textStyle}
             fontFamily={fontFamily}
@@ -278,6 +286,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         showAddressIcon={showAddressIcon}
         showWebsiteIcon={showWebsiteIcon}
         primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
         textAlignment={effectiveTextAlignment}
         isHorizontalLayout={false}
         fontSize={fontSize}

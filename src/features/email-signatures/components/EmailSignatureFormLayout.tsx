@@ -99,6 +99,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     },
     socialLinksDisplayMode: 'icons',
     socialLinksIconStyle: 'circle',
+    socialLinksIconColor: '#333333', // Couleur spécifique pour les icônes SVG des réseaux sociaux
     
     // Apparence
     useNewbiLogo: true,

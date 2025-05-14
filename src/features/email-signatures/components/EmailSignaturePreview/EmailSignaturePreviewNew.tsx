@@ -50,6 +50,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
     imagesLayout = 'stacked',
     textColor = '#333333',
     primaryColor = '#5b50ff',
+    secondaryColor,
+    socialLinksIconColor = '#333333', // Couleur spécifique pour les icônes SVG des réseaux sociaux
     textAlignment = 'left',
     socialLinks,
     socialLinksDisplayMode = 'icons',
@@ -204,6 +206,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
                 socialLinksDisplayMode={socialLinksDisplayMode as 'icons' | 'text'}
                 socialLinksIconStyle={socialLinksIconStyle}
                 primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                socialLinksIconColor={socialLinksIconColor}
                 effectiveTextAlignment={effectiveTextAlignment}
                 effectiveHorizontalSpacing={effectiveHorizontalSpacing}
                 effectiveVerticalSpacing={effectiveVerticalSpacing}
