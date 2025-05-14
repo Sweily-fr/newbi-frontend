@@ -305,6 +305,8 @@ export const useQuoteForm = ({
     let totalWithoutVAT = 0;
     let totalWithVAT = 0;
     let totalDiscount = 0;
+    // Objet pour suivre les montants par taux de TVA
+    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
 
     // Calculer les totaux pour chaque élément
     items.forEach((item) => {
@@ -333,6 +335,13 @@ export const useQuoteForm = ({
       // Calculer la TVA
       const itemVAT = (itemTotal * vatRate) / 100;
       totalVAT += itemVAT;
+      
+      // Ajouter les détails de TVA pour ce taux
+      if (!vatDetails[vatRate]) {
+        vatDetails[vatRate] = { rate: vatRate, amount: 0, baseAmount: 0 };
+      }
+      vatDetails[vatRate].amount += itemVAT;
+      vatDetails[vatRate].baseAmount += itemTotal;
     });
 
     // Appliquer la remise globale
@@ -348,6 +357,9 @@ export const useQuoteForm = ({
     // Calculer les totaux finaux
     totalWithoutVAT = subtotal;
     totalWithVAT = subtotal + totalVAT;
+    
+    // Convertir l'objet vatDetails en tableau trié par taux
+    const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
 
     return {
       subtotal: subtotal,
@@ -355,6 +367,7 @@ export const useQuoteForm = ({
       totalWithoutVAT: totalWithoutVAT,
       totalWithVAT: totalWithVAT,
       totalDiscount: totalDiscount,
+      vatRates: vatRates // Ajouter les détails des différents taux de TVA
     };
   };
 

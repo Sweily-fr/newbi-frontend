@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Quote, CompanyInfo, Client } from "../../../../types";
+import { CompanyInfo } from "../../../../types";
+import { Quote } from "../../../devis/types/quote";
+import { Client } from "../../../clients/types/client";
 import { Item } from "../../../factures/types/invoice";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../../utils/transactionCategoryUtils";
@@ -12,9 +14,16 @@ interface QuotePreviewProps {
   isNewClient?: boolean;
   newClient?: Partial<Client>;
   calculateTotals?: () => {
-    finalTotalHT: number;
+    subtotal: number;
     totalVAT: number;
-    finalTotalTTC: number;
+    totalWithoutVAT: number;
+    totalWithVAT: number;
+    totalDiscount: number;
+    vatRates?: Array<{
+      rate: number;
+      amount: number;
+      baseAmount: number;
+    }>;
   };
   footerNotes?: string;
   // Cette prop est utilisée pour déterminer si les coordonnées bancaires doivent être affichées
@@ -29,10 +38,13 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   selectedClient,
   isNewClient,
   newClient,
+  calculateTotals,
   footerNotes,
   useBankDetails,
   showActionButtons = true,
 }) => {
+  // Calculer les totaux si la fonction est fournie
+  const totals = calculateTotals ? calculateTotals() : null;
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
     if (!dateInput) return "";
@@ -314,7 +326,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
 
         <div className="flex justify-end mb-8" data-pdf-no-break="true">
           <div
-            className="ml-auto w-1/3 print:w-1/3"
+            className="ml-auto w-1/2 print:w-1/3"
             data-pdf-no-break="true"
             data-pdf-totals="true"
           >
@@ -323,7 +335,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               data-pdf-total-item="true"
             >
               <span>Total HT</span>
-              <span>{formatAmount(quote.totalHT)}</span>
+              <span>{totals ? formatAmount(totals.subtotal + totals.totalDiscount) : formatAmount(quote.totalHT || 0)}</span>
             </div>
 
             {quote.discount !== undefined && quote.discount > 0 && (
@@ -337,7 +349,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                     ? `(${quote.discount}%)`
                     : ""}
                 </span>
-                <span>-{formatAmount(quote.discountAmount)}</span>
+                <span>-{totals ? formatAmount(totals.totalDiscount) : formatAmount(quote.discountAmount || 0)}</span>
               </div>
             )}
 
@@ -348,27 +360,73 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               >
                 <span>Total HT après remise</span>
                 <span>
-                  {formatAmount(quote.finalTotalHT || quote.totalHT || 0)}
+                  {totals ? formatAmount(totals.totalWithoutVAT) : formatAmount(quote.finalTotalHT || quote.totalHT || 0)}
                 </span>
               </div>
             )}
 
-            <div
-              className="flex justify-between py-1 text-xs"
-              data-pdf-total-item="true"
-            >
-              <span>TVA</span>
-              <span>{formatAmount(quote.totalVAT || 0)}</span>
-            </div>
+            {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+            {(() => {
+              // Récupérer les détails des TVA depuis calculateTotals ou quote
+              // Utiliser une approche plus sûre pour accéder à calculateTotals
+              let totalsData = null;
+              try {
+                if (typeof calculateTotals === 'function') {
+                  totalsData = calculateTotals();
+                }
+              } catch (error) {
+                console.error('Erreur lors du calcul des totaux:', error);
+              }
+              
+              const vatRates = totalsData?.vatRates || quote.vatRates;
+              
+              // Vérifier si nous avons plusieurs taux de TVA
+              if (vatRates && vatRates.length > 1) {
+                return (
+                  <>
+                    {/* Afficher chaque taux de TVA séparément */}
+                    {vatRates.map((vatDetail: { rate: number; amount: number; baseAmount: number }, index: number) => (
+                      <div
+                        key={index}
+                        className="flex justify-between py-1 text-xs"
+                        data-pdf-total-item="true"
+                      >
+                        <span>Montant de la TVA ({vatDetail.rate} % de {formatAmount(vatDetail.baseAmount)})</span>
+                        <span>{formatAmount(vatDetail.amount)}</span>
+                      </div>
+                    ))}
+                    {/* Afficher le total de TVA */}
+                    <div
+                      className="flex justify-between font-bold py-1 text-xs"
+                      data-pdf-total-item="true"
+                    >
+                      <span>Montant total de TVA</span>
+                      <span>{formatAmount(totalsData?.totalVAT || quote.totalVAT || 0)}</span>
+                    </div>
+                  </>
+                );
+              } else {
+                // Afficher seulement le total de TVA si un seul taux est utilisé
+                return (
+                  <div
+                    className="flex justify-between py-1 text-xs"
+                    data-pdf-total-item="true"
+                  >
+                    <span>TVA</span>
+                    <span>{formatAmount(quote.totalVAT || 0)}</span>
+                  </div>
+                );
+              }
+            })()}
 
             <div
-              className="flex justify-between py-1 text-xs font-medium border-t border-gray-300"
+              className="flex justify-between font-bold py-1 text-xs border-t border-gray-300"
               data-pdf-total-item="true"
               data-pdf-total-ttc="true"
             >
               <span>Total TTC</span>
               <span>
-                {formatAmount(quote.finalTotalTTC || quote.totalTTC || 0)}
+                {totals ? formatAmount(totals.totalWithVAT) : formatAmount(quote.finalTotalTTC || quote.totalTTC || 0)}
               </span>
             </div>
 

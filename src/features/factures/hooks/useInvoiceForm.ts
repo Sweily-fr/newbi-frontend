@@ -508,6 +508,8 @@ export const useInvoiceForm = ({
   const calculateTotals = () => {
     let totalHT = 0;
     let totalVAT = 0;
+    // Objet pour suivre les montants par taux de TVA
+    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
 
     items.forEach(item => {
       let itemHT = item.quantity * item.unitPrice;
@@ -524,6 +526,13 @@ export const useInvoiceForm = ({
       const itemVAT = itemHT * (item.vatRate / 100);
       totalHT += itemHT;
       totalVAT += itemVAT;
+      
+      // Ajouter les détails de TVA pour ce taux
+      if (!vatDetails[item.vatRate]) {
+        vatDetails[item.vatRate] = { rate: item.vatRate, amount: 0, baseAmount: 0 };
+      }
+      vatDetails[item.vatRate].amount += itemVAT;
+      vatDetails[item.vatRate].baseAmount += itemHT;
     });
 
     const totalTTC = totalHT + totalVAT;
@@ -541,6 +550,9 @@ export const useInvoiceForm = ({
     // Si c'est le cas, limiter finalTotalHT à 0 (et non pas négatif)
     const finalTotalHT = Math.max(0, totalHT - discountAmount);
     const finalTotalTTC = finalTotalHT + totalVAT;
+    
+    // Convertir l'objet vatDetails en tableau trié par taux
+    const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
 
     return {
       totalHT,
@@ -548,7 +560,8 @@ export const useInvoiceForm = ({
       totalTTC,
       finalTotalHT,
       finalTotalTTC,
-      discountAmount
+      discountAmount,
+      vatRates // Ajouter les détails des différents taux de TVA
     };
   };
 

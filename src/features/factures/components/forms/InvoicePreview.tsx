@@ -25,6 +25,11 @@ interface InvoicePreviewProps {
     totalVAT?: number;
     finalTotalTTC?: number;
     discountAmount?: number;
+    vatRates?: Array<{
+      rate: number;
+      amount: number;
+      baseAmount: number;
+    }>;
   };
   headerNotes?: string;
   footerNotes?: string;
@@ -335,7 +340,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               </tr>
             </thead>
             <tbody>
-              {(invoice?.items || items)?.map((item, index) => {
+              {(items.length > 0 ? items : invoice?.items)?.map((item, index) => {
                 const itemTotal = item.quantity * item.unitPrice;
 
                 // Ne calculer la remise que si elle est supérieure à 0
@@ -397,7 +402,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         {/* Totaux */}
         <div className="flex justify-end mb-8" data-pdf-no-break="true">
           <div
-            className="ml-auto w-1/3 print:w-1/3"
+            className="ml-auto w-1/2 print:w-1/3"
             data-pdf-no-break="true"
             data-pdf-totals="true"
           >
@@ -443,15 +448,39 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               </div>
             )}
 
-            <div
-              className="flex justify-between py-1 text-xs font-normal"
-              data-pdf-total-item="true"
-            >
-              <span>TVA</span>
-              <span>
-                {formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}
-              </span>
-            </div>
+            {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+            {totals?.vatRates && totals.vatRates.length > 1 ? (
+              <>
+                {/* Afficher chaque taux de TVA séparément */}
+                {totals.vatRates.map((vatDetail: { rate: number; amount: number; baseAmount: number }, index: number) => (
+                  <div
+                    key={index}
+                    className="flex justify-between py-1 text-xs font-normal"
+                    data-pdf-total-item="true"
+                  >
+                    <span>Montant de la TVA ({vatDetail.rate} % de {formatAmount(vatDetail.baseAmount)})</span>
+                    <span>{formatAmount(vatDetail.amount)}</span>
+                  </div>
+                ))}
+                {/* Afficher le total de TVA */}
+                <div
+                  className="flex justify-between font-bold py-1 text-xs"
+                  data-pdf-total-item="true"
+                >
+                  <span>Montant total de TVA</span>
+                  <span>{formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}</span>
+                </div>
+              </>
+            ) : (
+              /* Afficher seulement le total de TVA si un seul taux est utilisé */
+              <div
+                className="flex justify-between py-1 text-xs font-bold"
+                data-pdf-total-item="true"
+              >
+                <span>TVA</span>
+                <span>{formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}</span>
+              </div>
+            )}
 
             <div
               className="flex justify-between py-1 text-xs font-bold border-t border-gray-300"

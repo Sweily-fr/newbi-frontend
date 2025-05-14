@@ -87,7 +87,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   // const [showPreview, setShowPreview] = useState(true);
   const showPreview = true; // Valeur fixe pour l'instant
   // État local pour stocker les données du devis mises à jour
-  const [quote, setQuote] = useState(initialQuote);
+  const [quote, setQuote] = useState<SidebarQuote>(initialQuote);
 
   // Utiliser useQuery pour obtenir les données à jour du devis
   const { data, refetch } = useQuery(GET_QUOTE, {
@@ -121,6 +121,61 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
       }
     });
   }, [refetch]);
+  
+  // Fonction pour calculer les totaux et les détails des TVA
+  const calculateTotals = () => {
+    // Calculer les détails des différentes TVA à partir des items
+    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
+    
+    // Si nous n'avons pas d'items ou si les items sont vides, créer un taux de TVA par défaut
+    // basé sur le total de TVA du devis
+    if (!quote?.items || quote.items.length === 0) {
+      // Si nous avons un total de TVA mais pas d'items, créer un taux de TVA par défaut
+      if (quote?.totalVAT && quote.totalVAT > 0 && quote?.totalHT && quote.totalHT > 0) {
+        // Calculer le taux de TVA moyen (arrondi à l'entier le plus proche)
+        const avgVatRate = Math.round((quote.totalVAT / quote.totalHT) * 100);
+        vatDetails[avgVatRate] = {
+          rate: avgVatRate,
+          amount: quote.totalVAT,
+          baseAmount: quote.totalHT
+        };
+      }
+    } else {
+      // Parcourir les items pour calculer les montants par taux de TVA
+      quote.items.forEach((item: QuoteItem) => {
+        const itemHT = item.quantity * item.unitPrice;
+        
+        // Appliquer la remise au niveau de l'item si elle existe
+        let itemHTAfterDiscount = itemHT;
+        if (item.discount && item.discount > 0) {
+          if (item.discountType === 'PERCENTAGE') {
+            itemHTAfterDiscount = itemHT * (1 - (item.discount / 100));
+          } else {
+            itemHTAfterDiscount = Math.max(0, itemHT - item.discount);
+          }
+        }
+        
+        const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
+        
+        // Ajouter les détails de TVA pour ce taux
+        if (!vatDetails[item.vatRate]) {
+          vatDetails[item.vatRate] = { rate: item.vatRate, amount: 0, baseAmount: 0 };
+        }
+        vatDetails[item.vatRate].amount += itemVAT;
+        vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
+      });
+    }
+    
+    // Convertir l'objet vatDetails en tableau trié par taux
+    const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
+    
+    return {
+      finalTotalHT: quote?.finalTotalHT || 0,
+      totalVAT: quote?.totalVAT || 0,
+      finalTotalTTC: quote?.finalTotalTTC || 0,
+      vatRates: vatRates // Ajouter les détails des différentes TVA
+    };
+  };
   
   // Fonction pour basculer l'affichage de la prévisualisation
   // Fonction non utilisée - à conserver pour référence future
@@ -197,8 +252,11 @@ console.log("quote", quote);
             <QuotePreview
               quote={{
                 ...quote,
+                // Ajouter explicitement les détails des TVA au devis
+                vatRates: calculateTotals().vatRates,
                 status: quote.status === 'CANCELED' ? 'COMPLETED' : quote.status
               }}
+              calculateTotals={calculateTotals}
               useBankDetails={true}
             />
           </div>
@@ -379,12 +437,47 @@ console.log("quote", quote);
                   {quote.totalHT?.toFixed(2) || '0.00'} €
                 </dd>
               </div>
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">TVA</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {quote.totalVAT?.toFixed(2) || '0.00'} €
-                </dd>
-              </div>
+              {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+              {(() => {
+                // Récupérer les détails des TVA depuis la fonction calculateTotals
+                const { vatRates } = calculateTotals();
+                
+                // Vérifier si nous avons des détails de TVA
+                if (vatRates && vatRates.length > 0) {
+                  return (
+                    <>
+                      {/* Afficher chaque taux de TVA séparément */}
+                      {vatRates.map((vatDetail, index) => (
+                        <div key={index} className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                          <dt className="text-sm font-medium text-gray-500">TVA {vatDetail.rate}%</dt>
+                          <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
+                          </dd>
+                        </div>
+                      ))}
+                      {/* Afficher le total de TVA si plusieurs taux */}
+                      {vatRates.length > 1 && (
+                        <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                          <dt className="text-sm font-medium text-gray-500">Total TVA</dt>
+                          <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+                            {quote.totalVAT?.toFixed(2) || '0.00'} €
+                          </dd>
+                        </div>
+                      )}
+                    </>
+                  );
+                } else {
+                  // Afficher seulement le total de TVA si aucun détail n'est disponible
+                  return (
+                    <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                      <dt className="text-sm font-medium text-gray-500">TVA</dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {quote.totalVAT?.toFixed(2) || '0.00'} €
+                      </dd>
+                    </div>
+                  );
+                }
+              })()}
               <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
                 <dt className="text-sm font-medium text-gray-500">Montant TTC</dt>
                 <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
@@ -488,6 +581,8 @@ console.log("quote", quote);
           </div>
         )}
       </div>
+
+
 
       {/* Modal de création de facture */}
       <QuoteInvoiceCreationModal

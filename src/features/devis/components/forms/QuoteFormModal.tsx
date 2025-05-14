@@ -507,6 +507,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
 
         {/* Aperçu à droite */}
         <div className="w-3/5 overflow-y-auto z-[1000]">
+          {/* Calculer les totaux pour l'aperçu */}
           <QuotePreview
             quote={{
               prefix: quotePrefix,
@@ -525,8 +526,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               termsAndConditionsLinkTitle,
               termsAndConditionsLink,
               customFields: customFields.filter((f) => f.key && f.value),
-              ...totals,
             }}
+            calculateTotals={calculateTotals}
             isNewClient={isNewClient}
             newClient={newClient}
             selectedClient={Array.isArray(clientsData?.clients?.items) 

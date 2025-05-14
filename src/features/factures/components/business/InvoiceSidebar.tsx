@@ -143,12 +143,43 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
 
   // Fonction pour calculer les totaux (nécessaire pour InvoicePreview)
   const calculateTotals = () => {
+    // Calculer les détails des différentes TVA à partir des items
+    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
+    
+    // Parcourir les items pour calculer les montants par taux de TVA
+    invoice.items.forEach(item => {
+      const itemHT = item.quantity * item.unitPrice;
+      
+      // Appliquer la remise au niveau de l'item si elle existe
+      let itemHTAfterDiscount = itemHT;
+      if (item.discount && item.discount > 0) {
+        if (item.discountType === 'PERCENTAGE') {
+          itemHTAfterDiscount = itemHT * (1 - (item.discount / 100));
+        } else {
+          itemHTAfterDiscount = Math.max(0, itemHT - item.discount);
+        }
+      }
+      
+      const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
+      
+      // Ajouter les détails de TVA pour ce taux
+      if (!vatDetails[item.vatRate]) {
+        vatDetails[item.vatRate] = { rate: item.vatRate, amount: 0, baseAmount: 0 };
+      }
+      vatDetails[item.vatRate].amount += itemVAT;
+      vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
+    });
+    
+    // Convertir l'objet vatDetails en tableau trié par taux
+    const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
+    
     return {
       totalHT: invoice.totalHT,
       totalVAT: invoice.totalVAT,
       finalTotalHT: invoice.finalTotalHT,
       finalTotalTTC: invoice.finalTotalTTC,
       discountAmount: invoice.discountAmount,
+      vatRates: vatRates // Ajouter les détails des différentes TVA
     };
   };
 
@@ -194,12 +225,44 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
                 {invoice.totalHT?.toFixed(2) || '0.00'} €
               </dd>
             </div>
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">TVA</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {invoice.totalVAT?.toFixed(2) || '0.00'} €
-              </dd>
-            </div>
+            {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+            {(() => {
+              // Calculer les détails des TVA
+              const vatDetails = calculateTotals().vatRates;
+              
+              if (vatDetails && vatDetails.length > 1) {
+                return (
+                  <>
+                    {vatDetails.map((vatDetail, index) => (
+                      <div key={index} className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          TVA {vatDetail.rate}%
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
+                        </dd>
+                      </div>
+                    ))}
+                    <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                      <dt className="text-sm font-medium text-gray-500">Total TVA</dt>
+                      <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+                        {invoice.totalVAT?.toFixed(2) || '0.00'} €
+                      </dd>
+                    </div>
+                  </>
+                );
+              } else {
+                // Afficher seulement le total de TVA si un seul taux est utilisé
+                return (
+                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">TVA</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {invoice.totalVAT?.toFixed(2) || '0.00'} €
+                    </dd>
+                  </div>
+                );
+              }
+            })()}
             <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
               <dt className="text-sm font-medium text-gray-500">Montant TTC</dt>
               <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
