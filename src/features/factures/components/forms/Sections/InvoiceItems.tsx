@@ -59,6 +59,17 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatExemptionTextError?: string;
   }>>([]);
   
+  // État pour suivre les champs avec lesquels l'utilisateur a interagi
+  const [touchedFields, setTouchedFields] = useState<Array<{
+    description: boolean;
+    quantity: boolean;
+    unitPrice: boolean;
+    vatRate: boolean;
+    unit: boolean;
+    discount: boolean;
+    vatExemptionText: boolean;
+  }>>([]);
+  
   // État pour suivre l'index de l'élément en cours de modification
   const [currentItemIndex, setCurrentItemIndex] = useState<number | null>(null);
   
@@ -96,11 +107,36 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     }
   }, [items.length, itemErrors.length]);
   
-  // Effet pour valider les items après leur mise à jour
+  // Effet pour  // Initialiser les erreurs et les champs touchés lorsque les items changent
   useEffect(() => {
+    // Initialiser ou mettre à jour les champs touchés lorsque le nombre d'items change
+    setTouchedFields(prev => {
+      // Si le nombre d'items a augmenté, ajouter des entrées pour les nouveaux items
+      if (prev.length < items.length) {
+        const newTouched = [...prev];
+        for (let i = prev.length; i < items.length; i++) {
+          newTouched[i] = {
+            description: false,
+            quantity: false,
+            unitPrice: false,
+            vatRate: false,
+            unit: false,
+            discount: false,
+            vatExemptionText: false
+          };
+        }
+        return newTouched;
+      } 
+      // Si le nombre d'items a diminué, supprimer les entrées en trop
+      else if (prev.length > items.length) {
+        return prev.slice(0, items.length);
+      }
+      return prev;
+    });
+    
     // Pour chaque item, valider les champs et mettre à jour les erreurs
     const validateAllItems = () => {
-      const newErrors = items.map(item => {
+      const newErrors = items.map((item, index) => {
         // Valider l'item
         const result = validateInvoiceItem(
           item.description,
@@ -113,14 +149,25 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           item.vatExemptionText, // Ajouter la validation du texte d'exemption de TVA
         );
         
+        // Ne pas afficher les erreurs pour les champs non touchés
+        const touched = touchedFields[index] || {
+          description: false,
+          quantity: false,
+          unitPrice: false,
+          vatRate: false,
+          unit: false,
+          discount: false,
+          vatExemptionText: false
+        };
+        
         return {
-          descriptionError: result.descriptionError,
-          quantityError: result.quantityError,
-          unitPriceError: result.unitPriceError,
-          vatRateError: result.vatRateError,
-          unitError: result.unitError,
-          discountError: result.discountError,
-          vatExemptionTextError: result.vatExemptionTextError // Ajouter l'erreur du texte d'exemption de TVA
+          descriptionError: touched.description ? result.descriptionError : undefined,
+          quantityError: touched.quantity ? result.quantityError : undefined,
+          unitPriceError: touched.unitPrice ? result.unitPriceError : undefined,
+          vatRateError: touched.vatRate ? result.vatRateError : undefined,
+          unitError: touched.unit ? result.unitError : undefined,
+          discountError: touched.discount ? result.discountError : undefined,
+          vatExemptionTextError: touched.vatExemptionText ? result.vatExemptionTextError : undefined
         };
       });
       
@@ -128,7 +175,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     };
     
     validateAllItems();
-  }, [items]); // Se déclenche chaque fois que les items changent
+  }, [items, touchedFields]); // Se déclenche chaque fois que les items ou les champs touchés changent
 
   // Fonction pour valider un item et mettre à jour les erreurs
   const validateItem = (index: number, field: string, value: any) => {
@@ -136,6 +183,27 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     
     // Mettre à jour la valeur temporairement pour la validation
     const updatedItem = { ...item, [field]: value };
+    
+    // Marquer le champ comme touché
+    setTouchedFields(prev => {
+      const newTouched = [...prev];
+      if (!newTouched[index]) {
+        newTouched[index] = {
+          description: false,
+          quantity: false,
+          unitPrice: false,
+          vatRate: false,
+          unit: false,
+          discount: false,
+          vatExemptionText: false
+        };
+      }
+      newTouched[index] = {
+        ...newTouched[index],
+        [field]: true
+      };
+      return newTouched;
+    });
     
     // Valider l'item
     const result = validateInvoiceItem(
@@ -152,15 +220,39 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     // Mettre à jour les erreurs pour cet item
     setItemErrors(prev => {
       const newErrors = [...prev];
-      newErrors[index] = {
-        descriptionError: result.descriptionError,
-        quantityError: result.quantityError,
-        unitPriceError: result.unitPriceError,
-        vatRateError: result.vatRateError,
-        unitError: result.unitError,
-        discountError: result.discountError,
-        vatExemptionTextError: result.vatExemptionTextError
-      };
+      if (!newErrors[index]) {
+        newErrors[index] = {};
+      }
+      
+      // Ne mettre à jour que l'erreur du champ modifié
+      const newErrorsForItem = { ...newErrors[index] };
+      
+      // Mettre à jour l'erreur spécifique en fonction du champ
+      switch(field) {
+        case 'description':
+          newErrorsForItem.descriptionError = result.descriptionError;
+          break;
+        case 'quantity':
+          newErrorsForItem.quantityError = result.quantityError;
+          break;
+        case 'unitPrice':
+          newErrorsForItem.unitPriceError = result.unitPriceError;
+          break;
+        case 'vatRate':
+          newErrorsForItem.vatRateError = result.vatRateError;
+          break;
+        case 'unit':
+          newErrorsForItem.unitError = result.unitError;
+          break;
+        case 'discount':
+          newErrorsForItem.discountError = result.discountError;
+          break;
+        case 'vatExemptionText':
+          newErrorsForItem.vatExemptionTextError = result.vatExemptionTextError;
+          break;
+      }
+      
+      newErrors[index] = newErrorsForItem;
       return newErrors;
     });
     
@@ -486,8 +578,12 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                 label=""
                 type="number"
                 value={(item.unitPrice !== undefined && item.unitPrice !== null) ? item.unitPrice.toString() : '0'}
-                key={`unitPrice-${index}-${JSON.stringify(item)}`} // Forcer le rendu quand n'importe quelle propriété de l'item change
-                onChange={(e) => validateItem(index, 'unitPrice', parseFloat(e.target.value))}
+                // Suppression de la clé dynamique qui forçait le rendu
+                onChange={(e) => {
+                  // Utilisation d'un délai pour éviter de valider à chaque frappe
+                  const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                  validateItem(index, 'unitPrice', value);
+                }}
                 placeholder="0.00"
                 min="0"
                 step="0.01" // Utiliser 0.01 pour permettre les décimales
@@ -634,7 +730,9 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   id={`item-vat-exemption-text-${index}`}
                   name={`item-vat-exemption-text-${index}`}
                   value={item.vatExemptionText || ''}
-                  onChange={(e) => validateItem(index, 'vatExemptionText', e.target.value)}
+                  onChange={(e) => {
+                    validateItem(index, 'vatExemptionText', e.target.value);
+                  }}
                   placeholder="Texte de la mention d'exonération"
                   rows={3}
                   className={`w-full ${!item.vatExemptionText && itemErrors[index]?.vatExemptionTextError ? 'border-red-500' : ''}`}
