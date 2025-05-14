@@ -205,7 +205,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
       errors.items = true;
     } else {
       const hasInvalidItem = items.some(
-        (item) => !item.description || !item.quantity || !item.unitPrice
+        (item) => !item.description || !item.quantity || !item.unitPrice || 
+        // Vérifier si un item a une TVA à 0 mais pas de texte d'exemption
+        (item.vatRate === 0 && (!item.vatExemptionText || item.vatExemptionText.trim() === ''))
       );
       if (hasInvalidItem) {
         errors.items = true;

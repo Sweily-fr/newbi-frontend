@@ -68,11 +68,12 @@ export const useQuoteForm = ({
           description: item.description || "",
           quantity: item.quantity || 1,
           unitPrice: item.unitPrice || 0,
-          vatRate: item.vatRate || 20,
+          vatRate: item.vatRate ?? 20,
           unit: item.unit || "unité",
           discount: item.discount || 0,
           discountType: item.discountType || "PERCENTAGE",
           details: item.details || "",
+          vatExemptionText: item.vatExemptionText || "",
         }))
       : [
           {
@@ -84,6 +85,7 @@ export const useQuoteForm = ({
             discount: 0,
             discountType: "PERCENTAGE",
             details: "",
+            vatExemptionText: "",
           },
         ];
   });
@@ -382,6 +384,7 @@ export const useQuoteForm = ({
         discount: 0,
         discountType: "PERCENTAGE",
         details: "",
+        vatExemptionText: "",
       },
     ]);
   };
@@ -393,11 +396,23 @@ export const useQuoteForm = ({
 
   // Fonction pour gérer les changements dans un élément
   const handleItemChange = (index: number, field: keyof Item, value: any) => {
+    // Créer une copie du tableau d'items
     const newItems = [...items];
-    newItems[index] = {
-      ...newItems[index],
-      [field]: value,
-    };
+    
+    // Si le champ modifié est vatRate, vérifier si nous devons effacer vatExemptionText
+    if (field === 'vatRate' && parseFloat(value.toString()) !== 0 && newItems[index].vatExemptionText) {
+      // Si le taux de TVA n'est pas 0, supprimer la mention d'exonération
+      newItems[index] = { 
+        ...newItems[index], 
+        [field]: value,
+        vatExemptionText: undefined 
+      };
+    } else {
+      // Mise à jour normale
+      newItems[index] = { ...newItems[index], [field]: value };
+    }
+    
+    // Mettre à jour l'état
     setItems(newItems);
   };
 
@@ -442,7 +457,10 @@ export const useQuoteForm = ({
         unit: unit,
         quantity: existingQuantity,
         discount: existingDiscount,
-        discountType: existingDiscountType
+        discountType: existingDiscountType,
+        // Ajouter la gestion du champ vatExemptionText
+        // Si le taux de TVA est 0, conserver la mention existante, sinon la supprimer
+        vatExemptionText: vatRate === 0 ? newItems[index]?.vatExemptionText : undefined
       };
       
       // Mettre à jour le tableau d'items en une seule fois
@@ -723,6 +741,7 @@ export const useQuoteForm = ({
           discount: item.discount,
           discountType: item.discountType,
           details: item.details,
+          vatExemptionText: item.vatExemptionText || '',
         })),
         discount,
         discountType,

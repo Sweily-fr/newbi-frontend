@@ -12,4 +12,4 @@ export { default as useInvoices } from './hooks/useInvoices';
 export * from './types/invoice';
 
 // Exporter les requêtes et mutations GraphQL
-export * from './graphql/invoices';
+export * from './graphql/';

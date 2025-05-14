@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Quote, CompanyInfo, Client } from "../../../../types";
+import { Item } from "../../../factures/types/invoice";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../../utils/transactionCategoryUtils";
 import { PDFGenerator, Loader } from "../../../../components/";
@@ -387,6 +388,26 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
         </div>
 
+        {/* Affichage des mentions d'exonération de TVA */}
+        {((quote.items && quote.items.length > 0 && quote.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) || 
+          quote.vatExemptionText) && (
+          <div className="mb-3 w-full print:w-full" data-pdf-keep-together="true">
+            {/* Afficher le texte d'exonération global du devis s'il existe */}
+            {quote.vatExemptionText && (
+              <p className="text-xs text-gray-600 mb-1">{quote.vatExemptionText}</p>
+            )}
+            {/* Afficher chaque mention unique des éléments une seule fois */}
+            {quote.items && (Array.from(new Set(
+              quote.items
+                .filter((item: Item) => item.vatRate === 0 && item.vatExemptionText)
+                .map((item: Item) => item.vatExemptionText)
+                .filter(Boolean) as string[]
+            )) as string[]).map((text, index) => (
+              <p key={index} className="text-xs text-gray-600 mb-1">{text}</p>
+            ))}
+          </div>
+        )}
+        
         {/* Affichage de la catégorie de transaction */}
         {companyInfo?.transactionCategory ? (
           <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">

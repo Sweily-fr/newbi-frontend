@@ -5,6 +5,26 @@ import { validateInvoiceItem } from '../../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../../products/graphql';
 
+// Liste des mentions de TVA disponibles
+const VAT_EXEMPTION_OPTIONS = [
+  { value: 'Article 259-1 du CGI', label: 'Article 259-1 du CGI', text: 'TVA non applicable, article 259-1 du CGI - Exportation de biens et services' },
+  { value: 'Article 259 B du CGI', label: 'Article 259 B du CGI', text: 'TVA non applicable, article 259 B du CGI – Services à un client non assujetti hors UE.' },
+  { value: 'Article 261 du CGI', label: 'Article 261 du CGI', text: 'TVA non applicable, article 261 du CGI - Opérations bancaires et financières' },
+  { value: 'Article 261 D du CGI', label: 'Article 261 D du CGI', text: 'TVA non applicable, article 261 D du CGI - Location de terres et de bâtiments agricoles.' },
+  { value: 'Article 261 D-4° du CGI', label: 'Article 261 D-4° du CGI', text: 'TVA non applicable, article 261 D-4°du CGI - Location à usage d\'habitation' },
+  { value: 'Article 261 2-4° du CGI', label: 'Article 261 2-4° du CGI', text: 'TVA non applicable, article 261, 2-4° du CGI - Activités de pêche' },
+  { value: 'Article 261-4 du CGI', label: 'Article 261-4 du CGI', text: 'TVA non applicable, article 261-4 du CGI - Activités médicales et paramédicales' },
+  { value: 'Article 261 4-4° du CGI', label: 'Article 261 4-4° du CGI', text: 'TVA non applicable, article 261 4-4° du CGI - Enseignement et formation professionnelle' },
+  { value: 'Article 262 du CGI', label: 'Article 262 du CGI', text: 'Exonération de TVA article 262 du CGI' },
+  { value: 'Article 262 ter-I du CGI', label: 'Article 262 ter-I du CGI', text: 'Exonération de TVA article 262 ter-I du CGI - Vente intracommunautaire de biens' },
+  { value: 'Article 275 du CGI', label: 'Article 275 du CGI', text: 'Exonération de TVA article 275 du CGI - Marchandises destinées à l\'exportation' },
+  { value: 'Article 283 du CGI', label: 'Article 283 du CGI', text: 'Autoliquidation de la TVA – article 283 du CGI : la taxe est due par le preneur.' },
+  { value: 'Article 283-2 du CGI', label: 'Article 283-2 du CGI', text: 'Autoliquidation de la TVA – article 283-2 du CGI' },
+  { value: 'Article 293 B du CGI', label: 'Article 293 B du CGI', text: 'TVA non applicable, article 293 B du CGI - Micro-entrepreneur ou association à but lucratif' },
+  { value: 'Article 298 sexies du CGI', label: 'Article 298 sexies du CGI', text: 'Exonération de TVA – Livraison intracommunautaire d\'un nouveau moyen de transport, article 298 sexies du CGI.' },
+  { value: 'Article 44 de la Directive 2006/112/CE', label: 'Article 44 de la Directive 2006/112/CE', text: 'TVA non applicable, services intracommunautaires, article 44 de la Directive 2006/112/CE. Le preneur est redevable de la taxe.' },
+];
+
 interface InvoiceItemsProps {
   items: Item[];
   handleItemChange: (index: number, field: string, value: any) => void;
@@ -36,6 +56,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     vatRateError?: string;
     unitError?: string;
     discountError?: string;
+    vatExemptionTextError?: string;
   }>>([]);
   
   // État pour suivre l'index de l'élément en cours de modification
@@ -89,6 +110,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           item.unit,
           item.discount,
           item.discountType as 'PERCENTAGE' | 'FIXED',
+          item.vatExemptionText, // Ajouter la validation du texte d'exemption de TVA
         );
         
         return {
@@ -97,7 +119,8 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           unitPriceError: result.unitPriceError,
           vatRateError: result.vatRateError,
           unitError: result.unitError,
-          discountError: result.discountError
+          discountError: result.discountError,
+          vatExemptionTextError: result.vatExemptionTextError // Ajouter l'erreur du texte d'exemption de TVA
         };
       });
       
@@ -123,6 +146,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
       updatedItem.unit,
       updatedItem.discount,
       updatedItem.discountType as 'PERCENTAGE' | 'FIXED',
+      updatedItem.vatExemptionText,
     );
     
     // Mettre à jour les erreurs pour cet item
@@ -134,7 +158,8 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
         unitPriceError: result.unitPriceError,
         vatRateError: result.vatRateError,
         unitError: result.unitError,
-        discountError: result.discountError
+        discountError: result.discountError,
+        vatExemptionTextError: result.vatExemptionTextError
       };
       return newErrors;
     });
@@ -525,6 +550,11 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                       }));
                     }
                     validateItem(index, 'vatRate', parseFloat(option.value));
+                    
+                    // Si le taux de TVA n'est pas 0, supprimer la mention d'exonération
+                    if (parseFloat(option.value) !== 0 && item.vatExemptionText) {
+                      handleItemChange(index, 'vatExemptionText', undefined);
+                    }
                   }}
                 >
                   {option.label}
@@ -545,6 +575,10 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   // Si on désactive le bouton "Autre", on réinitialise à 20%
                   if (!newValue) {
                     validateItem(index, 'vatRate', 20);
+                    // Supprimer la mention d'exonération si elle existe
+                    if (item.vatExemptionText) {
+                      handleItemChange(index, 'vatExemptionText', undefined);
+                    }
                   }
                 }}
               >
@@ -560,13 +594,55 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   step="0.1"
                   placeholder="Taux personnalisé"
                   value={item.vatRate.toString()}
-                  onChange={(e) => validateItem(index, 'vatRate', parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    const newVatRate = parseFloat(e.target.value);
+                    validateItem(index, 'vatRate', newVatRate);
+                    
+                    // Si le taux de TVA n'est pas 0, supprimer la mention d'exonération
+                    if (newVatRate !== 0 && item.vatExemptionText) {
+                      handleItemChange(index, 'vatExemptionText', undefined);
+                    }
+                  }}
                   className="w-full"
                 />
               </div>
             )}
             {itemErrors[index]?.vatRateError && (
               <p className="mt-1 text-sm text-red-600">{itemErrors[index].vatRateError}</p>
+            )}
+            
+            {/* Mention d'exonération de TVA (visible uniquement si TVA à 0%) */}
+            {item.vatRate === 0 && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mention d'exonération de TVA</label>
+                <Select
+                  id={`item-vat-exemption-${index}`}
+                  name={`item-vat-exemption-${index}`}
+                  label=""
+                  value={item.vatExemptionText ? VAT_EXEMPTION_OPTIONS.find(opt => opt.text === item.vatExemptionText)?.value || '' : ''}
+                  onChange={(e) => {
+                    const selectedOption = VAT_EXEMPTION_OPTIONS.find(opt => opt.value === e.target.value);
+                    validateItem(index, 'vatExemptionText', selectedOption ? selectedOption.text : '');
+                  }}
+                  options={[
+                    { value: '', label: 'Sélectionner une mention' },
+                    ...VAT_EXEMPTION_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))
+                  ]}
+                  className={`w-full mb-2 ${!item.vatExemptionText && itemErrors[index]?.vatExemptionTextError ? 'border-red-500' : ''}`}
+                />
+                <TextArea
+                  id={`item-vat-exemption-text-${index}`}
+                  name={`item-vat-exemption-text-${index}`}
+                  value={item.vatExemptionText || ''}
+                  onChange={(e) => validateItem(index, 'vatExemptionText', e.target.value)}
+                  placeholder="Texte de la mention d'exonération"
+                  rows={3}
+                  className={`w-full ${!item.vatExemptionText && itemErrors[index]?.vatExemptionTextError ? 'border-red-500' : ''}`}
+                />
+                {itemErrors[index]?.vatExemptionTextError && (
+                  <p className="mt-1 text-sm text-red-600">{itemErrors[index].vatExemptionTextError}</p>
+                )}
+              </div>
             )}
           </div>
         </div>

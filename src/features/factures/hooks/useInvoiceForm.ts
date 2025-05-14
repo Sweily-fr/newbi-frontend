@@ -87,8 +87,9 @@ export const useInvoiceForm = ({
       unit: item.unit || 'unité',
       discount: item.discount || 0,
       discountType: item.discountType || 'FIXED',
-      details: item.details || ''
-    })) : [{ description: '', quantity: 1, unitPrice: 0, vatRate: 20, unit: 'unité', discount: 0, discountType: 'FIXED' }]
+      details: item.details || '',
+      vatExemptionText: item.vatExemptionText || ''
+    })) : [{ description: '', quantity: 1, unitPrice: 0, vatRate: 20, unit: 'unité', discount: 0, discountType: 'FIXED', vatExemptionText: '' }]
   );
   // Ne pas définir de statut par défaut, laisser le backend le gérer
   const [status, setStatus] = useState(invoice?.status || '');
@@ -401,7 +402,7 @@ export const useInvoiceForm = ({
 
   // Handlers
   const handleAddItem = () => {
-    setItems([...items, { description: '', quantity: 1, unitPrice: 0, vatRate: 20, unit: 'unité', discount: 0, discountType: 'FIXED' }]);
+    setItems([...items, { description: '', quantity: 1, unitPrice: 0, vatRate: 20, unit: 'unité', discount: 0, discountType: 'FIXED', vatExemptionText: '' }]);
   };
 
   const handleRemoveItem = (index: number) => {
@@ -410,7 +411,20 @@ export const useInvoiceForm = ({
 
   const handleItemChange = (index: number, field: keyof Item, value: string | number) => {
     const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+    
+    // Si le champ modifié est vatRate, vérifier si nous devons effacer vatExemptionText
+    if (field === 'vatRate' && parseFloat(value.toString()) !== 0 && newItems[index].vatExemptionText) {
+      // Si le taux de TVA n'est pas 0, supprimer la mention d'exonération
+      newItems[index] = { 
+        ...newItems[index], 
+        [field]: value,
+        vatExemptionText: undefined 
+      };
+    } else {
+      // Mise à jour normale
+      newItems[index] = { ...newItems[index], [field]: value };
+    }
+    
     setItems(newItems);
   };
   
@@ -455,7 +469,10 @@ export const useInvoiceForm = ({
         unit: unit,
         quantity: existingQuantity,
         discount: existingDiscount,
-        discountType: existingDiscountType
+        discountType: existingDiscountType,
+        // Ajouter la gestion du champ vatExemptionText
+        // Si le taux de TVA est 0, conserver la mention existante, sinon la supprimer
+        vatExemptionText: vatRate === 0 ? newItems[index]?.vatExemptionText : undefined
       };
       
       // Mettre à jour le tableau d'items en une seule fois et attendre que la mise à jour soit terminée
@@ -867,7 +884,8 @@ export const useInvoiceForm = ({
           unit: item.unit || 'unité',
           discount: item.discount || 0,
           discountType: item.discountType || 'FIXED',
-          details: item.details || ''
+          details: item.details || '',
+          vatExemptionText: item.vatExemptionText || ''
         })),
         // Utiliser le statut déterminé plus haut
         status: status,

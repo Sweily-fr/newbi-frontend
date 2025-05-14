@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
 import { useInvoiceForm } from "../../hooks/useInvoiceForm";
-import { InvoiceFormModalProps } from "../../types/invoice";
+import { InvoiceFormModalProps, Item } from "../../types/invoice";
 import { Button, Form } from "../../../../components/";
 import { DocumentSettings } from "../../../../components/specific/DocumentSettings";
 import Collapse from "../../../../components/common/Collapse";
@@ -299,14 +299,26 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     
     // Vérifier les erreurs dans la section Produits/Services
     const hasItemErrors = items.some((item, index) => {
-      const hasError = !item.description || 
+      // Vérification des champs requis
+      const hasRequiredFieldsError = !item.description || 
                       !item.quantity || 
                       !item.unitPrice || 
                       item.vatRate === undefined || item.vatRate === null ||
                       !item.unit;
+      
+      // Vérification spécifique pour TVA à 0 sans texte d'exemption
+      const hasTvaExemptionError = item.vatRate === 0 && (!item.vatExemptionText || item.vatExemptionText.trim() === '');
+      
+      const hasError = hasRequiredFieldsError || hasTvaExemptionError;
+      
       if (hasError) {
-        console.error(`Erreur dans l'article ${index + 1}:`, item);
+        if (hasTvaExemptionError) {
+          console.error(`Erreur dans l'article ${index + 1}: TVA à 0% sans mention d'exemption`, item);
+        } else if (hasRequiredFieldsError) {
+          console.error(`Erreur dans l'article ${index + 1}: champs requis manquants`, item);
+        }
       }
+      
       return hasError;
     });
     errors.items = hasItemErrors;
@@ -322,9 +334,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       errors.bankDetails = true;
       console.error("Erreur: coordonnées bancaires incomplètes");
     }
-    
-   
-   
     
     // Mettre à jour l'état des erreurs
     setSectionErrors(errors);
@@ -490,7 +499,12 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     items={items}
                     handleAddItem={handleAddItem}
                     handleRemoveItem={handleRemoveItem}
-                    handleItemChange={handleItemChange as any}
+                    handleItemChange={(index, field, value) => {
+                      // Créer un adaptateur pour résoudre l'incompatibilité de types
+                      // La fonction handleItemChange du hook useInvoiceForm attend un field de type keyof Item
+                      // mais le composant InvoiceItems passe un field de type string
+                      handleItemChange(index, field as keyof Item, value);
+                    }}
                     handleProductSelect={handleProductSelect}
                   />
                 </Collapse>
