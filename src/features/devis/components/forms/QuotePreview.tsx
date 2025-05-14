@@ -391,8 +391,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         {/* Affichage des mentions d'exonération de TVA */}
         {((quote.items && quote.items.length > 0 && quote.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) || 
           quote.vatExemptionText) && (
-          <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
-            <p className="text-xs font-medium text-gray-700 mb-1">Mentions d'exonération de TVA :</p>
+          <div className="mb-3 w-full print:w-full" data-pdf-keep-together="true">
             {/* Afficher le texte d'exonération global du devis s'il existe */}
             {quote.vatExemptionText && (
               <p className="text-xs text-gray-600 mb-1">{quote.vatExemptionText}</p>

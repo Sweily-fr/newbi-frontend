@@ -472,8 +472,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         {(((invoice?.items && invoice.items.length > 0 && invoice.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) ||
           (items && items.length > 0 && items.some(item => item.vatRate === 0 && item.vatExemptionText)) ||
           invoice?.vatExemptionText)) && (
-          <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
-            <p className="text-xs font-medium text-gray-700 mb-1">Mentions d'exonération de TVA :</p>
+          <div className="mb-3 w-full print:w-full" data-pdf-keep-together="true">
             {/* Afficher le texte d'exonération global de la facture s'il existe */}
             {invoice?.vatExemptionText && (
               <p className="text-xs text-gray-600 mb-1">{invoice.vatExemptionText}</p>
