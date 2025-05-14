@@ -37,13 +37,6 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
 
   // Fonction pour formater le code couleur (enlever le #)
   const formatColorCode = (color: string) => color.replace('#', '');
-  // Mise à jour d'un réseau social spécifique
-  const handleSocialLinkChange = (network: keyof SignatureData['socialLinks'], value: string) => {
-    updateSignatureData('socialLinks', {
-      ...signatureData.socialLinks,
-      [network]: value
-    });
-  };
 
   return (
     <>
@@ -192,8 +185,8 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
               onChange={() => updateSignatureData('socialLinksIconStyle', 'rounded')}
             />
             <div className="flex space-x-3 mb-3">
-              <span className="w-6 h-6 flex items-center justify-center bg-[#5b50ff] text-white rounded-md"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></span>
-              <span className="w-6 h-6 flex items-center justify-center bg-[#5b50ff] text-white rounded-md"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></span>
+              <span className="w-6 h-6 flex items-center justify-center rounded-md" style={{ backgroundColor: signatureData.primaryColor || '#5b50ff' }}><svg className="w-3.5 h-3.5" style={{ fill: (signatureData as any).socialLinksIconColor || '#ffffff' }} viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></span>
+              <span className="w-6 h-6 flex items-center justify-center rounded-md" style={{ backgroundColor: signatureData.primaryColor || '#5b50ff' }}><svg className="w-3.5 h-3.5" style={{ fill: (signatureData as any).socialLinksIconColor || '#ffffff' }} viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></span>
             </div>
             <span className="text-sm text-gray-700">Carré arrondi</span>
           </label>
@@ -208,8 +201,8 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
               onChange={() => updateSignatureData('socialLinksIconStyle', 'circle')}
             />
             <div className="flex space-x-3 mb-3">
-              <span className="w-6 h-6 flex items-center justify-center bg-[#5b50ff] text-white rounded-full"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></span>
-              <span className="w-6 h-6 flex items-center justify-center bg-[#5b50ff] text-white rounded-full"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></span>
+              <span className="w-6 h-6 flex items-center justify-center rounded-full" style={{ backgroundColor: signatureData.primaryColor || '#5b50ff' }}><svg className="w-3.5 h-3.5" style={{ fill: (signatureData as any).socialLinksIconColor || '#ffffff' }} viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></span>
+              <span className="w-6 h-6 flex items-center justify-center rounded-full" style={{ backgroundColor: signatureData.primaryColor || '#5b50ff' }}><svg className="w-3.5 h-3.5" style={{ fill: (signatureData as any).socialLinksIconColor || '#ffffff' }} viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></span>
             </div>
             <span className="text-sm text-gray-700">Cercle</span>
           </label>
@@ -222,8 +215,8 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
         <h4 className="text-base font-medium text-gray-800 mb-3">Couleurs des icônes</h4>
         
         <div className="space-y-6">
-          {/* Couleur de fond - visible uniquement pour les styles avec fond */}
-          {signatureData.socialLinksIconStyle !== 'plain' && (
+          {/* Couleur de fond - visible uniquement pour les styles avec fond et en mode Icônes */}
+          {signatureData.socialLinksIconStyle !== 'plain' && signatureData.socialLinksDisplayMode === 'icons' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Couleur de fond
@@ -364,34 +357,7 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
             </div>
           </div>
           
-          {/* Couleur du texte - toujours visible */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Couleur du texte
-              <span className="ml-1 inline-flex items-center group relative">
-                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
-                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
-                  Couleur du texte des liens sociaux en mode texte
-                  <div className="absolute top-full left-2 transform border-4 border-transparent border-t-gray-800"></div>
-                </div>
-              </span>
-            </label>
-            <div className="flex items-center justify-between">
-              <div className="flex flex-wrap gap-2">
-                {/* Palette de couleurs pour le texte */}
-                {['#333333', '#5b50ff', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'].map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.secondaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => updateSignatureData('secondaryColor', color)}
-                    aria-label={`Couleur ${color}`}
-                  ></button>
-                ))}
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </>

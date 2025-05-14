@@ -22,12 +22,18 @@ interface EmailSignatureFormLayoutProps {
   defaultNewbiLogoUrl: string;
   activeSection: 'info' | 'social' | 'appearance' | 'settings';
   onSignatureDataChange?: (data: SignatureData) => void;
+  onSave?: (data: SignatureData) => void;
+  onCancel?: () => void;
+  initialData?: SignatureData;
 }
 
 export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> = ({
   defaultNewbiLogoUrl,
   activeSection,
-  onSignatureDataChange
+  onSignatureDataChange,
+  onSave,
+  onCancel,
+  initialData
 }) => {
 
   // La section active est maintenant fournie par le composant parent
@@ -72,7 +78,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   }, [showPrimaryColorPicker, showSecondaryColorPicker]);
   
   // État pour stocker les données de la signature
-  const [signatureData, setSignatureData] = useState<SignatureData>({
+  const [signatureData, setSignatureData] = useState<SignatureData>(initialData || {
     // Propriétés générales
     name: 'Ma signature professionnelle',
     isDefault: true,
@@ -81,7 +87,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     fullName: 'Jean Dupont',
     jobTitle: 'Fondateur & CEO',
     email: 'jean.dupont@newbi.fr',
-    phone: '+33 6 12 34 56 78',
+    phone: '+33 7 34 64 06 18',
+    mobilePhone: '+33 6 12 34 56 78',
     primaryColor: '#5b50ff',
     secondaryColor: '#f0eeff',
     
@@ -100,6 +107,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     socialLinksDisplayMode: 'icons',
     socialLinksIconStyle: 'circle',
     socialLinksIconColor: '#333333', // Couleur spécifique pour les icônes SVG des réseaux sociaux
+    socialLinksPosition: 'bottom', // Position des réseaux sociaux par défaut
     
     // Apparence
     useNewbiLogo: true,
@@ -120,7 +128,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     showWebsiteIcon: true,
     
     // Modèle
-    templateId: 1
+    templateId: '1'
   });
   
   // Notifier le composant parent des données initiales
@@ -158,7 +166,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   
   // Fonction pour sélectionner un modèle
   const handleSelectTemplate = (templateId: number) => {
-    updateSignatureData('templateId', templateId);
+    // Convertir le nombre en chaîne pour correspondre au type de SignatureData
+    updateSignatureData('templateId', String(templateId));
   };
 
   /**
@@ -170,7 +179,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     // Ajouter des logs pour déboguer les valeurs
     console.log('Conversion des données de signature:', {
       socialLinksDisplayMode: data.socialLinksDisplayMode,
-      socialLinksIconStyle: data.socialLinksIconStyle
+      socialLinksIconStyle: data.socialLinksIconStyle,
+      socialLinksIconColor: data.socialLinksIconColor // Ajouter le log de la couleur des icônes
     });
     
     return {
@@ -184,6 +194,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       jobTitle: data.jobTitle,
       email: data.email,
       phone: data.phone,
+      mobilePhone: data.mobilePhone, // Ajout du numéro de téléphone mobile
       companyName: data.companyName,
       website: data.companyWebsite,
       address: data.companyAddress,
@@ -193,6 +204,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       displayMode: data.socialLinksDisplayMode,
       socialLinksIconStyle: data.socialLinksIconStyle,
       iconStyle: data.socialLinksIconStyle,
+      // Ajouter la couleur des icônes SVG des réseaux sociaux
+      socialLinksIconColor: data.socialLinksIconColor,
       hasLogo: data.useNewbiLogo,
       logoUrl: data.customLogoUrl,
       fontFamily: data.fontFamily,
@@ -214,9 +227,11 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       layout: data.layout,
       verticalSpacing: data.verticalSpacing,
       horizontalSpacing: data.horizontalSpacing,
+      // Transmettre la position des réseaux sociaux (avec cast pour éviter les erreurs de type)
+      socialLinksPosition: data.socialLinksPosition as any,
       // Transmettre l'espacement entre icônes et texte
       iconTextSpacing: data.iconTextSpacing
-    };
+    } as Partial<EmailSignature>; // Cast pour éviter les erreurs TypeScript dues aux conflits de fusion
   };
 
   // Fonction pour rendre le contenu en fonction de la section active
@@ -299,12 +314,22 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
             <button 
               type="button" 
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              onClick={onCancel}
             >
               Annuler
             </button>
             <button 
-              type="submit" 
+              type="button" 
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+              onClick={() => {
+                console.log('Bouton Enregistrer cliqué');
+                console.log('onSave existe:', !!onSave);
+                console.log('signatureData:', signatureData);
+                if (onSave) {
+                  console.log('Appel de onSave avec les données');
+                  onSave(signatureData);
+                }
+              }}
             >
               Enregistrer
             </button>

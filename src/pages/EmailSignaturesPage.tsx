@@ -6,6 +6,7 @@ import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { Personalcard, Instagram, Paintbucket, Grid5, AddCircle, Sms, ArrowLeft } from 'iconsax-react';
 import { CircularProgressBar } from '../features/email-signatures/components/CircularProgressBar';
 import { useSignatureProgress } from '../features/email-signatures/hooks/useSignatureProgress';
+import { useSaveSignature } from '../features/email-signatures/hooks';
 import { SignatureData } from '../features/email-signatures/types';
 import { useMutation, useQuery } from '@apollo/client';
 import { DELETE_EMAIL_SIGNATURE, SET_DEFAULT_EMAIL_SIGNATURE, GET_EMAIL_SIGNATURES } from '../graphql/emailSignatures';
@@ -26,8 +27,92 @@ const EmailSignaturesPage: React.FC = () => {
   // État pour contrôler l'affichage du formulaire ou de la liste
   const [showForm, setShowForm] = useState(false);
   
+  // Hook pour sauvegarder la signature
+  const { saveSignature, isLoading: saveLoading, validationErrors } = useSaveSignature();
+  
+  // Fonction pour gérer l'enregistrement de la signature
+  const handleSave = async (data: SignatureData) => {
+    console.log('handleSave appelé avec les donnéess:', data);
+    console.log('Signature sélectionnée pour édition:', selectedSignature);
+    
+    // Si une signature est sélectionnée pour édition, transmettre son ID
+    const success = await saveSignature(data, selectedSignature?.id);
+    
+    if (success) {
+      // Réinitialiser le formulaire et afficher la liste des signatures
+      setShowForm(false);
+      setSelectedSignature(null); // Réinitialiser la signature sélectionnée
+      // Rafraîchir la liste des signatures
+      refetch();
+    }
+  };
+  
+  // Fonction pour annuler l'édition
+  const handleCancel = () => {
+    setShowForm(false);
+  };
+  
   // État pour stocker la signature sélectionnée pour édition
   const [selectedSignature, setSelectedSignature] = useState<EmailSignature | null>(null);
+  
+  // Fonction pour convertir une signature en données initiales pour le formulaire
+  const convertSignatureToFormData = (signature: EmailSignature | null): SignatureData | undefined => {
+    if (!signature) return undefined;
+    
+    // Mapper les valeurs de la signature aux champs du formulaire
+    return {
+      name: signature.name,
+      fullName: signature.fullName,
+      jobTitle: signature.jobTitle || '',
+      email: signature.email,
+      phone: signature.phone || '',
+      mobilePhone: signature.mobilePhone || '',
+      companyName: signature.companyName || '',
+      companyWebsite: signature.website || '',
+      companyAddress: signature.address || '',
+      socialLinks: signature.socialLinks || { linkedin: '', twitter: '', facebook: '', instagram: '' },
+      primaryColor: signature.primaryColor || '#5b50ff',
+      secondaryColor: signature.secondaryColor || '#f5f5f5',
+      useNewbiLogo: !signature.logoUrl, // Si pas de logo personnalisé, utiliser le logo Newbi
+      customLogoUrl: signature.logoUrl || '',
+      showLogo: signature.showLogo !== undefined ? signature.showLogo : true,
+      isDefault: signature.isDefault,
+      // Convertir le template en ID (inversé par rapport à mapTemplateIdToName)
+      templateId: String(getTemplateIdFromName(signature.template)),
+      fontFamily: signature.fontFamily || 'Arial, sans-serif',
+      fontSize: signature.fontSize || 14,
+      textStyle: signature.textStyle || 'normal',
+      layout: signature.layout || 'vertical',
+      textAlignment: signature.verticalAlignment || 'left',
+      horizontalSpacing: signature.horizontalSpacing || 10,
+      verticalSpacing: signature.verticalSpacing || 10,
+      profilePhotoUrl: signature.profilePhotoUrl || '',
+      profilePhotoBase64: undefined, // Les données base64 ne sont pas stockées en BDD
+      profilePhotoSize: signature.profilePhotoSize || 50,
+      socialLinksDisplayMode: signature.socialLinksDisplayMode || 'icons',
+      socialLinksIconStyle: signature.socialLinksIconStyle || 'plain',
+      socialLinksIconColor: signature.socialLinksIconColor || '#5b50ff',
+      socialLinksPosition: signature.socialLinksPosition || 'bottom',
+      // Utiliser les valeurs stockées dans la signature ou des valeurs par défaut si non définies
+      showEmailIcon: signature.showEmailIcon !== undefined ? signature.showEmailIcon : true,
+      showPhoneIcon: signature.showPhoneIcon !== undefined ? signature.showPhoneIcon : true,
+      showAddressIcon: signature.showAddressIcon !== undefined ? signature.showAddressIcon : true,
+      showWebsiteIcon: signature.showWebsiteIcon !== undefined ? signature.showWebsiteIcon : true,
+      iconTextSpacing: signature.iconTextSpacing || 5
+    };
+  };
+  
+  // Fonction pour convertir le nom du template en ID
+  const getTemplateIdFromName = (templateName: string): number => {
+    const templateMap: Record<string, number> = {
+      'simple': 1,
+      'professional': 2,
+      'modern': 3,
+      'creative': 4
+    };
+    
+    return templateMap[templateName] || 1; // Par défaut, retourner 1 (simple)
+  };
   
   // État pour la modale de confirmation
   const [confirmModal, setConfirmModal] = useState<{
@@ -46,13 +131,13 @@ const EmailSignaturesPage: React.FC = () => {
   const [signatureToDelete, setSignatureToDelete] = useState<EmailSignature | null>(null);
   
   // Requête pour récupérer les signatures
-  const { data: signaturesData, loading } = useQuery(GET_EMAIL_SIGNATURES, {
+  const { data: signaturesData, loading, refetch } = useQuery(GET_EMAIL_SIGNATURES, {
     variables: { page: 1, limit: 10, search: '' },
     fetchPolicy: 'network-only'
   });
   
   // Vérifier si des signatures existent
-  const hasSignatures = signaturesData?.emailSignatures?.items?.length > 0;
+  const hasSignatures = signaturesData?.emailSignatures?.signatures?.length > 0;
   
   // Calculer la progression de la signature
   const progress = useSignatureProgress(signatureData || {} as SignatureData);
@@ -169,27 +254,32 @@ const EmailSignaturesPage: React.FC = () => {
               />
               
               <div className="mt-6 mb-6">
-                <h2 className="text-xl font-medium text-gray-900 mb-4">Signatures Email</h2>
-                
-                {/* Barre de recherche et bouton alignés */}
-                <div className="flex items-center justify-between">
-                  <SearchInput 
-                    placeholder="Rechercher une signature..." 
-                    onChange={() => {}} 
-                    className="w-full max-w-xs"
-                  />
-                  <button 
-                    onClick={handleAddSignature}
-                    className="inline-flex items-center justify-center rounded-lg font-medium focus:outline-none border border-transparent bg-[#5b50ff] text-white hover:bg-[#4a41d0] py-2 px-4 text-sm font-medium"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-1">
-                      <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" fill="#fff"/>
-                      <path d="M16 12H8" stroke="#5b50ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 16V8" stroke="#5b50ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Créer une signature
-                  </button>
-                </div>
+                {/* Afficher le titre, la recherche et le bouton uniquement s'il n'y a pas de signatures */}
+                {!hasSignatures && (
+                  <>
+                    <h2 className="text-xl font-medium text-gray-900 mb-4">Signatures Email</h2>
+                    
+                    {/* Barre de recherche et bouton alignés */}
+                    <div className="flex items-center justify-between">
+                      <SearchInput 
+                        placeholder="Rechercher une signature..." 
+                        onChange={() => {}} 
+                        className="w-full max-w-xs"
+                      />
+                      <button 
+                        onClick={handleAddSignature}
+                        className="inline-flex items-center justify-center rounded-lg font-medium focus:outline-none border border-transparent bg-[#5b50ff] text-white hover:bg-[#4a41d0] py-2 px-4 text-sm font-medium"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-1">
+                          <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" fill="#fff"/>
+                          <path d="M16 12H8" stroke="#5b50ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12 16V8" stroke="#5b50ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Créer une signature
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </>
           )}
@@ -260,17 +350,24 @@ const EmailSignaturesPage: React.FC = () => {
                 defaultNewbiLogoUrl="/images/logo_newbi/SVG/Logo_Texte_Purple.svg"
                 activeSection={activeSection}
                 onSignatureDataChange={setSignatureData}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                initialData={convertSignatureToFormData(selectedSignature)}
               />
             </>
           ) : (
             /* Tableau des signatures ou état vide */
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className={`${!hasSignatures ? 'bg-white rounded-xl shadow-sm p-6' : ''}`}>
               {loading ? (
                 <div className="flex justify-center items-center py-16">
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#5b50ff]"></div>
                 </div>
               ) : hasSignatures ? (
                 <EmailSignaturesTable
+                  signatures={signaturesData?.emailSignatures?.signatures || []}
+                  totalCount={signaturesData?.emailSignatures?.totalCount || 0}
+                  hasNextPage={signaturesData?.emailSignatures?.hasNextPage || false}
+                  loading={loading}
                   onAddSignature={handleAddSignature}
                   onEditSignature={handleEditSignature}
                   onDeleteSignature={handleDeleteSignature}

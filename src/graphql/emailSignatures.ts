@@ -39,6 +39,12 @@ export const GET_EMAIL_SIGNATURES = gql`
         imagesLayout
         fontFamily
         fontSize
+        textStyle
+        showEmailIcon
+        showPhoneIcon
+        showAddressIcon
+        showWebsiteIcon
+        iconTextSpacing
         isDefault
         createdAt
         updatedAt

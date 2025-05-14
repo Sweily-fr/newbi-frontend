@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Import } from 'iconsax-react';
 import { SignatureData } from '../../types';
 import { useCompany } from '../../../profile/hooks';
 import { Notification } from '../../../../components/';
+import { ImageUploader } from '../../../../components/common/ImageUploader';
 
 interface CompanyInfoSectionProps {
   signatureData: SignatureData;
@@ -18,6 +19,9 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
 }) => {
   // Récupérer les informations de l'entreprise de l'utilisateur
   const { company, loading } = useCompany();
+  
+  // État pour la prévisualisation du logo
+  const [logoPreview, setLogoPreview] = useState<string | null>(signatureData.customLogoUrl || null);
   
   // Fonction simplifiée pour importer les informations de l'entreprise
   const importCompanyInfo = () => {
@@ -51,12 +55,50 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
     });
   };
   
+  // Gérer le changement de logo
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Vérifier le type de fichier (uniquement images)
+    if (!file.type.match('image.*')) {
+      Notification.error('Veuillez sélectionner une image valide');
+      return;
+    }
+    
+    // Vérifier la taille du fichier (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      Notification.error('L\'image ne doit pas dépasser 2MB');
+      return;
+    }
+    
+    // Convertir l'image en Base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setLogoPreview(base64);
+      updateSignatureData('customLogoUrl', base64);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Gérer la suppression du logo
+  const handleRemoveLogo = () => {
+    setLogoPreview(null);
+    updateSignatureData('customLogoUrl', undefined);
+  };
+  
   // Surveiller les changements dans les données de l'entreprise
   useEffect(() => {
     if (company) {
       console.log('Données d\'entreprise chargées:', company);
     }
   }, [company]);
+  
+  // Mettre à jour la prévisualisation du logo lorsque les données de signature changent
+  useEffect(() => {
+    setLogoPreview(signatureData.customLogoUrl || null);
+  }, [signatureData.customLogoUrl]);
 
   return (
     <>
@@ -75,6 +117,25 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                 </button>
               </div>
             </div>
+            
+            {/* Section Logo d'entreprise */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Logo d'entreprise
+              </label>
+              <ImageUploader
+                imageUrl=""
+                previewImage={logoPreview}
+                isLoading={false}
+                roundedStyle="square"
+                imageSize={80}
+                objectFit="contain"
+                onFileSelect={handleLogoChange}
+                onDelete={handleRemoveLogo}
+                helpText="Format recommandé: PNG ou SVG, max 2MB"
+              />
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               {/* Nom de l'entreprise */}
               <div>

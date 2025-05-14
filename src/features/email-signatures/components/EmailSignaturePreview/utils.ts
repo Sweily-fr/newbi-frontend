@@ -65,8 +65,8 @@ export const hasSocialLinksEnabled = (socialLinks?: SocialLinksType): boolean =>
 };
 
 // Fonction pour déterminer le style des liens
-export const getLinkStyle = (primaryColor: string = '#5b50ff'): React.CSSProperties => ({
-  color: primaryColor,
+export const getLinkStyle = (color: string): React.CSSProperties => ({
+  color: color,
   textDecoration: 'none'
 });
 

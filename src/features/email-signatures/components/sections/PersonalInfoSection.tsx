@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SignatureData } from '../../types';
 import { Checkbox } from '../../../../components/common';
 import { ImageUploader } from '../../../../components/common/ImageUploader';
@@ -12,6 +12,15 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   signatureData,
   updateSignatureData,
 }) => {
+  // État local pour la prévisualisation de la photo de profil
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(
+    signatureData.profilePhotoBase64 || signatureData.profilePhotoUrl || null
+  );
+  
+  // Mettre à jour la prévisualisation lorsque les données de signature changent
+  useEffect(() => {
+    setProfilePhotoPreview(signatureData.profilePhotoBase64 || signatureData.profilePhotoUrl || null);
+  }, [signatureData.profilePhotoBase64, signatureData.profilePhotoUrl]);
 
   return (
     <>
@@ -55,11 +64,11 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   Photo de profil
                 </label>
                 <ImageUploader
-                  imageUrl={signatureData.profilePhotoUrl || ''}
-                  previewImage={signatureData.profilePhotoBase64 || null}
+                  imageUrl="" // URL vide, comme dans CompanyInfoSection
+                  previewImage={profilePhotoPreview} // Utiliser l'état local au lieu des données de signature directement
                   isLoading={false}
                   roundedStyle="full"
-                  imageSize={80}
+                  imageSize={80} /* Taille fixe pour l'aperçu dans le composant d'upload */
                   objectFit="cover"
                   onFileSelect={(e) => {
                     const file = e.target.files?.[0];
@@ -68,7 +77,8 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                       const reader = new FileReader();
                       reader.onload = (event) => {
                         const base64 = event.target?.result as string;
-                        // Mettre à jour les données de signature avec l'image en base64
+                        // Mettre à jour l'état local ET les données de signature avec l'image en base64
+                        setProfilePhotoPreview(base64);
                         updateSignatureData('profilePhotoBase64' as any, base64);
                       };
                       reader.readAsDataURL(file);
@@ -76,11 +86,35 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   }}
                   onDelete={() => {
                     // Supprimer la photo de profil
+                    setProfilePhotoPreview(null); // Mettre à jour l'état local
                     updateSignatureData('profilePhotoBase64' as any, null);
                     updateSignatureData('profilePhotoUrl' as any, '');
                     updateSignatureData('profilePhotoToDelete' as any, true);
                   }}
                 />
+                
+                {/* Slider pour la taille de la photo de profil */}
+                {(signatureData.profilePhotoUrl || signatureData.profilePhotoBase64) && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">
+                      Taille de la photo ({signatureData.profilePhotoSize || 80}px)
+                    </h4>
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="range"
+                        min="40"
+                        max="120"
+                        step="5"
+                        value={signatureData.profilePhotoSize || 80}
+                        onChange={(e) => updateSignatureData('profilePhotoSize', parseInt(e.target.value))}
+                        className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
+                      />
+                      <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">
+                        {signatureData.profilePhotoSize || 80}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Nom complet */}
@@ -163,7 +197,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         id="showEmailIcon"
                         name="showEmailIcon"
                         label="Afficher l'icône pour l'email"
-                        checked={Boolean(signatureData.showEmailIcon)}
+                        checked={signatureData.showEmailIcon !== false}
                         onChange={(e) => {
                           const field = 'showEmailIcon';
                           updateSignatureData(field as any, e.target.checked);
@@ -175,7 +209,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         id="showPhoneIcon"
                         name="showPhoneIcon"
                         label="Afficher l'icône pour le téléphone"
-                        checked={Boolean(signatureData.showPhoneIcon)}
+                        checked={signatureData.showPhoneIcon !== false}
                         onChange={(e) => {
                           const field = 'showPhoneIcon';
                           updateSignatureData(field as any, e.target.checked);
@@ -187,7 +221,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         id="showAddressIcon"
                         name="showAddressIcon"
                         label="Afficher l'icône pour l'adresse"
-                        checked={Boolean(signatureData.showAddressIcon)}
+                        checked={signatureData.showAddressIcon !== false}
                         onChange={(e) => {
                           const field = 'showAddressIcon';
                           updateSignatureData(field as any, e.target.checked);
@@ -199,7 +233,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         id="showWebsiteIcon"
                         name="showWebsiteIcon"
                         label="Afficher l'icône pour le site web"
-                        checked={Boolean(signatureData.showWebsiteIcon)}
+                        checked={signatureData.showWebsiteIcon !== false}
                         onChange={(e) => {
                           const field = 'showWebsiteIcon';
                           updateSignatureData(field as any, e.target.checked);

@@ -34,6 +34,7 @@ export interface EmailSignature {
   imagesLayout?: 'horizontal' | 'vertical';
   fontFamily?: string;
   fontSize?: number;
+  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
   socialLinksDisplayMode?: 'icons' | 'text';
   socialLinksPosition?: 'bottom' | 'right';
   socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
@@ -77,7 +78,7 @@ export interface SignatureData {
   customLogoUrl: string;
   fontFamily: string;
   fontSize: number;
-  textStyle: string;
+  textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough';
   templateId: number;
   // Options d'affichage des icônes pour les coordonnées
   showEmailIcon: boolean;
