@@ -21,6 +21,7 @@ export interface Item {
   discount?: number;
   discountType?: 'PERCENTAGE' | 'FIXED';
   details?: string;
+  vatExemptionText?: string;
 }
 
 /**
@@ -54,6 +55,7 @@ export interface Invoice {
   finalTotalTTC?: number;
   notes?: string;
   customFields?: CustomField[];
+  vatExemptionText?: string;
   hasDifferentShippingAddress?: boolean;
   shippingAddress?: {
     street?: string;

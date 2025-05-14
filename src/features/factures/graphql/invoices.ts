@@ -56,6 +56,7 @@ export const CREATE_INVOICE_MUTATION = gql`
         discount
         discountType
         details
+        vatExemptionText
       }
     }
   }
@@ -117,6 +118,7 @@ export const UPDATE_INVOICE_MUTATION = gql`
         discount
         discountType
         details
+        vatExemptionText
       }
     }
   }
@@ -228,6 +230,7 @@ export const GET_INVOICES = gql`
           discount
           discountType
           details
+          vatExemptionText
         }
       }
       totalCount

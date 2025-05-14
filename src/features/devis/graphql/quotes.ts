@@ -75,6 +75,7 @@ export const QUOTE_FRAGMENT = gql`
       discount
       discountType
       details
+      vatExemptionText
     }
     customFields {
       key

@@ -38,6 +38,7 @@ export const ITEM_DESCRIPTION_ERROR_MESSAGE = 'La description de l\'article doit
 export const ITEM_QUANTITY_ERROR_MESSAGE = 'La quantité doit être un nombre positif ou nul';
 export const ITEM_UNIT_PRICE_ERROR_MESSAGE = 'Le prix unitaire doit être un nombre strictement positif';
 export const ITEM_VAT_RATE_ERROR_MESSAGE = 'Le taux de TVA doit être un pourcentage valide (entre 0 et 100)';
+export const ITEM_VAT_EXEMPTION_REQUIRED_ERROR_MESSAGE = 'Une mention d\'exemption de TVA est requise lorsque le taux de TVA est à 0%';
 export const ITEM_UNIT_ERROR_MESSAGE = 'L\'unité doit contenir entre 1 et 20 caractères';
 export const ITEM_DISCOUNT_ERROR_MESSAGE = 'La remise doit être un nombre positif ou nul';
 
@@ -310,7 +311,8 @@ export const validateInvoiceItem = (
   vatRate: number,
   unit: string,
   discount?: number,
-  discountType?: 'PERCENTAGE' | 'FIXED'
+  discountType?: 'PERCENTAGE' | 'FIXED',
+  vatExemptionText?: string
 ): { 
   isValid: boolean; 
   descriptionError?: string; 
@@ -319,12 +321,14 @@ export const validateInvoiceItem = (
   vatRateError?: string;
   unitError?: string;
   discountError?: string;
+  vatExemptionTextError?: string;
 } => {
   let isValid = true;
   let descriptionError: string | undefined;
   let quantityError: string | undefined;
   let unitPriceError: string | undefined;
   let vatRateError: string | undefined;
+  let vatExemptionTextError: string | undefined;
   let unitError: string | undefined;
   let discountError: string | undefined;
 
@@ -356,8 +360,14 @@ export const validateInvoiceItem = (
   }
 
   // Vérifier le taux de TVA
-  if (vatRate === undefined || vatRate === null) {
-    vatRateError = REQUIRED_FIELD_MESSAGE;
+  if (vatRate === undefined || vatRate === null || isNaN(vatRate) || vatRate < 0 || vatRate > 100) {
+    vatRateError = ITEM_VAT_RATE_ERROR_MESSAGE;
+    isValid = false;
+  }
+  
+  // Vérifier que si le taux de TVA est à 0, une mention d'exemption est fournie
+  if (vatRate === 0 && (!vatExemptionText || vatExemptionText.trim() === '')) {
+    vatExemptionTextError = ITEM_VAT_EXEMPTION_REQUIRED_ERROR_MESSAGE;
     isValid = false;
   } else if (vatRate < 0 || vatRate > 100 || isNaN(vatRate)) {
     vatRateError = ITEM_VAT_RATE_ERROR_MESSAGE;
@@ -391,7 +401,8 @@ export const validateInvoiceItem = (
     unitPriceError,
     vatRateError,
     unitError,
-    discountError
+    discountError,
+    vatExemptionTextError
   };
 };
 

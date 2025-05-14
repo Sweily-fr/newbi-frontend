@@ -33,6 +33,7 @@ export interface Quote {
   termsAndConditions?: string;
   termsAndConditionsLinkTitle?: string;
   termsAndConditionsLink?: string;
+  vatExemptionText?: string;
   customFields?: CustomField[];
   convertedToInvoice?: {
     id: string;

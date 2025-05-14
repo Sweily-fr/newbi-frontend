@@ -468,6 +468,28 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
         </div>
 
+        {/* Affichage des mentions d'exonération de TVA */}
+        {(((invoice?.items && invoice.items.length > 0 && invoice.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) ||
+          (items && items.length > 0 && items.some(item => item.vatRate === 0 && item.vatExemptionText)) ||
+          invoice?.vatExemptionText)) && (
+          <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
+            <p className="text-xs font-medium text-gray-700 mb-1">Mentions d'exonération de TVA :</p>
+            {/* Afficher le texte d'exonération global de la facture s'il existe */}
+            {invoice?.vatExemptionText && (
+              <p className="text-xs text-gray-600 mb-1">{invoice.vatExemptionText}</p>
+            )}
+            {/* Afficher chaque mention unique des éléments une seule fois */}
+            {Array.from(new Set(
+              [...(invoice?.items || []), ...items]
+                .filter(item => item.vatRate === 0 && item.vatExemptionText)
+                .map(item => item.vatExemptionText)
+                .filter(Boolean) as string[]
+            )).map((text, index) => (
+              <p key={index} className="text-xs text-gray-600 mb-1">{text}</p>
+            ))}
+          </div>
+        )}
+        
         {/* Affichage de la catégorie de transaction */}
         {companyInfo?.transactionCategory && (
           <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">

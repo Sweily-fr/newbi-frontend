@@ -299,14 +299,26 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     
     // Vérifier les erreurs dans la section Produits/Services
     const hasItemErrors = items.some((item, index) => {
-      const hasError = !item.description || 
+      // Vérification des champs requis
+      const hasRequiredFieldsError = !item.description || 
                       !item.quantity || 
                       !item.unitPrice || 
                       item.vatRate === undefined || item.vatRate === null ||
                       !item.unit;
+      
+      // Vérification spécifique pour TVA à 0 sans texte d'exemption
+      const hasTvaExemptionError = item.vatRate === 0 && (!item.vatExemptionText || item.vatExemptionText.trim() === '');
+      
+      const hasError = hasRequiredFieldsError || hasTvaExemptionError;
+      
       if (hasError) {
-        console.error(`Erreur dans l'article ${index + 1}:`, item);
+        if (hasTvaExemptionError) {
+          console.error(`Erreur dans l'article ${index + 1}: TVA à 0% sans mention d'exemption`, item);
+        } else if (hasRequiredFieldsError) {
+          console.error(`Erreur dans l'article ${index + 1}: champs requis manquants`, item);
+        }
       }
+      
       return hasError;
     });
     errors.items = hasItemErrors;
@@ -322,9 +334,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       errors.bankDetails = true;
       console.error("Erreur: coordonnées bancaires incomplètes");
     }
-    
-   
-   
     
     // Mettre à jour l'état des erreurs
     setSectionErrors(errors);
@@ -490,7 +499,27 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     items={items}
                     handleAddItem={handleAddItem}
                     handleRemoveItem={handleRemoveItem}
-                    handleItemChange={handleItemChange as any}
+                    handleItemChange={(index, item) => {
+                      const hasRequiredFieldsError = !item.description || 
+                        !item.quantity || 
+                        !item.unitPrice || 
+                        item.vatRate === undefined || item.vatRate === null ||
+                        !item.unit;
+                      
+                      const hasTvaExemptionError = item.vatRate === 0 && (!item.vatExemptionText || item.vatExemptionText.trim() === '');
+                      
+                      const hasError = hasRequiredFieldsError || hasTvaExemptionError;
+                      
+                      if (hasError) {
+                        if (hasTvaExemptionError) {
+                          console.error(`Erreur dans l'article ${index + 1}: TVA à 0% sans mention d'exemption`, item);
+                        } else if (hasRequiredFieldsError) {
+                          console.error(`Erreur dans l'article ${index + 1}: champs requis manquants`, item);
+                        }
+                      }
+                      
+                      handleItemChange(index, item);
+                    }}
                     handleProductSelect={handleProductSelect}
                   />
                 </Collapse>
