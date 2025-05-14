@@ -32,7 +32,7 @@ const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({
   const groupedResults = groupResultsByCategory(analysisResults);
 
   return (
-    <div className="lg:w-1/3 bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
+    <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">Recommandations</h2>
         

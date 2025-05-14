@@ -23,6 +23,9 @@ export interface ModalProps {
   className?: string;
   footer?: ReactNode;
   maxHeight?: string;
+  zIndex?: number;
+  preventBackgroundClose?: boolean;
+  overlayOpacity?: number;
 }
 
 export const Modal = ({
@@ -36,6 +39,9 @@ export const Modal = ({
   className = "",
   footer,
   maxHeight,
+  zIndex = 50,
+  preventBackgroundClose = false,
+  overlayOpacity = 25,
 }: ModalProps) => {
   // Définir la largeur du modal en fonction de la taille
   const sizeClasses = {
@@ -53,7 +59,7 @@ export const Modal = ({
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog as="div" className={`relative z-[${zIndex}]`} onClose={preventBackgroundClose ? () => {} : onClose}>
         {/* Overlay avec animation de fondu */}
         <Transition.Child
           as={Fragment}
@@ -64,7 +70,7 @@ export const Modal = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className={`fixed inset-0 bg-[#5b50ff] bg-opacity-${overlayOpacity}`} style={{ backgroundColor: '#5b50ff', opacity: overlayOpacity / 100 }} />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">

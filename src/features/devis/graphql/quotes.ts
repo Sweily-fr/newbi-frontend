@@ -54,6 +54,13 @@ export const QUOTE_FRAGMENT = gql`
         postalCode
         country
       }
+      hasDifferentShippingAddress
+      shippingAddress {
+        street
+        city
+        postalCode
+        country
+      }
       siret
       vatNumber
       firstName
@@ -185,6 +192,56 @@ export const CONVERT_QUOTE_TO_INVOICE_MUTATION = gql`
         description
         quantity
         unitPrice
+      }
+    }
+  }
+`;
+
+// Version détaillée de la mutation de conversion avec tous les champs client
+export const CONVERT_QUOTE_TO_INVOICE_DETAILED_MUTATION = gql`
+  mutation ConvertQuoteToInvoiceDetailed($id: ID!, $distribution: [Float], $isDeposit: Boolean, $skipValidation: Boolean) {
+    convertQuoteToInvoice(id: $id, distribution: $distribution, isDeposit: $isDeposit, skipValidation: $skipValidation) {
+      id
+      number
+      prefix
+      status
+      totalHT
+      totalTTC
+      totalVAT
+      isDeposit
+      createdAt
+      client {
+        id
+        name
+        email
+        type
+        address {
+          street
+          city
+          postalCode
+          country
+        }
+        hasDifferentShippingAddress
+        shippingAddress {
+          street
+          city
+          postalCode
+          country
+        }
+        siret
+        vatNumber
+        firstName
+        lastName
+      }
+      items {
+        description
+        quantity
+        unitPrice
+        vatRate
+        unit
+        discount
+        discountType
+        details
       }
     }
   }

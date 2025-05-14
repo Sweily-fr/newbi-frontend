@@ -283,23 +283,23 @@ export const InvoiceDiscountAndTotals: React.FC<
           <div>
             <div className="flex justify-between">
               <span>Total HT:</span>
-              <span>{totals?.totalHT.toFixed(2)} €</span>
+              <span>{totals?.totalHT?.toFixed(2) || '0.00'} €</span>
             </div>
             <div className="flex justify-between">
               <span>TVA:</span>
-              <span>{totals?.totalVAT.toFixed(2)} €</span>
+              <span>{totals?.totalVAT?.toFixed(2) || '0.00'} €</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-red-600">
                 <span>
                   Remise{discountType === "PERCENTAGE" ? ` (${discount}%)` : ""}:
                 </span>
-                <span>-{totals?.discountAmount.toFixed(2)} €</span>
+                <span>-{totals?.discountAmount?.toFixed(2) || '0.00'} €</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total TTC:</span>
-              <span>{totals?.finalTotalTTC.toFixed(2)} €</span>
+              <span>{totals?.finalTotalTTC?.toFixed(2) || '0.00'} €</span>
             </div>
           </div>
         )}

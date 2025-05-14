@@ -35,13 +35,6 @@ interface InvoicePreviewProps {
   termsAndConditionsLink?: string;
   showActionButtons?: boolean;
   useBankDetails?: boolean;
-  hasDifferentShippingAddress?: boolean;
-  shippingAddress?: {
-    street?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-  };
 }
 
 export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
@@ -67,8 +60,6 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   termsAndConditionsLink,
   showActionButtons,
   useBankDetails,
-  hasDifferentShippingAddress = false,
-  shippingAddress = {},
 }) => {
   const totals = calculateTotals
     ? calculateTotals()
@@ -133,6 +124,9 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   let clientInfo = isNewClient
     ? newClient
     : selectedClient || invoice?.client || {};
+    
+  // Déterminer si le client a une adresse de livraison différente
+  const hasShippingAddress = clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
 
   // Restructurer les données du nouveau client si nécessaire
   if (isNewClient) {
@@ -240,15 +234,16 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         </div>
 
         <div className="flex justify-between mb-8">
-          <div className={hasDifferentShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
+          <div className={hasShippingAddress ? "w-1/3 pr-2" : "w-1/2 pr-4"}>
             <h3 className="font-normal mb-2">
               {companyInfo?.name || "Votre Entreprise"}
             </h3>
             <p className="text-xs">{companyInfo?.email}</p>
             <p className="text-xs">{companyInfo?.phone}</p>
             <p className="text-xs">{companyInfo?.address?.street}</p>
-            <p className="text-xs">{companyInfo?.address?.city}</p>
-            <p className="text-xs">{companyInfo?.address?.postalCode}</p>
+            <p className="text-xs">
+              {companyInfo?.address?.postalCode} {companyInfo?.address?.city}
+            </p>
             <p className="text-xs">{companyInfo?.address?.country}</p>
             {companyInfo?.siret && (
               <p className="text-xs">SIRET: {companyInfo.siret}</p>
@@ -257,7 +252,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               <p className="text-xs">TVA: {companyInfo.vatNumber}</p>
             )}
           </div>
-          <div className={hasDifferentShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
+          <div className={hasShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
             <h3 className="font-normal mb-2">Facturer à :</h3>
             <p className="text-xs">{clientInfo?.name}</p>
             <p className="text-xs">{clientInfo?.email}</p>
@@ -273,15 +268,15 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               <p className="text-xs">TVA: {clientInfo.vatNumber}</p>
             )}
           </div>
-          {hasDifferentShippingAddress && (
+          {hasShippingAddress && (
             <div className="w-1/3 pl-2">
               <h3 className="font-normal mb-2">Livrer à :</h3>
               <p className="text-xs">{clientInfo.name}</p>
-              <p className="text-xs">{shippingAddress?.street}</p>
+              <p className="text-xs">{clientInfo.shippingAddress?.street}</p>
               <p className="text-xs">
-                {shippingAddress?.postalCode} {shippingAddress?.city}
+                {clientInfo.shippingAddress?.postalCode} {clientInfo.shippingAddress?.city}
               </p>
-              <p className="text-xs">{shippingAddress?.country}</p>
+              <p className="text-xs">{clientInfo.shippingAddress?.country}</p>
             </div>
           )}
         </div>

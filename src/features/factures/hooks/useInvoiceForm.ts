@@ -12,7 +12,7 @@ import { GET_USER_INFO } from '../../../graphql/queries';
 import { Item, CustomField, Client, CompanyInfo } from '../types/invoice';
 
 export interface UseInvoiceFormProps {
-  invoice?: any;
+  invoice?: any; // Utiliser any pour éviter les erreurs de type qui ne sont pas liées à notre problème actuel
   onClose: () => void;
   onSubmit?: (data: any) => void;
   showNotifications?: boolean;
@@ -39,6 +39,14 @@ export const useInvoiceForm = ({
     city: '',
     country: '',
     postalCode: '',
+    // Adresse de livraison
+    hasDifferentShippingAddress: false,
+    shippingAddress: {
+      street: '',
+      city: '',
+      postalCode: '',
+      country: ''
+    },
     // Champs spécifiques aux entreprises
     siret: '',
     vatNumber: '',
@@ -139,8 +147,10 @@ export const useInvoiceForm = ({
   const [issueDate, setIssueDate] = useState(formatDate(invoice?.issueDate));
   const [executionDate, setExecutionDate] = useState(formatDate(invoice?.executionDate));
   const [dueDate, setDueDate] = useState(formatDate(invoice?.dueDate));
-  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(invoice?.hasDifferentShippingAddress || false);
-  const [shippingAddress, setShippingAddress] = useState(invoice?.shippingAddress || {
+  // Nous n'utilisons plus ces états car l'adresse de livraison est maintenant gérée au niveau du client
+  // Ces variables sont conservées pour la compatibilité avec le code existant, mais elles sont désactivées dans l'interface
+  const [hasDifferentShippingAddress, setHasDifferentShippingAddress] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState({
     street: '',
     city: '',
     postalCode: '',
@@ -413,25 +423,55 @@ export const useInvoiceForm = ({
     vatRate?: number;
     unit?: string;
   }) => {    
-    // Créer une copie du tableau d'items
-    const newItems = [...items];
-    
-    // Créer un nouvel objet item en conservant les propriétés existantes
-    // qui ne doivent pas être modifiées
-    newItems[index] = {
-      ...newItems[index],
-      description: product.name,
-      details: product.description || '',
-      unitPrice: product.unitPrice !== undefined && product.unitPrice !== null ? product.unitPrice : 0,
-      vatRate: product.vatRate !== undefined && product.vatRate !== null ? product.vatRate : 20,
-      unit: product.unit || 'unité',
-      // Conserver la quantité existante ou initialiser à 1
-      quantity: newItems[index].quantity || 1
-    };
-    
-    // Mettre à jour le tableau d'items en une seule fois
-    setItems(newItems);
-    
+    try {
+      // Vérifier si le produit a un prix unitaire valide
+      if (product.unitPrice === undefined || product.unitPrice === null) {
+        console.warn('Le produit n\'a pas de prix unitaire valide:', product);
+      }
+
+      // Extraire les valeurs du produit avec des valeurs par défaut sécurisées
+      const {
+        name,
+        description = '',
+        unitPrice = 0,
+        vatRate = 20,
+        unit = 'unité'
+      } = product;
+      
+      // Approche directe : mettre à jour l'item directement dans le tableau
+      const newItems = [...items];
+      
+      // Conserver la quantité et le discount existants
+      const existingQuantity = newItems[index]?.quantity || 1;
+      const existingDiscount = newItems[index]?.discount || 0;
+      const existingDiscountType = newItems[index]?.discountType || 'PERCENTAGE';
+      
+      // Créer un nouvel objet item complet
+      newItems[index] = {
+        description: name,
+        details: description,
+        unitPrice: unitPrice,
+        vatRate: vatRate,
+        unit: unit,
+        quantity: existingQuantity,
+        discount: existingDiscount,
+        discountType: existingDiscountType
+      };
+      
+      // Mettre à jour le tableau d'items en une seule fois et attendre que la mise à jour soit terminée
+      setItems(newItems);
+      
+      // Aucune mise à jour individuelle n'est nécessaire car nous avons déjà mis à jour l'objet complet
+      // Cela évite les problèmes de synchronisation et de réinitialisation
+      
+      console.log('Produit importé avec succès:', {
+        index,
+        product,
+        updatedItem: newItems[index]
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'importation du produit:', error);
+    }
   };
 
   const handleAddCustomField = () => {
@@ -492,6 +532,17 @@ export const useInvoiceForm = ({
       finalTotalHT,
       finalTotalTTC,
       discountAmount
+    };
+  };
+
+  // Fonction utilitaire pour nettoyer les objets d'adresse (enlever __typename)
+  const cleanAddressObject = (address: Record<string, unknown> | null | undefined) => {
+    if (!address) return undefined; // Utiliser undefined au lieu de null comme dans useQuoteForm
+    return {
+      street: address.street || "",
+      city: address.city || "",
+      postalCode: address.postalCode || "",
+      country: address.country || ""
     };
   };
 
@@ -565,6 +616,9 @@ export const useInvoiceForm = ({
               postalCode: newClient.postalCode || "00000",
               country: newClient.country || "France",
             },
+            hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+            shippingAddress: newClient.hasDifferentShippingAddress ? 
+              cleanAddressObject(newClient.shippingAddress) : null,
             // Champs spécifiques aux entreprises
             siret: clientType === 'COMPANY' ? (newClient.siret || "12345678901234") : "",
             vatNumber: clientType === 'COMPANY' ? (newClient.vatNumber || "FR12345678901") : "",
@@ -588,12 +642,15 @@ export const useInvoiceForm = ({
               type: clientType,
               name: invoice.client.name,
               email: invoice.client.email || "client@example.com",
-              address: {
-                street: invoice.client.address?.street || "Adresse non spécifiée",
-                city: invoice.client.address?.city || "Ville non spécifiée",
-                postalCode: invoice.client.address?.postalCode || "00000",
-                country: invoice.client.address?.country || "France",
+              address: cleanAddressObject(invoice.client.address) || {
+                street: "Adresse non spécifiée",
+                city: "Ville non spécifiée",
+                postalCode: "00000",
+                country: "France",
               },
+              hasDifferentShippingAddress: invoice.client.hasDifferentShippingAddress || false,
+              shippingAddress: invoice.client.hasDifferentShippingAddress ? 
+                cleanAddressObject(invoice.client.shippingAddress) : null,
               siret: siret,
               vatNumber: vatNumber,
               firstName: invoice.client.firstName || "",
@@ -621,12 +678,15 @@ export const useInvoiceForm = ({
               type: clientType,
               name: localSelectedClientData.name,
               email: localSelectedClientData.email || "client@example.com", // Email obligatoire
-              address: {
-                street: localSelectedClientData.address?.street || "Adresse non spécifiée",
-                city: localSelectedClientData.address?.city || "Ville non spécifiée",
-                postalCode: localSelectedClientData.address?.postalCode || "00000",
-                country: localSelectedClientData.address?.country || "France",
+              address: cleanAddressObject(localSelectedClientData.address) || {
+                street: "Adresse non spécifiée",
+                city: "Ville non spécifiée",
+                postalCode: "00000",
+                country: "France",
               },
+              hasDifferentShippingAddress: localSelectedClientData.hasDifferentShippingAddress || false,
+              shippingAddress: localSelectedClientData.hasDifferentShippingAddress && localSelectedClientData.shippingAddress ? 
+                cleanAddressObject(localSelectedClientData.shippingAddress) : null,
               siret,
               vatNumber,
               firstName: localSelectedClientData.firstName || "",
@@ -706,6 +766,8 @@ export const useInvoiceForm = ({
                   postalCode: newClient.postalCode,
                   country: newClient.country
                 },
+                hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+                shippingAddress: newClient.hasDifferentShippingAddress ? cleanAddressObject(newClient.shippingAddress) : undefined,
                 siret: newClient.siret,
                 vatNumber: newClient.vatNumber
               }
@@ -736,31 +798,42 @@ export const useInvoiceForm = ({
         bic: companyInfo.bankDetails?.bic,
         bankName: companyInfo.bankDetails?.bankName
       } : {iban: "", bic: "", bankName: ""};
+      
+      // S'assurer que les adresses de livraison sont correctement formatées
+      // et que les valeurs null/undefined sont gérées de manière cohérente comme dans useQuoteForm
+      
+      // Préparer l'adresse de livraison en utilisant la même approche que dans useQuoteForm
+      const clientShippingAddress = clientData.hasDifferentShippingAddress && clientData.shippingAddress ? 
+        cleanAddressObject(clientData.shippingAddress) : undefined;
 
       // Nettoyer les champs personnalisés en ne gardant que key et value
       const cleanCustomFields = customFields
         .filter(field => field.key && field.value)
         .map(({ key, value }) => ({ key, value }));
 
-      const invoiceData = {
-        client: {
-          id: isNewClient ? clientId : (clientData.id || effectiveSelectedClient),
-          type: clientData.type,
-          name: clientData.name,
-          email: clientData.email,
-          address: {
-            street: clientData.address.street,
-            city: clientData.address.city,
-            postalCode: clientData.address.postalCode,
-            country: clientData.address.country
-          },
-          // Champs spécifiques aux entreprises
-          siret: clientData.siret,
-          vatNumber: clientData.vatNumber,
-          // Champs spécifiques aux particuliers
-          firstName: clientData.firstName,
-          lastName: clientData.lastName
+      // Préparer les données du client pour l'API
+      // Le backend attend toujours un objet client complet avec tous les champs requis
+      const clientDataForSubmission = {
+        id: isNewClient ? clientId : (clientData.id || effectiveSelectedClient),
+        type: clientData.type || 'COMPANY', // Type est requis
+        name: clientData.name || '', // Name est requis
+        email: clientData.email || '', // Email est requis
+        address: cleanAddressObject(clientData.address) || { // Address est requis
+          street: '',
+          city: '',
+          postalCode: '',
+          country: ''
         },
+        hasDifferentShippingAddress: clientData.hasDifferentShippingAddress || false,
+        shippingAddress: clientData.hasDifferentShippingAddress && clientShippingAddress ? clientShippingAddress : undefined,
+        siret: clientData.siret || '',
+        vatNumber: clientData.vatNumber || '',
+        firstName: clientData.firstName || '',
+        lastName: clientData.lastName || ''
+      };
+      
+      const invoiceData = {
+        client: clientDataForSubmission,
         items: items.map(({ id, ...item }) => ({
           description: item.description,
           quantity: parseFloat(item.quantity.toString()),
@@ -834,13 +907,78 @@ export const useInvoiceForm = ({
       } else {
         // Updating existing invoice
         try {
+          // Pour la mise à jour, nous devons toujours envoyer un objet client complet avec tous les champs requis
+          
+          // Préparer les données du client pour la mise à jour
+          let clientForUpdate;
+          
+          if (isNewClient) {
+            // Si c'est un nouveau client, utiliser les données du nouveau client
+            clientForUpdate = clientData;
+          } else if (selectedClient && localSelectedClientData) {
+            // Si un client existant est sélectionné, utiliser ses données
+            clientForUpdate = {
+              id: selectedClient,
+              type: localSelectedClientData.type || 'COMPANY',
+              name: localSelectedClientData.name || '',
+              email: localSelectedClientData.email || '',
+              address: cleanAddressObject(localSelectedClientData.address) || {
+                street: '',
+                city: '',
+                postalCode: '',
+                country: ''
+              },
+              // Utiliser les données d'adresse de livraison du client sélectionné
+              hasDifferentShippingAddress: localSelectedClientData.hasDifferentShippingAddress || false,
+              shippingAddress: localSelectedClientData.hasDifferentShippingAddress && localSelectedClientData.shippingAddress ? 
+                cleanAddressObject(localSelectedClientData.shippingAddress) : undefined,
+              siret: localSelectedClientData.siret || '',
+              vatNumber: localSelectedClientData.vatNumber || '',
+              firstName: localSelectedClientData.firstName || '',
+              lastName: localSelectedClientData.lastName || ''
+            };
+          } else {
+            // Si aucun client n'est sélectionné, utiliser le client de la facture existante
+            clientForUpdate = {
+              id: invoice?.client?.id,
+              type: invoice?.client?.type || 'COMPANY',
+              name: invoice?.client?.name || '',
+              email: invoice?.client?.email || '',
+              address: cleanAddressObject(invoice?.client?.address) || {
+                street: '',
+                city: '',
+                postalCode: '',
+                country: ''
+              },
+              // Utiliser les données d'adresse de livraison du client existant
+              hasDifferentShippingAddress: invoice?.client?.hasDifferentShippingAddress || false,
+              shippingAddress: invoice?.client?.hasDifferentShippingAddress && invoice?.client?.shippingAddress ? 
+                cleanAddressObject(invoice?.client?.shippingAddress) : undefined,
+              siret: invoice?.client?.siret || '',
+              vatNumber: invoice?.client?.vatNumber || '',
+              firstName: invoice?.client?.firstName || '',
+              lastName: invoice?.client?.lastName || ''
+            };
+          }
+          
+          // Créer l'objet de données pour la mise à jour
+          const updateInvoiceData = {
+            ...invoiceData,
+            client: clientForUpdate
+          };
+          
+          // Ajouter des logs pour déboguer
+          console.log('Mise à jour de la facture avec les données:', updateInvoiceData);
+          console.log('Client original ID:', invoice?.client?.id);
+          console.log('Client sélectionné ID:', selectedClient);
+          
           await updateInvoice({
             variables: {
               id: invoice.id,
-              input: invoiceData
+              input: updateInvoiceData
             }
           });
-          if (onSubmit) onSubmit(invoiceData);
+          if (onSubmit) onSubmit(updateInvoiceData);
         } catch (error) {
           if (showNotifications) {
             Notification.error('Erreur lors de la modification de la facture', {

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useBlogSeo } from '../../hooks/useBlogSeo';
+import { KeywordSuggestions } from './KeywordSuggestions';
 
 const KeywordsMetaForm: React.FC = () => {
   const { state, setKeywords, setMetaTags } = useBlogSeo();
@@ -29,16 +30,24 @@ const KeywordsMetaForm: React.FC = () => {
   }, [state.keywords, setKeywords]);
 
   // Gestion des mots-clés secondaires
-  const handleAddSecondaryKeyword = () => {
-    if (secondaryKeyword.trim() && 
-        !state.keywords.secondary.includes(secondaryKeyword.trim()) && 
+  const handleAddSecondaryKeyword = (keyword?: string) => {
+    const keywordToAdd = keyword || secondaryKeyword;
+    if (keywordToAdd.trim() && 
+        !state.keywords.secondary.includes(keywordToAdd.trim()) && 
         state.keywords.secondary.length < 5) {
       setKeywords({
         ...state.keywords,
-        secondary: [...state.keywords.secondary, secondaryKeyword.trim()]
+        secondary: [...state.keywords.secondary, keywordToAdd.trim()]
       });
-      setSecondaryKeyword('');
+      if (!keyword) {
+        setSecondaryKeyword('');
+      }
     }
+  };
+
+  const handleAddButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleAddSecondaryKeyword();
   };
 
   const handleRemoveSecondaryKeyword = (keyword: string) => {
@@ -121,21 +130,21 @@ const KeywordsMetaForm: React.FC = () => {
               id="secondary-keyword"
               value={secondaryKeyword}
               onChange={(e) => setSecondaryKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
               placeholder="Ajouter un mot-clé secondaire"
-              disabled={state.keywords.secondary.length >= 5}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   handleAddSecondaryKeyword();
                 }
               }}
+              disabled={state.keywords.secondary.length >= 5}
             />
             <button
               type="button"
-              onClick={handleAddSecondaryKeyword}
+              onClick={handleAddButtonClick}
               className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff] disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={state.keywords.secondary.length >= 5}
+              disabled={!secondaryKeyword.trim() || state.keywords.secondary.length >= 5}
             >
               Ajouter
             </button>
@@ -165,6 +174,17 @@ const KeywordsMetaForm: React.FC = () => {
           <p className="mt-1 text-sm text-gray-500">
             Ces mots-clés complémentaires aideront à enrichir votre contenu.
           </p>
+          
+          {/* Suggestions de mots-clés secondaires */}
+          {state.keywords.main && (
+            <div className="mt-6 p-4 border border-gray-200 rounded-lg">
+              <KeywordSuggestions 
+                mainKeyword={state.keywords.main}
+                onSelectSuggestion={handleAddSecondaryKeyword}
+                selectedKeywords={state.keywords.secondary}
+              />
+            </div>
+          )}
         </div>
         
         {/* Mots-clés de longue traîne */}
