@@ -110,6 +110,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           item.unit,
           item.discount,
           item.discountType as 'PERCENTAGE' | 'FIXED',
+          item.vatExemptionText, // Ajouter la validation du texte d'exemption de TVA
         );
         
         return {
@@ -118,7 +119,8 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           unitPriceError: result.unitPriceError,
           vatRateError: result.vatRateError,
           unitError: result.unitError,
-          discountError: result.discountError
+          discountError: result.discountError,
+          vatExemptionTextError: result.vatExemptionTextError // Ajouter l'erreur du texte d'exemption de TVA
         };
       });
       
