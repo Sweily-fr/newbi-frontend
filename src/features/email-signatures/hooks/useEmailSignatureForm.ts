@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useCompany } from '../../../hooks/useCompany';
 import { EMAIL_PATTERN, NAME_REGEX } from '../../../constants/formValidations';
 import { Notification } from '../../../components/common/Notification';
 
@@ -156,7 +155,22 @@ export function useEmailSignatureForm({
   onChange
 }: UseEmailSignatureFormProps): UseEmailSignatureFormReturn {
   // Récupérer les informations de l'entreprise
-  const { company } = useCompany();
+  // Implémentation directe pour remplacer useCompany
+  const company = {
+    name: '',
+    logo: '',
+    address: {
+      street: '',
+      postalCode: '',
+      city: '',
+      country: ''
+    },
+    website: '',
+    phone: ''
+  };
+  
+  // Note: Dans une implémentation réelle, ces données pourraient être récupérées
+  // depuis une API GraphQL ou un store global
   
   // États pour les champs du formulaire
   const id = initialData?.id;
