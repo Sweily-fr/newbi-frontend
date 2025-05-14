@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const QUOTE_FRAGMENT = gql`
   fragment QuoteFields on Quote {
@@ -175,8 +175,18 @@ export const CHANGE_QUOTE_STATUS_MUTATION = gql`
 `;
 
 export const CONVERT_QUOTE_TO_INVOICE_MUTATION = gql`
-  mutation ConvertQuoteToInvoice($id: ID!, $distribution: [Float], $isDeposit: Boolean, $skipValidation: Boolean) {
-    convertQuoteToInvoice(id: $id, distribution: $distribution, isDeposit: $isDeposit, skipValidation: $skipValidation) {
+  mutation ConvertQuoteToInvoice(
+    $id: ID!
+    $distribution: [Float]
+    $isDeposit: Boolean
+    $skipValidation: Boolean
+  ) {
+    convertQuoteToInvoice(
+      id: $id
+      distribution: $distribution
+      isDeposit: $isDeposit
+      skipValidation: $skipValidation
+    ) {
       id
       number
       prefix
@@ -200,8 +210,18 @@ export const CONVERT_QUOTE_TO_INVOICE_MUTATION = gql`
 
 // Version détaillée de la mutation de conversion avec tous les champs client
 export const CONVERT_QUOTE_TO_INVOICE_DETAILED_MUTATION = gql`
-  mutation ConvertQuoteToInvoiceDetailed($id: ID!, $distribution: [Float], $isDeposit: Boolean, $skipValidation: Boolean) {
-    convertQuoteToInvoice(id: $id, distribution: $distribution, isDeposit: $isDeposit, skipValidation: $skipValidation) {
+  mutation ConvertQuoteToInvoiceDetailed(
+    $id: ID!
+    $distribution: [Float]
+    $isDeposit: Boolean
+    $skipValidation: Boolean
+  ) {
+    convertQuoteToInvoice(
+      id: $id
+      distribution: $distribution
+      isDeposit: $isDeposit
+      skipValidation: $skipValidation
+    ) {
       id
       number
       prefix
@@ -243,6 +263,7 @@ export const CONVERT_QUOTE_TO_INVOICE_DETAILED_MUTATION = gql`
         discount
         discountType
         details
+        vatExemptionText
       }
     }
   }

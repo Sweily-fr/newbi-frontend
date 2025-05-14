@@ -68,7 +68,7 @@ export const useQuoteForm = ({
           description: item.description || "",
           quantity: item.quantity || 1,
           unitPrice: item.unitPrice || 0,
-          vatRate: item.vatRate || 20,
+          vatRate: item.vatRate ?? 20,
           unit: item.unit || "unité",
           discount: item.discount || 0,
           discountType: item.discountType || "PERCENTAGE",
