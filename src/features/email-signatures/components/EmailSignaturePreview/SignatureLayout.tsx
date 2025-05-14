@@ -17,28 +17,27 @@ interface SignatureLayoutProps {
   website?: string;
   address?: string;
   logoUrl?: string;
-  profilePhotoSource: string | null;
-  photoSize: number;
+  profilePhotoSource?: string;
+  photoSize: number; // Valeur par défaut fournie dans le composant
   imagesLayout: 'stacked' | 'side-by-side';
-  showLogo?: boolean;
-  showEmailIcon: boolean;
-  showPhoneIcon: boolean;
-  showAddressIcon: boolean;
-  showWebsiteIcon: boolean;
+  showLogo: boolean; // Valeur par défaut fournie dans le composant
+  showEmailIcon: boolean; // Valeur par défaut fournie dans le composant
+  showPhoneIcon: boolean; // Valeur par défaut fournie dans le composant
+  showAddressIcon: boolean; // Valeur par défaut fournie dans le composant
+  showWebsiteIcon: boolean; // Valeur par défaut fournie dans le composant
   socialLinks?: SocialLinks;
-  socialPosition: 'bottom' | 'right';
   socialLinksDisplayMode: 'icons' | 'text';
   socialLinksIconStyle: string;
-  primaryColor: string;
+  primaryColor: string; // Valeur par défaut fournie dans le composant
   secondaryColor?: string; // Couleur secondaire pour les textes d'informations de contact
   socialLinksIconColor?: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
   effectiveTextAlignment: 'left' | 'center' | 'right';
   effectiveHorizontalSpacing: number;
   effectiveVerticalSpacing: number;
-  iconTextSpacing?: number; // Espacement entre icônes et texte
-  fontSize?: number;
-  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  fontFamily?: string;
+  iconTextSpacing: number; // Valeur par défaut fournie dans le composant
+  fontSize: number; // Valeur par défaut fournie dans le composant
+  textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough'; // Valeur par défaut fournie dans le composant
+  fontFamily: string; // Valeur par défaut fournie dans le composant
 }
 
 export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
@@ -50,21 +49,20 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   mobilePhone,
   email,
   logoUrl,
-  showLogo,
+  showLogo = false,
   website,
   address,
   profilePhotoSource,
-  photoSize,
+  photoSize = 80, // Valeur par défaut pour la taille de la photo
   imagesLayout,
-  showEmailIcon,
-  showPhoneIcon,
-  showAddressIcon,
-  showWebsiteIcon,
+  showEmailIcon = true,
+  showPhoneIcon = true,
+  showAddressIcon = true,
+  showWebsiteIcon = true,
   socialLinks,
-  socialPosition,
   socialLinksDisplayMode,
   socialLinksIconStyle,
-  primaryColor,
+  primaryColor = '#5b50ff', // Couleur principale Newbi
   secondaryColor,
   socialLinksIconColor,
   effectiveTextAlignment,
@@ -201,7 +199,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   if (signatureLayout === 'horizontal') {
     // Si la position des réseaux sociaux est sous les informations personnelles
     // Utilisation d'une comparaison de chaînes pour éviter les problèmes de typage
-    if (socialPosition === 'below-personal' as any) {
+    // Cas non utilisé dans la version simplifiée
+    if (false) {
       return (
         <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
           {/* Partie gauche - Photo de profil et logo */}
@@ -344,7 +343,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
     }
     
     // Si la position des réseaux sociaux est à droite, les afficher à côté des informations de contact
-    if (socialPosition === 'right') {
+    // Cas non utilisé dans la version simplifiée
+    if (false) {
       return (
         <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
           {/* Partie gauche - Photo de profil et logo */}
@@ -422,20 +422,18 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
                 </div>
               </div>
             )}
-          </div>
-          
-          {/* Partie centrale - Informations personnelles */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: '0 10px 0 0',
-            textAlign: 'left',
-            gap: `${effectiveVerticalSpacing}px`
-          }}>
-            {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
-            {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
-            {companyName && <p style={{...companyNameStyle, margin: '0'}}>{companyName}</p>}
+            
+            {/* Informations personnelles sous la photo de profil */}
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              textAlign: 'left',
+              gap: `${effectiveVerticalSpacing}px`
+            }}>
+              {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
+              {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
+              {companyName && <p style={{...companyNameStyle, margin: '0'}}>{companyName}</p>}
+            </div>
           </div>
           
           {/* Séparateur vertical */}
@@ -606,15 +604,154 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   }
 
   // Débogage des valeurs
+  const layoutType = signatureLayout as string;
   console.log('SignatureLayout Debug:', { 
     signatureLayout, 
     showLogo, 
     logoUrl, 
-    isHorizontal: signatureLayout === 'horizontal',
-    isVertical: signatureLayout === 'vertical',
+    isHorizontal: layoutType === 'horizontal',
+    isVertical: layoutType === 'vertical',
     typeofSignatureLayout: typeof signatureLayout
   });
   
+  // Fonction unique pour le rendu horizontal avec les informations personnelles en dessous de la photo
+  const renderHorizontalLayout = () => {
+    console.log('renderHorizontalLayout est appelée !', { fullName, jobTitle, companyName });
+    
+    // Modèle unique pour le mode horizontal
+    return (
+      <div style={containerStyle}>
+        <div style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%'
+        }}>
+          {/* Partie supérieure - Photo de profil uniquement */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center', 
+            marginBottom: '15px'
+          }}>
+            {/* Photo de profil */}
+            <div style={{ 
+              width: `${photoSize}px`, 
+              height: `${photoSize}px`, 
+              borderRadius: '50%',
+              overflow: 'hidden',
+              backgroundColor: '#f0eeff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {profilePhotoSource ? (
+                <img 
+                  src={profilePhotoSource} 
+                  alt="Profile" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover'
+                  }} 
+                />
+              ) : (
+                <img 
+                  src="/images/logo_newbi/SVG/Logo_Texte_Purple.svg" 
+                  alt="Newbi" 
+                  style={{ 
+                    width: '80%', 
+                    height: '80%', 
+                    objectFit: 'contain'
+                  }} 
+                />
+              )}
+            </div>
+          </div>
+          
+          {/* Informations personnelles en dessous de la photo */}
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: '15px',
+            width: '100%'
+          }}>
+            {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
+            {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
+            {companyName && <p style={{ ...companyNameStyle, margin: '5px 0' }}>{companyName}</p>}
+          </div>
+          
+          {/* Logo d'entreprise sous les informations personnelles */}
+          {showLogo && logoUrl && (
+            <div style={{
+              width: `${photoSize * 0.8}px`,
+              height: `${photoSize * 0.5}px`,
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: '5px',
+              marginBottom: '15px',
+              border: '1px solid #f0eeff',
+              borderRadius: '4px',
+              padding: '4px'
+            }}>
+              <img 
+                src={logoUrl} 
+                alt="Logo" 
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '100%', 
+                  objectFit: 'contain'
+                }} 
+              />
+            </div>
+          )}
+        </div>
+        
+        {/* Séparateur horizontal */}
+        <div style={{
+          height: '1px',
+          backgroundColor: '#e0e0e0',
+          width: '60%',
+          alignSelf: 'center',
+          margin: '0 auto 15px'
+        }}></div>
+        
+        {/* Informations de contact */}
+        <ContactInfo
+          phone={phone}
+          mobilePhone={mobilePhone}
+          email={email}
+          website={website}
+          address={address}
+          companyName={undefined} // Déjà affiché au-dessus
+          showEmailIcon={showEmailIcon}
+          showPhoneIcon={showPhoneIcon}
+          showAddressIcon={showAddressIcon}
+          showWebsiteIcon={showWebsiteIcon}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor || '#333333'}
+          textAlignment="center"
+          isHorizontalLayout={false}
+          fontSize={fontSize}
+          textStyle={textStyle}
+          fontFamily={fontFamily}
+          verticalSpacing={effectiveVerticalSpacing}
+          iconTextSpacing={iconTextSpacing}
+        />
+        
+        {/* Liens sociaux en bas */}
+        {renderSocialLinks()}
+      </div>
+    );
+  };
+  
+  // Utiliser la fonction renderHorizontalLayout pour le mode horizontal
+  if (signatureLayout === 'horizontal') {
+    return renderHorizontalLayout();
+  }
+  
+  // Mode vertical pour les autres cas
   return (
     <div style={containerStyle}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
@@ -628,9 +765,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
           signatureLayout={signatureLayout}
         />
         
-        {/* Logo d'entreprise en mode horizontal */}
-        {/* Utiliser une approche différente pour éviter les erreurs TypeScript */}
-        {String(signatureLayout) === 'horizontal' && logoUrl && (
+        {/* Logo d'entreprise en mode vertical */}
+        {logoUrl && showLogo && (
           <div style={{
             width: `${photoSize * 0.8}px`,
             height: `${photoSize * 0.5}px`,
@@ -656,8 +792,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         )}
       </div>
       
-      {/* Informations personnelles */}
-      <div style={{ textAlign: signatureLayout === 'vertical' ? effectiveTextAlignment : 'left' }}>
+      {/* Informations personnelles en mode vertical */}
+      <div style={{ textAlign: effectiveTextAlignment }}>
         {fullName && <h3 style={nameStyle}>{fullName}</h3>}
         {jobTitle && <p style={jobTitleStyle}>{jobTitle}</p>}
         {companyName && <p style={{ ...companyNameStyle, margin: '5px 0' }}>{companyName}</p>}
@@ -698,16 +834,14 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
       />
       
       {/* Liens sociaux en bas si nécessaire */}
-      {socialPosition === 'bottom' && renderSocialLinks()}
+      {/* Réseaux sociaux en bas */}
+      {renderSocialLinks()}
       
-      {/* Logo d'entreprise en mode vertical (après les réseaux sociaux) */}
-      {signatureLayout === 'vertical' && socialPosition === 'bottom' && renderCompanyLogoVertical()}
+      {/* Logo d'entreprise en bas en mode vertical */}
+      {signatureLayout === 'vertical' && renderCompanyLogoVertical()}
       
-      {/* Afficher les liens sociaux à droite si nécessaire */}
-      {socialPosition === 'right' && renderSocialLinks(signatureLayout === 'horizontal' as any)}
-      
-      {/* Afficher les liens sociaux sous les informations personnelles si nécessaire */}
-      {(socialPosition as any) === 'below-personal' && (
+      {/* Cas non utilisés dans la version simplifiée */}
+      {false && (
         <div style={{ 
           marginTop: '5px',
           textAlign: effectiveTextAlignment,

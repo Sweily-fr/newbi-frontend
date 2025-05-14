@@ -289,29 +289,6 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
             </div>
           ) : (
             <div className="mt-6 space-y-5">
-              {/* Position des réseaux sociaux - mode horizontal */}
-              <div>
-                <h4 className="text-base font-medium text-gray-800 mb-3">Position des réseaux sociaux</h4>
-                <div className="flex items-center">
-                  <div className="relative w-1/2">
-                    <select
-                      value={signatureData.socialLinksPosition}
-                      onChange={(e) => updateSignatureData('socialLinksPosition', e.target.value as 'bottom' | 'right' | 'below-personal')}
-                      className="w-full h-10 px-3 pr-8 border border-[#E3E2E5] rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#5b50ff] appearance-none"
-                    >
-                      <option value="bottom">En bas de la signature</option>
-                      <option value="right">À droite avec les informations de contact</option>
-                      <option value="below-personal">Sous les informations personnelles</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
               {/* Espacement entre colonnes - mode horizontal */}
               <div>
                 <h4 className="text-base font-medium text-gray-800 mb-3">Espacement entre les colonnes ({signatureData.horizontalSpacing}px)</h4>
