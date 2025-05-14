@@ -4,7 +4,7 @@ import { EmailSignatureFormLayout } from '../features/email-signatures/component
 import { PageHeader } from '../components/layout/PageHeader';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { Personalcard, Instagram, Paintbucket, Grid5, AddCircle, Sms, ArrowLeft } from 'iconsax-react';
-import { CircularProgressBar } from '../features/email-signatures/components/CircularProgressBar';
+import { NavigationSidebar } from '../components/common/NavigationSidebar';
 import { useSignatureProgress } from '../features/email-signatures/hooks/useSignatureProgress';
 import { useSaveSignature } from '../features/email-signatures/hooks';
 import { SignatureData } from '../features/email-signatures/types';
@@ -286,64 +286,37 @@ const EmailSignaturesPage: React.FC = () => {
           
           {showForm ? (
             <>
-              {/* Sidebar de navigation - positionnée à l'extrême gauche, fixée pour rester visible au scroll */}
-              <div className="w-20 bg-white flex flex-col items-center py-8 fixed left-0 top-[80px] bottom-0 shadow-[2px_0px_5px_rgba(0,0,0,0.05)]">
-                <div className="flex flex-col items-center space-y-8">
-                  {/* Logo Newbi en haut */}
-                  <div className="mb-8 flex items-center justify-center">
-                    <div className="flex space-x-1">
-                      <div className="w-3 h-3 rounded-full bg-[#b19aff]"></div>
-                      <div className="w-3 h-3 rounded-full bg-[#5b50ff]"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Icône Informations */}
-                  <button 
-                    onClick={() => setActiveSection('info')} 
-                    className={`p-2 rounded-xl transition-all ${activeSection === 'info' ? 'bg-[#f0eeff] text-[#5b50ff]' : 'text-[#222] hover:text-[#5b50ff]'}`}
-                  >
-                    <Personalcard size="24" color={activeSection === 'info' ? '#5b50ff' : '#222'} variant={activeSection === 'info' ? 'Bold' : 'Linear'} />
-                  </button>
-                  
-                  {/* Icône Réseaux sociaux */}
-                  <button 
-                    onClick={() => setActiveSection('social')} 
-                    className={`p-2 rounded-xl transition-all ${activeSection === 'social' ? 'bg-[#f0eeff] text-[#5b50ff]' : 'text-[#222] hover:text-[#5b50ff]'}`}
-                  >
-                    <Instagram size="24" color={activeSection === 'social' ? '#5b50ff' : '#222'} variant={activeSection === 'social' ? 'Bold' : 'Linear'} />
-                  </button>
-                  
-                  {/* Icône Apparence */}
-                  <button 
-                    onClick={() => setActiveSection('appearance')} 
-                    className={`p-2 rounded-xl transition-all ${activeSection === 'appearance' ? 'bg-[#f0eeff] text-[#5b50ff]' : 'text-[#222] hover:text-[#5b50ff]'}`}
-                  >
-                    <Paintbucket size="24" color={activeSection === 'appearance' ? '#5b50ff' : '#222'} variant={activeSection === 'appearance' ? 'Bold' : 'Linear'} />
-                  </button>
-                  
-                  {/* Icône Paramètres */}
-                  <button 
-                    onClick={() => setActiveSection('settings')} 
-                    className={`p-2 rounded-xl transition-all ${activeSection === 'settings' ? 'bg-[#f0eeff] text-[#5b50ff]' : 'text-[#222] hover:text-[#5b50ff]'}`}
-                  >
-                    <Grid5 size="24" color={activeSection === 'settings' ? '#5b50ff' : '#222'} variant={activeSection === 'settings' ? 'Bold' : 'Linear'} />
-                  </button>
-                </div>
-                
-                {/* Barre de progression circulaire en bas de la sidebar */}
-                <div className="mt-auto mb-2 relative group">
-                  <CircularProgressBar 
-                    progress={progress} 
-                    size={40} 
-                    strokeWidth={2.5}
-                    circleColor="#E3E2E5"
-                    progressColor="#5b50ff"
-                  />
-                  <div className="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                    Progression: {progress}%
-                  </div>
-                </div>
-              </div>
+              {/* Sidebar de navigation réutilisable */}
+              <NavigationSidebar
+                items={[
+                  {
+                    id: 'info',
+                    icon: <Personalcard size="24" color={activeSection === 'info' ? '#5b50ff' : '#222'} variant={activeSection === 'info' ? 'Bold' : 'Linear'} />,
+                    tooltip: 'Informations personnelles'
+                  },
+                  {
+                    id: 'social',
+                    icon: <Instagram size="24" color={activeSection === 'social' ? '#5b50ff' : '#222'} variant={activeSection === 'social' ? 'Bold' : 'Linear'} />,
+                    tooltip: 'Réseaux sociaux'
+                  },
+                  {
+                    id: 'appearance',
+                    icon: <Paintbucket size="24" color={activeSection === 'appearance' ? '#5b50ff' : '#222'} variant={activeSection === 'appearance' ? 'Bold' : 'Linear'} />,
+                    tooltip: 'Apparence'
+                  },
+                  {
+                    id: 'settings',
+                    icon: <Grid5 size="24" color={activeSection === 'settings' ? '#5b50ff' : '#222'} variant={activeSection === 'settings' ? 'Bold' : 'Linear'} />,
+                    tooltip: 'Paramètres'
+                  }
+                ]}
+                activeItemId={activeSection}
+                onItemClick={(itemId) => setActiveSection(itemId as 'info' | 'social' | 'appearance' | 'settings')}
+                progress={progress}
+                progressTooltip="Progression"
+                fixed={true}
+                topOffset="80px"
+              />
               
               {/* Formulaire de signature */}
               <EmailSignatureFormLayout 
