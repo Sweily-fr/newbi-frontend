@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useQuery } from '@apollo/client';
-import { GET_EMAIL_SIGNATURES } from '../../../../graphql/emailSignatures';
 import { Table, Column } from '../../../common/Table';
 import { Button, SearchInput } from '../../..';
 import { PlusIcon, EnvelopeIcon, PencilIcon, TrashIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
@@ -47,12 +45,22 @@ export interface EmailSignature {
   imagesLayout?: 'horizontal' | 'vertical';
   fontFamily?: string;
   fontSize?: number;
+  // Options d'affichage des icônes pour les coordonnées
+  showEmailIcon?: boolean;
+  showPhoneIcon?: boolean;
+  showAddressIcon?: boolean;
+  showWebsiteIcon?: boolean;
+  iconTextSpacing?: number;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 interface EmailSignaturesTableProps {
+  signatures?: EmailSignature[];
+  totalCount?: number;
+  hasNextPage?: boolean;
+  loading?: boolean;
   onAddSignature?: () => void;
   onEditSignature?: (signature: EmailSignature) => void;
   onDeleteSignature?: (signature: EmailSignature) => void;
@@ -60,6 +68,10 @@ interface EmailSignaturesTableProps {
 }
 
 export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({ 
+  signatures = [],
+  totalCount = 0,
+  hasNextPage = false,
+  loading = false,
   onAddSignature,
   onEditSignature,
   onDeleteSignature,
@@ -99,25 +111,15 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
     setPage(1);
   }, [search]);
   
-  const { loading, error, data } = useQuery(GET_EMAIL_SIGNATURES, {
-    variables: { page, limit, search },
-    fetchPolicy: 'network-only',
-    onCompleted: () => {
-      // Remettre le focus sur le champ de recherche après le chargement des données
-      if (searchInputRef.current) {
-        searchInputRef.current.focus();
-      }
-      // Désactiver le loader après un court délai pour une meilleure UX
-      setTimeout(() => {
-        setLocalLoading(false);
-      }, 300);
-    }
-  });
-  
   // Effet pour gérer l'état de chargement
   useEffect(() => {
     if (loading) {
       setLocalLoading(true);
+    } else {
+      // Désactiver le loader après un court délai pour une meilleure UX
+      setTimeout(() => {
+        setLocalLoading(false);
+      }, 300);
     }
   }, [loading]);
 
@@ -227,11 +229,8 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
     ) : undefined
   };
 
-  if (error) return <div className="py-10 text-center text-red-500">Erreur: {error.message}</div>;
-
-  const signatures = data?.emailSignatures?.signatures || [];
-  const totalCount = data?.emailSignatures?.totalCount || 0;
-  const hasNextPage = data?.emailSignatures?.hasNextPage || false;
+  // Afficher un message d'erreur si nécessaire (à implémenter si besoin)
+  // if (errorMessage) return <div className="py-10 text-center text-red-500">Erreur: {errorMessage}</div>;
 
   return (
     <div>

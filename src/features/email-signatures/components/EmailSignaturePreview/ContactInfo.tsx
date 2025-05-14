@@ -1,5 +1,5 @@
 import React from 'react';
-import { getLinkStyle } from './utils';
+import { log } from 'console';
 
 interface ContactInfoProps {
   phone?: string;
@@ -44,8 +44,9 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
   textStyle = 'normal',
   fontFamily = 'Arial, sans-serif'
 }) => {
-  // Utiliser la couleur secondaire pour le texte si elle est définie, sinon utiliser la couleur primaire
-  const textColor = secondaryColor || primaryColor;
+  // Utiliser la couleur secondaire si elle est définie et n'est pas la couleur de fond légère #f0eeff,
+  // sinon utiliser #333333 comme couleur par défaut pour le texte et les icônes
+  const textColor = secondaryColor && secondaryColor !== '#f0eeff' ? secondaryColor : '#333333';
   // Style de base pour les éléments de contact
   const contactItemStyle: React.CSSProperties = {
     display: 'flex',
@@ -75,12 +76,16 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
   
   // Style pour les liens
   const linkStyle = {
-    ...getLinkStyle(textColor),
+    color: textColor,
+    textDecoration: 'none',
     fontSize: `${fontSize}px`,
     ...getTextStyleProps(textStyle),
-    fontFamily
+    fontFamily,
+    opacity: 1 // Assurer une opacité complète
   };
 
+  console.log(linkStyle, "linkStyle");
+  console.log(getTextStyleProps(textStyle), "getTextStyleProps(textStyle)")
   // Style pour le conteneur principal des informations de contact
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -104,7 +109,21 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
               </svg>
             </span>
           )}
-          <span style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, color: textColor }}>{phone} {mobilePhone && `| ${mobilePhone}`}</span>
+          <span style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, color: textColor, opacity: 1, fontWeight: 'normal' }}>{phone}</span>
+        </div>
+      )}
+      
+      {mobilePhone && (
+        <div style={contactItemStyle}>
+          {showPhoneIcon && (
+            <span style={{ color: textColor }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path fillRule="evenodd" d="M18 1.5c.829 0 1.5.67 1.5 1.5v18c0 .83-.671 1.5-1.5 1.5H6c-.829 0-1.5-.67-1.5-1.5V3c0-.83.671-1.5 1.5-1.5h12zm-6 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+                <path d="M16.5 5.25a.75.75 0 00-.75-.75h-7.5a.75.75 0 00-.75.75v9a.75.75 0 00.75.75h7.5a.75.75 0 00.75-.75v-9z" />
+              </svg>
+            </span>
+          )}
+          <span style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, color: textColor, opacity: 1, fontWeight: 'normal' }}>{mobilePhone}</span>
         </div>
       )}
       
@@ -118,7 +137,7 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
               </svg>
             </span>
           )}
-          <a href={`mailto:${email}`} style={linkStyle}>{email}</a>
+          <a href={`mailto:${email}`} style={{fontSize: `${fontSize}px`,...getTextStyleProps(textStyle),color: textColor, opacity: 1}}>{email}</a>
         </div>
       )}
       
@@ -146,13 +165,13 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
               </svg>
             </span>
           )}
-          <span style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, whiteSpace: 'pre-line', color: textColor }}>{address}</span>
+          <span style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, whiteSpace: 'pre-line', color: textColor, opacity: 1, fontWeight: 'normal' }}>{address}</span>
         </div>
       )}
       
       {companyName && (
         <div style={contactItemStyle}>
-          <strong style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, color: textColor }}>{companyName}</strong>
+          <strong style={{ fontSize: `${fontSize}px`, ...getTextStyleProps(textStyle), fontFamily, color: textColor, opacity: 1 }}>{companyName}</strong>
         </div>
       )}
     </div>

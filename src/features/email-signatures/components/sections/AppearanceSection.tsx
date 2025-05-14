@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HexColorPicker } from 'react-colorful';
 import { RowHorizontal, RowVertical, InfoCircle } from 'iconsax-react';
 import { SignatureData } from '../../types';
 
 interface AppearanceSectionProps {
   signatureData: SignatureData;
   updateSignatureData: <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => void;
-  showPrimaryColorPicker: boolean;
-  setShowPrimaryColorPicker: (show: boolean) => void;
-  primaryColorPickerRef: React.RefObject<HTMLDivElement | null>;
-  showSecondaryColorPicker: boolean;
-  setShowSecondaryColorPicker: (show: boolean) => void;
-  secondaryColorPickerRef: React.RefObject<HTMLDivElement | null>;
-  formatColorCode: (color: string) => string;
 }
 
 /**
@@ -20,14 +12,7 @@ interface AppearanceSectionProps {
  */
 export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
   signatureData,
-  updateSignatureData,
-  showPrimaryColorPicker,
-  setShowPrimaryColorPicker,
-  primaryColorPickerRef,
-  showSecondaryColorPicker,
-  setShowSecondaryColorPicker,
-  secondaryColorPickerRef,
-  formatColorCode
+  updateSignatureData
 }) => {
   const fontOptions = [
     { value: 'Arial', label: 'Arial' },
@@ -52,23 +37,6 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
     { value: 'strikethrough', label: 'Barré' }
   ];
 
-  const predefinedColors = [
-    '#5b50ff', // Couleur principale Newbi
-    '#3b82f6', // Bleu
-    '#10b981', // Vert
-    '#f59e0b', // Orange
-    '#ef4444', // Rouge
-    '#8b5cf6'  // Violet
-  ];
-
-  const textColors = [
-    '#ffffff', // Blanc
-    '#f3f4f6', // Gris très clair
-    '#e5e7eb', // Gris clair
-    '#d1d5db', // Gris moyen
-    '#9ca3af', // Gris
-    '#6b7280'  // Gris foncé
-  ];
 
   // État pour gérer l'affichage du menu déroulant de style de texte
   const [showTextStyleDropdown, setShowTextStyleDropdown] = useState(false);
@@ -328,11 +296,12 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                   <div className="relative w-1/2">
                     <select
                       value={signatureData.socialLinksPosition}
-                      onChange={(e) => updateSignatureData('socialLinksPosition', e.target.value as 'bottom' | 'right')}
+                      onChange={(e) => updateSignatureData('socialLinksPosition', e.target.value as 'bottom' | 'right' | 'below-personal')}
                       className="w-full h-10 px-3 pr-8 border border-[#E3E2E5] rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#5b50ff] appearance-none"
                     >
                       <option value="bottom">En bas de la signature</option>
-                      <option value="right">A droite avec les informations de contact</option>
+                      <option value="right">À droite avec les informations de contact</option>
+                      <option value="below-personal">Sous les informations personnelles</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                       <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -388,80 +357,22 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
         <div className="space-y-4">
           <h4 className="text-base font-medium text-gray-800">Couleurs</h4>
           
-          {/* Couleur principale */}
+          {/* Couleur du texte - déplacée depuis SocialLinksSection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Couleur principale
-            </label>
-            <div className="flex items-center justify-between">
-              <div className="flex flex-wrap gap-2">
-                {predefinedColors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`rounded-lg border border-transparent transition-all duration-200 ease-in-out ${signatureData.primaryColor === color ? 'w-7 h-7 shadow-md transform scale-110 z-10' : 'w-6 h-6'}`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => updateSignatureData('primaryColor', color)}
-                    aria-label={`Couleur ${color}`}
-                  ></button>
-                ))}
-              </div>
-              
-              <div 
-                className="flex items-center border border-gray-300 rounded-xl overflow-hidden cursor-pointer" 
-                onClick={() => setShowPrimaryColorPicker(!showPrimaryColorPicker)}
-              >
-                <div 
-                  className="w-8 h-8" 
-                  style={{ backgroundColor: signatureData.primaryColor || '#5b50ff' }}
-                ></div>
-                <div className="px-3 py-1 text-sm font-medium">
-                  {formatColorCode(signatureData.primaryColor || '#5b50ff')}
+              Couleur du texte
+              <span className="ml-1 inline-flex items-center group relative">
+                <InfoCircle size="16" color="#5b50ff" variant="Bold" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap z-10">
+                  Couleur du texte des liens sociaux en mode texte
+                  <div className="absolute top-full left-2 transform border-4 border-transparent border-t-gray-800"></div>
                 </div>
-                {showPrimaryColorPicker && (
-                  <div className="absolute z-10 mt-2 left-0" ref={primaryColorPickerRef}>
-                    <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
-                      <HexColorPicker
-                        color={signatureData.primaryColor || '#5b50ff'}
-                        onChange={(color) => updateSignatureData('primaryColor', color)}
-                      />
-                      <div className="flex justify-between mt-2">
-                        <button
-                          type="button"
-                          className="px-2 py-1 text-xs bg-gray-100 rounded-lg hover:bg-gray-200"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowPrimaryColorPicker(false);
-                          }}
-                        >
-                          Fermer
-                        </button>
-                        <button
-                          type="button"
-                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded-lg hover:bg-[#4a41e0]"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateSignatureData('primaryColor', '#5b50ff');
-                          }}
-                        >
-                          Réinitialiser
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Couleur secondaire */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Couleur secondaire
+              </span>
             </label>
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap gap-2">
-                {textColors.map((color) => (
+                {/* Palette de couleurs pour le texte */}
+                {['#333333', '#5b50ff', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'].map((color) => (
                   <button
                     key={color}
                     type="button"
@@ -471,51 +382,6 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
                     aria-label={`Couleur ${color}`}
                   ></button>
                 ))}
-              </div>
-              
-              <div 
-                className="flex items-center border border-gray-300 rounded-xl overflow-hidden cursor-pointer" 
-                onClick={() => setShowSecondaryColorPicker(!showSecondaryColorPicker)}
-              >
-                <div 
-                  className="w-8 h-8" 
-                  style={{ backgroundColor: signatureData.secondaryColor || '#ffffff' }}
-                ></div>
-                <div className="px-3 py-1 text-sm font-medium">
-                  {formatColorCode(signatureData.secondaryColor || '#ffffff')}
-                </div>
-                {showSecondaryColorPicker && (
-                  <div className="absolute z-10 mt-2 left-0" ref={secondaryColorPickerRef}>
-                    <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
-                      <HexColorPicker
-                        color={signatureData.secondaryColor || '#ffffff'}
-                        onChange={(color) => updateSignatureData('secondaryColor', color)}
-                      />
-                      <div className="flex justify-between mt-2">
-                        <button
-                          type="button"
-                          className="px-2 py-1 text-xs bg-gray-100 rounded-lg hover:bg-gray-200"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowSecondaryColorPicker(false);
-                          }}
-                        >
-                          Fermer
-                        </button>
-                        <button
-                          type="button"
-                          className="px-2 py-1 text-xs bg-[#5b50ff] text-white rounded-lg hover:bg-[#4a41e0]"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateSignatureData('secondaryColor', '#ffffff');
-                          }}
-                        >
-                          Réinitialiser
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

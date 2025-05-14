@@ -6,7 +6,40 @@ import { SignatureLayout } from './SignatureLayout';
 import { getFullProfilePhotoUrl } from './utils';
 
 interface EmailSignaturePreviewProps {
-  signature: Partial<EmailSignature>;
+  // Accepte soit un objet signature complet, soit des propriétés individuelles
+  signature?: Partial<EmailSignature>;
+  // Propriétés individuelles au lieu d'un objet signature
+  fullName?: string;
+  jobTitle?: string;
+  companyName?: string;
+  phone?: string;
+  mobilePhone?: string;
+  email?: string;
+  website?: string;
+  address?: string;
+  logoUrl?: string;
+  profilePhotoUrl?: string;
+  profilePhotoBase64?: string;
+  profilePhotoSize?: number;
+  layout?: string;
+  horizontalSpacing?: number;
+  verticalSpacing?: number;
+  verticalAlignment?: string;
+  imagesLayout?: string;
+  textColor?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  showLogo?: boolean;
+  textAlignment?: string;
+  fontFamily?: string;
+  fontSize?: number;
+  socialLinksDisplayMode?: string;
+  socialLinksIconStyle?: string;
+  socialLinksIconColor?: string;
+  socialLinks?: any;
+  textStyle?: string;
+  iconTextSpacing?: number;
+  // Props spécifiques à l'affichage
   showEmailIcon?: boolean;
   showPhoneIcon?: boolean;
   showAddressIcon?: boolean;
@@ -14,7 +47,36 @@ interface EmailSignaturePreviewProps {
 }
 
 export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ 
-  signature, 
+  signature,
+  // Propriétés individuelles avec valeurs par défaut
+  fullName: propFullName,
+  jobTitle: propJobTitle,
+  companyName: propCompanyName,
+  phone: propPhone,
+  mobilePhone: propMobilePhone,
+  email: propEmail,
+  website: propWebsite,
+  address: propAddress,
+  logoUrl: propLogoUrl,
+  profilePhotoUrl: propProfilePhotoUrl,
+  profilePhotoBase64: propProfilePhotoBase64,
+  profilePhotoSize: propProfilePhotoSize,
+  layout: propLayout,
+  horizontalSpacing: propHorizontalSpacing,
+  verticalSpacing: propVerticalSpacing,
+  textColor: propTextColor,
+  primaryColor: propPrimaryColor,
+  secondaryColor: propSecondaryColor,
+  textAlignment: propTextAlignment,
+  socialLinks: propSocialLinks,
+  socialLinksDisplayMode: propSocialLinksDisplayMode,
+  socialLinksIconStyle: propSocialLinksIconStyle,
+  socialLinksIconColor: propSocialLinksIconColor,
+  showLogo: propShowLogo,
+  fontSize: propFontSize,
+  textStyle: propTextStyle,
+  fontFamily: propFontFamily,
+  iconTextSpacing: propIconTextSpacing,
   showEmailIcon = false,
   showPhoneIcon = false,
   showAddressIcon = false,
@@ -29,40 +91,38 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   // URL de base de l'API pour les images
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-  // Extraire toutes les propriétés de la signature
-  const {
-    fullName,
-    jobTitle,
-    companyName,
-    phone,
-    mobilePhone,
-    email,
-    website,
-    address,
-    logoUrl,
-    profilePhotoUrl,
-    profilePhotoBase64,
-    profilePhotoSize = 80,
-    layout = 'vertical',
-    horizontalSpacing = 20,
-    verticalSpacing = 10,
-    verticalAlignment = 'left',
-    imagesLayout = 'stacked',
-    textColor = '#333333',
-    primaryColor = '#5b50ff',
-    secondaryColor,
-    socialLinksIconColor = '#333333', // Couleur spécifique pour les icônes SVG des réseaux sociaux
-    textAlignment = 'left',
-    socialLinks,
-    socialLinksDisplayMode = 'icons',
-    socialLinksPosition = 'bottom',
-    socialLinksIconStyle = 'simple',
-    showLogo = true,
-    fontSize = 14,
-    textStyle = 'normal',
-    fontFamily = 'Arial, sans-serif',
-    iconTextSpacing = 5 // Espacement entre icônes et texte
-  } = signature;
+  // Utiliser les propriétés de l'objet signature si disponible, sinon utiliser les propriétés individuelles
+  const fullName = signature?.fullName || propFullName;
+  const jobTitle = signature?.jobTitle || propJobTitle;
+  const companyName = signature?.companyName || propCompanyName;
+  const phone = signature?.phone || propPhone;
+  const mobilePhone = signature?.mobilePhone || propMobilePhone;
+  const email = signature?.email || propEmail;
+  const website = signature?.website || propWebsite;
+  const address = signature?.address || propAddress;
+  const logoUrl = signature?.logoUrl || propLogoUrl;
+  const profilePhotoUrl = signature?.profilePhotoUrl || propProfilePhotoUrl;
+  const profilePhotoBase64 = signature?.profilePhotoBase64 || propProfilePhotoBase64;
+  const profilePhotoSize = signature?.profilePhotoSize || propProfilePhotoSize || 80;
+  const layout = signature?.layout || propLayout || 'vertical';
+  const horizontalSpacing = signature?.horizontalSpacing || propHorizontalSpacing || 20;
+  const verticalSpacing = signature?.verticalSpacing || propVerticalSpacing || 10;
+  const verticalAlignment = signature?.verticalAlignment || 'left';
+  const imagesLayout = signature?.imagesLayout || 'stacked';
+  const textColor = signature?.textColor || propTextColor || '#333333';
+  const primaryColor = signature?.primaryColor || propPrimaryColor || '#5b50ff';
+  const secondaryColor = signature?.secondaryColor || propSecondaryColor || '#333333';
+  const socialLinksIconColor = signature?.socialLinksIconColor || propSocialLinksIconColor || '#333333';
+  const textAlignment = signature?.textAlignment || propTextAlignment || 'left';
+  const socialLinks = signature?.socialLinks || propSocialLinks;
+  const socialLinksDisplayMode = signature?.socialLinksDisplayMode || propSocialLinksDisplayMode || 'icons';
+  const socialLinksPosition = signature?.socialLinksPosition || 'bottom';
+  const socialLinksIconStyle = signature?.socialLinksIconStyle || propSocialLinksIconStyle || 'simple';
+  const showLogo = signature?.showLogo ?? propShowLogo ?? true;
+  const fontSize = signature?.fontSize || propFontSize || 14;
+  const textStyle = signature?.textStyle || propTextStyle || 'normal';
+  const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
+  const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
 
   // Définir la taille de la photo de profil avec une valeur par défaut
   const photoSize = profilePhotoSize || 80; // Taille par défaut: 80px
@@ -76,6 +136,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
 
   // Définir le type de disposition de la signature
   const signatureLayout = layout as 'horizontal' | 'vertical';
+  // Débogage du changement de mode
+  console.log('EmailSignaturePreviewNew Debug - Layout changed:', { layout, signatureLayout });
 
   // Utiliser profilePhotoBase64 s'il est disponible, sinon utiliser profilePhotoUrl
   // S'assurer que l'image par défaut n'est pas utilisée si une photo a été téléchargée
