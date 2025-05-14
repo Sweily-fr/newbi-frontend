@@ -4,8 +4,9 @@ import { useQuoteForm } from "../../hooks/useQuoteForm";
 import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
 import { QuoteFormModalProps } from "../../types";
 import { Button, Form } from "../../../../components/";
-import Collapse from "../../../../components/common/Collapse";
 import { DocumentSettings } from "../../../../components/specific/DocumentSettings";
+import { NavigationSidebar } from "../../../../components/common/NavigationSidebar/NavigationSidebar";
+import { DocumentText, Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2 } from "iconsax-react";
 import {
   ClientSelection,
   QuoteGeneralInfo,
@@ -67,6 +68,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     discountAndTotals: false,
     bankDetails: false,
   });
+  
+  // État pour suivre la section active dans la navigation
+  const [activeSection, setActiveSection] = useState<"generalInfo" | "client" | "companyInfo" | "items" | "discountAndTotals" | "bankDetails">("generalInfo");
 
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
   const {
@@ -299,10 +303,54 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
 
       {/* Contenu principal avec formulaire à gauche et aperçu à droite */}
       <div className="flex flex-1 h-full overflow-hidden">
+        {/* Navigation sidebar */}
+        {!showSettings && (
+          <NavigationSidebar
+            items={[
+              {
+                id: "generalInfo",
+                icon: <DocumentText size="24" color={activeSection === "generalInfo" ? "#5b50ff" : "#222"} variant={activeSection === "generalInfo" ? "Bold" : "Linear"} />,
+                tooltip: "Informations générales"
+              },
+              {
+                id: "client",
+                icon: <Profile2User size="24" color={activeSection === "client" ? "#5b50ff" : "#222"} variant={activeSection === "client" ? "Bold" : "Linear"} />,
+                tooltip: "Informations client"
+              },
+              {
+                id: "companyInfo",
+                icon: <Building size="24" color={activeSection === "companyInfo" ? "#5b50ff" : "#222"} variant={activeSection === "companyInfo" ? "Bold" : "Linear"} />,
+                tooltip: "Informations société"
+              },
+              {
+                id: "items",
+                icon: <ShoppingCart size="24" color={activeSection === "items" ? "#5b50ff" : "#222"} variant={activeSection === "items" ? "Bold" : "Linear"} />,
+                tooltip: "Produits et services"
+              },
+              {
+                id: "discountAndTotals",
+                icon: <Calculator size="24" color={activeSection === "discountAndTotals" ? "#5b50ff" : "#222"} variant={activeSection === "discountAndTotals" ? "Bold" : "Linear"} />,
+                tooltip: "Remise et totaux"
+              },
+              {
+                id: "bankDetails",
+                icon: <MessageText size="24" color={activeSection === "bankDetails" ? "#5b50ff" : "#222"} variant={activeSection === "bankDetails" ? "Bold" : "Linear"} />,
+                tooltip: "Notes de bas de page"
+              }
+            ]}
+            activeItemId={activeSection}
+            onItemClick={(id) => setActiveSection(id as typeof activeSection)}
+            primaryColor="#5b50ff"
+            activeBackgroundColor="#f0eeff"
+            fixed={false}
+          />
+        )}
+        
         {/* Formulaire à gauche */}
-        <div className="w-2/5 overflow-y-auto border-r border-gray-200">
-          <Form onSubmit={(e) => e.preventDefault()} spacing="normal" className="w-full p-6">
+        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200">
+          <Form onSubmit={(e) => e.preventDefault()}>
             {showSettings ? (
+            <div className="p-6">
               <DocumentSettings
                 documentType="QUOTE"
                 defaultHeaderNotes={defaultHeaderNotes}
@@ -319,171 +367,180 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 onCancel={() => setShowSettings(false)}
                 isSaving={isSavingSettings}
               />
+            </div>
             ) : (
               <>
-                <div className="flex justify-end">
+                <div className="flex justify-end mb-4 px-10 pt-10">
                   <Button
                     onClick={() => setShowSettings(true)}
                     variant="secondary"
                     size="md"
                     className="flex items-center gap-2"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
+                    <Setting2 color="#5b50ff" size="20" variant="Linear" />
                     Paramètres
                   </Button>
                 </div>
-                <Collapse
-                  title="Informations générales"
-                  defaultOpen={true}
-                  hasError={sectionErrors.generalInfo}
-                  description="Numéro, dates et informations de base du devis"
-                  icon="document"
-                >
-                  <QuoteGeneralInfo
-                    quotePrefix={quotePrefix}
-                    setQuotePrefix={setQuotePrefix}
-                    quoteNumber={quoteNumber}
-                    setQuoteNumber={setQuoteNumber}
-                    issueDate={issueDate}
-                    setIssueDate={setIssueDate}
-                    validUntil={validUntil}
-                    setValidUntil={setValidUntil}
-                    headerNotes={headerNotes}
-                    setHeaderNotes={setHeaderNotes}
-                    defaultHeaderNotes={defaultHeaderNotes}
-                  />
-                </Collapse>
-
-                <Collapse
-                  title="Informations client"
-                  defaultOpen={false}
-                  hasError={sectionErrors.client}
-                  description="Sélection ou création d'un client pour le devis"
-                  icon="user"
-                >
-                  <ClientSelection
-                    isNewClient={isNewClient}
-                    setIsNewClient={handleClientModeChange}
-                    newClient={newClient}
-                    setNewClient={setNewClient}
-                    selectedClient={selectedClient}
-                    setSelectedClient={setSelectedClient}
-                    clientsData={clientsData}
-                    quote={quote}
-                    selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient)}
-                  />
-                </Collapse>
-
-                <Collapse
-                  title="Informations société"
-                  defaultOpen={false}
-                  hasError={sectionErrors.companyInfo}
-                  description="Coordonnées et informations de votre entreprise"
-                  icon="company"
-                >
-                  <QuoteCompanyInfo
-                    companyInfo={companyInfo}
-                    userData={userData}
-                    apiUrl={apiUrl}
-                    onConfigureInfoClick={handleConfigureInfoRequest}
-                    setCompanyInfo={setCompanyInfo}
-                  />
-                </Collapse>
-
-                <Collapse
-                  title="Produits et services"
-                  defaultOpen={false}
-                  hasError={sectionErrors.items}
-                  description="Articles, quantités et prix à facturer"
-                  icon="products"
-                >
-                  <QuoteItems
-                    items={items}
-                    handleItemChange={handleItemChange}
-                    handleRemoveItem={handleRemoveItem}
-                    handleAddItem={handleAddItem}
-                    handleProductSelect={handleProductSelect}
-                  />
-                </Collapse>
-
-                <Collapse
-                  title="Remise et totaux"
-                  defaultOpen={false}
-                  hasError={sectionErrors.discountAndTotals}
-                  description="Remises, taxes et champs personnalisés"
-                  icon="calculator"
-                >
-                  <QuoteDiscountAndTotals
-                    discount={discount}
-                    setDiscount={setDiscount}
-                    discountType={discountType}
-                    setDiscountType={setDiscountType}
-                    totals={totals}
-                    customFields={customFields || []}
-                    handleAddCustomField={handleAddCustomField}
-                    handleRemoveCustomField={handleRemoveCustomField}
-                    handleCustomFieldChange={handleCustomFieldChange}
-                  />
-                </Collapse>
-
-                <Collapse
-                  title="Notes de bas de page"
-                  defaultOpen={false}
-                  hasError={sectionErrors.bankDetails}
-                  description="Coordonnées bancaires, conditions et notes"
-                  icon="notes"
-                >
-                  <QuoteBankDetails
-                    userData={userData}
-                    useBankDetails={useBankDetails}
-                    setUseBankDetails={setUseBankDetails}
-                    setCompanyInfo={setCompanyInfo}
-                    onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
-                  />
-                  <QuoteTermsAndConditions
-                    termsAndConditions={termsAndConditions}
-                    setTermsAndConditions={setTermsAndConditions}
-                    termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
-                    setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
-                    termsAndConditionsLink={termsAndConditionsLink}
-                    setTermsAndConditionsLink={setTermsAndConditionsLink}
-                    onApplyDefaults={() => {
-                      if (defaultTermsAndConditions) {
-                        setTermsAndConditions(defaultTermsAndConditions);
-                      }
-                      if (defaultTermsAndConditionsLinkTitle) {
-                        setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
-                      }
-                      if (defaultTermsAndConditionsLink) {
-                        setTermsAndConditionsLink(defaultTermsAndConditionsLink);
-                      }
-                    }}
-                    hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
-                  />
-                  <QuoteFooterNotes
-                    footerNotes={footerNotes}
-                    setFooterNotes={setFooterNotes}
-                    onApplyDefaults={() => {
-                      if (defaultFooterNotes) {
-                        setFooterNotes(defaultFooterNotes);
-                      }
-                    }}
-                    hasDefaults={!!defaultFooterNotes}
-                  />
-                </Collapse>
+                {/* Section dynamique basée sur la navigation */}
+                <div className="mb-4 px-10 pt-10">
+                  {activeSection === "generalInfo" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.generalInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <DocumentText color="#5b50ff" size="20" variant="Bold" />
+                        </span>
+                        Informations générales
+                      </h2>
+                      <p className="text-gray-500 mb-4">Informations de base du devis</p>
+                      <QuoteGeneralInfo
+                        quotePrefix={quotePrefix}
+                        setQuotePrefix={setQuotePrefix}
+                        quoteNumber={quoteNumber}
+                        setQuoteNumber={setQuoteNumber}
+                        issueDate={issueDate}
+                        setIssueDate={setIssueDate}
+                        validUntil={validUntil}
+                        setValidUntil={setValidUntil}
+                        headerNotes={headerNotes}
+                        setHeaderNotes={setHeaderNotes}
+                        defaultHeaderNotes={defaultHeaderNotes}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "client" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <Profile2User color="#5b50ff" size="20" variant="Bold"  />
+                        </span>
+                        Informations client
+                      </h2>
+                      <p className="text-gray-500 mb-4">Sélection ou création d'un client pour le devis</p>
+                      <ClientSelection
+                        isNewClient={isNewClient}
+                        setIsNewClient={handleClientModeChange}
+                        newClient={newClient}
+                        setNewClient={setNewClient as any}
+                        selectedClient={selectedClient}
+                        setSelectedClient={setSelectedClient}
+                        clientsData={clientsData}
+                        quote={quote}
+                        selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient) || null}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "companyInfo" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <Building color="#5b50ff" size="20" variant="Bold" />
+                        </span>
+                        Informations société
+                      </h2>
+                      <p className="text-gray-500 mb-4">Coordonnées et informations de votre entreprise</p>
+                      <QuoteCompanyInfo
+                        companyInfo={companyInfo}
+                        userData={userData}
+                        apiUrl={apiUrl}
+                        onConfigureInfoClick={handleConfigureInfoRequest}
+                        setCompanyInfo={setCompanyInfo}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "items" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <ShoppingCart color="#5b50ff" size="20" variant="Bold" />
+                        </span>
+                        Produits et services
+                      </h2>
+                      <p className="text-gray-500 mb-4">Articles, quantités et prix à facturer</p>
+                      <QuoteItems
+                        items={items}
+                        handleAddItem={handleAddItem}
+                        handleRemoveItem={handleRemoveItem}
+                        handleItemChange={handleItemChange as any}
+                        handleProductSelect={handleProductSelect}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "discountAndTotals" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <Calculator color="#5b50ff" size="20" variant="Bold" />
+                        </span>
+                        Remise et totaux
+                      </h2>
+                      <p className="text-gray-500 mb-4">Remises, taxes et champs personnalisés</p>
+                      <QuoteDiscountAndTotals
+                        discount={discount}
+                        setDiscount={setDiscount}
+                        discountType={discountType}
+                        setDiscountType={setDiscountType}
+                        calculateTotals={calculateTotals}
+                        customFields={customFields}
+                        handleAddCustomField={handleAddCustomField}
+                        handleRemoveCustomField={handleRemoveCustomField}
+                        handleCustomFieldChange={handleCustomFieldChange}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "bankDetails" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.bankDetails ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <MessageText color="#5b50ff" size="20" variant="Bold" />
+                        </span>
+                        Notes de bas de page
+                      </h2>
+                      <p className="text-gray-500 mb-4">Coordonnées bancaires, conditions et notes</p>
+                      <QuoteBankDetails
+                        userData={userData}
+                        useBankDetails={useBankDetails}
+                        setUseBankDetails={setUseBankDetails}
+                        setCompanyInfo={setCompanyInfo}
+                        onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
+                      />
+                      <QuoteTermsAndConditions
+                        termsAndConditions={termsAndConditions}
+                        setTermsAndConditions={setTermsAndConditions}
+                        termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
+                        setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
+                        termsAndConditionsLink={termsAndConditionsLink}
+                        setTermsAndConditionsLink={setTermsAndConditionsLink}
+                        onApplyDefaults={() => {
+                          if (defaultTermsAndConditions) {
+                            setTermsAndConditions(defaultTermsAndConditions);
+                          }
+                          if (defaultTermsAndConditionsLinkTitle) {
+                            setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+                          }
+                          if (defaultTermsAndConditionsLink) {
+                            setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+                          }
+                        }}
+                        hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
+                      />
+                      <QuoteFooterNotes
+                        footerNotes={footerNotes}
+                        setFooterNotes={setFooterNotes}
+                        onApplyDefaults={() => {
+                          if (defaultFooterNotes) {
+                            setFooterNotes(defaultFooterNotes);
+                          }
+                        }}
+                        hasDefaults={!!defaultFooterNotes}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 {/* Espace en bas pour les boutons fixes */}
                 <div className="h-20"></div>
@@ -506,7 +563,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         </div>
 
         {/* Aperçu à droite */}
-        <div className="w-3/5 overflow-y-auto z-[1000]">
+        <div className="w-3/6 overflow-y-hidden z-[1000]">
           {/* Calculer les totaux pour l'aperçu */}
           <QuotePreview
             quote={{

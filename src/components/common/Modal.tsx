@@ -23,7 +23,6 @@ export interface ModalProps {
   className?: string;
   footer?: ReactNode;
   maxHeight?: string;
-  zIndex?: number;
   preventBackgroundClose?: boolean;
   overlayOpacity?: number;
 }
@@ -39,7 +38,6 @@ export const Modal = ({
   className = "",
   footer,
   maxHeight,
-  zIndex = 50,
   preventBackgroundClose = false,
   overlayOpacity = 25,
 }: ModalProps) => {
@@ -59,7 +57,7 @@ export const Modal = ({
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className={`relative z-[${zIndex}]`} onClose={preventBackgroundClose ? () => {} : onClose}>
+      <Dialog as="div" className="relative z-[2000]" onClose={preventBackgroundClose ? () => {} : onClose}>
         {/* Overlay avec animation de fondu */}
         <Transition.Child
           as={Fragment}

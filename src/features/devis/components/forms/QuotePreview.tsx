@@ -102,14 +102,23 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   const clientInfo = isNewClient
     ? newClient
     : selectedClient || quote.client || {};
-    
+
   // Déterminer si le client a une adresse de livraison différente
-  const hasShippingAddress = clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
-    
+  const hasShippingAddress =
+    clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
+
   // Détermination des informations client terminée
 
   const documentContent = (
-    <div className="bg-white print:overflow-visible" style={{ height: "auto", minHeight: "100%", fontFamily: "Poppins, sans-serif", color: "#5c5c5c" }}>
+    <div
+      className="bg-white print:overflow-visible"
+      style={{
+        height: "auto",
+        minHeight: "100%",
+        fontFamily: "Poppins, sans-serif",
+        color: "#5c5c5c",
+      }}
+    >
       <div
         className="p-6 pb-0 max-w-full"
         style={{
@@ -173,7 +182,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             <p className="text-xs">{quote.companyInfo?.phone}</p>
             <p className="text-xs">{quote.companyInfo?.address?.street}</p>
             <p className="text-xs">
-              {quote.companyInfo?.address?.postalCode} {quote.companyInfo?.address?.city}
+              {quote.companyInfo?.address?.postalCode}{" "}
+              {quote.companyInfo?.address?.city}
             </p>
             <p className="text-xs">{quote.companyInfo?.address?.country}</p>
             {quote.companyInfo?.siret && (
@@ -184,9 +194,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             )}
           </div>
           <div className={hasShippingAddress ? "w-1/3 px-2" : "w-1/2 pl-4"}>
-            <h3 className="font-normal mb-2">
-              Facturer à :
-            </h3>
+            <h3 className="font-normal mb-2">Facturer à :</h3>
             <p className="text-xs">{clientInfo?.name || "Client"}</p>
             <p className="text-xs">{clientInfo?.email}</p>
             <p className="text-xs">{clientInfo?.address?.street}</p>
@@ -207,7 +215,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               <p className="text-xs">{clientInfo.name}</p>
               <p className="text-xs">{clientInfo.shippingAddress?.street}</p>
               <p className="text-xs">
-                {clientInfo.shippingAddress?.postalCode} {clientInfo.shippingAddress?.city}
+                {clientInfo.shippingAddress?.postalCode}{" "}
+                {clientInfo.shippingAddress?.city}
               </p>
               <p className="text-xs">{clientInfo.shippingAddress?.country}</p>
             </div>
@@ -301,7 +310,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                       )}
                     </td>
                     <td className="p-2 text-xs text-right">
-                      {item.quantity} {(() => {
+                      {item.quantity}{" "}
+                      {(() => {
                         return getUnitAbbreviation(item.unit);
                       })()}
                     </td>
@@ -335,7 +345,11 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               data-pdf-total-item="true"
             >
               <span>Total HT</span>
-              <span>{totals ? formatAmount(totals.subtotal + totals.totalDiscount) : formatAmount(quote.totalHT || 0)}</span>
+              <span>
+                {totals
+                  ? formatAmount(totals.subtotal + totals.totalDiscount)
+                  : formatAmount(quote.totalHT || 0)}
+              </span>
             </div>
 
             {quote.discount !== undefined && quote.discount > 0 && (
@@ -349,7 +363,12 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                     ? `(${quote.discount}%)`
                     : ""}
                 </span>
-                <span>-{totals ? formatAmount(totals.totalDiscount) : formatAmount(quote.discountAmount || 0)}</span>
+                <span>
+                  -
+                  {totals
+                    ? formatAmount(totals.totalDiscount)
+                    : formatAmount(quote.discountAmount || 0)}
+                </span>
               </div>
             )}
 
@@ -360,7 +379,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               >
                 <span>Total HT après remise</span>
                 <span>
-                  {totals ? formatAmount(totals.totalWithoutVAT) : formatAmount(quote.finalTotalHT || quote.totalHT || 0)}
+                  {totals
+                    ? formatAmount(totals.totalWithoutVAT)
+                    : formatAmount(quote.finalTotalHT || quote.totalHT || 0)}
                 </span>
               </div>
             )}
@@ -371,37 +392,53 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               // Utiliser une approche plus sûre pour accéder à calculateTotals
               let totalsData = null;
               try {
-                if (typeof calculateTotals === 'function') {
+                if (typeof calculateTotals === "function") {
                   totalsData = calculateTotals();
                 }
               } catch (error) {
-                console.error('Erreur lors du calcul des totaux:', error);
+                console.error("Erreur lors du calcul des totaux:", error);
               }
-              
+
               const vatRates = totalsData?.vatRates || quote.vatRates;
-              
+
               // Vérifier si nous avons plusieurs taux de TVA
               if (vatRates && vatRates.length > 1) {
                 return (
                   <>
                     {/* Afficher chaque taux de TVA séparément */}
-                    {vatRates.map((vatDetail: { rate: number; amount: number; baseAmount: number }, index: number) => (
-                      <div
-                        key={index}
-                        className="flex justify-between py-1 text-xs"
-                        data-pdf-total-item="true"
-                      >
-                        <span>Montant de la TVA ({vatDetail.rate} % de {formatAmount(vatDetail.baseAmount)})</span>
-                        <span>{formatAmount(vatDetail.amount)}</span>
-                      </div>
-                    ))}
+                    {vatRates.map(
+                      (
+                        vatDetail: {
+                          rate: number;
+                          amount: number;
+                          baseAmount: number;
+                        },
+                        index: number
+                      ) => (
+                        <div
+                          key={index}
+                          className="flex justify-between py-1 text-xs"
+                          data-pdf-total-item="true"
+                        >
+                          <span>
+                            Montant de la TVA ({vatDetail.rate} % de{" "}
+                            {formatAmount(vatDetail.baseAmount)})
+                          </span>
+                          <span>{formatAmount(vatDetail.amount)}</span>
+                        </div>
+                      )
+                    )}
                     {/* Afficher le total de TVA */}
                     <div
                       className="flex justify-between font-bold py-1 text-xs"
                       data-pdf-total-item="true"
                     >
                       <span>Montant total de TVA</span>
-                      <span>{formatAmount(totalsData?.totalVAT || quote.totalVAT || 0)}</span>
+                      <span>
+                        {formatAmount(
+                          totalsData?.totalVAT || quote.totalVAT || 0
+                        )}
+                      </span>
                     </div>
                   </>
                 );
@@ -426,7 +463,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
             >
               <span>Total TTC</span>
               <span>
-                {totals ? formatAmount(totals.totalWithVAT) : formatAmount(quote.finalTotalTTC || quote.totalTTC || 0)}
+                {totals
+                  ? formatAmount(totals.totalWithVAT)
+                  : formatAmount(quote.finalTotalTTC || quote.totalTTC || 0)}
               </span>
             </div>
 
@@ -447,32 +486,56 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
         </div>
 
         {/* Affichage des mentions d'exonération de TVA */}
-        {((quote.items && quote.items.length > 0 && quote.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) || 
+        {((quote.items &&
+          quote.items.length > 0 &&
+          quote.items.some(
+            (item: Item) => item.vatRate === 0 && item.vatExemptionText
+          )) ||
           quote.vatExemptionText) && (
-          <div className="mb-3 w-full print:w-full" data-pdf-keep-together="true">
+          <div
+            className="mb-3 w-full print:w-full"
+            data-pdf-keep-together="true"
+          >
             {/* Afficher le texte d'exonération global du devis s'il existe */}
             {quote.vatExemptionText && (
-              <p className="text-xs text-gray-600 mb-1">{quote.vatExemptionText}</p>
+              <p className="text-xs text-gray-600 mb-1">
+                {quote.vatExemptionText}
+              </p>
             )}
             {/* Afficher chaque mention unique des éléments une seule fois */}
-            {quote.items && (Array.from(new Set(
-              quote.items
-                .filter((item: Item) => item.vatRate === 0 && item.vatExemptionText)
-                .map((item: Item) => item.vatExemptionText)
-                .filter(Boolean) as string[]
-            )) as string[]).map((text, index) => (
-              <p key={index} className="text-xs text-gray-600 mb-1">{text}</p>
-            ))}
+            {quote.items &&
+              (
+                Array.from(
+                  new Set(
+                    quote.items
+                      .filter(
+                        (item: Item) =>
+                          item.vatRate === 0 && item.vatExemptionText
+                      )
+                      .map((item: Item) => item.vatExemptionText)
+                      .filter(Boolean) as string[]
+                  )
+                ) as string[]
+              ).map((text, index) => (
+                <p key={index} className="text-xs text-gray-600 mb-1">
+                  {text}
+                </p>
+              ))}
           </div>
         )}
-        
+
         {/* Affichage de la catégorie de transaction */}
         {companyInfo?.transactionCategory ? (
           <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
             <p className="text-xs font-medium text-gray-700">
               {(() => {
-                const displayText = getTransactionCategoryDisplayText(companyInfo.transactionCategory);
-                return displayText || `Catégorie de transaction : ${companyInfo.transactionCategory}`;
+                const displayText = getTransactionCategoryDisplayText(
+                  companyInfo.transactionCategory
+                );
+                return (
+                  displayText ||
+                  `Catégorie de transaction : ${companyInfo.transactionCategory}`
+                );
               })()}
             </p>
           </div>
@@ -554,21 +617,24 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
 
   // Vérifier si les boutons doivent être affichés en fonction du statut
   // Afficher les boutons uniquement si le devis a un statut défini (donc déjà créé)
-  const showButtons = showActionButtons && 
-    quote?.status && (quote.status === "PENDING" || quote.status === "COMPLETED");
+  const showButtons =
+    showActionButtons &&
+    quote?.status &&
+    (quote.status === "PENDING" || quote.status === "COMPLETED");
 
   return (
     <div
       className="bg-white overflow-hidden flex flex-col"
       style={{ height: "100vh" }}
     >
-      <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-medium">Aperçu du devis</h2>
-        {showButtons && (
+      {showButtons && (
+        <div className="flex justify-between items-center p-4 border-b">
           <div className="flex space-x-2">
             <PDFGenerator
               content={documentContent}
-              fileName={`Devis_${quote?.prefix || ""}${quote?.number || ""}.pdf`}
+              fileName={`Devis_${quote?.prefix || ""}${
+                quote?.number || ""
+              }.pdf`}
               buttonText="Télécharger en PDF"
               buttonProps={{
                 variant: "outline",
@@ -591,12 +657,9 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
               }}
             />
           </div>
-        )}
-      </div>
-      <div
-        className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative"
-        style={{ minHeight: "0" }}
-      >
+        </div>
+      )}
+      <div className="flex-grow bg-[#f0eeff] overflow-x-hidden w-full relative">
         {isGeneratingPDF && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
             {pdfSuccess ? (
@@ -632,8 +695,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
         )}
         <div
-          className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
-          style={{ minHeight: "29.7cm", height: "auto" }}
+          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
+          style={{ height: "auto", minHeight: "297mm" }}
         >
           {documentContent}
         </div>

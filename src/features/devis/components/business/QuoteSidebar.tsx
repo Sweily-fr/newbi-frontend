@@ -1,20 +1,20 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Sidebar } from '../../../../components/layout/Sidebar';
-import { Button } from '../../../../components/';
-import { formatDate } from '../../../../utils/date';
-import { QuoteInvoiceCreationModal } from './QuoteInvoiceCreationModal';
-import { QuoteInvoiceProgress } from './QuoteInvoiceProgress';
-import { useQuery } from '@apollo/client';
-import { GET_QUOTE } from '../../graphql/quotes';
-import { QuotePreview } from '../forms/QuotePreview';
-import { Quote } from '../../types';
-import { ConfirmationModal } from '../../../../components/common/ConfirmationModal';
+import React, { useState, useCallback, useEffect } from "react";
+import { Sidebar } from "../../../../components/layout/Sidebar";
+import { Button } from "../../../../components/";
+import { formatDate } from "../../../../utils/date";
+import { QuoteInvoiceCreationModal } from "./QuoteInvoiceCreationModal";
+import { QuoteInvoiceProgress } from "./QuoteInvoiceProgress";
+import { useQuery } from "@apollo/client";
+import { GET_QUOTE } from "../../graphql/quotes";
+import { QuotePreview } from "../forms/QuotePreview";
+import { Quote } from "../../types";
+import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 
 interface Invoice {
   id: string;
   prefix: string;
   number: string;
-  status: 'DRAFT' | 'PENDING' | 'COMPLETED';
+  status: "DRAFT" | "PENDING" | "COMPLETED";
   finalTotalTTC?: number;
   isDeposit?: boolean;
 }
@@ -31,10 +31,10 @@ interface QuoteItem {
 }
 
 // Type étendu pour inclure le statut CANCELED qui est utilisé dans l'interface mais pas dans le type Quote
-type ExtendedQuoteStatus = Quote['status'] | 'CANCELED';
+type ExtendedQuoteStatus = Quote["status"] | "CANCELED";
 
 // Type étendu pour le devis dans la sidebar
-type SidebarQuote = Omit<Quote, 'status'> & {
+type SidebarQuote = Omit<Quote, "status"> & {
   status: ExtendedQuoteStatus;
   id: string;
   prefix: string;
@@ -78,11 +78,14 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   onClose,
   onEdit,
   onDelete,
-  onStatusChange
+  onStatusChange,
 }) => {
-  const [isInvoiceCreationModalOpen, setIsInvoiceCreationModalOpen] = useState(false);
+  const [isInvoiceCreationModalOpen, setIsInvoiceCreationModalOpen] =
+    useState(false);
   // État pour la popup de confirmation d'annulation
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  // État pour afficher/masquer les détails du statut et de la facturation
+  const [showStatusDetails, setShowStatusDetails] = useState(true);
   // État non utilisé - à réactiver si besoin
   // const [showPreview, setShowPreview] = useState(true);
   const showPreview = true; // Valeur fixe pour l'instant
@@ -93,7 +96,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   const { data, refetch } = useQuery(GET_QUOTE, {
     variables: { id: initialQuote?.id },
     skip: !initialQuote?.id || !isOpen,
-    fetchPolicy: 'network-only',
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
@@ -121,62 +124,74 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
       }
     });
   }, [refetch]);
-  
+
   // Fonction pour calculer les totaux et les détails des TVA
   const calculateTotals = () => {
     // Calculer les détails des différentes TVA à partir des items
-    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
-    
+    const vatDetails: Record<
+      number,
+      { rate: number; amount: number; baseAmount: number }
+    > = {};
+
     // Si nous n'avons pas d'items ou si les items sont vides, créer un taux de TVA par défaut
     // basé sur le total de TVA du devis
     if (!quote?.items || quote.items.length === 0) {
       // Si nous avons un total de TVA mais pas d'items, créer un taux de TVA par défaut
-      if (quote?.totalVAT && quote.totalVAT > 0 && quote?.totalHT && quote.totalHT > 0) {
+      if (
+        quote?.totalVAT &&
+        quote.totalVAT > 0 &&
+        quote?.totalHT &&
+        quote.totalHT > 0
+      ) {
         // Calculer le taux de TVA moyen (arrondi à l'entier le plus proche)
         const avgVatRate = Math.round((quote.totalVAT / quote.totalHT) * 100);
         vatDetails[avgVatRate] = {
           rate: avgVatRate,
           amount: quote.totalVAT,
-          baseAmount: quote.totalHT
+          baseAmount: quote.totalHT,
         };
       }
     } else {
       // Parcourir les items pour calculer les montants par taux de TVA
       quote.items.forEach((item: QuoteItem) => {
         const itemHT = item.quantity * item.unitPrice;
-        
+
         // Appliquer la remise au niveau de l'item si elle existe
         let itemHTAfterDiscount = itemHT;
         if (item.discount && item.discount > 0) {
-          if (item.discountType === 'PERCENTAGE') {
-            itemHTAfterDiscount = itemHT * (1 - (item.discount / 100));
+          if (item.discountType === "PERCENTAGE") {
+            itemHTAfterDiscount = itemHT * (1 - item.discount / 100);
           } else {
             itemHTAfterDiscount = Math.max(0, itemHT - item.discount);
           }
         }
-        
+
         const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
-        
+
         // Ajouter les détails de TVA pour ce taux
         if (!vatDetails[item.vatRate]) {
-          vatDetails[item.vatRate] = { rate: item.vatRate, amount: 0, baseAmount: 0 };
+          vatDetails[item.vatRate] = {
+            rate: item.vatRate,
+            amount: 0,
+            baseAmount: 0,
+          };
         }
         vatDetails[item.vatRate].amount += itemVAT;
         vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
       });
     }
-    
+
     // Convertir l'objet vatDetails en tableau trié par taux
     const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
-    
+
     return {
       finalTotalHT: quote?.finalTotalHT || 0,
       totalVAT: quote?.totalVAT || 0,
       finalTotalTTC: quote?.finalTotalTTC || 0,
-      vatRates: vatRates // Ajouter les détails des différentes TVA
+      vatRates: vatRates, // Ajouter les détails des différentes TVA
     };
   };
-  
+
   // Fonction pour basculer l'affichage de la prévisualisation
   // Fonction non utilisée - à conserver pour référence future
   // const togglePreview = useCallback(() => {
@@ -195,37 +210,42 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
     if (!quote) return [];
 
     switch (quote.status) {
-      case 'DRAFT':
+      case "DRAFT":
         return [
           {
-            label: 'Marquer comme envoyé',
-            action: () => onStatusChange('PENDING'),
-            color: 'purple'
-          }
-        ];
-      case 'PENDING':
-        return [
-          {
-            label: 'Marquer comme accepté',
-            action: () => onStatusChange('COMPLETED'),
-            color: 'green'
+            label: "Marquer comme envoyé",
+            action: () => onStatusChange("PENDING"),
+            color: "purple",
           },
         ];
-      case 'COMPLETED': {
+      case "PENDING":
+        return [
+          {
+            label: "Marquer comme accepté",
+            action: () => onStatusChange("COMPLETED"),
+            color: "green",
+          },
+        ];
+      case "COMPLETED": {
         // Vérifier si on peut encore créer des factures (max 3)
         const linkedInvoicesCount = quote.linkedInvoices?.length || 0;
         const canCreateMoreInvoices = linkedInvoicesCount < 3;
-        
-        return canCreateMoreInvoices ? [
-          {
-            label: linkedInvoicesCount === 0 ? 'Créer une facture' : 'Ajouter une facture',
-            action: handleCreateInvoice,
-            color: 'blue',
-            disabled: false
-          }
-        ] : [];
+
+        return canCreateMoreInvoices
+          ? [
+              {
+                label:
+                  linkedInvoicesCount === 0
+                    ? "Créer une facture"
+                    : "Ajouter une facture",
+                action: handleCreateInvoice,
+                color: "blue",
+                disabled: false,
+              },
+            ]
+          : [];
       }
-      case 'CANCELED':
+      case "CANCELED":
         return [];
       default:
         return [];
@@ -236,14 +256,13 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
 
   const statusActions = getStatusActions();
 
-
-console.log("quote", quote);
+  console.log("quote", quote);
   return (
     <>
       {/* Prévisualisation du devis */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-[calc(100%-32rem)] bg-gray-50 z-[9999] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 h-full w-3/6 bg-gray-50 z-[1500] transition-opacity duration-300 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{ display: isOpen ? "block" : "none" }}
@@ -254,7 +273,8 @@ console.log("quote", quote);
                 ...quote,
                 // Ajouter explicitement les détails des TVA au devis
                 vatRates: calculateTotals().vatRates,
-                status: quote.status === 'CANCELED' ? 'COMPLETED' : quote.status
+                status:
+                  quote.status === "CANCELED" ? "COMPLETED" : quote.status,
               }}
               calculateTotals={calculateTotals}
               useBankDetails={true}
@@ -267,348 +287,492 @@ console.log("quote", quote);
         isOpen={isOpen}
         onClose={onClose}
         title={`Devis ${quote.prefix}${quote.number}`}
-        width="w-[32rem]"
+        width="w-3/6"
         position="right"
         actions={
           <>
-            <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-medium text-gray-500">Statut</h3>
-            <div className="flex items-center">
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                quote.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                quote.status === 'PENDING' ? 'bg-purple-100 text-purple-800' :
-                quote.status === 'CANCELED' ? 'bg-red-100 text-red-800' :
-                'bg-green-100 text-green-800'
-              }`}>
-                {quote.status === 'DRAFT' ? 'Brouillon' :
-                 quote.status === 'PENDING' ? 'En attente' :
-                 quote.status === 'CANCELED' ? 'Annulé' :
-                 'Accepté'}
-              </span>
-            </div>
-          </div>
-
-            {/* Progression des factures */}
-            {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
-              <QuoteInvoiceProgress
-                quoteTotal={quote.finalTotalTTC}
-                linkedInvoices={quote.linkedInvoices}
-                quoteId={quote.id}
-                refreshInterval={2000} // Rafraîchir toutes les 2 secondes
-                key={`invoice-progress-${quote.linkedInvoices.length}`} // Forcer le remontage du composant quand le nombre de factures change
-              />
-            )}
-
-          <div className="space-y-2 mt-2">
-            {/* Vérifier si toutes les factures sont complétées et si le montant total est atteint */}
-            {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
-              (() => {
-                const totalInvoiced = quote.linkedInvoices.reduce((sum, inv) => sum + (inv.finalTotalTTC || 0), 0);
-                const remainingAmount = quote.finalTotalTTC - totalInvoiced;
-                const isFullyPaid = quote.linkedInvoices.every(inv => inv.status === 'COMPLETED') && 
-                                   Math.abs(remainingAmount) < 0.01; // Tolérance pour les erreurs d'arrondi
-                const hasMaxInvoices = quote.linkedInvoices.length >= 3;
-                
-                if (isFullyPaid) {
-                  return (
-                    <Button
-                      variant="outline"
-                      color="green"
-                      fullWidth
-                      disabled={true}
-                    >
-                      <span className="flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Payée
-                      </span>
-                    </Button>
-                  );
-                } else if (Math.abs(remainingAmount) < 0.01 || hasMaxInvoices) {
-                  // Ne pas afficher les boutons si le reste à facturer est 0 ou si 3 factures sont déjà liées
-                  return null;
-                }
-                
-                // Sinon, afficher les boutons d'action normaux
-                return statusActions.map((action, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    color={action.color}
-                    fullWidth
-                    onClick={action.action}
-                    disabled={action.disabled}
+            <div className="bg-white border border-[#e6e1ff] rounded-lg overflow-hidden">
+              {/* En-tête avec statut et bouton pour réduire/développer */}
+              <div 
+                className="flex justify-between items-center p-4 bg-[#f0eeff] cursor-pointer"
+                onClick={() => setShowStatusDetails(!showStatusDetails)}
+              >
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-[#5b50ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <h3 className="text-sm font-medium text-[#5b50ff]">Statut et facturation</h3>
+                </div>
+                <div className="flex items-center">
+                  <span
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full flex items-center mr-2 ${
+                      quote.status === "DRAFT"
+                        ? "bg-gray-100 text-gray-700"
+                        : quote.status === "PENDING"
+                        ? "bg-[#f0eeff] text-[#5b50ff]"
+                        : quote.status === "CANCELED"
+                        ? "bg-red-50 text-red-600"
+                        : "bg-[#e6e1ff] text-[#4a41e0]"
+                    }`}
                   >
-                    {action.label}
-                  </Button>
-                ));
-              })()
-            )}
-            
-            {/* Si pas de factures liées, afficher les boutons normaux */}
-            {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) && 
-              statusActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  color={action.color}
-                  fullWidth
-                  onClick={action.action}
-                  disabled={action.disabled}
-                >
-                  {action.label}
-                </Button>
-              ))
-            }
-          </div>
-        </div>
-          {quote.status !== 'COMPLETED' && quote.status !== 'CANCELED' && (
-            <Button
-              variant="outline"
-              onClick={onEdit}
-              fullWidth
-              className="flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-              Modifier
-            </Button>
-          )}
-          {quote.status === 'DRAFT' && (
-            <Button
-              variant="outline"
-              color="red"
-              onClick={onDelete}
-              fullWidth
-              className="flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              Supprimer
-            </Button>
-          )}
-          {quote.status === 'PENDING' && (
-            <Button
-              variant="outline"
-              color="red"
-              onClick={() => setShowCancelConfirmation(true)}
-              fullWidth
-              className="flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              Annuler
-            </Button>
-          )}
-        </>
-      }
-    >
-      <div className="space-y-6">
-        {/* Statut et actions */}
-
-
-        {/* Informations générales */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Informations générales</h3>
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <dl>
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Date d'émission</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {formatDate(quote.issueDate)}
-                </dd>
-              </div>
-              {quote.validUntil && (
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Valide jusqu'au</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {formatDate(quote.validUntil)}
-                  </dd>
+                    {quote.status === "DRAFT" && (
+                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    )}
+                    {quote.status === "PENDING" && (
+                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    )}
+                    {quote.status === "CANCELED" && (
+                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    )}
+                    {quote.status === "COMPLETED" && (
+                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    )}
+                    {quote.status === "DRAFT"
+                      ? "Brouillon"
+                      : quote.status === "PENDING"
+                      ? "En attente"
+                      : quote.status === "CANCELED"
+                      ? "Annulé"
+                      : "Accepté"}
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 text-[#5b50ff] transition-transform duration-300 ${showStatusDetails ? 'transform rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </div>
-              )}
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Montant HT</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {quote.totalHT?.toFixed(2) || '0.00'} €
-                </dd>
               </div>
-              {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
-              {(() => {
-                // Récupérer les détails des TVA depuis la fonction calculateTotals
-                const { vatRates } = calculateTotals();
-                
-                // Vérifier si nous avons des détails de TVA
-                if (vatRates && vatRates.length > 0) {
-                  return (
-                    <>
-                      {/* Afficher chaque taux de TVA séparément */}
-                      {vatRates.map((vatDetail, index) => (
-                        <div key={index} className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                          <dt className="text-sm font-medium text-gray-500">TVA {vatDetail.rate}%</dt>
-                          <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
-                          </dd>
-                        </div>
-                      ))}
-                      {/* Afficher le total de TVA si plusieurs taux */}
-                      {vatRates.length > 1 && (
-                        <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                          <dt className="text-sm font-medium text-gray-500">Total TVA</dt>
-                          <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
-                            {quote.totalVAT?.toFixed(2) || '0.00'} €
-                          </dd>
-                        </div>
-                      )}
-                    </>
-                  );
-                } else {
-                  // Afficher seulement le total de TVA si aucun détail n'est disponible
-                  return (
-                    <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">TVA</dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {quote.totalVAT?.toFixed(2) || '0.00'} €
-                      </dd>
+
+              {/* Contenu détaillé - affiché uniquement si showStatusDetails est true */}
+              {showStatusDetails && (
+                <div className="p-4 border-t border-[#e6e1ff]">
+                  {/* Progression des factures */}
+                  {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
+                    <div className="mb-4">
+                      <QuoteInvoiceProgress
+                        quoteTotal={quote.finalTotalTTC}
+                        linkedInvoices={quote.linkedInvoices}
+                        quoteId={quote.id}
+                        refreshInterval={2000} // Rafraîchir toutes les 2 secondes
+                        key={`invoice-progress-${quote.linkedInvoices.length}`} // Forcer le remontage du composant quand le nombre de factures change
+                      />
                     </div>
-                  );
-                }
-              })()}
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Montant TTC</dt>
-                <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
-                  {quote.totalTTC?.toFixed(2) || '0.00'} €
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-
-        {/* Client */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Client</h3>
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <dl>
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Nom</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {quote.client.name}
-                </dd>
-              </div>
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Email</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {quote.client.email}
-                </dd>
-              </div>
-              {quote.client.address && (
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                  <dt className="text-sm font-medium text-gray-500">Adresse</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {quote.client.address.street}<br />
-                    {quote.client.address.postalCode} {quote.client.address.city}<br />
-                    {quote.client.address.country}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </div>
-        </div>
-
-        {/* Éléments du devis */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Éléments du devis</h3>
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
-              {quote.items && quote.items.map((item: QuoteItem, index: number) => (
-                <li key={index} className="px-4 py-3">
-                  <div className="flex justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{item.description}</p>
-                      <p className="text-sm text-gray-500">
-                        {item.quantity} {item.unit || 'unité(s)'} x {item.unitPrice.toFixed(2)} € 
-                        {item.discount && item.discount > 0 && ` (-${item.discount}${item.discountType === 'PERCENTAGE' ? '%' : '€'})`}
-                      </p>
-                    </div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {((item.quantity * item.unitPrice) * (1 - (item.discountType === 'PERCENTAGE' && item.discount ? item.discount / 100 : 0))).toFixed(2)} €
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Notes */}
-        {(quote.headerNotes || quote.footerNotes || quote.termsAndConditions) && (
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              {quote.headerNotes && (
-                <div className="px-4 py-3">
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">En-tête</h4>
-                  <p className="text-sm text-gray-900">{quote.headerNotes}</p>
-                </div>
-              )}
-              {quote.footerNotes && (
-                <div className="px-4 py-3 border-t border-gray-200">
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Pied de page</h4>
-                  <p className="text-sm text-gray-900">{quote.footerNotes}</p>
-                </div>
-              )}
-              {quote.termsAndConditions && (
-                <div className="px-4 py-3 border-t border-gray-200">
-                  <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Conditions générales</h4>
-                  <p className="text-sm text-gray-900">{quote.termsAndConditions}</p>
-                  {quote.termsAndConditionsLink && (
-                    <a 
-                      href={quote.termsAndConditionsLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block"
-                    >
-                      {quote.termsAndConditionsLinkTitle || 'Voir les conditions générales'}
-                    </a>
                   )}
+
+                  <div className="space-y-2">
+                    {/* Vérifier si toutes les factures sont complétées et si le montant total est atteint */}
+                    {quote.linkedInvoices &&
+                      quote.linkedInvoices.length > 0 &&
+                      (() => {
+                        const totalInvoiced = quote.linkedInvoices.reduce(
+                          (sum, inv) => sum + (inv.finalTotalTTC || 0),
+                          0
+                        );
+                        const remainingAmount = quote.finalTotalTTC - totalInvoiced;
+                        const isFullyPaid =
+                          quote.linkedInvoices.every(
+                            (inv) => inv.status === "COMPLETED"
+                          ) && Math.abs(remainingAmount) < 0.01; // Tolérance pour les erreurs d'arrondi
+                        const hasMaxInvoices = quote.linkedInvoices.length >= 3;
+
+                        if (isFullyPaid) {
+                          return (
+                            <Button
+                              variant="outline"
+                              color="green"
+                              fullWidth
+                              disabled={true}
+                            >
+                              <span className="flex items-center justify-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 mr-2"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                Payée
+                              </span>
+                            </Button>
+                          );
+                        } else if (
+                          Math.abs(remainingAmount) < 0.01 ||
+                          hasMaxInvoices
+                        ) {
+                          // Ne pas afficher les boutons si le reste à facturer est 0 ou si 3 factures sont déjà liées
+                          return null;
+                        }
+
+                        // Sinon, afficher les boutons d'action normaux
+                        return statusActions.map((action, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            color={action.color}
+                            fullWidth
+                            onClick={action.action}
+                            disabled={action.disabled}
+                          >
+                            {action.label}
+                          </Button>
+                        ));
+                      })()}
+
+                    {/* Si pas de factures liées, afficher les boutons normaux */}
+                    {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) &&
+                      statusActions.map((action, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          color={action.color}
+                          fullWidth
+                          onClick={action.action}
+                          disabled={action.disabled}
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
+                  </div>
                 </div>
               )}
             </div>
+            {quote.status !== "COMPLETED" && quote.status !== "CANCELED" && (
+              <Button
+                variant="outline"
+                onClick={onEdit}
+                fullWidth
+                className="flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                Modifier
+              </Button>
+            )}
+            {quote.status === "DRAFT" && (
+              <Button
+                variant="outline"
+                color="red"
+                onClick={onDelete}
+                fullWidth
+                className="flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Supprimer
+              </Button>
+            )}
+            {quote.status === "PENDING" && (
+              <Button
+                variant="outline"
+                color="red"
+                onClick={() => setShowCancelConfirmation(true)}
+                fullWidth
+                className="flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Annuler
+              </Button>
+            )}
+          </>
+        }
+      >
+        <div className="space-y-6">
+          {/* Statut et actions */}
+
+          {/* Informations générales */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">
+              Informations générales
+            </h3>
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <dl>
+                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Date d'émission
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {formatDate(quote.issueDate)}
+                  </dd>
+                </div>
+                {quote.validUntil && (
+                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Valide jusqu'au
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {formatDate(quote.validUntil)}
+                    </dd>
+                  </div>
+                )}
+                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Montant HT
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {quote.totalHT?.toFixed(2) || "0.00"} €
+                  </dd>
+                </div>
+                {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+                {(() => {
+                  // Récupérer les détails des TVA depuis la fonction calculateTotals
+                  const { vatRates } = calculateTotals();
+
+                  // Vérifier si nous avons des détails de TVA
+                  if (vatRates && vatRates.length > 0) {
+                    return (
+                      <>
+                        {/* Afficher chaque taux de TVA séparément */}
+                        {vatRates.map((vatDetail, index) => (
+                          <div
+                            key={index}
+                            className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                          >
+                            <dt className="text-sm font-medium text-gray-500">
+                              TVA {vatDetail.rate}%
+                            </dt>
+                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}%
+                              de {vatDetail.baseAmount.toFixed(2)} €)
+                            </dd>
+                          </div>
+                        ))}
+                        {/* Afficher le total de TVA si plusieurs taux */}
+                        {vatRates.length > 1 && (
+                          <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                            <dt className="text-sm font-medium text-gray-500">
+                              Total TVA
+                            </dt>
+                            <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+                              {quote.totalVAT?.toFixed(2) || "0.00"} €
+                            </dd>
+                          </div>
+                        )}
+                      </>
+                    );
+                  } else {
+                    // Afficher seulement le total de TVA si aucun détail n'est disponible
+                    return (
+                      <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          TVA
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {quote.totalVAT?.toFixed(2) || "0.00"} €
+                        </dd>
+                      </div>
+                    );
+                  }
+                })()}
+                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Montant TTC
+                  </dt>
+                  <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+                    {quote.totalTTC?.toFixed(2) || "0.00"} €
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
-        )}
-      </div>
 
+          {/* Client */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Client</h3>
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <dl>
+                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                  <dt className="text-sm font-medium text-gray-500">Nom</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {quote.client.name}
+                  </dd>
+                </div>
+                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">Email</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {quote.client.email}
+                  </dd>
+                </div>
+                {quote.client.address && (
+                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Adresse
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {quote.client.address.street}
+                      <br />
+                      {quote.client.address.postalCode}{" "}
+                      {quote.client.address.city}
+                      <br />
+                      {quote.client.address.country}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          </div>
 
+          {/* Éléments du devis */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">
+              Éléments du devis
+            </h3>
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <ul className="divide-y divide-gray-200">
+                {quote.items &&
+                  quote.items.map((item: QuoteItem, index: number) => (
+                    <li key={index} className="px-4 py-3">
+                      <div className="flex justify-between">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {item.description}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {item.quantity} {item.unit || "unité(s)"} x{" "}
+                            {item.unitPrice.toFixed(2)} €
+                            {item.discount &&
+                              item.discount > 0 &&
+                              ` (-${item.discount}${
+                                item.discountType === "PERCENTAGE" ? "%" : "€"
+                              })`}
+                          </p>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {(
+                            item.quantity *
+                            item.unitPrice *
+                            (1 -
+                              (item.discountType === "PERCENTAGE" &&
+                              item.discount
+                                ? item.discount / 100
+                                : 0))
+                          ).toFixed(2)}{" "}
+                          €
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
 
-      {/* Modal de création de facture */}
-      <QuoteInvoiceCreationModal
-        isOpen={isInvoiceCreationModalOpen}
-        onClose={() => setIsInvoiceCreationModalOpen(false)}
-        quoteId={quote.id}
-        quoteTotal={quote.finalTotalTTC}
-        linkedInvoices={quote.linkedInvoices}
-        onInvoiceCreated={handleInvoiceCreated}
-      />
-      
-      {/* Modal de confirmation d'annulation */}
-      <ConfirmationModal
-        isOpen={showCancelConfirmation}
-        onClose={() => setShowCancelConfirmation(false)}
-        onConfirm={() => {
-          onStatusChange('CANCELED');
-          setShowCancelConfirmation(false);
-        }}
-        title="Confirmation d'annulation"
-        message="Êtes-vous sûr de vouloir annuler ce devis ? Cette action ne peut pas être annulée."
-        confirmButtonText="Oui, annuler le devis"
-        cancelButtonText="Non, conserver"
-        confirmButtonVariant="danger"
-      />
-    </Sidebar>
+          {/* Notes */}
+          {(quote.headerNotes ||
+            quote.footerNotes ||
+            quote.termsAndConditions) && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
+              <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                {quote.headerNotes && (
+                  <div className="px-4 py-3">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
+                      En-tête
+                    </h4>
+                    <p className="text-sm text-gray-900">{quote.headerNotes}</p>
+                  </div>
+                )}
+                {quote.footerNotes && (
+                  <div className="px-4 py-3 border-t border-gray-200">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
+                      Pied de page
+                    </h4>
+                    <p className="text-sm text-gray-900">{quote.footerNotes}</p>
+                  </div>
+                )}
+                {quote.termsAndConditions && (
+                  <div className="px-4 py-3 border-t border-gray-200">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
+                      Conditions générales
+                    </h4>
+                    <p className="text-sm text-gray-900">
+                      {quote.termsAndConditions}
+                    </p>
+                    {quote.termsAndConditionsLink && (
+                      <a
+                        href={quote.termsAndConditionsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block"
+                      >
+                        {quote.termsAndConditionsLinkTitle ||
+                          "Voir les conditions générales"}
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal de création de facture */}
+        <QuoteInvoiceCreationModal
+          isOpen={isInvoiceCreationModalOpen}
+          onClose={() => setIsInvoiceCreationModalOpen(false)}
+          quoteId={quote.id}
+          quoteTotal={quote.finalTotalTTC}
+          linkedInvoices={quote.linkedInvoices}
+          onInvoiceCreated={handleInvoiceCreated}
+        />
+
+        {/* Modal de confirmation d'annulation */}
+        <ConfirmationModal
+          isOpen={showCancelConfirmation}
+          onClose={() => setShowCancelConfirmation(false)}
+          onConfirm={() => {
+            onStatusChange("CANCELED");
+            setShowCancelConfirmation(false);
+          }}
+          title="Confirmation d'annulation"
+          message="Êtes-vous sûr de vouloir annuler ce devis ? Cette action ne peut pas être annulée."
+          confirmButtonText="Oui, annuler le devis"
+          cancelButtonText="Non, conserver"
+          confirmButtonVariant="danger"
+        />
+      </Sidebar>
     </>
   );
 };

@@ -258,13 +258,14 @@ export const InvoiceDiscountAndTotals: React.FC<
         <h3 className="text-lg font-medium">Totaux</h3>
         {calculateTotals ? (
           <div>
+            {/* Utiliser l'opérateur de chaînage optionnel pour éviter les erreurs si calculateTotals() retourne undefined */}
             <div className="flex justify-between">
               <span>Total HT:</span>
-              <span>{calculateTotals().totalHT.toFixed(2)} €</span>
+              <span>{calculateTotals()?.totalHT?.toFixed(2) || "0.00"} €</span>
             </div>
             <div className="flex justify-between">
               <span>TVA:</span>
-              <span>{calculateTotals().totalVAT.toFixed(2)} €</span>
+              <span>{calculateTotals()?.totalVAT?.toFixed(2) || "0.00"} €</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-red-600">
@@ -276,7 +277,7 @@ export const InvoiceDiscountAndTotals: React.FC<
             )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Total TTC:</span>
-              <span>{calculateTotals().finalTotalTTC.toFixed(2)} €</span>
+              <span>{calculateTotals()?.finalTotalTTC?.toFixed(2) || "0.00"} €</span>
             </div>
           </div>
         ) : (

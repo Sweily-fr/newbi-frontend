@@ -81,21 +81,31 @@ export const QuoteInvoiceProgress: React.FC<QuoteInvoiceProgressProps> = ({
   const completedPercentage = (completedAmount / quoteTotal) * 100;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700">Progression de facturation</h3>
+    <div className="bg-white rounded-lg shadow-sm border border-[#e6e1ff] overflow-hidden">
+      <div className="px-4 py-3 bg-[#f0eeff] border-b border-[#e6e1ff]">
+        <h3 className="text-sm font-medium text-[#5b50ff] flex items-center">
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Progression de facturation
+        </h3>
       </div>
       
       <div className="p-4 space-y-4">
         {/* Barre de progression */}
         <div>
           <div className="flex justify-between mb-1">
-            <span className="text-xs text-gray-500">Facturé</span>
-            <span className="text-xs font-medium text-gray-700">{invoicedPercentage.toFixed(1)}%</span>
+            <span className="text-xs text-gray-500 flex items-center">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Facturé
+            </span>
+            <span className="text-xs font-medium text-[#5b50ff]">{invoicedPercentage.toFixed(1)}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-[#f0eeff] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 rounded-full"
+              className="h-full bg-[#5b50ff] rounded-full transition-all duration-500 ease-in-out"
               style={{ width: `${invoicedPercentage}%` }}
             ></div>
           </div>
@@ -104,57 +114,74 @@ export const QuoteInvoiceProgress: React.FC<QuoteInvoiceProgressProps> = ({
         {/* Barre de progression des factures terminées */}
         <div>
           <div className="flex justify-between mb-1">
-            <span className="text-xs text-gray-500">Encaissé</span>
-            <span className="text-xs font-medium text-gray-700">{completedPercentage.toFixed(1)}%</span>
+            <span className="text-xs text-gray-500 flex items-center">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Encaissé
+            </span>
+            <span className="text-xs font-medium text-[#4a41e0]">{completedPercentage.toFixed(1)}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-[#f0eeff] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-green-500 rounded-full"
+              className="h-full bg-[#4a41e0] rounded-full transition-all duration-500 ease-in-out"
               style={{ width: `${completedPercentage}%` }}
             ></div>
           </div>
         </div>
 
         {/* Informations sur les montants */}
-        <div className="pt-2 border-t border-gray-100 space-y-1">
+        <div className="pt-3 border-t border-[#f0eeff] space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Montant total :</span>
             <span className="font-medium text-gray-800">{quoteTotal.toFixed(2)} €</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Montant facturé :</span>
-            <span className="font-medium text-gray-800">{invoicedAmount.toFixed(2)} € ({invoicedPercentage.toFixed(1)}%)</span>
+            <span className="font-medium text-[#5b50ff]">{invoicedAmount.toFixed(2)} € ({invoicedPercentage.toFixed(1)}%)</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Montant encaissé :</span>
-            <span className="font-medium text-gray-800">{completedAmount.toFixed(2)} € ({completedPercentage.toFixed(1)}%)</span>
+            <span className="font-medium text-[#4a41e0]">{completedAmount.toFixed(2)} € ({completedPercentage.toFixed(1)}%)</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Reste à facturer :</span>
+          <div className="flex justify-between text-sm bg-[#f0eeff] p-2 rounded-md mt-2">
+            <span className="text-gray-700 font-medium">Reste à facturer :</span>
             <span className="font-medium text-gray-800">{remainingAmount.toFixed(2)} € ({remainingPercentage.toFixed(1)}%)</span>
           </div>
         </div>
 
         {/* Liste des factures liées */}
         {linkedInvoices.length > 0 && (
-          <div className="pt-2 border-t border-gray-100">
-            <h4 className="text-xs font-medium text-gray-700 mb-2">Factures liées</h4>
-            <ul className="space-y-2">
+          <div className="pt-3 border-t border-[#f0eeff]">
+            <h4 className="text-xs font-medium text-[#5b50ff] mb-3 flex items-center">
+              <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Factures liées
+            </h4>
+            <ul className="space-y-2.5">
               {linkedInvoices.map((invoice: Invoice) => (
-                <li key={invoice.id} className="flex justify-between items-center text-sm">
-                  <div>
-                    <span className="text-gray-700">
-                      {invoice.isDeposit ? "Acompte" : "Facture"} {invoice.prefix}{invoice.number}
-                    </span>
-                    <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
-                      invoice.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                      invoice.status === 'PENDING' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {invoice.status === 'COMPLETED' ? 'Terminée' :
-                       invoice.status === 'PENDING' ? 'À encaisser' :
-                       'Brouillon'}
-                    </span>
+                <li key={invoice.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-[#f0eeff] transition-colors duration-200">
+                  <div className="flex items-center">
+                    <div className="mr-2 w-6 h-6 rounded-full bg-[#e6e1ff] flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-[#5b50ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="text-gray-700 font-medium">
+                        {invoice.isDeposit ? "Acompte" : "Facture"} {invoice.prefix}{invoice.number}
+                      </span>
+                      <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                        invoice.status === 'COMPLETED' ? 'bg-[#e6e1ff] text-[#4a41e0]' :
+                        invoice.status === 'PENDING' ? 'bg-[#f0eeff] text-[#5b50ff]' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {invoice.status === 'COMPLETED' ? 'Terminée' :
+                        invoice.status === 'PENDING' ? 'À encaisser' :
+                        'Brouillon'}
+                      </span>
+                    </div>
                   </div>
                   <span className="font-medium text-gray-800">
                     {invoice.finalTotalTTC?.toFixed(2)} €

@@ -68,7 +68,13 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
 }) => {
   const totals = calculateTotals
     ? calculateTotals()
-    : { finalTotalHT: 0, totalVAT: 0, finalTotalTTC: 0, totalHT: 0, discountAmount: 0 };
+    : {
+        finalTotalHT: 0,
+        totalVAT: 0,
+        finalTotalTTC: 0,
+        totalHT: 0,
+        discountAmount: 0,
+      };
 
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | undefined | null) => {
@@ -129,9 +135,10 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   let clientInfo = isNewClient
     ? newClient
     : selectedClient || invoice?.client || {};
-    
+
   // Déterminer si le client a une adresse de livraison différente
-  const hasShippingAddress = clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
+  const hasShippingAddress =
+    clientInfo?.hasDifferentShippingAddress && clientInfo?.shippingAddress;
 
   // Restructurer les données du nouveau client si nécessaire
   if (isNewClient) {
@@ -143,22 +150,27 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         street: clientInfo?.street || "",
         city: clientInfo?.city || "",
         postalCode: clientInfo?.postalCode || "",
-        country: clientInfo?.country || ""
+        country: clientInfo?.country || "",
       },
       siret: clientInfo?.siret || "",
-      vatNumber: clientInfo?.vatNumber || ""
+      vatNumber: clientInfo?.vatNumber || "",
     };
   } else {
     // S'assurer que l'adresse du client existe toujours pour éviter les erreurs
     if (!clientInfo.address) {
-      clientInfo.address = { street: "", city: "", postalCode: "", country: "" };
+      clientInfo.address = {
+        street: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      };
     }
-    
+
     // S'assurer que les autres champs importants existent
     if (clientInfo?.siret === undefined) {
       clientInfo.siret = "";
     }
-    
+
     if (clientInfo?.vatNumber === undefined) {
       clientInfo.vatNumber = "";
     }
@@ -173,7 +185,12 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   const documentContent = (
     <div
       className="bg-white print:overflow-visible"
-      style={{ height: "auto", minHeight: "100%", fontFamily: "Poppins, sans-serif", color: "#5c5c5c" }}
+      style={{
+        height: "auto",
+        minHeight: "100%",
+        fontFamily: "Poppins, sans-serif",
+        color: "#5c5c5c",
+      }}
     >
       <div
         className="p-6 pb-0 max-w-full"
@@ -279,7 +296,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               <p className="text-xs">{clientInfo.name}</p>
               <p className="text-xs">{clientInfo.shippingAddress?.street}</p>
               <p className="text-xs">
-                {clientInfo.shippingAddress?.postalCode} {clientInfo.shippingAddress?.city}
+                {clientInfo.shippingAddress?.postalCode}{" "}
+                {clientInfo.shippingAddress?.city}
               </p>
               <p className="text-xs">{clientInfo.shippingAddress?.country}</p>
             </div>
@@ -340,61 +358,65 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               </tr>
             </thead>
             <tbody>
-              {(items.length > 0 ? items : invoice?.items)?.map((item, index) => {
-                const itemTotal = item.quantity * item.unitPrice;
+              {(items.length > 0 ? items : invoice?.items)?.map(
+                (item, index) => {
+                  const itemTotal = item.quantity * item.unitPrice;
 
-                // Ne calculer la remise que si elle est supérieure à 0
-                const itemDiscount =
-                  item.discount !== undefined && item.discount > 0
-                    ? item.discountType === "PERCENTAGE"
-                      ? itemTotal * (item.discount / 100)
-                      : item.discount
-                    : 0;
-                const itemTotalAfterDiscount = itemTotal - itemDiscount;
+                  // Ne calculer la remise que si elle est supérieure à 0
+                  const itemDiscount =
+                    item.discount !== undefined && item.discount > 0
+                      ? item.discountType === "PERCENTAGE"
+                        ? itemTotal * (item.discount / 100)
+                        : item.discount
+                      : 0;
+                  const itemTotalAfterDiscount = itemTotal - itemDiscount;
 
-                return (
-                  <tr
-                    key={index}
-                    className="border-b"
-                    style={{ pageBreakInside: "avoid" }}
-                  >
-                    <td className="p-2 text-xs">
-                      <div className="font-medium break-words">
-                        {item.description}
-                      </div>
-                      {item.details && (
-                        <div className="text-xs text-gray-600 break-words">
-                          {item.details}
+                  return (
+                    <tr
+                      key={index}
+                      className="border-b"
+                      style={{ pageBreakInside: "avoid" }}
+                    >
+                      <td className="p-2 text-xs">
+                        <div className="font-medium break-words">
+                          {item.description}
                         </div>
-                      )}
-                      {/* N'afficher la remise que si elle est strictement supérieure à 0 */}
-                      {item.discount !== undefined && item.discount > 0 && (
-                        <div className="text-xs text-red-600">
-                          Remise:{" "}
-                          {item.discountType === "PERCENTAGE"
-                            ? `${item.discount}%`
-                            : formatAmount(item.discount)}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-2 text-xs text-right">
-                      {item.quantity} {getUnitAbbreviation(item.unit)}
-                    </td>
-                    <td className="p-2 text-xs text-right">
-                      {formatAmount(item.unitPrice)}
-                    </td>
-                    <td className="p-2 text-xs text-right">{item.vatRate}%</td>
-                    <td className="p-2 text-xs text-right">
-                      {item.discount !== undefined && item.discount > 0 && (
-                        <div className="text-gray-500 text-sm line-through">
-                          {formatAmount(itemTotal)}
-                        </div>
-                      )}
-                      <div>{formatAmount(itemTotalAfterDiscount)}</div>
-                    </td>
-                  </tr>
-                );
-              })}
+                        {item.details && (
+                          <div className="text-xs text-gray-600 break-words">
+                            {item.details}
+                          </div>
+                        )}
+                        {/* N'afficher la remise que si elle est strictement supérieure à 0 */}
+                        {item.discount !== undefined && item.discount > 0 && (
+                          <div className="text-xs text-red-600">
+                            Remise:{" "}
+                            {item.discountType === "PERCENTAGE"
+                              ? `${item.discount}%`
+                              : formatAmount(item.discount)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-2 text-xs text-right">
+                        {item.quantity} {getUnitAbbreviation(item.unit)}
+                      </td>
+                      <td className="p-2 text-xs text-right">
+                        {formatAmount(item.unitPrice)}
+                      </td>
+                      <td className="p-2 text-xs text-right">
+                        {item.vatRate}%
+                      </td>
+                      <td className="p-2 text-xs text-right">
+                        {item.discount !== undefined && item.discount > 0 && (
+                          <div className="text-gray-500 text-sm line-through">
+                            {formatAmount(itemTotal)}
+                          </div>
+                        )}
+                        <div>{formatAmount(itemTotalAfterDiscount)}</div>
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
             </tbody>
           </table>
         </div>
@@ -452,23 +474,37 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             {totals?.vatRates && totals.vatRates.length > 1 ? (
               <>
                 {/* Afficher chaque taux de TVA séparément */}
-                {totals.vatRates.map((vatDetail: { rate: number; amount: number; baseAmount: number }, index: number) => (
-                  <div
-                    key={index}
-                    className="flex justify-between py-1 text-xs font-normal"
-                    data-pdf-total-item="true"
-                  >
-                    <span>Montant de la TVA ({vatDetail.rate} % de {formatAmount(vatDetail.baseAmount)})</span>
-                    <span>{formatAmount(vatDetail.amount)}</span>
-                  </div>
-                ))}
+                {totals.vatRates.map(
+                  (
+                    vatDetail: {
+                      rate: number;
+                      amount: number;
+                      baseAmount: number;
+                    },
+                    index: number
+                  ) => (
+                    <div
+                      key={index}
+                      className="flex justify-between py-1 text-xs font-normal"
+                      data-pdf-total-item="true"
+                    >
+                      <span>
+                        Montant de la TVA ({vatDetail.rate} % de{" "}
+                        {formatAmount(vatDetail.baseAmount)})
+                      </span>
+                      <span>{formatAmount(vatDetail.amount)}</span>
+                    </div>
+                  )
+                )}
                 {/* Afficher le total de TVA */}
                 <div
                   className="flex justify-between font-bold py-1 text-xs"
                   data-pdf-total-item="true"
                 >
                   <span>Montant total de TVA</span>
-                  <span>{formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}</span>
+                  <span>
+                    {formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}
+                  </span>
                 </div>
               </>
             ) : (
@@ -478,7 +514,9 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                 data-pdf-total-item="true"
               >
                 <span>TVA</span>
-                <span>{formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}</span>
+                <span>
+                  {formatAmount(totals?.totalVAT || invoice?.totalVAT || 0)}
+                </span>
               </div>
             )}
 
@@ -498,37 +536,59 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         </div>
 
         {/* Affichage des mentions d'exonération de TVA */}
-        {(((invoice?.items && invoice.items.length > 0 && invoice.items.some((item: Item) => item.vatRate === 0 && item.vatExemptionText)) ||
-          (items && items.length > 0 && items.some(item => item.vatRate === 0 && item.vatExemptionText)) ||
-          invoice?.vatExemptionText)) && (
-          <div className="mb-3 w-full print:w-full" data-pdf-keep-together="true">
+        {((invoice?.items &&
+          invoice.items.length > 0 &&
+          invoice.items.some(
+            (item: Item) => item.vatRate === 0 && item.vatExemptionText
+          )) ||
+          (items &&
+            items.length > 0 &&
+            items.some(
+              (item) => item.vatRate === 0 && item.vatExemptionText
+            )) ||
+          invoice?.vatExemptionText) && (
+          <div
+            className="mb-3 w-full print:w-full"
+            data-pdf-keep-together="true"
+          >
             {/* Afficher le texte d'exonération global de la facture s'il existe */}
             {invoice?.vatExemptionText && (
-              <p className="text-xs text-gray-600 mb-1">{invoice.vatExemptionText}</p>
+              <p className="text-xs text-gray-600 mb-1">
+                {invoice.vatExemptionText}
+              </p>
             )}
             {/* Afficher chaque mention unique des éléments une seule fois */}
-            {Array.from(new Set(
-              [...(invoice?.items || []), ...items]
-                .filter(item => item.vatRate === 0 && item.vatExemptionText)
-                .map(item => item.vatExemptionText)
-                .filter(Boolean) as string[]
-            )).map((text, index) => (
-              <p key={index} className="text-xs text-gray-600 mb-1">{text}</p>
+            {Array.from(
+              new Set(
+                [...(invoice?.items || []), ...items]
+                  .filter((item) => item.vatRate === 0 && item.vatExemptionText)
+                  .map((item) => item.vatExemptionText)
+                  .filter(Boolean) as string[]
+              )
+            ).map((text, index) => (
+              <p key={index} className="text-xs text-gray-600 mb-1">
+                {text}
+              </p>
             ))}
           </div>
         )}
-        
+
         {/* Affichage de la catégorie de transaction */}
         {companyInfo?.transactionCategory && (
           <div className="mb-3 w-4/6 print:w-4/6" data-pdf-keep-together="true">
             <p className="text-xs font-medium text-gray-700">
-              {getTransactionCategoryDisplayText(companyInfo.transactionCategory)}
+              {getTransactionCategoryDisplayText(
+                companyInfo.transactionCategory
+              )}
             </p>
           </div>
         )}
 
         {(termsAndConditions || invoice?.termsAndConditions) && (
-          <div className="mb-6 w-full print:w-full" data-pdf-keep-together="true">
+          <div
+            className="mb-6 w-full print:w-full"
+            data-pdf-keep-together="true"
+          >
             <p className="whitespace-pre-line text-xs">
               {termsAndConditions || invoice?.termsAndConditions}
             </p>
@@ -608,9 +668,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       className="bg-white overflow-hidden flex flex-col"
       style={{ height: "100vh" }}
     >
-      <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-medium">Aperçu de la facture</h2>
-        {showButtons && (
+      {showButtons && (
+        <div className="flex justify-between items-center p-4 border-b">
           <div className="flex space-x-2">
             <PDFGenerator
               content={documentContent}
@@ -639,12 +698,9 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
               }}
             />
           </div>
-        )}
-      </div>
-      <div
-        className="flex-grow bg-[#f0eeff] py-12 overflow-auto overflow-x-hidden w-full relative"
-        style={{ minHeight: "0" }}
-      >
+        </div>
+      )}
+      <div className="flex-grow bg-[#f0eeff] overflow-x-hidden w-full relative">
         {isGeneratingPDF && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
             {pdfSuccess ? (
@@ -680,8 +736,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
         )}
         <div
-          className="w-10/12 sm:w-11/12 md:w-9/12 lg:w-8/12 xl:w-8/12 2xl:w-6/12 mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
-          style={{ minHeight: "29.7cm", height: "auto" }}
+          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
+          style={{ height: "auto", minHeight: "297mm" }}
         >
           {documentContent}
         </div>

@@ -4,22 +4,23 @@ import { useInvoiceForm } from "../../hooks/useInvoiceForm";
 import { InvoiceFormModalProps, Item } from "../../types/invoice";
 import { Button, Form } from "../../../../components/";
 import { DocumentSettings } from "../../../../components/specific/DocumentSettings";
-import Collapse from "../../../../components/common/Collapse";
 import { validateInvoiceDates } from "../../../../constants/formValidations";
 import { ClientSelection } from "./Sections";
 import { InvoiceItems } from "./Sections";
 import { InvoiceDiscountAndTotals } from "./Sections";
 import { InvoiceGeneralInfo } from "./Sections";
-import { InvoiceFooterNotes } from "./Sections";
-import { InvoiceTermsAndConditions } from "./Sections";
-import { InvoiceCompanyInfo } from "./Sections";
 import { InvoiceBankDetails } from "./Sections";
+import { InvoiceTermsAndConditions } from "./Sections";
+import { InvoiceFooterNotes } from "./Sections";
+import { InvoiceCompanyInfo } from "./Sections";
 import { InvoiceActionButtons } from "./Sections";
 import { InvoicePreview } from "./InvoicePreview";
 import { useQuery } from "@apollo/client";
 import { GET_QUOTE } from "../../../devis/graphql/quotes";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { Notification } from "../../../../components/";
+import { NavigationSidebar } from "../../../../components/common/NavigationSidebar/NavigationSidebar";
+import { DocumentText, Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2 } from "iconsax-react";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,
@@ -58,6 +59,24 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     discountAndTotals: false,
     bankDetails: false,
   });
+  
+  // État pour suivre la section active dans la navigation
+  const [activeSection, setActiveSection] = useState<"generalInfo" | "client" | "companyInfo" | "items" | "discountAndTotals" | "bankDetails">("generalInfo");
+  
+  // Fonction pour calculer la progression du formulaire
+  const calculateProgress = useCallback(() => {
+    const sections = [
+      !sectionErrors.generalInfo,
+      !sectionErrors.client,
+      !sectionErrors.companyInfo,
+      !sectionErrors.items,
+      !sectionErrors.discountAndTotals,
+      !sectionErrors.bankDetails
+    ];
+    
+    const completedSections = sections.filter(Boolean).length;
+    return Math.round((completedSections / sections.length) * 100);
+  }, [sectionErrors]);
   // Gestionnaire pour demander confirmation avant de fermer
   const handleCloseRequest = () => {
     setShowConfirmationModal(true);
@@ -122,8 +141,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       setShowSettings(false);
     }
   };
-
-
 
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
   const {
@@ -201,10 +218,6 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
     showNotifications: false // Désactiver les notifications ici pour éviter les doublons avec useInvoices
   });
 
-  
- 
-  
-  
   // Fonction pour appliquer les paramètres par défaut
   const applyDefaultSettingsToForm = useCallback(() => {
     if (defaultHeaderNotes && !headerNotes) setHeaderNotes(defaultHeaderNotes);
@@ -379,10 +392,54 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
 
       {/* Contenu principal avec formulaire à gauche et aperçu à droite */}
       <div className="flex flex-1 h-full overflow-hidden">
+        {/* Navigation sidebar */}
+        {!showSettings && (
+          <NavigationSidebar
+            items={[
+              {
+                id: "generalInfo",
+                icon: <DocumentText size="24" color={activeSection === "generalInfo" ? "#5b50ff" : "#222"} variant={activeSection === "generalInfo" ? "Bold" : "Linear"} />,
+                tooltip: "Informations générales"
+              },
+              {
+                id: "client",
+                icon: <Profile2User size="24" color={activeSection === "client" ? "#5b50ff" : "#222"} variant={activeSection === "client" ? "Bold" : "Linear"} />,
+                tooltip: "Informations client"
+              },
+              {
+                id: "companyInfo",
+                icon: <Building size="24" color={activeSection === "companyInfo" ? "#5b50ff" : "#222"} variant={activeSection === "companyInfo" ? "Bold" : "Linear"} />,
+                tooltip: "Informations société"
+              },
+              {
+                id: "items",
+                icon: <ShoppingCart size="24" color={activeSection === "items" ? "#5b50ff" : "#222"} variant={activeSection === "items" ? "Bold" : "Linear"} />,
+                tooltip: "Produits et services"
+              },
+              {
+                id: "discountAndTotals",
+                icon: <Calculator size="24" color={activeSection === "discountAndTotals" ? "#5b50ff" : "#222"} variant={activeSection === "discountAndTotals" ? "Bold" : "Linear"} />,
+                tooltip: "Remise et totaux"
+              },
+              {
+                id: "bankDetails",
+                icon: <MessageText size="24" color={activeSection === "bankDetails" ? "#5b50ff" : "#222"} variant={activeSection === "bankDetails" ? "Bold" : "Linear"} />,
+                tooltip: "Notes de bas de page"
+              }
+            ]}
+            activeItemId={activeSection}
+            onItemClick={(id) => setActiveSection(id as typeof activeSection)}
+            primaryColor="#5b50ff"
+            activeBackgroundColor="#f0eeff"
+            fixed={false}
+          />
+        )}
+        
         {/* Formulaire à gauche */}
-        <div className="w-2/5 overflow-y-auto border-r border-gray-200">
-          <Form onSubmit={(e) => e.preventDefault()} className="p-4">
+        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200">
+          <Form onSubmit={(e) => e.preventDefault()}>
             {showSettings ? (
+            <div className="p-6">
               <DocumentSettings
                 documentType="INVOICE"
                 defaultHeaderNotes={defaultHeaderNotes}
@@ -399,181 +456,214 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                 onCancel={() => setShowSettings(false)}
                 isSaving={isSavingSettings}
               />
+            </div>
             ) : (
               <>
-                <div className="flex justify-end">
+                <div className="flex justify-end mb-4 px-10 pt-10">
                   <Button
                     onClick={() => setShowSettings(true)}
                     variant="secondary"
                     size="md"
                     className="flex items-center gap-2"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
+                    <Setting2 color="#5b50ff" size="20" variant="Linear" />
                     Paramètres
                   </Button>
                 </div>
-                <Collapse 
-                  title="Informations générales" 
-                  defaultOpen={true} 
-                  hasError={sectionErrors.generalInfo}
-                  description="Informations de base de la facture"
-                  icon="document"
-                >
-                  <InvoiceGeneralInfo
-                    isDeposit={isDeposit}
-                    setIsDeposit={setIsDeposit}
-                    purchaseOrderNumber={purchaseOrderNumber}
-                    setPurchaseOrderNumber={setPurchaseOrderNumber}
-                    issueDate={issueDate}
-                    setIssueDate={setIssueDate}
-                    executionDate={executionDate}
-                    setExecutionDate={setExecutionDate}
-                    dueDate={dueDate}
-                    setDueDate={setDueDate}
-                    invoicePrefix={invoicePrefix}
-                    setInvoicePrefix={setInvoicePrefix}
-                    invoiceNumber={invoiceNumber}
-                    setInvoiceNumber={setInvoiceNumber}
-                    headerNotes={headerNotes}
-                    setHeaderNotes={setHeaderNotes}
-                    defaultHeaderNotes={defaultHeaderNotes}
-                  />
-                </Collapse>
-                <Collapse 
-                  title="Informations client" 
-                  defaultOpen={false} 
-                  hasError={sectionErrors.client}
-                  description="Sélection ou création d'un client pour la facture"
-                  icon="user"
-                >
-                  <ClientSelection
-                    isNewClient={isNewClient}
-                    setIsNewClient={handleClientModeChange}
-                    newClient={newClient}
-                    setNewClient={setNewClient as any}
-                    selectedClient={selectedClient}
-                    setSelectedClient={setSelectedClient}
-                    clientsData={clientsData}
-                    invoice={invoice}
-                    selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient) || null}
-                  />
-                </Collapse>
-
-                <Collapse 
-                  title="Informations société" 
-                  defaultOpen={false} 
-                  hasError={sectionErrors.companyInfo}
-                  description="Coordonnées et informations de votre entreprise"
-                  icon="company"
-                >
-                  <InvoiceCompanyInfo
-                    companyInfo={companyInfo}
-                    userData={userData}
-                    apiUrl={apiUrl}
-                    onConfigureInfoClick={handleConfigureInfoRequest}
-                    setCompanyInfo={setCompanyInfo}
-                  />
-                </Collapse>
-
-                <Collapse 
-                  title="Produits et services" 
-                  defaultOpen={false} 
-                  hasError={sectionErrors.items}
-                  description="Articles, quantités et prix à facturer"
-                  icon="products"
-                >
-                  <InvoiceItems
-                    items={items}
-                    handleAddItem={handleAddItem}
-                    handleRemoveItem={handleRemoveItem}
-                    handleItemChange={(index, field, value) => {
-                      // Créer un adaptateur pour résoudre l'incompatibilité de types
-                      // La fonction handleItemChange du hook useInvoiceForm attend un field de type keyof Item
-                      // mais le composant InvoiceItems passe un field de type string
-                      handleItemChange(index, field as keyof Item, value);
-                    }}
-                    handleProductSelect={handleProductSelect}
-                  />
-                </Collapse>
-
-                <Collapse 
-                  title="Remise et totaux" 
-                  defaultOpen={false} 
-                  hasError={sectionErrors.discountAndTotals}
-                  description="Remises, taxes et champs personnalisés"
-                  icon="calculator"
-                >
-                  <InvoiceDiscountAndTotals
-                    discount={discount}
-                    setDiscount={setDiscount}
-                    discountType={discountType}
-                    setDiscountType={setDiscountType}
-                    calculateTotals={calculateTotals}
-                    customFields={customFields}
-                    handleAddCustomField={handleAddCustomField}
-                    handleRemoveCustomField={handleRemoveCustomField}
-                    handleCustomFieldChange={handleCustomFieldChange}
-                  />
-                </Collapse>
-
-                <Collapse 
-                  title="Notes de bas de page" 
-                  defaultOpen={false} 
-                  hasError={sectionErrors.bankDetails}
-                  description="Coordonnées bancaires, conditions et notes"
-                  icon="notes"
-                >
-                  <InvoiceBankDetails
-                    userData={userData}
-                    useBankDetails={useBankDetails}
-                    setUseBankDetails={setUseBankDetails}
-                    setCompanyInfo={setCompanyInfo}
-                    onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
-                  />
-                  <InvoiceTermsAndConditions
-                    termsAndConditions={termsAndConditions}
-                    setTermsAndConditions={setTermsAndConditions}
-                    termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
-                    setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
-                    termsAndConditionsLink={termsAndConditionsLink}
-                    setTermsAndConditionsLink={setTermsAndConditionsLink}
-                    onApplyDefaults={() => {
-                      if (defaultTermsAndConditions) {
-                        setTermsAndConditions(defaultTermsAndConditions);
-                      }
-                      if (defaultTermsAndConditionsLinkTitle) {
-                        setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
-                      }
-                      if (defaultTermsAndConditionsLink) {
-                        setTermsAndConditionsLink(defaultTermsAndConditionsLink);
-                      }
-                    }}
-                    hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
-                  />
-                  <InvoiceFooterNotes
-                    footerNotes={footerNotes}
-                    setFooterNotes={setFooterNotes}
-                    onApplyDefaults={() => {
-                      if (defaultFooterNotes) {
-                        setFooterNotes(defaultFooterNotes);
-                      }
-                    }}
-                    hasDefaults={!!defaultFooterNotes}
-                  />
-                </Collapse>
+                <div className="mb-4 px-10 pt-10">
+                  {activeSection === "generalInfo" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.generalInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                          </svg>
+                        </span>
+                        Informations générales
+                      </h2>
+                      <p className="text-gray-500 mb-4">Informations de base de la facture</p>
+                      <InvoiceGeneralInfo
+                        isDeposit={isDeposit}
+                        setIsDeposit={setIsDeposit}
+                        purchaseOrderNumber={purchaseOrderNumber}
+                        setPurchaseOrderNumber={setPurchaseOrderNumber}
+                        issueDate={issueDate}
+                        setIssueDate={setIssueDate}
+                        executionDate={executionDate}
+                        setExecutionDate={setExecutionDate}
+                        dueDate={dueDate}
+                        setDueDate={setDueDate}
+                        invoicePrefix={invoicePrefix}
+                        setInvoicePrefix={setInvoicePrefix}
+                        invoiceNumber={invoiceNumber}
+                        setInvoiceNumber={setInvoiceNumber}
+                        headerNotes={headerNotes}
+                        setHeaderNotes={setHeaderNotes}
+                        defaultHeaderNotes={defaultHeaderNotes}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "client" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                        </span>
+                        Informations client
+                      </h2>
+                      <p className="text-gray-500 mb-4">Sélection ou création d'un client pour la facture</p>
+                      <ClientSelection
+                        isNewClient={isNewClient}
+                        setIsNewClient={handleClientModeChange}
+                        newClient={newClient}
+                        setNewClient={setNewClient as any} // Type casting nécessaire en raison d'incompatibilités entre les types
+                        selectedClient={selectedClient}
+                        setSelectedClient={setSelectedClient}
+                        clientsData={clientsData}
+                        invoice={invoice}
+                        selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient) || null} // Type casting nécessaire pour éviter l'erreur de typage implicite
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "companyInfo" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                          </svg>
+                        </span>
+                        Informations société
+                      </h2>
+                      <p className="text-gray-500 mb-4">Coordonnées et informations de votre entreprise</p>
+                      <InvoiceCompanyInfo
+                        companyInfo={companyInfo}
+                        userData={userData}
+                        apiUrl={apiUrl}
+                        onConfigureInfoClick={handleConfigureInfoRequest}
+                        setCompanyInfo={setCompanyInfo}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "items" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                          </svg>
+                        </span>
+                        Produits et services
+                      </h2>
+                      <p className="text-gray-500 mb-4">Articles, quantités et prix à facturer</p>
+                      <InvoiceItems
+                        items={items}
+                        handleAddItem={handleAddItem}
+                        handleRemoveItem={handleRemoveItem}
+                        handleItemChange={(index, field, value) => {
+                          // Créer un adaptateur pour résoudre l'incompatibilité de types
+                          // La fonction handleItemChange du hook useInvoiceForm attend un field de type keyof Item
+                          // mais le composant InvoiceItems passe un field de type string
+                          handleItemChange(index, field as keyof Item, value);
+                        }}
+                        handleProductSelect={handleProductSelect}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "discountAndTotals" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="2" y1="7" x2="22" y2="7"></line>
+                            <line x1="12" y1="17" x2="12" y2="17"></line>
+                            <path d="M12 20v1"></path>
+                          </svg>
+                        </span>
+                        Remise et totaux
+                      </h2>
+                      <p className="text-gray-500 mb-4">Remises, taxes et champs personnalisés</p>
+                      <InvoiceDiscountAndTotals
+                        discount={discount}
+                        setDiscount={setDiscount}
+                        discountType={discountType}
+                        setDiscountType={setDiscountType}
+                        calculateTotals={calculateTotals}
+                        customFields={customFields}
+                        handleAddCustomField={handleAddCustomField}
+                        handleRemoveCustomField={handleRemoveCustomField}
+                        handleCustomFieldChange={handleCustomFieldChange}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection === "bankDetails" && (
+                    <div>
+                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                        <span className={`mr-2 ${sectionErrors.bankDetails ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                          </svg>
+                        </span>
+                        Notes de bas de page
+                      </h2>
+                      <p className="text-gray-500 mb-4">Coordonnées bancaires, conditions et notes</p>
+                      <InvoiceBankDetails
+                        userData={userData}
+                        useBankDetails={useBankDetails}
+                        setUseBankDetails={setUseBankDetails}
+                        setCompanyInfo={setCompanyInfo}
+                        onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
+                      />
+                      <InvoiceTermsAndConditions
+                        termsAndConditions={termsAndConditions}
+                        setTermsAndConditions={setTermsAndConditions}
+                        termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
+                        setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
+                        termsAndConditionsLink={termsAndConditionsLink}
+                        setTermsAndConditionsLink={setTermsAndConditionsLink}
+                        onApplyDefaults={() => {
+                          if (defaultTermsAndConditions) {
+                            setTermsAndConditions(defaultTermsAndConditions);
+                          }
+                          if (defaultTermsAndConditionsLinkTitle) {
+                            setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+                          }
+                          if (defaultTermsAndConditionsLink) {
+                            setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+                          }
+                        }}
+                        hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
+                      />
+                      <InvoiceFooterNotes
+                        footerNotes={footerNotes}
+                        setFooterNotes={setFooterNotes}
+                        onApplyDefaults={() => {
+                          if (defaultFooterNotes) {
+                            setFooterNotes(defaultFooterNotes);
+                          }
+                        }}
+                        hasDefaults={!!defaultFooterNotes}
+                      />
+                    </div>
+                  )}
+                </div>
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-8">
                   <div className="max-w-7xl mx-auto flex justify-end items-center">
                     <InvoiceActionButtons 
@@ -590,7 +680,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
         </div>
 
         {/* Aperçu à droite */}
-        <div className="w-3/5 overflow-y-auto bg-gray-50">
+        <div className="w-3/6 overflow-y-hidden z-[1000]">
           <InvoicePreview
             invoice={invoice}
             selectedClient={clientsData?.clients?.items?.find(
