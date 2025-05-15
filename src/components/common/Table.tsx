@@ -1,7 +1,20 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, createContext } from 'react';
 import { Pagination } from '../specific/navigation/Pagination';
 import { TruncatedText } from '../specific/TruncatedText';
 import { ArrowDown2, ArrowUp2, Sort, EmptyWallet } from 'iconsax-react';
+import { ActionButton, ActionMenuItem } from './ActionButton';
+
+// Contexte pour gérer l'état des menus déroulants dans le tableau
+interface TableMenuContext {
+  activeMenuId: string | null;
+  setActiveMenuId: (id: string | null) => void;
+}
+
+// Exporter le contexte pour qu'il soit accessible par ActionButton
+export const TableMenuContext = createContext<TableMenuContext>({
+  activeMenuId: null,
+  setActiveMenuId: () => {}
+});
 
 // Types pour les colonnes
 export interface Column<T> {
@@ -10,7 +23,11 @@ export interface Column<T> {
   align?: 'left' | 'center' | 'right';
   className?: string;
   sortable?: boolean;
+  isAction?: boolean;
 }
+
+// Réexporter le type ActionMenuItem depuis ActionButton pour la rétrocompatibilité
+export type { ActionMenuItem } from './ActionButton';
 
 // Props pour le composant Table
 interface TableProps<T> {
@@ -30,6 +47,8 @@ interface TableProps<T> {
     direction: 'asc' | 'desc' | null;
     onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
   };
+  actionItems?: ActionMenuItem<T>[];
+  actionButtonLabel?: string;
   // Props de pagination
   pagination?: {
     currentPage: number;
@@ -42,6 +61,8 @@ interface TableProps<T> {
   };
 }
 
+// Le composant ActionMenu a été remplacé par le composant ActionButton
+
 export function Table<T>({
   columns,
   data,
@@ -50,8 +71,12 @@ export function Table<T>({
   onRowClick,
   emptyState,
   pagination,
-  sortConfig
+  sortConfig,
+  actionItems,
+  actionButtonLabel
 }: TableProps<T>) {
+  // État pour suivre quel menu est actuellement ouvert
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   // Si les données sont vides et qu'un état vide est fourni, afficher l'état vide
   if (data.length === 0 && emptyState) {
     return (
@@ -69,9 +94,10 @@ export function Table<T>({
   }
 
   return (
-    <div className="bg-white shadow-sm border border-gray-100 overflow-hidden rounded-lg">
-      <div className="overflow-x-auto">
-        <table className={`min-w-full divide-y divide-gray-100 ${className}`}>
+    <TableMenuContext.Provider value={{ activeMenuId, setActiveMenuId }}>
+      <div className="bg-white shadow-sm border border-gray-100 rounded-lg">
+        <div className="overflow-x-auto overflow-visible">
+          <table className={`min-w-full divide-y divide-gray-100 ${className}`}>
           <thead className="bg-[#f9f8ff]">
             <tr>
               {columns.map((column, index) => {
@@ -129,10 +155,20 @@ export function Table<T>({
                   return (
                     <td 
                       key={index} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${column.className || ''}`}
-                      style={{ textAlign: column.align || 'left' }}
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${column.isAction ? 'overflow-visible' : ''} ${column.className || ''}`}
+                      style={{ textAlign: column.align || 'left', position: column.isAction ? 'relative' : 'static' }}
                     >
-                      {typeof value === 'string' ? (
+                      {column.isAction && actionItems ? (
+                        <div className="overflow-visible" style={{ position: 'relative' }}>
+                          <ActionButton
+                            item={item}
+                            actions={actionItems}
+                            buttonLabel={actionButtonLabel}
+                            className="relative"
+                            menuId={keyExtractor(item).toString()}
+                          />
+                        </div>
+                      ) : typeof value === 'string' ? (
                         <TruncatedText text={value} />
                       ) : (
                         value as ReactNode
@@ -144,20 +180,21 @@ export function Table<T>({
             ))}
           </tbody>
         </table>
+        </div>
+        
+        {pagination && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalItems={pagination.totalItems}
+            itemsPerPage={pagination.itemsPerPage}
+            onPageChange={pagination.onPageChange}
+            rowsPerPageOptions={pagination.rowsPerPageOptions}
+            onItemsPerPageChange={pagination.onItemsPerPageChange}
+            hasNextPage={pagination.hasNextPage}
+            className="border-t border-gray-100"
+          />
+        )}
       </div>
-      
-      {pagination && (
-        <Pagination
-          currentPage={pagination.currentPage}
-          totalItems={pagination.totalItems}
-          itemsPerPage={pagination.itemsPerPage}
-          onPageChange={pagination.onPageChange}
-          rowsPerPageOptions={pagination.rowsPerPageOptions}
-          onItemsPerPageChange={pagination.onItemsPerPageChange}
-          hasNextPage={pagination.hasNextPage}
-          className="border-t border-gray-100"
-        />
-      )}
-    </div>
+    </TableMenuContext.Provider>
   );
 }

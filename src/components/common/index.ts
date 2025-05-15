@@ -26,3 +26,4 @@ export { default as TextArea } from './TextArea';
 export { default as TextField } from './TextField';
 export { default as TextFieldURL } from './TextFieldURL';
 export { default as Tooltip } from './Tooltip';
+export { default as ActionButton } from './ActionButton';

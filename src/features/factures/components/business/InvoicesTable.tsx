@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_INVOICES } from '../../graphql/invoices';
-import { Table } from '../../../../components/common/Table';
+import { Table, ActionMenuItem } from '../../../../components/common/Table';
 import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../../components/common/Spinner';
 import { Button } from '../../../../components/';
 import { Notification } from '../../../../components/';
+import { DocumentText, ClipboardTick, Timer, NoteText, CloseCircle, Edit2, Trash, Printer, ArrowDown, Receipt21 } from 'iconsax-react';
 
 // Type pour les onglets de filtrage
 export type TabType = 'DRAFT' | 'PENDING' | 'COMPLETED' | null;
@@ -63,6 +64,11 @@ interface InvoicesTableProps {
   onItemsPerPageChange: (itemsPerPage: number) => void;
   onSelectInvoice: (invoice: Invoice) => void;
   onCreateInvoice?: () => void;
+  onEditInvoice?: (invoice: Invoice) => void;
+  onDeleteInvoice?: (invoice: Invoice) => void;
+  onDownloadInvoice?: (invoice: Invoice) => void;
+  onPrintInvoice?: (invoice: Invoice) => void;
+  onDuplicateInvoice?: (invoice: Invoice) => void;
 }
 
 export const InvoicesTable: React.FC<InvoicesTableProps> = ({
@@ -74,7 +80,12 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
   onPageChange,
   onItemsPerPageChange,
   onSelectInvoice,
-  onCreateInvoice
+  onCreateInvoice,
+  onEditInvoice,
+  onDeleteInvoice,
+  onDownloadInvoice,
+  onPrintInvoice,
+  onDuplicateInvoice
 }) => {
   const [localLoading, setLocalLoading] = useState(false);
   
@@ -120,79 +131,49 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
 
   // Gérer l'affichage du statut
   const renderStatus = (status: string) => {
-    let statusIcon = null;
+    let variant = '';
     let statusText = '';
-    let textColor = '';
+    let icon = null;
 
     switch (status) {
       case 'DRAFT':
         statusText = 'Brouillon';
-        textColor = 'text-gray-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
-            </svg>
-          </span>
-        );
+        variant = 'warning';
+        icon = <NoteText size={16} variant="Bold" className="mr-2" color="#f59e0b" />;
         break;
       case 'PENDING':
         statusText = 'À encaisser';
-        textColor = 'text-purple-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-purple-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-            </svg>
-          </span>
-        );
+        variant = 'primary';
+        icon = <Timer size={16} variant="Bold" className="mr-2" color="#5b50ff" />;
         break;
       case 'COMPLETED':
         statusText = 'Payée';
-        textColor = 'text-green-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-green-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-          </span>
-        );
+        variant = 'success';
+        icon = <ClipboardTick size={16} variant="Bold" className="mr-2" color="#10b981" />;
         break;
       case 'CANCELED':
         statusText = 'Annulée';
-        textColor = 'text-red-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-red-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
-            </svg>
-          </span>
-        );
+        variant = 'danger';
+        icon = <CloseCircle size={16} variant="Bold" className="mr-2" color="#ef4444" />;
         break;
       default:
         statusText = 'Inconnu';
-        textColor = 'text-gray-800';
+        variant = 'default';
+        icon = <CloseCircle size={16} variant="Bold" className="mr-2" color="#6b7280" />;
     }
 
+    // Classes pour les différentes variantes de tags
+    const variantClasses = {
+      primary: 'bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]',
+      success: 'bg-[#ecfdf5] text-[#10b981] border border-[#d1fae5]',
+      warning: 'bg-[#fffbeb] text-[#f59e0b] border border-[#fef3c7]',
+      danger: 'bg-[#fef2f2] text-[#ef4444] border border-[#fee2e2]',
+      default: 'bg-gray-100 text-gray-800 border border-gray-200'
+    };
+
     return (
-      <span className={`px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full border ${textColor} bg-white`}>
-        {statusIcon}
+      <span className={`px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 ${variantClasses[variant as keyof typeof variantClasses]}`}>
+        {icon}
         {statusText}
       </span>
     );
@@ -200,6 +181,66 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
 
   // En cas d'erreur, on affiche quand même le tableau mais vide
   // Les notifications s'occuperont d'informer l'utilisateur de l'erreur
+
+  // Définir les actions disponibles pour le menu d'actions des factures
+  const getActionItems = (): ActionMenuItem<Invoice>[] => {
+    const items: ActionMenuItem<Invoice>[] = [];
+    
+    // Action pour voir la facture (toujours disponible)
+    items.push({
+      label: 'Voir la facture',
+      icon: <DocumentText size={16} variant="Linear" color="#5b50ff" />,
+      onClick: (invoice) => onSelectInvoice(invoice)
+    });
+    
+    // Action pour modifier la facture si disponible
+    if (onEditInvoice) {
+      items.push({
+        label: 'Modifier',
+        icon: <Edit2 size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (invoice) => onEditInvoice(invoice)
+      });
+    }
+    
+    // Action pour télécharger la facture si disponible
+    if (onDownloadInvoice) {
+      items.push({
+        label: 'Télécharger',
+        icon: <ArrowDown size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (invoice) => onDownloadInvoice(invoice)
+      });
+    }
+    
+    // Action pour imprimer la facture si disponible
+    if (onPrintInvoice) {
+      items.push({
+        label: 'Imprimer',
+        icon: <Printer size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (invoice) => onPrintInvoice(invoice)
+      });
+    }
+    
+    // Action pour dupliquer la facture si disponible
+    if (onDuplicateInvoice) {
+      items.push({
+        label: 'Dupliquer',
+        icon: <Receipt21 size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (invoice) => onDuplicateInvoice(invoice)
+      });
+    }
+    
+    // Action pour supprimer la facture si disponible (toujours en dernier)
+    if (onDeleteInvoice) {
+      items.push({
+        label: 'Supprimer',
+        icon: <Trash size={16} variant="Linear" color="#ef4444" />,
+        onClick: (invoice) => onDeleteInvoice(invoice),
+        variant: 'danger'
+      });
+    }
+    
+    return items;
+  };
 
   return (
     <div className="space-y-4">
@@ -244,19 +285,15 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
           },
           {
             header: 'Actions',
-            accessor: (invoice) => (
-              <button
-                onClick={() => onSelectInvoice(invoice)}
-                className="text-[#5b50ff] hover:text-[#4a41e0] font-medium cursor-pointer"
-              >
-                Voir
-              </button>
-            ),
+            isAction: true,
+            accessor: 'id',
             className: 'text-right'
           }
         ]}
         data={invoices}
         keyExtractor={(invoice) => invoice.id}
+        actionItems={getActionItems()}
+        actionButtonLabel="Actions de facture"
         emptyState={{
           title: 'Aucune facture',
           description: 'Commencez par créer une nouvelle facture.',

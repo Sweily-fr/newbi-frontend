@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Table, Column } from '../../../common/Table';
+import { Table, Column, ActionMenuItem } from '../../../common/Table';
 import { Button, SearchInput } from '../../..';
-import { PlusIcon, EnvelopeIcon, PencilIcon, TrashIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
+import { Add, Sms, Edit2, Trash, TickCircle } from 'iconsax-react';
 import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../common/Spinner';
 
@@ -65,6 +65,7 @@ interface EmailSignaturesTableProps {
   onEditSignature?: (signature: EmailSignature) => void;
   onDeleteSignature?: (signature: EmailSignature) => void;
   onSetDefault?: (signature: EmailSignature) => void;
+  actionButtonLabel?: string;
 }
 
 export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({ 
@@ -75,7 +76,8 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
   onAddSignature,
   onEditSignature,
   onDeleteSignature,
-  onSetDefault
+  onSetDefault,
+  actionButtonLabel = "Actions"
 }) => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -123,9 +125,44 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
     }
   }, [loading]);
 
-  // Fonction pour stopper la propagation des événements
-  const stopPropagation = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Définir les actions disponibles pour le menu d'actions
+  const getActionItems = (): ActionMenuItem<EmailSignature>[] => {
+    const items: ActionMenuItem<EmailSignature>[] = [];
+    
+    // Ajouter l'action de modification si disponible
+    if (onEditSignature) {
+      items.push({
+        label: 'Modifier',
+        icon: <Edit2 size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (signature) => onEditSignature(signature)
+      });
+    }
+    
+    // Ajouter l'action pour définir comme défaut si disponible
+    if (onSetDefault) {
+      items.push({
+        label: 'Définir par défaut',
+        icon: <TickCircle size={16} variant="Linear" color="#22c55e" />,
+        onClick: (signature) => {
+          // Ne pas permettre de définir comme défaut si c'est déjà la signature par défaut
+          if (!signature.isDefault) {
+            onSetDefault(signature);
+          }
+        }
+      });
+    }
+    
+    // Ajouter l'action de suppression si disponible
+    if (onDeleteSignature) {
+      items.push({
+        label: 'Supprimer',
+        icon: <Trash size={16} variant="Linear" color="#ef4444" />,
+        onClick: (signature) => onDeleteSignature(signature),
+        variant: 'danger'
+      });
+    }
+    
+    return items;
   };
 
   // Définition des colonnes du tableau
@@ -135,7 +172,9 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
       accessor: (signature) => (
         <div className="flex items-center">
           {signature.isDefault && (
-            <CheckBadgeIcon className="h-5 w-5 text-green-600 mr-1" title="Signature par défaut" />
+            <div title="Signature par défaut">
+              <TickCircle size={20} variant="Linear" color="#22c55e" className="mr-1" />
+            </div>
           )}
           {signature.name}
         </div>
@@ -177,44 +216,15 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
     },
     {
       header: 'Actions',
-      accessor: (signature) => (
-        <div className="flex justify-end space-x-2" onClick={stopPropagation}>
-          {onEditSignature && (
-            <button
-              onClick={() => onEditSignature(signature)}
-              className="p-1 text-[#5b50ff] hover:text-[#4a41e0] rounded-full hover:bg-[#f0eeff]"
-              title="Modifier"
-            >
-              <PencilIcon className="h-5 w-5" />
-            </button>
-          )}
-          {onDeleteSignature && (
-            <button
-              onClick={() => onDeleteSignature(signature)}
-              className="p-1 text-red-600 hover:text-red-800 rounded-full hover:bg-red-100"
-              title="Supprimer"
-            >
-              <TrashIcon className="h-5 w-5" />
-            </button>
-          )}
-          {onSetDefault && !signature.isDefault && (
-            <button
-              onClick={() => onSetDefault(signature)}
-              className="p-1 text-green-600 hover:text-green-800 rounded-full hover:bg-green-100"
-              title="Définir comme signature par défaut"
-            >
-              <CheckBadgeIcon className="h-5 w-5" />
-            </button>
-          )}
-        </div>
-      ),
-      className: 'w-1/12'
+      accessor: () => null,
+      className: 'w-1/12',
+      isAction: true
     }
   ];
 
   // État vide pour le tableau
   const emptyState = {
-    icon: <EnvelopeIcon className="mx-auto h-12 w-12 text-gray-400" />,
+    icon: <Sms size={48} variant="Bulk" color="#9ca3af" className="mx-auto" />,
     title: "Aucune signature email",
     description: "Commencez par créer votre première signature email professionnelle.",
     action: onAddSignature ? (
@@ -223,7 +233,7 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
         variant="primary"
         className="inline-flex items-center"
       >
-        <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+        <Add size={20} color='#ffffff' variant="Linear" className="-ml-1 mr-2" />
         Créer une signature
       </Button>
     ) : undefined
@@ -256,7 +266,7 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
               variant="primary"
               className="inline-flex items-center"
             >
-              <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              <Add size={20} variant="Linear" color="#ffffff" className="-ml-1 mr-2" />
               Créer une signature
             </Button>
           )}
@@ -285,6 +295,8 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
             rowsPerPageOptions: [5, 10, 20, 50],
             onItemsPerPageChange: setLimit
           }}
+          actionItems={getActionItems()}
+          actionButtonLabel={actionButtonLabel}
         />
       </div>
     </div>

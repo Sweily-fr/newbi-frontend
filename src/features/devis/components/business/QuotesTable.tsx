@@ -6,9 +6,55 @@ import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../../components/common/Spinner';
 import { Button } from '../../../../components/';
 import { Notification } from '../../../../components/';
+import { DocumentText, ClipboardTick, Timer, NoteText, CloseCircle, DocumentCopy } from 'iconsax-react';
 
 // Type pour les onglets de filtrage
 export type TabType = 'DRAFT' | 'PENDING' | 'COMPLETED' | 'CANCELED' | null;
+
+// Interface pour les données de devis
+interface QuoteItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  vatRate: number;
+  unit: string;
+  discount?: number;
+  discountType?: string;
+  details?: string;
+}
+
+interface QuoteClient {
+  id: string;
+  name: string;
+  email: string;
+  address?: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
+  siret?: string;
+  vatNumber?: string;
+}
+
+interface Quote {
+  id: string;
+  number: string;
+  prefix: string;
+  status: string;
+  issueDate: string;
+  executionDate?: string;
+  dueDate: string;
+  createdAt: string;
+  totalHT: number;
+  totalTTC: number;
+  totalVAT: number;
+  client: QuoteClient;
+  items: QuoteItem[];
+  customFields?: Array<{ key: string; value: string }>;
+  convertedToInvoice?: boolean;
+  invoiceId?: string;
+}
 
 interface QuotesTableProps {
   activeTab: TabType;
@@ -18,9 +64,9 @@ interface QuotesTableProps {
   rowsPerPageOptions: number[];
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
-  onSelectQuote: (quote: any) => void;
+  onSelectQuote: (quote: Quote) => void;
   onCreateQuote?: () => void;
-  onRefresh?: (refetchFn: () => Promise<any>) => void;
+  onRefresh?: (refetchFn: () => Promise<unknown>) => void;
 }
 
 export const QuotesTable: React.FC<QuotesTableProps> = ({
@@ -89,113 +135,67 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
 
   // Gérer l'affichage du statut
   const renderStatus = (status: string) => {
-    let statusIcon = null;
+    let variant = '';
     let statusText = '';
-    let textColor = '';
+    let icon = null;
 
     switch (status) {
       case 'DRAFT':
         statusText = 'Brouillon';
-        textColor = 'text-gray-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
-            </svg>
-          </span>
-        );
+        variant = 'warning';
+        icon = <NoteText size={16} variant="Bold" className="mr-2" color="#f59e0b" />;
         break;
       case 'PENDING':
         statusText = 'En attente';
-        textColor = 'text-purple-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-purple-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-            </svg>
-          </span>
-        );
+        variant = 'primary';
+        icon = <Timer size={16} variant="Bold" className="mr-2" color="#5b50ff" />;
         break;
       case 'COMPLETED':
         statusText = 'Accepté';
-        textColor = 'text-green-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-green-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-          </span>
-        );
+        variant = 'success';
+        icon = <ClipboardTick size={16} variant="Bold" className="mr-2" color="#10b981" />;
         break;
       case 'CANCELED':
         statusText = 'Annulé';
-        textColor = 'text-red-600';
-        statusIcon = (
-          <span className="w-4 h-4 mr-1 text-red-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
-            </svg>
-          </span>
-        );
+        variant = 'danger';
+        icon = <CloseCircle size={16} variant="Bold" className="mr-2" color="#ef4444" />;
         break;
       default:
         statusText = 'Inconnu';
-        textColor = 'text-gray-800';
+        variant = 'default';
+        icon = <CloseCircle size={16} variant="Bold" className="mr-2" color="#6b7280" />;
     }
 
+    // Classes pour les différentes variantes de tags
+    const variantClasses = {
+      primary: 'bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]',
+      success: 'bg-[#ecfdf5] text-[#10b981] border border-[#d1fae5]',
+      warning: 'bg-[#fffbeb] text-[#f59e0b] border border-[#fef3c7]',
+      danger: 'bg-[#fef2f2] text-[#ef4444] border border-[#fee2e2]',
+      default: 'bg-gray-100 text-gray-800 border border-gray-200'
+    };
+
     return (
-      <span className={`px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full border ${textColor} bg-white`}>
-        {statusIcon}
+      <span className={`px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 ${variantClasses[variant as keyof typeof variantClasses]}`}>
+        {icon}
         {statusText}
       </span>
     );
   };
 
   // Afficher si le devis a été converti en facture
-  const renderConvertedStatus = (quote: any) => {
+  const renderConvertedStatus = (quote: Quote) => {
     if (quote.convertedToInvoice) {
       return (
-        <span className="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full border text-blue-600 bg-white">
-          <span className="w-4 h-4 mr-1 text-blue-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z" />
-            </svg>
-          </span>
+        <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]">
+          <DocumentCopy size={16} variant="Bold" className="mr-2" color="#5b50ff" />
           Facturé
         </span>
       );
     }
     return (
-      <span className="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full border text-gray-400 bg-white">
-        <span className="w-4 h-4 mr-1 text-gray-400">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z" />
-          </svg>
-        </span>
+      <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-gray-100 text-gray-600 border border-gray-200">
+        <DocumentText size={16} variant="Bold" className="mr-2" color="#6b7280" />
         Non facturé
       </span>
     );
@@ -214,7 +214,7 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
           columns={[
             {
               header: 'Numéro',
-              accessor: (quote: any) => (
+              accessor: (quote: Quote) => (
                 <span className="font-medium text-gray-900">
                   {quote.prefix}{quote.number}
                 </span>
@@ -227,39 +227,41 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
             },
             {
               header: 'Statut',
-              accessor: (quote: any) => renderStatus(quote.status),
+              accessor: (quote: Quote) => renderStatus(quote.status),
               className: 'text-center'
             },
             {
               header: 'Conversion',
-              accessor: (quote: any) => renderConvertedStatus(quote),
+              accessor: (quote: Quote) => renderConvertedStatus(quote),
               className: 'text-center'
             },
             {
               header: 'Date',
-              accessor: (quote: any) => formatDateShort(quote.issueDate),
+              accessor: (quote: Quote) => formatDateShort(quote.issueDate),
               className: 'text-gray-500'
             },
             {
               header: 'Montant',
-              accessor: (quote: any) => `${quote.totalTTC?.toFixed(2) || '0.00'} €`,
+              accessor: (quote: Quote) => `${quote.totalTTC?.toFixed(2) || '0.00'} €`,
               className: 'text-right text-gray-900 font-medium'
             },
             {
               header: 'Actions',
-              accessor: (quote: any) => (
-                <button
-                  onClick={() => onSelectQuote(quote)}
-                  className="text-[#5b50ff] hover:text-[#4a41e0] font-medium cursor-pointer"
-                >
-                  Voir
-                </button>
-              ),
+              isAction: true,
+              accessor: 'id',
               className: 'text-right'
             }
           ]}
           data={displayedQuotes}
-          keyExtractor={(quote: any) => quote.id}
+          keyExtractor={(quote: Quote) => quote.id}
+          actionItems={[
+            {
+              label: 'Voir le devis',
+              icon: <DocumentText size={18} variant="Bulk" color="#5b50ff" />,
+              onClick: (quote) => onSelectQuote(quote)
+            }
+          ]}
+          actionButtonLabel="Actions de devis"
           emptyState={{
             title: 'Aucun devis',
             description: 'Commencez par créer un nouveau devis.',

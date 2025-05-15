@@ -1,5 +1,6 @@
 // /src/components/navigation/Pagination.tsx
 import React from 'react';
+import Select from '../../common/Select';
 
 export interface PaginationProps {
   currentPage: number;
@@ -79,14 +80,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
         >
           Précédent
         </button>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage * itemsPerPage >= totalItems && !hasNextPage}
-          className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          className="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
         >
           Suivant
         </button>
@@ -105,30 +106,30 @@ export const Pagination: React.FC<PaginationProps> = ({
               <label htmlFor="rows-per-page" className="text-sm text-gray-700">
                 Lignes par page:
               </label>
-              <select
+              <Select
                 id="rows-per-page"
-                value={itemsPerPage}
+                name="itemsPerPage"
+                value={itemsPerPage.toString()}
                 onChange={(e) => {
                   onItemsPerPageChange(Number(e.target.value));
                 }}
-                className="rounded-md border-gray-300 py-1.5 text-sm text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-600"
-              >
-                {rowsPerPageOptions.map(option => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                options={rowsPerPageOptions.map(option => ({
+                  value: option.toString(),
+                  label: option.toString()
+                }))}
+                className="w-24"
+                selectClassName="py-1.5 text-sm focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 hover:border-[#4a41e0]"
+              />
             </div>
           )}
         </div>
         <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <nav className="relative z-0 inline-flex rounded-md -space-x-px" aria-label="Pagination">
             {/* Bouton Précédent */}
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              className="relative inline-flex items-center px-2 py-2 rounded-l-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
             >
               <span className="sr-only">Précédent</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -143,7 +144,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 return (
                   <span
                     key={`ellipsis-${index}`}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                    className="relative inline-flex items-center px-4 py-2 bg-white text-sm font-medium text-gray-700"
                   >
                     ...
                   </span>
@@ -155,10 +156,10 @@ export const Pagination: React.FC<PaginationProps> = ({
                 <button
                   key={`page-${pageNumber}`}
                   onClick={() => handlePageChange(pageNumber)}
-                  className={`relative inline-flex items-center px-4 py-2 border ${
+                  className={`relative inline-flex items-center px-4 py-2 ${
                     currentPage === pageNumber
-                      ? 'z-10 bg-[#f9f8ff] border-[#5b50ff] text-[#5b50ff]'
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      ? 'z-10 bg-[#5b50ff] text-white rounded-[10px]'
+                      : 'bg-white text-gray-500 hover:bg-gray-50'
                   } text-sm font-medium`}
                 >
                   {pageNumber}
@@ -170,7 +171,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage * itemsPerPage >= totalItems && !hasNextPage}
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              className="relative inline-flex items-center px-2 py-2 rounded-r-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
             >
               <span className="sr-only">Suivant</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

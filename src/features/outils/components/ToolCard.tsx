@@ -74,8 +74,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
         <div className="mt-auto pt-3">
           <Button
             variant="outline"
-            className={`rounded-lg font-medium text-sm py-2.5 px-5 w-full transition-all duration-300 
-              ${tool.premium ? 'border-[#5b50ff] text-[#5b50ff]' : ''}
+            size="md"
+            fullWidth
+            className={`font-medium transition-all duration-300 
+              ${tool.premium ? 'text-[#5b50ff]' : ''}
               group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:transform group-hover:translate-y-[-2px]
               pointer-events-none
             `}
