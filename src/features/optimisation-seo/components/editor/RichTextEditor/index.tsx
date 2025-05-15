@@ -16,6 +16,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const editorRef = useRef<HTMLDivElement>(null);
   
   const {
+    isLinkPopupOpen,
     setIsLinkPopupOpen,
     isImagePopupOpen,
     setIsImagePopupOpen,
@@ -48,7 +49,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   // Variables temporaires pour éviter les erreurs de rendu
   const isAnalyzing = false;
-  const isLinkPopupOpen = false;
 
   // Initialisation de l'éditeur
   useEffect(() => {
