@@ -4,6 +4,7 @@ import { Notification } from '../../../components/common/Notification';
 import { CREATE_EMAIL_SIGNATURE, UPDATE_EMAIL_SIGNATURE } from '../../../graphql/emailSignatures';
 import { SignatureData } from '../types';
 import { useSignatureValidation } from './useSignatureValidation';
+import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
 
 /**
  * Hook simple pour enregistrer une signature de mail
@@ -75,7 +76,7 @@ export const useSaveSignature = () => {
       isDefault: data.isDefault !== undefined ? data.isDefault : false,
       profilePhotoUrl: data.profilePhotoUrl || '',
       profilePhotoBase64: data.profilePhotoBase64 || null,
-      profilePhotoSize: data.profilePhotoSize || 50,
+      profilePhotoSize: data.profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE,
       layout: data.layout || 'vertical',
       horizontalSpacing: data.horizontalSpacing || 10,
       verticalSpacing: data.verticalSpacing || 10,

@@ -4,6 +4,7 @@ import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../../../components/';
 import { SignatureLayout } from './SignatureLayout';
 import { getFullProfilePhotoUrl } from './utils';
+import { DEFAULT_PROFILE_PHOTO_SIZE } from '../../constants/images';
 
 interface EmailSignaturePreviewProps {
   // Accepte soit un objet signature complet, soit des propriétés individuelles
@@ -103,7 +104,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const logoUrl = signature?.logoUrl || propLogoUrl;
   const profilePhotoUrl = signature?.profilePhotoUrl || propProfilePhotoUrl;
   const profilePhotoBase64 = signature?.profilePhotoBase64 || propProfilePhotoBase64;
-  const profilePhotoSize = signature?.profilePhotoSize || propProfilePhotoSize || 80;
+  const profilePhotoSize = signature?.profilePhotoSize || propProfilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE;
   const layout = signature?.layout || propLayout || 'vertical';
   const horizontalSpacing = signature?.horizontalSpacing || propHorizontalSpacing || 20;
   const verticalSpacing = signature?.verticalSpacing || propVerticalSpacing || 10;
@@ -112,20 +113,26 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const textColor = signature?.textColor || propTextColor || '#333333';
   const primaryColor = signature?.primaryColor || propPrimaryColor || '#5b50ff';
   const secondaryColor = signature?.secondaryColor || propSecondaryColor || '#333333';
-  const socialLinksIconColor = signature?.socialLinksIconColor || propSocialLinksIconColor || '#333333';
+  const socialLinksIconColor = signature?.socialLinksIconColor || propSocialLinksIconColor || '#ffffff';
   const textAlignment = signature?.textAlignment || propTextAlignment || 'left';
   const socialLinks = signature?.socialLinks || propSocialLinks;
   const socialLinksDisplayMode = signature?.socialLinksDisplayMode || propSocialLinksDisplayMode || 'icons';
   const socialLinksPosition = signature?.socialLinksPosition || 'bottom';
   const socialLinksIconStyle = signature?.socialLinksIconStyle || propSocialLinksIconStyle || 'simple';
-  const showLogo = signature?.showLogo ?? propShowLogo ?? true;
+  // Modification de la logique pour s'assurer que false est correctement pris en compte
+  // Si signature?.showLogo est explicitement défini (même à false), on l'utilise
+  // Sinon, on utilise propShowLogo si défini, sinon true par défaut
+  const showLogo = signature?.showLogo !== undefined ? signature.showLogo : (propShowLogo !== undefined ? propShowLogo : true);
+  console.log('EmailSignaturePreviewNew - signature?.showLogo:', signature?.showLogo, 'type:', typeof signature?.showLogo);
+  console.log('EmailSignaturePreviewNew - propShowLogo:', propShowLogo, 'type:', typeof propShowLogo);
+  console.log('EmailSignaturePreviewNew - showLogo (calculé):', showLogo, 'type:', typeof showLogo);
   const fontSize = signature?.fontSize || propFontSize || 14;
   const textStyle = signature?.textStyle || propTextStyle || 'normal';
   const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
   const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
 
   // Définir la taille de la photo de profil avec une valeur par défaut
-  const photoSize = profilePhotoSize || 80; // Taille par défaut: 80px
+  const photoSize = profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE;
 
   // Définir l'alignement effectif en fonction de la disposition
   const effectiveTextAlignment = textAlignment as 'left' | 'center' | 'right';
@@ -140,7 +147,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   console.log('EmailSignaturePreviewNew Debug - Layout changed:', { layout, signatureLayout });
 
   // Utiliser profilePhotoBase64 s'il est disponible, sinon utiliser profilePhotoUrl
-  // S'assurer que l'image par défaut n'est pas utilisée si une photo a été téléchargée
+  // Si aucune image personnalisée n'est fournie, profilePhotoSource sera null pour afficher l'icône Profile
   const profilePhotoSource = profilePhotoBase64 || (profilePhotoUrl && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg' ? profilePhotoUrl : null);
   
   // Définir le logo Newbi par défaut si aucun logo n'est fourni
@@ -234,16 +241,13 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
           </div>
           
           {/* Corps de l'email */}
-          <div className="px-6 py-5">
+          <div className="px-6 pb-5">
             <div className="text-gray-800 mb-8 text-sm">
-              <p className="mb-2">Bonjour,</p>
-              <p className="mb-2">Je vous remercie pour votre message et l'intérêt que vous portez à nos services.</p>
-              <p className="mb-2">Je reste à votre disposition pour toute information complémentaire.</p>
-              <p className="mb-4">Cordialement,</p>
+              {/* Espace réservé pour le contenu de l'email */}
             </div>
             
             {/* Signature */}
-            <div ref={signatureRef} style={signatureStyle} className="border-t pt-4">
+            <div ref={signatureRef} style={signatureStyle} className="pt-1">
               <SignatureLayout
                 signatureLayout={signatureLayout}
                 fullName={fullName}

@@ -39,7 +39,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button 
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('bold');
+              // Approche ultra-directe pour le formatage en gras
+              document.execCommand('bold', false);
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
             className={`p-1.5 rounded hover:bg-[#f0eeff] transition-colors duration-200 ${activeFormats.bold ? 'bg-[#d8d3ff]' : ''}`}
             title="Gras"
@@ -51,7 +56,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button 
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('italic');
+              // Approche ultra-directe pour le formatage en italique
+              document.execCommand('italic', false);
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
             className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.italic ? 'bg-[#d8d3ff]' : ''}`}
             title="Italique"
@@ -63,7 +73,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button 
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('underline');
+              // Approche ultra-directe pour le soulignement
+              document.execCommand('underline', false);
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
             className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.underline ? 'bg-[#d8d3ff]' : ''}`}
             title="Souligné"
@@ -84,7 +99,16 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             title="Titre H1"
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('formatBlock', '<h1>');
+              // Si le format H1 est déjà actif, appliquer directement le format paragraphe
+              if (activeFormats.h1) {
+                document.execCommand('formatBlock', false, '<p>');
+              } else {
+                document.execCommand('formatBlock', false, '<h1>');
+              }
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
           >
             <span className="font-bold text-sm">H1</span>
@@ -94,7 +118,16 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             title="Titre H2"
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('formatBlock', '<h2>');
+              // Si le format H2 est déjà actif, appliquer directement le format paragraphe
+              if (activeFormats.h2) {
+                document.execCommand('formatBlock', false, '<p>');
+              } else {
+                document.execCommand('formatBlock', false, '<h2>');
+              }
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
           >
             <span className="font-bold text-sm">H2</span>
@@ -104,7 +137,16 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             title="Titre H3"
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('formatBlock', '<h3>');
+              // Si le format H3 est déjà actif, appliquer directement le format paragraphe
+              if (activeFormats.h3) {
+                document.execCommand('formatBlock', false, '<p>');
+              } else {
+                document.execCommand('formatBlock', false, '<h3>');
+              }
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
           >
             <span className="font-bold text-sm">H3</span>
@@ -114,7 +156,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             title="Paragraphe"
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('formatBlock', '<p>');
+              // Approche directe pour le formatage en paragraphe
+              document.execCommand('formatBlock', false, '<p>');
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
           >
             <span className="text-sm">P</span>
@@ -167,7 +214,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button 
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('insertUnorderedList');
+              // Approche directe pour la liste à puces
+              document.execCommand('insertUnorderedList', false);
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
             className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.ul ? 'bg-[#d8d3ff]' : ''}`}
             title="Liste à puces"
@@ -184,7 +236,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button 
             onMouseDown={(e) => {
               e.preventDefault();
-              handleFormatAction('insertOrderedList');
+              // Approche directe pour la liste numérotée
+              document.execCommand('insertOrderedList', false);
+              // Mettre à jour les formats actifs après un court délai
+              setTimeout(() => {
+                handleFormatAction('checkFormat');
+              }, 10);
             }}
             className={`p-1.5 rounded hover:bg-[#e6e1ff] transition-colors duration-200 ${activeFormats.ol ? 'bg-[#d8d3ff]' : ''}`}
             title="Liste numérotée"

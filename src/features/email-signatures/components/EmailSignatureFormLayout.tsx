@@ -78,6 +78,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   }, [showPrimaryColorPicker, showSecondaryColorPicker]);
   
   // État pour stocker les données de la signature
+  // État pour stocker les données de la signature
   const [signatureData, setSignatureData] = useState<SignatureData>(initialData || {
     // Propriétés générales
     name: 'Ma signature professionnelle',
@@ -99,6 +100,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     
     // Réseaux sociaux
     socialLinks: {
+
       linkedin: 'https://www.linkedin.com/company/newbi',
       twitter: 'https://twitter.com/newbi',
       facebook: 'https://www.facebook.com/newbi',
@@ -106,7 +108,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     },
     socialLinksDisplayMode: 'icons',
     socialLinksIconStyle: 'circle',
-    socialLinksIconColor: '#333333', // Couleur spécifique pour les icônes SVG des réseaux sociaux
+    socialLinksIconColor: '#ffffff', // Couleur spécifique pour les icônes SVG des réseaux sociaux
     socialLinksPosition: 'bottom', // Position des réseaux sociaux par défaut
     
     // Apparence
@@ -130,6 +132,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     // Modèle
     templateId: '1'
   });
+  
   
   // Notifier le composant parent des données initiales
   useEffect(() => {
@@ -230,7 +233,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       // Transmettre la position des réseaux sociaux (avec cast pour éviter les erreurs de type)
       socialLinksPosition: data.socialLinksPosition as any,
       // Transmettre l'espacement entre icônes et texte
-      iconTextSpacing: data.iconTextSpacing
+      iconTextSpacing: data.iconTextSpacing,
+      // Ajouter la propriété showLogo pour contrôler l'affichage du logo
+      showLogo: data.showLogo
     } as Partial<EmailSignature>; // Cast pour éviter les erreurs TypeScript dues aux conflits de fusion
   };
 
