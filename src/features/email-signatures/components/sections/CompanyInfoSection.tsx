@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Import } from 'iconsax-react';
+import { Import, InfoCircle } from 'iconsax-react';
 import { SignatureData } from '../../types';
 import { useCompany } from '../../../profile/hooks';
 import { Notification } from '../../../../components/';
-import { ImageUploader } from '../../../../components/common/ImageUploader';
+import { Checkbox } from '../../../../components/common/Checkbox';
 
 interface CompanyInfoSectionProps {
   signatureData: SignatureData;
@@ -20,73 +20,122 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   // Récupérer les informations de l'entreprise de l'utilisateur
   const { company, loading } = useCompany();
   
-  // État pour la prévisualisation du logo
-  const [logoPreview, setLogoPreview] = useState<string | null>(signatureData.customLogoUrl || null);
+  // États locaux pour les champs d'entreprise
+  const [localCompanyName, setLocalCompanyName] = useState(signatureData.companyName);
+  const [localCompanyWebsite, setLocalCompanyWebsite] = useState(signatureData.companyWebsite);
+  const [localCompanyAddress, setLocalCompanyAddress] = useState(signatureData.companyAddress);
   
-  // Fonction simplifiée pour importer les informations de l'entreprise
+  // État pour gérer l'affichage du logo dans la prévisualisation
+  const [showLogo, setShowLogo] = useState(signatureData.showLogo !== false);
+  
+  // S'assurer que la valeur initiale de showLogo est correctement définie dans les données de signature
+  useEffect(() => {
+    // Définir explicitement la valeur de showLogo dans les données de signature au chargement
+    updateSignatureData('showLogo', showLogo);
+  }, []);
+  
+  // Synchroniser les états locaux avec les données de signature
+  useEffect(() => {
+    updateSignatureData('companyName', localCompanyName);
+    updateSignatureData('companyWebsite', localCompanyWebsite);
+    updateSignatureData('companyAddress', localCompanyAddress);
+
+  }, [localCompanyName, localCompanyWebsite, localCompanyAddress]);
+  
+  // État pour suivre si les informations de l'entreprise ont été explicitement importées via le bouton
+  const [companyInfoImported, setCompanyInfoImported] = useState(false);
+  
+  // Récupérer l'URL de l'API depuis les variables d'environnement
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  
+  /**
+   * Importe les informations de l'entreprise depuis les données de l'API
+   * Cette fonction utilise des états locaux pour éviter les conflits d'état
+   */
   const importCompanyInfo = () => {
     if (!company) {
       Notification.warning('Aucune information d\'entreprise disponible');
       return;
     }
     
-    console.log('Données d\'entreprise disponibles:', company);
-    console.log('Données de signature avant mise à jour:', signatureData);
+    console.log('Début de l\'importation des données d\'entreprise');
     
-    // Créer un objet avec toutes les mises à jour
-    const updates = {
-      companyName: company.name || signatureData.companyName,
-      companyWebsite: company.website || signatureData.companyWebsite,
-      companyAddress: company.address ? 
-        `${company.address.street || ''}, ${company.address.postalCode || ''} ${company.address.city || ''}, ${company.address.country || ''}` : 
-        signatureData.companyAddress
-    };
-    
-    // Appliquer chaque mise à jour individuellement
-    Object.entries(updates).forEach(([key, value]) => {
-      console.log(`Mise à jour de ${key}:`, value);
-      updateSignatureData(key as keyof SignatureData, value);
-    });
-    
-    // Afficher une notification de succès
-    Notification.success('Informations de l\'entreprise importées avec succès', {
-      duration: 3000,
-      position: 'bottom-left'
-    });
-  };
-  
-  // Gérer le changement de logo
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Vérifier le type de fichier (uniquement images)
-    if (!file.type.match('image.*')) {
-      Notification.error('Veuillez sélectionner une image valide');
-      return;
+    // Formater l'URL du logo si elle existe
+    let logoUrl = '';
+    if (company.logo) {
+      logoUrl = company.logo;
+      
+      // Assurer que l'URL est complète
+      if (logoUrl.startsWith('/uploads/')) {
+        logoUrl = `${apiUrl}${logoUrl}`;
+      } else if (logoUrl.startsWith('uploads/')) {
+        logoUrl = `${apiUrl}/${logoUrl}`;
+      } else if (!logoUrl.startsWith('http')) {
+        logoUrl = `http://${logoUrl}`;
+      }
+      
+      // Vérifier si l'URL contient déjà le domaine de l'API
+      if (logoUrl.includes('company-logos') && !logoUrl.includes(apiUrl)) {
+        const logoPath = logoUrl.includes('/uploads/') 
+          ? logoUrl.substring(logoUrl.indexOf('/uploads/')) 
+          : `/uploads/company-logos/${logoUrl.split('/').pop()}`;
+        logoUrl = `${apiUrl}${logoPath}`;
+      }
     }
     
-    // Vérifier la taille du fichier (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      Notification.error('L\'image ne doit pas dépasser 2MB');
-      return;
-    }
+    // Préparer les données formatées
+    const companyName = company.name || '';
+    const companyWebsite = company.website 
+      ? (company.website.startsWith('http') ? company.website : `https://${company.website}`)
+      : '';
+    const companyAddress = company.address 
+      ? `${company.address.street || ''}, ${company.address.postalCode || ''} ${company.address.city || ''}, ${company.address.country || ''}`
+      : '';
     
-    // Convertir l'image en Base64
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setLogoPreview(base64);
-      updateSignatureData('customLogoUrl', base64);
-    };
-    reader.readAsDataURL(file);
+    console.log('Données formatées pour l\'importation:', {
+      companyName,
+      companyWebsite,
+      companyAddress,
+      logoUrl
+    });
+    
+    try {
+      // Mettre à jour les états locaux au lieu de mettre à jour directement signatureData
+      // Cela déclenchera les effets qui mettront à jour signatureData
+      console.log('Valeur de l\'adresse avant mise à jour:', localCompanyAddress);
+      console.log('Nouvelle valeur d\'adresse à importer:', companyAddress);
+      
+      setLocalCompanyName(companyName);
+      setLocalCompanyWebsite(companyWebsite);
+      setLocalCompanyAddress(companyAddress);
+      
+      // Vérifier que l'adresse a bien été mise à jour
+      setTimeout(() => {
+        console.log('Valeur de l\'adresse après mise à jour:', localCompanyAddress);
+      }, 0);
+      
+      // Mettre à jour le logo directement car il n'a pas d'état local
+      if (logoUrl) {
+        updateSignatureData('customLogoUrl', logoUrl);
+      }
+      
+      // Marquer que les informations de l'entreprise ont été importées
+      setCompanyInfoImported(true);
+      
+      // Afficher une notification de succès
+      Notification.success('Informations de l\'entreprise importées avec succès', {
+        duration: 3000,
+        position: 'bottom-left'
+      });
+      
+      console.log('Importation terminée avec succès');
+    } catch (error) {
+      console.error('Erreur lors de l\'importation des données:', error);
+      Notification.error('Erreur lors de l\'importation des données');
+    }
   };
   
-  // Gérer la suppression du logo
-  const handleRemoveLogo = () => {
-    setLogoPreview(null);
-    updateSignatureData('customLogoUrl', undefined);
-  };
+  // Les fonctions de gestion du logo ont été supprimées car le logo est uniquement géré via l'importation des informations d'entreprise
   
   // Surveiller les changements dans les données de l'entreprise
   useEffect(() => {
@@ -95,10 +144,8 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
     }
   }, [company]);
   
-  // Mettre à jour la prévisualisation du logo lorsque les données de signature changent
-  useEffect(() => {
-    setLogoPreview(signatureData.customLogoUrl || null);
-  }, [signatureData.customLogoUrl]);
+  // Nous supprimons l'effet qui définit automatiquement companyInfoImported à true
+  // pour que seul le clic sur le bouton d'importation puisse activer l'affichage du logo
 
   return (
     <>
@@ -118,23 +165,79 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
               </div>
             </div>
             
-            {/* Section Logo d'entreprise */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Logo d'entreprise
-              </label>
-              <ImageUploader
-                imageUrl=""
-                previewImage={logoPreview}
-                isLoading={false}
-                roundedStyle="square"
-                imageSize={80}
-                objectFit="contain"
-                onFileSelect={handleLogoChange}
-                onDelete={handleRemoveLogo}
-                helpText="Format recommandé: PNG ou SVG, max 2MB"
-              />
-            </div>
+            {/* Affichage du logo d'entreprise uniquement après importation explicite */}
+            {companyInfoImported && signatureData.customLogoUrl && (
+              <div className="mb-6">
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Logo d'entreprise
+                  </label>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="relative w-20 h-20 border border-gray-200 rounded-full flex items-center justify-center overflow-hidden bg-gray-50">
+                    {signatureData.customLogoUrl ? (
+                      <>
+                        {/* Utiliser une image avec source absolue */}
+                        <img 
+                          src={signatureData.customLogoUrl} 
+                          alt="Logo entreprise" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('Erreur de chargement de l\'image:', e);
+                            // Afficher un message d'erreur dans la console
+                            console.log('URL du logo qui a échoué:', signatureData.customLogoUrl);
+                            // Afficher un message d'erreur à la place de l'image
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            // Ajouter un message d'erreur dans le parent
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorMsg = document.createElement('div');
+                              errorMsg.className = 'text-red-500 text-xs text-center';
+                              errorMsg.innerText = 'Erreur de chargement';
+                              parent.appendChild(errorMsg);
+                            }
+                          }}
+                          onLoad={() => console.log('Image chargée avec succès:', signatureData.customLogoUrl)}
+                        />
+                        {/* Aucun lien visuel sur l'image */}
+                      </>
+                    ) : (
+                      <div className="text-gray-400 text-sm">Logo non disponible</div>
+                    )}
+                    </div>
+                    
+                    {/* Icône d'information positionnée en haut à droite du cercle */}
+                    <div className="absolute -top-[-1px] -right-[-1px] group">
+                      <InfoCircle size="16" color="#5b50ff" variant="Bold" className="cursor-help" />
+                      <div className="absolute right-0 -top-2 transform -translate-y-full hidden group-hover:block w-64 bg-white border border-gray-200 rounded-md shadow-md p-3 z-10 origin-top-right">
+                        <p className="text-sm text-gray-700 mb-1">Le logo de votre entreprise sera utilisé dans votre signature email.</p>
+                        <p className="text-xs text-gray-500">Pour modifier ce logo, rendez-vous dans les paramètres de votre entreprise.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center">
+                      <Checkbox
+                        id="show-logo-checkbox"
+                        name="showLogo"
+                        label="Afficher le logo"
+                        checked={showLogo}
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          setShowLogo(isChecked);
+                          // Mettre à jour les données de signature avec la nouvelle valeur
+                          updateSignatureData('showLogo', isChecked);
+                          console.log('Mise à jour de showLogo:', isChecked);
+                        }}
+                      />
+                    </div>
+                    {/* Le bouton "Tester l'URL" a été supprimé */}
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               {/* Nom de l'entreprise */}
@@ -146,8 +249,8 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                   type="text" 
                   className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
                   placeholder="Newbi"
-                  value={signatureData.companyName}
-                  onChange={(e) => updateSignatureData('companyName', e.target.value)}
+                  value={localCompanyName}
+                  onChange={(e) => setLocalCompanyName(e.target.value)}
                 />
               </div>
               
@@ -160,8 +263,8 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                   type="url" 
                   className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
                   placeholder="https://www.exemple.com"
-                  value={signatureData.companyWebsite}
-                  onChange={(e) => updateSignatureData('companyWebsite', e.target.value)}
+                  value={localCompanyWebsite}
+                  onChange={(e) => setLocalCompanyWebsite(e.target.value)}
                 />
               </div>
               
@@ -173,8 +276,11 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                 <textarea 
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
                   placeholder="Ex: 123 Rue Exemple, 75000 Paris, France"
-                  value={signatureData.companyAddress}
-                  onChange={(e) => updateSignatureData('companyAddress', e.target.value)}
+                  value={localCompanyAddress}
+                  onChange={(e) => {
+                    console.log('Changement manuel de l\'adresse:', e.target.value);
+                    setLocalCompanyAddress(e.target.value);
+                  }}
                   rows={2}
                 ></textarea>
               </div>

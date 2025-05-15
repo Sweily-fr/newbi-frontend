@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client';
 import { useState, useEffect } from 'react';
 import { GET_EMAIL_SIGNATURE } from '../../../graphql/emailSignatures';
 import { SignatureData } from '../types';
+import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
 
 /**
  * Hook pour récupérer les données d'une signature existante
@@ -48,7 +49,7 @@ export const useGetSignature = (id?: string) => {
         customLogoUrl: signature.logoUrl || '',
         showLogo: signature.showLogo || true,
         profilePhotoUrl: signature.profilePhotoUrl || '',
-        profilePhotoSize: signature.profilePhotoSize || 80,
+        profilePhotoSize: signature.profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE,
         fontFamily: signature.fontFamily || 'Arial',
         fontSize: signature.fontSize || 14,
         textStyle: 'normal',
