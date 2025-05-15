@@ -174,7 +174,7 @@ export const InvoicesPage = () => {
             />
           
             <SearchInput
-              placeholder="Rechercher par numéro, client, date, ou montant..."
+              placeholder="Rechercher par numéro, client..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               width="w-72"
