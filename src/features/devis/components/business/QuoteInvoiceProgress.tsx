@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTE } from '../../graphql/quotes';
 import { Notification } from '../../../../components/';
+import { Chart, DocumentText, TickCircle, Receipt21, ArrowRight2 } from 'iconsax-react';
 
 interface Invoice {
   id: string;
@@ -25,6 +26,8 @@ export const QuoteInvoiceProgress: React.FC<QuoteInvoiceProgressProps> = ({
   quoteId,
   refreshInterval = 2000 // 2 secondes par défaut
 }) => {
+  // État pour contrôler l'affichage du contenu
+  const [isContentVisible, setIsContentVisible] = useState(true);
   // Utiliser useQuery pour récupérer les données du devis en temps réel
   const { data, refetch, startPolling, stopPolling } = useQuery(GET_QUOTE, {
     variables: { id: quoteId },
@@ -81,117 +84,132 @@ export const QuoteInvoiceProgress: React.FC<QuoteInvoiceProgressProps> = ({
   const completedPercentage = (completedAmount / quoteTotal) * 100;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-[#e6e1ff] overflow-hidden">
+    <div className="bg-white rounded-lg border border-[#e6e1ff] overflow-hidden">
       <div className="px-4 py-3 bg-[#f0eeff] border-b border-[#e6e1ff]">
-        <h3 className="text-sm font-medium text-[#5b50ff] flex items-center">
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-          </svg>
-          Progression de facturation
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-[#5b50ff] flex items-center">
+            <Chart size="18" color="#5b50ff" variant="Bold" className="mr-4 text-[#5b50ff]" />
+            Progression de facturation
+          </h3>
+          <span 
+            className="text-xs font-medium bg-white text-[#5b50ff] px-3 py-1 rounded-full shadow-sm border border-[#e6e1ff] cursor-pointer hover:bg-[#f0eeff] transition-all duration-300"
+            onClick={() => setIsContentVisible(!isContentVisible)}
+          >
+            {isContentVisible ? "Masquer" : "Afficher"}
+          </span>
+        </div>
       </div>
       
-      <div className="p-4 space-y-4">
+      {isContentVisible && (
+        <div className="p-4 space-y-4 transition-all duration-300">
         {/* Barre de progression */}
-        <div>
+        <div className="group">
           <div className="flex justify-between mb-1">
-            <span className="text-xs text-gray-500 flex items-center">
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+            <span className="text-xs text-gray-600 flex items-center font-medium">
+              <DocumentText size="14" color="#5b50ff" variant="Bold" className="mr-1.5 text-[#5b50ff]" />
               Facturé
             </span>
-            <span className="text-xs font-medium text-[#5b50ff]">{invoicedPercentage.toFixed(1)}%</span>
+            <span className="text-xs font-medium text-[#5b50ff] bg-[#f0eeff] px-2 py-0.5 rounded-full transition-all duration-300 group-hover:bg-[#e6e1ff] inline-block whitespace-nowrap">
+              {invoicedPercentage.toFixed(1)}%
+            </span>
           </div>
-          <div className="w-full h-2.5 bg-[#f0eeff] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-[#f0eeff] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#5b50ff] rounded-full transition-all duration-500 ease-in-out"
+              className="h-full bg-[#5b50ff] rounded-full transition-all duration-500 ease-in-out shadow-inner"
               style={{ width: `${invoicedPercentage}%` }}
             ></div>
           </div>
         </div>
 
         {/* Barre de progression des factures terminées */}
-        <div>
+        <div className="group">
           <div className="flex justify-between mb-1">
-            <span className="text-xs text-gray-500 flex items-center">
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+            <span className="text-xs text-gray-600 flex items-center font-medium">
+              <TickCircle size="14" color="#5b50FF" variant="Bold" className="mr-1.5 text-[#4a41e0]" />
               Encaissé
             </span>
-            <span className="text-xs font-medium text-[#4a41e0]">{completedPercentage.toFixed(1)}%</span>
+            <span className="text-xs font-medium text-[#4a41e0] bg-[#f0eeff] px-2 py-0.5 rounded-full transition-all duration-300 group-hover:bg-[#e6e1ff] inline-block whitespace-nowrap">
+              {completedPercentage.toFixed(1)}%
+            </span>
           </div>
-          <div className="w-full h-2.5 bg-[#f0eeff] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-[#f0eeff] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#4a41e0] rounded-full transition-all duration-500 ease-in-out"
+              className="h-full bg-[#4a41e0] rounded-full transition-all duration-500 ease-in-out shadow-inner"
               style={{ width: `${completedPercentage}%` }}
             ></div>
           </div>
         </div>
 
         {/* Informations sur les montants */}
-        <div className="pt-3 border-t border-[#f0eeff] space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Montant total :</span>
-            <span className="font-medium text-gray-800">{quoteTotal.toFixed(2)} €</span>
+        <div className="pt-4 border-t border-[#f0eeff] space-y-2.5">
+          <div className="flex justify-between text-sm items-center">
+            <span className="text-gray-600 flex items-center">
+              <Receipt21 size="16" color="#5b50FF" className="mr-1.5 text-gray-500" />
+              Montant total :
+            </span>
+            <span className="font-medium text-gray-800 bg-[#f0eeff] px-2.5 py-1 rounded-lg">{quoteTotal.toFixed(2)} €</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm items-center">
             <span className="text-gray-600">Montant facturé :</span>
-            <span className="font-medium text-[#5b50ff]">{invoicedAmount.toFixed(2)} € ({invoicedPercentage.toFixed(1)}%)</span>
+            <span className="font-medium text-[#5b50ff]">{invoicedAmount.toFixed(2)} € <span className="text-xs px-1.5 py-0.5 rounded-full ml-1 inline-block whitespace-nowrap">({invoicedPercentage.toFixed(1)}%)</span></span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm items-center">
             <span className="text-gray-600">Montant encaissé :</span>
-            <span className="font-medium text-[#4a41e0]">{completedAmount.toFixed(2)} € ({completedPercentage.toFixed(1)}%)</span>
+            <span className="font-medium text-[#4a41e0]">{completedAmount.toFixed(2)} € <span className="text-xs px-1.5 py-0.5 rounded-full ml-1 inline-block whitespace-nowrap">({completedPercentage.toFixed(1)}%)</span></span>
           </div>
-          <div className="flex justify-between text-sm bg-[#f0eeff] p-2 rounded-md mt-2">
+          <div className="flex justify-between text-sm rounded-lg mt-3">
             <span className="text-gray-700 font-medium">Reste à facturer :</span>
-            <span className="font-medium text-gray-800">{remainingAmount.toFixed(2)} € ({remainingPercentage.toFixed(1)}%)</span>
+            <span className="font-medium text-gray-800">{remainingAmount.toFixed(2)} € <span className="text-xs bg-white px-1.5 py-0.5 rounded-full ml-1 text-[#5b50ff] inline-block whitespace-nowrap">({remainingPercentage.toFixed(1)}%)</span></span>
           </div>
         </div>
 
         {/* Liste des factures liées */}
         {linkedInvoices.length > 0 && (
-          <div className="pt-3 border-t border-[#f0eeff]">
+          <div className="pt-4 border-t border-[#f0eeff]">
             <h4 className="text-xs font-medium text-[#5b50ff] mb-3 flex items-center">
-              <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
+              <DocumentText size="16" color="#5b50ff" variant="Bold" className="mr-1.5 text-[#5b50ff]" />
               Factures liées
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {linkedInvoices.map((invoice: Invoice) => (
-                <li key={invoice.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-[#f0eeff] transition-colors duration-200">
+                <li key={invoice.id} className="flex justify-between items-center text-sm p-2.5 rounded-lg hover:bg-[#f0eeff] transition-all duration-300 border border-transparent hover:border-[#e6e1ff] cursor-pointer group">
                   <div className="flex items-center">
-                    <div className="mr-2 w-6 h-6 rounded-full bg-[#e6e1ff] flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-[#5b50ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                      </svg>
+                    <div className="mr-3 w-8 h-8 rounded-full bg-[#e6e1ff] flex items-center justify-center transition-all duration-300">
+                      {invoice.status === 'COMPLETED' ? (
+                        <TickCircle size="16" color="#4a41e0" variant="Bold" className="text-[#4a41e0] group-hover:text-white" />
+                      ) : (
+                        <Receipt21 size="16" color="#5b50ff" variant="Bold" className="text-[#5b50ff] group-hover:text-white" />
+                      )}
                     </div>
                     <div>
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-700 font-medium group-hover:text-[#5b50ff] transition-colors duration-300">
                         {invoice.isDeposit ? "Acompte" : "Facture"} {invoice.prefix}{invoice.number}
                       </span>
-                      <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-                        invoice.status === 'COMPLETED' ? 'bg-[#e6e1ff] text-[#4a41e0]' :
-                        invoice.status === 'PENDING' ? 'bg-[#f0eeff] text-[#5b50ff]' :
-                        'bg-gray-100 text-gray-700'
+                      <span className={`ml-2 px-2 py-0.5 text-xs rounded-full inline-flex items-center whitespace-nowrap ${
+                        invoice.status === 'COMPLETED' ? 'bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]' :
+                        invoice.status === 'PENDING' ? 'bg-[#fff8e6] text-[#e6a700] border border-[#ffe7a0]' :
+                        'bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]'
                       }`}>
+                        {invoice.status === 'DRAFT' && <span className="w-1.5 h-1.5 rounded-full bg-current mr-1 animate-pulse"></span>}
                         {invoice.status === 'COMPLETED' ? 'Terminée' :
                         invoice.status === 'PENDING' ? 'À encaisser' :
                         'Brouillon'}
                       </span>
                     </div>
                   </div>
-                  <span className="font-medium text-gray-800">
-                    {invoice.finalTotalTTC?.toFixed(2)} €
-                  </span>
+                  <div className="flex items-center">
+                    <span className="font-medium text-gray-800 mr-2">
+                      {invoice.finalTotalTTC?.toFixed(2)} €
+                    </span>
+                    <ArrowRight2 size="16" color="#5b50ff" className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

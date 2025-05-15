@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Sidebar } from "../../../../components/layout/Sidebar";
 import { Button } from "../../../../components/";
 import { formatDate } from "../../../../utils/date";
+import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { QuoteInvoiceCreationModal } from "./QuoteInvoiceCreationModal";
 import { QuoteInvoiceProgress } from "./QuoteInvoiceProgress";
 import { useQuery } from "@apollo/client";
@@ -9,6 +10,23 @@ import { GET_QUOTE } from "../../graphql/quotes";
 import { QuotePreview } from "../forms/QuotePreview";
 import { Quote } from "../../types";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
+import { 
+  TickCircle, 
+  ArrowRight, 
+  Money,
+  InfoCircle,
+  Profile2User,
+  DocumentText,
+  Calendar,
+  Clock,
+  Receipt21,
+  Wallet,
+  Sms,
+  ReceiptItem,
+  Edit2,
+  Trash,
+  CloseCircle
+} from "iconsax-react";
 
 interface Invoice {
   id: string;
@@ -84,13 +102,35 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
     useState(false);
   // État pour la popup de confirmation d'annulation
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
-  // État pour afficher/masquer les détails du statut et de la facturation
-  const [showStatusDetails, setShowStatusDetails] = useState(true);
+  // État pour le statut et la facturation
+  const showStatusDetails = true;
   // État non utilisé - à réactiver si besoin
   // const [showPreview, setShowPreview] = useState(true);
   const showPreview = true; // Valeur fixe pour l'instant
   // État local pour stocker les données du devis mises à jour
   const [quote, setQuote] = useState<SidebarQuote>(initialQuote);
+  
+  // Palette de couleurs pour les statuts avec la charte graphique Newbi
+  const statusColors = {
+    DRAFT: "bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]",
+    PENDING: "bg-[#fff8e6] text-[#e6a700] border border-[#ffe7a0]",
+    ACCEPTED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
+    COMPLETED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
+    REJECTED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]",
+    CANCELED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]",
+    EXPIRED: "bg-gray-100 text-gray-700 border border-gray-200"
+  };
+  
+  // Texte des statuts en français
+  const statusText = {
+    DRAFT: "Brouillon",
+    PENDING: "En attente",
+    ACCEPTED: "Accepté",
+    COMPLETED: "Accepté",
+    REJECTED: "Refusé",
+    CANCELED: "Annulé",
+    EXPIRED: "Expiré"
+  };
 
   // Utiliser useQuery pour obtenir les données à jour du devis
   const { data, refetch } = useQuery(GET_QUOTE, {
@@ -204,6 +244,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
     action: () => void;
     color: string;
     disabled?: boolean;
+    icon?: React.ReactNode;
   }
 
   const getStatusActions = (): StatusAction[] => {
@@ -216,6 +257,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             label: "Marquer comme envoyé",
             action: () => onStatusChange("PENDING"),
             color: "purple",
+            icon: <ArrowRight size={18} className="ml-2" variant="Bold" />
           },
         ];
       case "PENDING":
@@ -224,6 +266,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             label: "Marquer comme accepté",
             action: () => onStatusChange("COMPLETED"),
             color: "green",
+            icon: <TickCircle size={20} color="#00c853" className="mr-2" variant="Bold" />
           },
         ];
       case "COMPLETED": {
@@ -241,6 +284,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                 action: handleCreateInvoice,
                 color: "blue",
                 disabled: false,
+                icon: <Money size={20} color="#5b50ff" className="mr-2" variant="Linear" />
               },
             ]
           : [];
@@ -256,13 +300,12 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
 
   const statusActions = getStatusActions();
 
-  console.log("quote", quote);
   return (
     <>
       {/* Prévisualisation du devis */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[1500] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[999] transition-opacity duration-300 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{ display: isOpen ? "block" : "none" }}
@@ -289,463 +332,425 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         title={`Devis ${quote.prefix}${quote.number}`}
         width="w-1/2"
         position="right"
+        className="custom-scrollbar bg-white shadow-xl"
         actions={
           <>
-            <div className="bg-white border border-[#e6e1ff] rounded-lg overflow-hidden">
-              {/* En-tête avec statut et bouton pour réduire/développer */}
-              <div 
-                className="flex justify-between items-center p-4 bg-[#f0eeff] cursor-pointer"
-                onClick={() => setShowStatusDetails(!showStatusDetails)}
-              >
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-[#5b50ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  <h3 className="text-sm font-medium text-[#5b50ff]">Statut et facturation</h3>
-                </div>
-                <div className="flex items-center">
-                  <span
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full flex items-center mr-2 ${
-                      quote.status === "DRAFT"
-                        ? "bg-gray-100 text-gray-700"
-                        : quote.status === "PENDING"
-                        ? "bg-[#f0eeff] text-[#5b50ff]"
-                        : quote.status === "CANCELED"
-                        ? "bg-red-50 text-red-600"
-                        : "bg-[#e6e1ff] text-[#4a41e0]"
-                    }`}
-                  >
-                    {quote.status === "DRAFT" && (
-                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    )}
-                    {quote.status === "PENDING" && (
-                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    )}
-                    {quote.status === "CANCELED" && (
-                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                      </svg>
-                    )}
-                    {quote.status === "COMPLETED" && (
-                      <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                    )}
-                    {quote.status === "DRAFT"
-                      ? "Brouillon"
-                      : quote.status === "PENDING"
-                      ? "En attente"
-                      : quote.status === "CANCELED"
-                      ? "Annulé"
-                      : "Accepté"}
-                  </span>
-                  <svg 
-                    className={`w-5 h-5 text-[#5b50ff] transition-transform duration-300 ${showStatusDetails ? 'transform rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
 
-              {/* Contenu détaillé - affiché uniquement si showStatusDetails est true */}
-              {showStatusDetails && (
-                <div className="p-4 border-t border-[#e6e1ff]">
-                  {/* Progression des factures */}
-                  {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
-                    <div className="mb-4">
-                      <QuoteInvoiceProgress
-                        quoteTotal={quote.finalTotalTTC}
-                        linkedInvoices={quote.linkedInvoices}
-                        quoteId={quote.id}
-                        refreshInterval={2000} // Rafraîchir toutes les 2 secondes
-                        key={`invoice-progress-${quote.linkedInvoices.length}`} // Forcer le remontage du composant quand le nombre de factures change
-                      />
-                    </div>
-                  )}
 
-                  <div className="space-y-2">
-                    {/* Vérifier si toutes les factures sont complétées et si le montant total est atteint */}
-                    {quote.linkedInvoices &&
-                      quote.linkedInvoices.length > 0 &&
-                      (() => {
-                        const totalInvoiced = quote.linkedInvoices.reduce(
-                          (sum, inv) => sum + (inv.finalTotalTTC || 0),
-                          0
+            {/* Contenu détaillé - affiché uniquement si showStatusDetails est true */}
+            {showStatusDetails && (
+              <div className="transition-all duration-300 overflow-hidden">
+                {/* Progression des factures */}
+                {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
+                  <div className="mb-4">
+                    <QuoteInvoiceProgress
+                      quoteTotal={quote.finalTotalTTC}
+                      linkedInvoices={quote.linkedInvoices}
+                      quoteId={quote.id}
+                      refreshInterval={2000} // Rafraîchir toutes les 2 secondes
+                      key={`invoice-progress-${quote.linkedInvoices.length}`} // Forcer le remontage du composant quand le nombre de factures change
+                    />
+                  </div>
+                )}
+
+                {/* Conteneur principal pour tous les boutons d'action */}
+                <div className="space-y-3">
+                  {/* Vérifier si toutes les factures sont complétées et si le montant total est atteint */}
+                  {quote.linkedInvoices &&
+                    quote.linkedInvoices.length > 0 &&
+                    (() => {
+                      const totalInvoiced = quote.linkedInvoices.reduce(
+                        (sum, inv) => sum + (inv.finalTotalTTC || 0),
+                        0
+                      );
+                      const remainingAmount = quote.finalTotalTTC - totalInvoiced;
+                      const isFullyPaid =
+                        quote.linkedInvoices.every(
+                          (inv) => inv.status === "COMPLETED"
+                        ) && Math.abs(remainingAmount) < 0.01; // Tolérance pour les erreurs d'arrondi
+                      const hasMaxInvoices = quote.linkedInvoices.length >= 3;
+
+                      if (isFullyPaid) {
+                        return (
+                          <Button
+                            variant="outline"
+                            color="green"
+                            fullWidth
+                            disabled={true}
+                            className="border border-[#00c853] text-[#00c853] rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
+                          >
+                            <TickCircle size={20} color="#00c853" className="mr-2" variant="Bold" />
+                            Payée
+                          </Button>
                         );
-                        const remainingAmount = quote.finalTotalTTC - totalInvoiced;
-                        const isFullyPaid =
-                          quote.linkedInvoices.every(
-                            (inv) => inv.status === "COMPLETED"
-                          ) && Math.abs(remainingAmount) < 0.01; // Tolérance pour les erreurs d'arrondi
-                        const hasMaxInvoices = quote.linkedInvoices.length >= 3;
+                      } else if (
+                        Math.abs(remainingAmount) < 0.01 ||
+                        hasMaxInvoices
+                      ) {
+                        // Ne pas afficher les boutons si le reste à facturer est 0 ou si 3 factures sont déjà liées
+                        return null;
+                      }
 
-                        if (isFullyPaid) {
-                          return (
-                            <Button
-                              variant="outline"
-                              color="green"
-                              fullWidth
-                              disabled={true}
-                            >
-                              <span className="flex items-center justify-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 mr-2"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                Payée
-                              </span>
-                            </Button>
-                          );
-                        } else if (
-                          Math.abs(remainingAmount) < 0.01 ||
-                          hasMaxInvoices
-                        ) {
-                          // Ne pas afficher les boutons si le reste à facturer est 0 ou si 3 factures sont déjà liées
-                          return null;
+                      // Sinon, afficher les boutons d'action normaux avec le nouveau style
+                      return statusActions.map((action, index) => {
+                        // Déterminer la couleur et l'icône en fonction de l'action
+                        let buttonClass = "";
+                        let icon = null;
+                        
+                        if (action.color === "primary") {
+                          buttonClass = "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                          icon = <Money size={20} color="#fff" className="mr-2" variant="Linear" />;
+                        } else if (action.color === "green") {
+                          buttonClass = "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                          icon = <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />;
+                        } else {
+                          buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
+                          icon = <ArrowRight size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
                         }
-
-                        // Sinon, afficher les boutons d'action normaux
-                        return statusActions.map((action, index) => (
+                        
+                        return (
                           <Button
                             key={index}
-                            variant="outline"
-                            color={action.color}
+                            variant={action.color === "primary" || action.color === "green" ? "primary" : "outline"}
                             fullWidth
+                            className={buttonClass}
                             onClick={action.action}
                             disabled={action.disabled}
                           >
+                            {icon}
                             {action.label}
+                            {(action.color === "primary" || action.color === "green") && 
+                              <ArrowRight size={18} className="ml-2" variant="Bold" />}
                           </Button>
-                        ));
-                      })()}
+                        );
+                      });
+                    })()}
 
-                    {/* Si pas de factures liées, afficher les boutons normaux */}
-                    {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) &&
-                      statusActions.map((action, index) => (
+                  {/* Si pas de factures liées, afficher les boutons normaux avec le nouveau style */}
+                  {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) &&
+                    statusActions.map((action, index) => {
+                      // Déterminer la couleur et l'icône en fonction de l'action
+                      let buttonClass = "";
+                      let icon = null;
+                      
+                      if (action.color === "primary") {
+                        buttonClass = "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                        icon = <Money size={20} color="#fff" className="mr-2" variant="Linear" />;
+                      } else if (action.color === "green") {
+                        buttonClass = "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                        icon = <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />;
+                      } else {
+                        buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
+                        icon = <ArrowRight size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
+                      }
+                      
+                      return (
                         <Button
                           key={index}
-                          variant="outline"
-                          color={action.color}
+                          variant={action.color === "primary" || action.color === "green" ? "primary" : "outline"}
                           fullWidth
+                          className={buttonClass}
                           onClick={action.action}
                           disabled={action.disabled}
                         >
+                          {icon}
                           {action.label}
+                          {(action.color === "primary" || action.color === "green") && 
+                            <ArrowRight size={18} className="ml-2" variant="Bold" />}
                         </Button>
-                      ))}
-                  </div>
+                      );
+                    })}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+            
+            {/* Conteneur pour les boutons d'édition et de suppression/annulation - toujours visible */}
             {quote.status !== "COMPLETED" && quote.status !== "CANCELED" && (
-              <Button
-                variant="outline"
-                onClick={onEdit}
-                fullWidth
-                className="flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                Modifier
-              </Button>
-            )}
-            {quote.status === "DRAFT" && (
-              <Button
-                variant="outline"
-                color="red"
-                onClick={onDelete}
-                fullWidth
-                className="flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Supprimer
-              </Button>
-            )}
-            {quote.status === "PENDING" && (
-              <Button
-                variant="outline"
-                color="red"
-                onClick={() => setShowCancelConfirmation(true)}
-                fullWidth
-                className="flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Annuler
-              </Button>
+              <div className="mt-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={onEdit}
+                    fullWidth
+                    className="border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
+                  >
+                    <Edit2 size={20} color="#5b50ff" className="mr-2" variant="Linear" />
+                    Modifier
+                  </Button>
+                  
+                  {quote.status === "DRAFT" ? (
+                    <Button
+                      variant="outline"
+                      color="red"
+                      onClick={onDelete}
+                      fullWidth
+                      className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
+                    >
+                      <Trash size={20} color="#f44336" className="mr-2" variant="Linear" />
+                      Supprimer
+                    </Button>
+                  ) : quote.status === "PENDING" && (
+                    <Button
+                      variant="outline"
+                      color="red"
+                      onClick={() => setShowCancelConfirmation(true)}
+                      fullWidth
+                      className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
+                    >
+                      <CloseCircle size={20} color="#f44336" className="mr-2" variant="Bold" />
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              </div>
             )}
           </>
         }
       >
-        <div className="space-y-6">
-          {/* Statut et actions */}
-
-          {/* Informations générales */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">
-              Informations générales
-            </h3>
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <dl>
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Date d'émission
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {formatDate(quote.issueDate)}
-                  </dd>
-                </div>
-                {quote.validUntil && (
-                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Valide jusqu'au
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {formatDate(quote.validUntil)}
-                    </dd>
-                  </div>
-                )}
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Montant HT
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {quote.totalHT?.toFixed(2) || "0.00"} €
-                  </dd>
-                </div>
-                {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
-                {(() => {
-                  // Récupérer les détails des TVA depuis la fonction calculateTotals
-                  const { vatRates } = calculateTotals();
-
-                  // Vérifier si nous avons des détails de TVA
-                  if (vatRates && vatRates.length > 0) {
-                    return (
-                      <>
-                        {/* Afficher chaque taux de TVA séparément */}
-                        {vatRates.map((vatDetail, index) => (
-                          <div
-                            key={index}
-                            className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                          >
-                            <dt className="text-sm font-medium text-gray-500">
-                              TVA {vatDetail.rate}%
-                            </dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                              {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}%
-                              de {vatDetail.baseAmount.toFixed(2)} €)
-                            </dd>
-                          </div>
-                        ))}
-                        {/* Afficher le total de TVA si plusieurs taux */}
-                        {vatRates.length > 1 && (
-                          <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                            <dt className="text-sm font-medium text-gray-500">
-                              Total TVA
-                            </dt>
-                            <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
-                              {quote.totalVAT?.toFixed(2) || "0.00"} €
-                            </dd>
-                          </div>
-                        )}
-                      </>
-                    );
-                  } else {
-                    // Afficher seulement le total de TVA si aucun détail n'est disponible
-                    return (
-                      <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt className="text-sm font-medium text-gray-500">
-                          TVA
+        <div className="space-y-8">
+      {/* Statut du devis */}
+      <div className="mb-8 animate-fadeIn">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium text-gray-600 flex items-center">
+            <div className="w-7 h-7 rounded-full bg-[#f0eeff] flex items-center justify-center mr-2">
+              <TickCircle size={18} color="#5b50ff" variant="Bold" />
+            </div>
+            Statut
+          </span>
+          <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[quote.status as keyof typeof statusColors]} shadow-sm transition-all duration-300 hover:shadow-md badge-transition flex items-center`}>
+            <span className="w-2 h-2 rounded-full bg-current mr-2 animate-pulse"></span>
+            {statusText[quote.status as keyof typeof statusText]}
+          </span>
+        </div>
+        <div className="mt-4 h-4 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
+          <div 
+            className={`h-full ${quote.status === 'DRAFT' ? 'w-1/3' : 
+              quote.status === 'PENDING' ? 'w-2/3' : 
+              (quote.status === 'ACCEPTED' || quote.status === 'COMPLETED') ? 'w-full' : 
+              'w-0'} bg-[#5b50ff]`}
+            style={{ transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+          />
+        </div>
+        <div className="flex justify-between mt-2 text-xs font-medium text-gray-600">
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            Création
+          </span>
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            En attente
+          </span>
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            Accepté
+          </span>
+        </div>
+      </div>
+      {/* Informations générales */}
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <InfoCircle size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Informations générales
+        </h3>
+        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
+          <dl>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Calendar size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'émission</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
+                {formatDate(quote.issueDate)}
+              </dd>
+            </div>
+            {quote.validUntil && (
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><Clock size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Valide jusqu'au</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {formatDate(quote.validUntil)}
+                </dd>
+              </div>
+            )}
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Wallet size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant HT</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
+                {quote.totalHT?.toFixed(2) || '0.00'} €
+              </dd>
+            </div>
+            {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
+            {(() => {
+              // Calculer les détails des TVA
+              const vatDetails = calculateTotals().vatRates;
+              
+              if (vatDetails && vatDetails.length > 1) {
+                return (
+                  <>
+                    {vatDetails.map((vatDetail, index) => (
+                      <div key={index} className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                        <dt className="text-sm font-medium text-gray-600 flex items-center">
+                          <ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA {vatDetail.rate}%
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                          {quote.totalVAT?.toFixed(2) || "0.00"} €
+                          {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
                         </dd>
                       </div>
-                    );
-                  }
-                })()}
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Montant TTC
-                  </dt>
-                  <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
-                    {quote.totalTTC?.toFixed(2) || "0.00"} €
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Client */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Client</h3>
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <dl>
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                  <dt className="text-sm font-medium text-gray-500">Nom</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {quote.client.name}
-                  </dd>
-                </div>
-                <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Email</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {quote.client.email}
-                  </dd>
-                </div>
-                {quote.client.address && (
-                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Adresse
-                    </dt>
+                    ))}
+                    <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                      <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Total TVA</dt>
+                      <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+                        {quote.totalVAT?.toFixed(2) || '0.00'} €
+                      </dd>
+                    </div>
+                  </>
+                );
+              } else {
+                // Afficher seulement le total de TVA si un seul taux est utilisé
+                return (
+                  <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                    <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {quote.client.address.street}
-                      <br />
-                      {quote.client.address.postalCode}{" "}
-                      {quote.client.address.city}
-                      <br />
-                      {quote.client.address.country}
+                      {quote.totalVAT?.toFixed(2) || '0.00'} €
                     </dd>
                   </div>
-                )}
-              </dl>
+                );
+              }
+            })()}
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Money size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant TTC</dt>
+              <dd className="mt-1 text-sm font-bold text-[#5b50ff] sm:mt-0 sm:col-span-2 transition-transform duration-300 rounded-lg inline-block">
+                {quote.totalTTC?.toFixed(2) || '0.00'} €
+              </dd>
             </div>
-          </div>
+          </dl>
+        </div>
+      </div>
 
-          {/* Éléments du devis */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">
-              Éléments du devis
-            </h3>
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <ul className="divide-y divide-gray-200">
-                {quote.items &&
-                  quote.items.map((item: QuoteItem, index: number) => (
-                    <li key={index} className="px-4 py-3">
-                      <div className="flex justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {item.description}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {item.quantity} {item.unit || "unité(s)"} x{" "}
-                            {item.unitPrice.toFixed(2)} €
-                            {item.discount &&
-                              item.discount > 0 &&
-                              ` (-${item.discount}${
-                                item.discountType === "PERCENTAGE" ? "%" : "€"
-                              })`}
-                          </p>
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {(
-                            item.quantity *
-                            item.unitPrice *
-                            (1 -
-                              (item.discountType === "PERCENTAGE" &&
-                              item.discount
-                                ? item.discount / 100
-                                : 0))
-                          ).toFixed(2)}{" "}
-                          €
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-              </ul>
+      {/* Client */}
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <Profile2User size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Client
+        </h3>
+        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
+          <dl>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Profile2User size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Nom</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
+                {quote.client.name}
+              </dd>
             </div>
-          </div>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Sms size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Email</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                {quote.client.email}
+              </dd>
+            </div>
+            {quote.client.siret && (
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" /> SIRET</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {quote.client.siret}
+                </dd>
+              </div>
+            )}
+            {quote.client.vatNumber && (
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><Receipt21 size={16} color="#5b50ff" className="mr-4" variant="Linear" /> N° TVA</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {quote.client.vatNumber}
+                </dd>
+              </div>
+            )}
+            {quote.client.address && (
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><InfoCircle size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Adresse</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {quote.client.address.street}<br />
+                  {quote.client.address.postalCode} {quote.client.address.city}<br />
+                  {quote.client.address.country}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </div>
 
-          {/* Notes */}
-          {(quote.headerNotes ||
-            quote.footerNotes ||
-            quote.termsAndConditions) && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
-              <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                {quote.headerNotes && (
-                  <div className="px-4 py-3">
-                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
-                      En-tête
-                    </h4>
-                    <p className="text-sm text-gray-900">{quote.headerNotes}</p>
-                  </div>
-                )}
-                {quote.footerNotes && (
-                  <div className="px-4 py-3 border-t border-gray-200">
-                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
-                      Pied de page
-                    </h4>
-                    <p className="text-sm text-gray-900">{quote.footerNotes}</p>
-                  </div>
-                )}
-                {quote.termsAndConditions && (
-                  <div className="px-4 py-3 border-t border-gray-200">
-                    <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">
-                      Conditions générales
-                    </h4>
-                    <p className="text-sm text-gray-900">
-                      {quote.termsAndConditions}
+      {/* Éléments du devis */}
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <DocumentText size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Éléments du devis
+        </h3>
+        <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
+          <ul className="divide-y divide-gray-200">
+            {quote.items && quote.items.map((item, index) => (
+              <li key={index} className={`px-4 py-4 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-all duration-300 hover:bg-gray-100`}>
+                <div className="flex justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900 flex items-center">
+                      <DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" />
+                      {item.description}
                     </p>
-                    {quote.termsAndConditionsLink && (
-                      <a
-                        href={quote.termsAndConditionsLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block"
-                      >
-                        {quote.termsAndConditionsLinkTitle ||
-                          "Voir les conditions générales"}
-                      </a>
-                    )}
+                    <p className="text-sm text-gray-500 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700 mr-2">
+                        {item.quantity} {getUnitAbbreviation(item.unit) || 'u'}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700">
+                        {item.unitPrice.toFixed(2)} €
+                      </span>
+                    </p>
                   </div>
+                  <div className="text-sm font-medium text-gray-800 px-3 py-1 rounded-lg">
+                    {((item.quantity * item.unitPrice) * (1 - (item.discountType === 'PERCENTAGE' && item.discount ? item.discount / 100 : 0))).toFixed(2)} €
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Notes */}
+      {(quote.headerNotes || quote.footerNotes || quote.termsAndConditions) && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
+          <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
+            <div className="divide-y divide-gray-200">
+            {quote.headerNotes && (
+              <div className="px-4 py-4 border-b border-gray-200">
+                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">En-tête</h4>
+                <p className="text-sm text-gray-900">{quote.headerNotes}</p>
+              </div>
+            )}
+            {quote.footerNotes && (
+              <div className="px-4 py-4 border-b border-gray-200">
+                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Pied de page</h4>
+                <p className="text-sm text-gray-900">{quote.footerNotes}</p>
+              </div>
+            )}
+            {quote.termsAndConditions && (
+              <div className="px-4 py-4 border-b border-gray-200">
+                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Conditions générales</h4>
+                <p className="text-sm text-gray-900">{quote.termsAndConditions}</p>
+                {quote.termsAndConditionsLink && (
+                  <a 
+                    href={quote.termsAndConditionsLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center"
+                  >
+                    {quote.termsAndConditionsLinkTitle || 'Voir les conditions générales'} <ArrowRight size={14} className="ml-1" variant="Bold" />
+                  </a>
                 )}
               </div>
+            )}
             </div>
-          )}
+          </div>
+        </div>
+      )}
         </div>
 
         {/* Modal de création de facture */}

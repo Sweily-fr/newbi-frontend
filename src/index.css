@@ -1,3 +1,6 @@
+/* Import des styles personnalisés */
+@import './styles/scrollbar.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
