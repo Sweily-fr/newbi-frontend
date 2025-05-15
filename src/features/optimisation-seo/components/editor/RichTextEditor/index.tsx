@@ -430,7 +430,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               selection.addRange(savedRange);
               
               // Insérer l'image
-              handleFormatAction('insertImage', imageUrl);
+              document.execCommand('insertImage', false, imageUrl);
               
               // Ajouter les attributs à l'image
               setTimeout(() => {
@@ -446,8 +446,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     img.setAttribute('data-file-name', file.name);
                     img.setAttribute('data-file-size', file.size.toString());
                     img.setAttribute('data-file-type', file.type);
-                    img.setAttribute('data-processed', 'true'); // Marquer l'image comme traitée
-                    img.setAttribute('data-timestamp', Date.now().toString()); // Ajouter un timestamp unique
+                    img.setAttribute('data-processed', 'true');
+                    img.setAttribute('data-timestamp', Date.now().toString());
                     
                     // Ajouter des styles pour une meilleure présentation
                     if (img instanceof HTMLElement) {
@@ -470,8 +470,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }
                   });
                   
-                  // Mettre à jour le contenu
-                  setContent(editorRef.current.innerHTML);
+                  // Mettre à jour le contenu via le contexte
+                  if (setContent) {
+                    setContent(editorRef.current.innerHTML);
+                  }
+                  
+                  // Mettre à jour le nombre de mots
+                  setCurrentWordCount(calculateWordCount(editorRef.current.innerHTML));
                 }
               }, 100);
             }
@@ -480,6 +485,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           // Réinitialiser et fermer la popup
           setSavedRange(null);
           setIsImagePopupOpen(false);
+          
+          // Nettoyer les URLs d'objets obsolètes
+          const cleanupObjectUrls = () => {
+            const currentImages = editorRef.current?.querySelectorAll('img') || [];
+            const currentImageUrls = Array.from(currentImages).map(img => img.getAttribute('src'));
+            
+            objectUrlsRef.current = objectUrlsRef.current.filter(url => {
+              if (!currentImageUrls.includes(url)) {
+                URL.revokeObjectURL(url);
+                return false;
+              }
+              return true;
+            });
+          };
+          
+          // Nettoyer les URLs d'objets obsolètes après un délai
+          setTimeout(cleanupObjectUrls, 1000);
         }}
       />
       
@@ -490,25 +512,70 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         imageElement={selectedImage}
         onSubmit={(alt, width, height) => {
           if (selectedImage && editorRef.current) {
+            console.log('Modification d\'image - alt:', alt, 'width:', width, 'height:', height);
+            
             // Appliquer les modifications à l'image
             selectedImage.setAttribute('alt', alt);
             
-            if (width) {
-              selectedImage.style.width = `${width}px`;
-              selectedImage.setAttribute('width', width);
+            // Convertir les dimensions en nombres
+            const numWidth = width ? parseInt(width) : 0;
+            const numHeight = height ? parseInt(height) : 0;
+            
+            console.log('Dimensions converties - width:', numWidth, 'height:', numHeight);
+            
+            // Appliquer les dimensions spécifiées
+            if (numWidth > 0) {
+              // Définir la largeur avec plusieurs méthodes pour assurer la compatibilité
+              selectedImage.setAttribute('width', String(numWidth));
+              selectedImage.width = numWidth;
+              selectedImage.style.width = `${numWidth}px`;
+              
+              // Si seule la largeur est spécifiée, maintenir le ratio d'aspect
+              if (numHeight === 0) {
+                selectedImage.style.height = 'auto';
+                selectedImage.removeAttribute('height');
+              }
+            } else {
+              // Si pas de largeur, réinitialiser la largeur
+              selectedImage.style.width = '';
+              selectedImage.removeAttribute('width');
             }
             
-            if (height) {
-              selectedImage.style.height = `${height}px`;
-              selectedImage.setAttribute('height', height);
+            if (numHeight > 0) {
+              // Définir la hauteur avec plusieurs méthodes pour assurer la compatibilité
+              selectedImage.setAttribute('height', String(numHeight));
+              selectedImage.height = numHeight;
+              selectedImage.style.height = `${numHeight}px`;
+              
+              // Si seule la hauteur est spécifiée, maintenir le ratio d'aspect
+              if (numWidth === 0) {
+                selectedImage.style.width = 'auto';
+                selectedImage.removeAttribute('width');
+              }
+            } else {
+              // Si pas de hauteur, réinitialiser la hauteur
+              selectedImage.style.height = '';
+              selectedImage.removeAttribute('height');
             }
             
-            // Mettre à jour le contenu
-            const newContent = editorRef.current.innerHTML;
-            setContent(newContent);
+            // Si aucune dimension n'est spécifiée, utiliser les dimensions originales
+            if (numWidth === 0 && numHeight === 0) {
+              selectedImage.style.width = '100%';
+              selectedImage.style.height = 'auto';
+              selectedImage.removeAttribute('width');
+              selectedImage.removeAttribute('height');
+            }
             
-            // Analyser le contenu mis à jour
-            handleAnalyzeContent();
+            console.log('Image modifiée:', selectedImage);
+            
+            // Mettre à jour le contenu via le contexte
+            if (typeof setContent === 'function') {
+              const newContent = editorRef.current.innerHTML;
+              setContent(newContent);
+              
+              // Analyser le contenu mis à jour
+              handleAnalyzeContent();
+            }
           }
           
           // Afficher la notification de succès

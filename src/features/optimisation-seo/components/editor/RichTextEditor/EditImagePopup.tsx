@@ -20,28 +20,55 @@ const EditImagePopup: React.FC<EditImagePopupProps> = ({
       // Récupérer l'attribut alt
       setAlt(imageElement.alt || '');
       
-      // Récupérer les dimensions
-      const currentWidth = imageElement.width || parseInt(imageElement.style.width) || 0;
-      const currentHeight = imageElement.height || parseInt(imageElement.style.height) || 0;
+      // Récupérer les dimensions - vérifier plusieurs sources possibles
+      let currentWidth = 0;
+      let currentHeight = 0;
       
-      setWidth(currentWidth ? currentWidth.toString() : '');
-      setHeight(currentHeight ? currentHeight.toString() : '');
+      // Vérifier d'abord les attributs width/height
+      if (imageElement.hasAttribute('width')) {
+        currentWidth = parseInt(imageElement.getAttribute('width') || '0');
+      } else if (imageElement.width) {
+        currentWidth = imageElement.width;
+      } else if (imageElement.style.width) {
+        // Extraire la valeur numérique du style (enlever 'px')
+        const widthMatch = imageElement.style.width.match(/^(\d+)(?:px)?$/);
+        if (widthMatch) {
+          currentWidth = parseInt(widthMatch[1]);
+        }
+      }
+      
+      if (imageElement.hasAttribute('height')) {
+        currentHeight = parseInt(imageElement.getAttribute('height') || '0');
+      } else if (imageElement.height) {
+        currentHeight = imageElement.height;
+      } else if (imageElement.style.height) {
+        // Extraire la valeur numérique du style (enlever 'px')
+        const heightMatch = imageElement.style.height.match(/^(\d+)(?:px)?$/);
+        if (heightMatch) {
+          currentHeight = parseInt(heightMatch[1]);
+        }
+      }
+      
+      // Mettre à jour les champs de formulaire
+      setWidth(currentWidth > 0 ? currentWidth.toString() : '');
+      setHeight(currentHeight > 0 ? currentHeight.toString() : '');
       
       // Stocker les dimensions originales pour le calcul du ratio
-      if (currentWidth && currentHeight) {
+      if (currentWidth > 0 && currentHeight > 0) {
         setOriginalDimensions({ width: currentWidth, height: currentHeight });
       } else {
         // Si les dimensions ne sont pas disponibles, charger l'image pour obtenir ses dimensions
         const img = new Image();
         img.onload = () => {
           setOriginalDimensions({ width: img.width, height: img.height });
+          // Ne mettre à jour les dimensions que si elles n'ont pas déjà été définies
           if (!width) setWidth(img.width.toString());
           if (!height) setHeight(img.height.toString());
         };
         img.src = imageElement.src;
       }
     }
-  }, [isOpen, imageElement, width, height]);
+  }, [isOpen, imageElement]); // Suppression des dépendances width et height pour éviter les boucles
   
   // Gérer le changement de largeur avec maintien du ratio
   const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -7,7 +7,7 @@ import { useBlogSeo } from '../hooks/useBlogSeo';
 import { ToolLayout } from '../../../components/layout/ToolLayout';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 
-const BlogSeoOptimizerContent: React.FC = () => {
+export const BlogSeoOptimizerContent: React.FC = () => {
   const { state } = useBlogSeo();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<'keywords' | 'score' | 'recommendations'>('keywords');
@@ -31,11 +31,11 @@ const BlogSeoOptimizerContent: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex flex-col bg-gray-50 p-6 overflow-x-hidden">
       <div className="flex-1 flex flex-col w-full overflow-hidden">
-        <div className="flex-1 flex w-full overflow-hidden gap-6 max-w-full">
+        <div className="flex w-full gap-6 max-w-full" style={{ height: 'calc(100vh - 200px)' }}>
           {/* Colonne de gauche - Onglets (4/12) */}
-          <div className="w-4/12 flex flex-col h-[calc(100vh-200px)] rounded-xl overflow-visible">
+          <div className="w-4/12 flex flex-col h-full rounded-xl">
             {/* Onglets */}
-            <div className="flex border-b border-gray-200 bg-white rounded-t-xl px-6 overflow-visible">
+            <div className="flex border-b border-gray-200 bg-white rounded-t-xl px-6">
               <button
                 className={`py-4 text-center font-medium px-4 cursor-pointer ${activeTab === 'keywords' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 onClick={() => setActiveTab('keywords')}
@@ -64,7 +64,7 @@ const BlogSeoOptimizerContent: React.FC = () => {
                   </button>
                   {!hasAnalyzed && (
                     <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-max bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 z-50">
-                      Effectuez une analyse pour débloquer
+                      Effectuez une analyse
                     </div>
                   )}
                 </div>
@@ -91,7 +91,7 @@ const BlogSeoOptimizerContent: React.FC = () => {
                   </button>
                   {!hasAnalyzed && (
                     <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-max bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 z-50">
-                      Effectuez une analyse pour débloquer
+                      Effectuez une analyse
                     </div>
                   )}
                 </div>
@@ -117,9 +117,9 @@ const BlogSeoOptimizerContent: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           {/* Colonne de droite - Éditeur (8/12) */}
-          <div className="w-8/12 flex flex-col h-[calc(100vh-200px)]">
+          <div className="w-8/12 flex flex-col h-full">
             <div className="h-full bg-white rounded-xl shadow-sm">
               <RichTextEditor placeholder="Commencez à rédiger votre contenu ici..." />
             </div>
