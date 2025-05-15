@@ -57,7 +57,7 @@ export const Modal = ({
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-[2000]" onClose={preventBackgroundClose ? () => {} : onClose}>
+      <Dialog as="div" className="relative z-[9999]" onClose={preventBackgroundClose ? () => {} : onClose}>
         {/* Overlay avec animation de fondu */}
         <Transition.Child
           as={Fragment}

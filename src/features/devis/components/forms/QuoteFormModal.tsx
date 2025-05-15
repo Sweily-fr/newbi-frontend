@@ -563,7 +563,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         </div>
 
         {/* Aperçu à droite */}
-        <div className="w-3/6 overflow-y-hidden z-[1000]">
+        <div className="w-3/6 overflow-y-hidden z-[900]">
           {/* Calculer les totaux pour l'aperçu */}
           <QuotePreview
             quote={{

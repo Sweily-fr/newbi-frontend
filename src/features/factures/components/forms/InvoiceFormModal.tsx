@@ -680,7 +680,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
         </div>
 
         {/* Aperçu à droite */}
-        <div className="w-3/6 overflow-y-hidden z-[1000]">
+        <div className="w-3/6 overflow-y-hidden z-[900]">
           <InvoicePreview
             invoice={invoice}
             selectedClient={clientsData?.clients?.items?.find(

@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useContext, useState } from 'react';
 import { SubscriptionContext } from '../../context/SubscriptionContext.context';
-import { Dropdown, Avatar } from '../';
+import { Dropdown, Avatar, Button } from '../';
 import { Logo } from '../../assets/logo';
 import { ButtonLink } from '../';
 import { useQuery } from '@apollo/client';
@@ -167,18 +167,18 @@ export const Navbar = () => {
               </span>
             </div>
             
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center">
               <div className="hidden md:flex md:items-center space-x-5">
                 {isAuthenticated && (
                   <>
-                    <ButtonLink
-                      to="/outils"
+                    <Button
                       variant="outline"
                       size="md"
                       className="shadow-sm transform hover:translate-y-[-2px]"
+                      onClick={() => navigate('/outils')}
                     >
                       Accéder aux outils
-                    </ButtonLink>
+                    </Button>
                     
                     {/* Bouton Premium uniquement pour les utilisateurs sans licence premium */}
                     {isAuthenticated && subscription && !subscription.licence ? (

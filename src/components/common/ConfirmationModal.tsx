@@ -2,7 +2,6 @@ import React from 'react';
 import { Modal } from './Modal';
 import { Button } from '..';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { ModalPriority } from './constants';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -14,7 +13,6 @@ interface ConfirmationModalProps {
   cancelButtonText?: string;
   confirmButtonVariant?: 'primary' | 'danger' | 'secondary';
   isLoading?: boolean;
-  priority?: ModalPriority; // Nouvelle prop pour définir la priorité de la modale
   preventBackgroundClose?: boolean; // Empêche la fermeture en cliquant sur l'arrière-plan
   overlayOpacity?: number; // Opacité de l'overlay (0-100)
 }
@@ -34,7 +32,6 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   cancelButtonText = 'Annuler',
   confirmButtonVariant = 'danger',
   isLoading = false,
-  priority = 'critical', // Par défaut, les modales de confirmation ont la priorité la plus élevée
   preventBackgroundClose = false,
   overlayOpacity = 10 // Overlay semi-transparent avec teinte violette
 }) => {
@@ -43,12 +40,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      priority={priority}
       preventBackgroundClose={preventBackgroundClose}
       overlayOpacity={overlayOpacity}
-      size="sm"
-      className="shadow-lg shadow-[#5b50ff]/10" // Ombre avec la couleur primaire de Newbi
-      zIndex={9999} // Assure que le modal apparaît au-dessus de tous les autres éléments
+      size="md"
+      className="shadow-lg shadow-[#5b50ff]/10 !rounded-xl" // Ombre avec la couleur primaire de Newbi et coins plus arrondis
     >
       <div className="sm:flex sm:items-start">
         <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
