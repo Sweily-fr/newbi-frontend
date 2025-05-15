@@ -17,21 +17,21 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   // Classes de base pour tous les boutons
-  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium focus:outline-none';
+  const baseClasses = 'inline-flex items-center justify-center rounded-[16px] font-light focus:outline-none transition-colors duration-200';
   
   // Classes spécifiques à la variante
   const variantClasses = {
-    primary: 'border border-transparent bg-[#5b50ff] text-white hover:bg-[#4a41d0]',
-    secondary: 'border border-transparent bg-[#eeecff] text-[#5b50ff] hover:bg-[#e0ddff]',
-    outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100',
-    danger: 'border border-transparent bg-red-600 text-white hover:bg-red-700',
+    primary: 'bg-[#5b50ff] text-white hover:bg-[#4a41e0]',
+    secondary: 'bg-[#f0eeff] text-[#5b50ff] hover:bg-[#e6e1ff]',
+    outline: 'border border-[#5b50ff] border-opacity-30 bg-white text-[#5b50ff] hover:bg-[#f0eeff] hover:border-opacity-50',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
   };
   
   // Classes spécifiques à la taille
   const sizeClasses = {
-    sm: 'py-1.5 px-3 text-xs',
-    md: 'py-3 px-6 text-sm font-medium',
-    lg: 'py-3 px-8 text-base',
+    sm: 'py-2 px-4 text-xs',
+    md: 'py-3 px-8 text-[14px]',
+    lg: 'py-4 px-10 text-[14px]',
   };
   
   // Classes pour la largeur

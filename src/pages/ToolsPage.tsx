@@ -5,7 +5,8 @@ import { Button, SearchInput } from "../components";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
 import { PremiumModal } from "../components/specific/subscription/PremiumModal";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { Building } from 'iconsax-react';
 import { SEOHead } from "../components/specific/SEO/SEOHead";
 
 export const ToolsPage = () => {
@@ -125,20 +126,7 @@ export const ToolsPage = () => {
                 <CheckBadgeIcon className="h-6 w-6" />
               </span>
             )}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
+            <Building color="currentColor" size="16" variant="Outline" />
             Paramètres entreprise
           </Button>
         </div>

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Pagination } from '../specific/navigation/Pagination';
 import { TruncatedText } from '../specific/TruncatedText';
+import { ArrowDown2, ArrowUp2, Sort, EmptyWallet } from 'iconsax-react';
 
 // Types pour les colonnes
 export interface Column<T> {
@@ -8,6 +9,7 @@ export interface Column<T> {
   accessor: keyof T | ((item: T) => ReactNode);
   align?: 'left' | 'center' | 'right';
   className?: string;
+  sortable?: boolean;
 }
 
 // Props pour le composant Table
@@ -22,6 +24,11 @@ interface TableProps<T> {
     title: string;
     description: string;
     action?: ReactNode;
+  };
+  sortConfig?: {
+    key: keyof T | null;
+    direction: 'asc' | 'desc' | null;
+    onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
   };
   // Props de pagination
   pagination?: {
@@ -42,16 +49,19 @@ export function Table<T>({
   className = '',
   onRowClick,
   emptyState,
-  pagination
+  pagination,
+  sortConfig
 }: TableProps<T>) {
   // Si les données sont vides et qu'un état vide est fourni, afficher l'état vide
   if (data.length === 0 && emptyState) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <div className="text-center py-12">
-          {emptyState.icon}
-          <h3 className="mt-2 text-sm font-medium text-gray-900">{emptyState.title}</h3>
-          <p className="mt-1 text-sm text-gray-500">{emptyState.description}</p>
+      <div className="bg-white shadow-sm border border-gray-100 overflow-hidden rounded-lg">
+        <div className="text-center py-12 px-4">
+          <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-[#f0eeff]">
+            {emptyState.icon || <EmptyWallet size={24} variant="Bulk" color="#5b50ff" />}
+          </div>
+          <h3 className="mt-4 text-base font-medium text-gray-900">{emptyState.title}</h3>
+          <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">{emptyState.description}</p>
           {emptyState.action && <div className="mt-6">{emptyState.action}</div>}
         </div>
       </div>
@@ -59,27 +69,57 @@ export function Table<T>({
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md">
+    <div className="bg-white shadow-sm border border-gray-100 overflow-hidden rounded-lg">
       <div className="overflow-x-auto">
-        <table className={`min-w-full divide-y divide-gray-200 ${className}`}>
-          <thead className="bg-gray-50">
+        <table className={`min-w-full divide-y divide-gray-100 ${className}`}>
+          <thead className="bg-[#f9f8ff]">
             <tr>
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className={`px-6 py-3 text-${column.align || 'left'} text-xs font-medium text-gray-500 uppercase tracking-wider ${column.className || ''}`}
-                >
-                  {column.header}
-                </th>
-              ))}
+              {columns.map((column, index) => {
+                const isSorted = sortConfig?.key === column.accessor && typeof column.accessor !== 'function';
+                const sortDirection = isSorted ? sortConfig.direction : null;
+                
+                return (
+                  <th
+                    key={index}
+                    className={`px-6 py-4 text-${column.align || 'left'} text-xs font-medium text-gray-600 tracking-wider ${column.className || ''}`}
+                    style={{ textAlign: column.align || 'left' }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>{column.header}</span>
+                      {column.sortable && (
+                        <button 
+                          className="focus:outline-none"
+                          onClick={() => {
+                            if (sortConfig?.onSort && typeof column.accessor !== 'function') {
+                              const direction = 
+                                isSorted && sortDirection === 'asc' ? 'desc' : 'asc';
+                              sortConfig.onSort(column.accessor as keyof T, direction);
+                            }
+                          }}
+                        >
+                          {isSorted ? (
+                            sortDirection === 'asc' ? (
+                              <ArrowUp2 size={16} variant="Bold" color="#5b50ff" />
+                            ) : (
+                              <ArrowDown2 size={16} variant="Bold" color="#5b50ff" />
+                            )
+                          ) : (
+                            <Sort size={16} variant="Linear" color="#9ca3af" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
             {data.map((item) => (
               <tr 
                 key={keyExtractor(item)}
                 onClick={onRowClick ? () => onRowClick(item) : undefined}
-                className={onRowClick ? 'cursor-pointer hover:bg-[#f0eeff]/50' : ''}
+                className={onRowClick ? 'cursor-pointer hover:bg-[#f0eeff]/50 transition-colors duration-150' : ''}
               >
                 {columns.map((column, index) => {
                   const value = typeof column.accessor === 'function' 
@@ -89,7 +129,8 @@ export function Table<T>({
                   return (
                     <td 
                       key={index} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm ${column.align === 'right' ? 'text-right' : ''} ${column.className || ''}`}
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${column.className || ''}`}
+                      style={{ textAlign: column.align || 'left' }}
                     >
                       {typeof value === 'string' ? (
                         <TruncatedText text={value} />
@@ -114,6 +155,7 @@ export function Table<T>({
           rowsPerPageOptions={pagination.rowsPerPageOptions}
           onItemsPerPageChange={pagination.onItemsPerPageChange}
           hasNextPage={pagination.hasNextPage}
+          className="border-t border-gray-100"
         />
       )}
     </div>
