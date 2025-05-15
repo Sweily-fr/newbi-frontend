@@ -262,7 +262,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
       {/* Prévisualisation du devis */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-3/6 bg-gray-50 z-[1500] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[1500] transition-opacity duration-300 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{ display: isOpen ? "block" : "none" }}
@@ -287,7 +287,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         title={`Devis ${quote.prefix}${quote.number}`}
-        width="w-3/6"
+        width="w-1/2"
         position="right"
         actions={
           <>

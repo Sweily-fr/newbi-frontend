@@ -479,7 +479,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       {/* Prévisualisation de la facture */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-[calc(100%-32rem)] bg-gray-50 z-[9999] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[9999] transition-opacity duration-300 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{ display: isOpen ? "block" : "none" }}
@@ -513,7 +513,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         title={`Facture ${invoice.prefix}${invoice.number}`}
-        width="w-[32rem]"
+        width="w-1/2"
         position="right"
         actions={actions}
       >

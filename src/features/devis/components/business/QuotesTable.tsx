@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTES } from '../../graphql/quotes';
-import { Table } from '../../../../components/common/Table';
+import { Table, ActionMenuItem } from '../../../../components/common/Table';
 import { formatDateShort } from '../../../../utils/date';
 import { Spinner } from '../../../../components/common/Spinner';
 import { Button } from '../../../../components/';
 import { Notification } from '../../../../components/';
-import { DocumentText, ClipboardTick, Timer, NoteText, CloseCircle, DocumentCopy } from 'iconsax-react';
+import { DocumentText, ClipboardTick, Timer, NoteText, CloseCircle, DocumentCopy, Edit2, Trash, Printer, ArrowDown, Receipt21 } from 'iconsax-react';
 
 // Type pour les onglets de filtrage
 export type TabType = 'DRAFT' | 'PENDING' | 'COMPLETED' | 'CANCELED' | null;
@@ -67,6 +67,12 @@ interface QuotesTableProps {
   onSelectQuote: (quote: Quote) => void;
   onCreateQuote?: () => void;
   onRefresh?: (refetchFn: () => Promise<unknown>) => void;
+  onEditQuote?: (quote: Quote) => void;
+  onDeleteQuote?: (quote: Quote) => void;
+  onDownloadQuote?: (quote: Quote) => void;
+  onPrintQuote?: (quote: Quote) => void;
+  onDuplicateQuote?: (quote: Quote) => void;
+  onConvertToInvoice?: (quote: Quote) => void;
 }
 
 export const QuotesTable: React.FC<QuotesTableProps> = ({
@@ -79,7 +85,13 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
   onItemsPerPageChange,
   onSelectQuote,
   onCreateQuote,
-  onRefresh
+  onRefresh,
+  onEditQuote,
+  onDeleteQuote,
+  onDownloadQuote,
+  onPrintQuote,
+  onDuplicateQuote,
+  onConvertToInvoice
 }) => {
   const [localLoading, setLocalLoading] = useState(false);
   
@@ -200,6 +212,77 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
       </span>
     );
   };
+  
+  // Définir les actions disponibles pour le menu d'actions des devis
+  const getActionItems = (): ActionMenuItem<Quote>[] => {
+    const items: ActionMenuItem<Quote>[] = [];
+    
+    // Action pour voir le devis (toujours disponible)
+    items.push({
+      label: 'Voir le devis',
+      icon: <DocumentText size={16} variant="Linear" color="#5b50ff" />,
+      onClick: (quote) => onSelectQuote(quote)
+    });
+    
+    // Action pour modifier le devis si disponible
+    if (onEditQuote) {
+      items.push({
+        label: 'Modifier',
+        icon: <Edit2 size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (quote) => onEditQuote(quote)
+      });
+    }
+    
+    // Action pour télécharger le devis si disponible
+    if (onDownloadQuote) {
+      items.push({
+        label: 'Télécharger',
+        icon: <ArrowDown size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (quote) => onDownloadQuote(quote)
+      });
+    }
+    
+    // Action pour imprimer le devis si disponible
+    if (onPrintQuote) {
+      items.push({
+        label: 'Imprimer',
+        icon: <Printer size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (quote) => onPrintQuote(quote)
+      });
+    }
+    
+    // Action pour dupliquer le devis si disponible
+    if (onDuplicateQuote) {
+      items.push({
+        label: 'Dupliquer',
+        icon: <Receipt21 size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (quote) => onDuplicateQuote(quote)
+      });
+    }
+    
+    // Action pour convertir le devis en facture si disponible et si non déjà converti
+    if (onConvertToInvoice) {
+      items.push({
+        label: 'Convertir en facture',
+        icon: <DocumentCopy size={16} variant="Linear" color="#5b50ff" />,
+        onClick: (quote) => onConvertToInvoice(quote),
+        disabled: quote => quote.convertedToInvoice === true,
+        tooltip: quote => quote.convertedToInvoice ? 'Ce devis a déjà été converti en facture' : undefined
+      });
+    }
+    
+    // Action pour supprimer le devis si disponible (toujours en dernier)
+    if (onDeleteQuote) {
+      items.push({
+        label: 'Supprimer',
+        icon: <Trash size={16} variant="Linear" color="#ef4444" />,
+        onClick: (quote) => onDeleteQuote(quote),
+        variant: 'danger'
+      });
+    }
+    
+    return items;
+  };
 
   return (
     <div className="space-y-4">
@@ -254,13 +337,7 @@ export const QuotesTable: React.FC<QuotesTableProps> = ({
           ]}
           data={displayedQuotes}
           keyExtractor={(quote: Quote) => quote.id}
-          actionItems={[
-            {
-              label: 'Voir le devis',
-              icon: <DocumentText size={18} variant="Bulk" color="#5b50ff" />,
-              onClick: (quote) => onSelectQuote(quote)
-            }
-          ]}
+          actionItems={getActionItems()}
           actionButtonLabel="Actions de devis"
           emptyState={{
             title: 'Aucun devis',

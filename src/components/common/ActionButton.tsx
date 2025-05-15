@@ -11,6 +11,8 @@ export interface ActionMenuItem<T> {
   icon?: ReactNode;
   onClick: (item: T) => void;
   variant?: 'default' | 'danger';
+  disabled?: (item: T) => boolean;
+  tooltip?: (item: T) => string | undefined;
 }
 
 // Props pour le bouton d'action
@@ -125,23 +127,35 @@ export function ActionButton<T>({
           }}
         >
           <div className="py-0" role="menu" aria-orientation="vertical">
-            {actions.map((action, index) => (
-              <button
-                key={index}
-                className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors duration-150 ${action.variant === 'danger' ? 'text-red-600 hover:bg-red-50' : 'text-gray-700 hover:bg-[#f0eeff]'}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.onClick(item);
-                  tableMenuContext.setActiveMenuId(null);
-                }}
-                role="menuitem"
-              >
-                <span className="flex items-center justify-center w-5 h-5">
-                  {action.icon}
-                </span>
-                <span className="font-medium">{action.label}</span>
-              </button>
-            ))}
+            {actions.map((action, index) => {
+              const isDisabled = action.disabled ? action.disabled(item) : false;
+              const tooltipText = action.tooltip ? action.tooltip(item) : undefined;
+              
+              return (
+                <button
+                  key={index}
+                  className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors duration-150 
+                    ${action.variant === 'danger' ? 'text-red-600 hover:bg-red-50' : 'text-gray-700 hover:bg-[#f0eeff]'}
+                    ${isDisabled ? 'opacity-50 cursor-not-allowed hover:bg-white' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isDisabled) {
+                      action.onClick(item);
+                      tableMenuContext.setActiveMenuId(null);
+                    }
+                  }}
+                  role="menuitem"
+                  disabled={isDisabled}
+                  title={tooltipText}
+                  aria-disabled={isDisabled}
+                >
+                  <span className="flex items-center justify-center w-5 h-5">
+                    {action.icon}
+                  </span>
+                  <span className="font-medium">{action.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>,
         document.body
