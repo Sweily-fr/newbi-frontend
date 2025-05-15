@@ -3,6 +3,8 @@ import { ImageContainer } from './ImageContainer';
 import { ContactInfo } from './ContactInfo';
 import { SocialLinksComponent } from './SocialLinks';
 import { SignatureData } from '../../types';
+// Import des constantes pour les images par défaut
+import { DEFAULT_PROFILE_IMAGE, DEFAULT_PROFILE_PHOTO_SIZE } from '../../constants/images';
 
 type SocialLinks = NonNullable<SignatureData['socialLinks']>;
 
@@ -17,7 +19,7 @@ interface SignatureLayoutProps {
   website?: string;
   address?: string;
   logoUrl?: string;
-  profilePhotoSource?: string;
+  profilePhotoSource?: string | null;
   photoSize: number; // Valeur par défaut fournie dans le composant
   imagesLayout: 'stacked' | 'side-by-side';
   showLogo: boolean; // Valeur par défaut fournie dans le composant
@@ -53,7 +55,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   website,
   address,
   profilePhotoSource,
-  photoSize = 80, // Valeur par défaut pour la taille de la photo
+  photoSize = DEFAULT_PROFILE_PHOTO_SIZE, // Utilisation de la constante pour la taille de la photo
   imagesLayout,
   showEmailIcon = true,
   showPhoneIcon = true,
@@ -64,7 +66,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   socialLinksIconStyle,
   primaryColor = '#5b50ff', // Couleur principale Newbi
   secondaryColor,
-  socialLinksIconColor,
+  socialLinksIconColor = '#ffffff', // Couleur par défaut blanche pour les icônes de réseaux sociaux
   effectiveTextAlignment,
   effectiveHorizontalSpacing,
   effectiveVerticalSpacing,
@@ -135,10 +137,11 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
 
   // Rendu du logo d'entreprise en mode vertical
   const renderCompanyLogoVertical = () => {
+    console.log(showLogo, "showLogo");
     if (!showLogo || !logoUrl) return null;
     
     return (
-      <div style={{ width: '100%', marginTop: '15px' }}>
+      <div style={{ width: '100%' }}>
         {/* Trait séparateur */}
         <div style={{
           height: '1px',
@@ -154,12 +157,11 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
           width: '100%',
           display: 'flex',
           justifyContent: effectiveTextAlignment === 'center' ? 'center' : 
-                        effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start',
-          marginTop: '10px'
+                        effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start'
         }}>
           <div style={{ 
-            width: `${photoSize * 0.8}px`, 
-            height: `${photoSize * 0.5}px`, 
+            width: `${photoSize * 1}px`, 
+            height: `${photoSize * 1}px`, 
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -197,364 +199,39 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   };
 
   if (signatureLayout === 'horizontal') {
-    // Si la position des réseaux sociaux est sous les informations personnelles
-    // Utilisation d'une comparaison de chaînes pour éviter les problèmes de typage
-    // Cas non utilisé dans la version simplifiée
-    if (false) {
-      return (
-        <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
-          {/* Partie gauche - Photo de profil et logo */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '10px'
-          }}>
-            {/* Photo de profil */}
-            <div style={{ 
-              width: `${photoSize}px`, 
-              height: `${photoSize}px`, 
-              borderRadius: '50%',
-              overflow: 'hidden',
-              backgroundColor: '#f0eeff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {profilePhotoSource ? (
-                <img 
-                  src={profilePhotoSource} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
-              ) : (
-                <img 
-                  src="/images/logo_newbi/SVG/Logo_Texte_Purple.svg" 
-                  alt="Newbi" 
-                  style={{ 
-                    width: '80%', 
-                    height: '80%', 
-                    objectFit: 'contain'
-                  }} 
-                />
-              )}
-            </div>
-            
-            {/* Logo d'entreprise sous la photo de profil */}
-            {showLogo && logoUrl && (
-              <div style={{ marginTop: '10px', width: '100%' }}>
-                {/* Trait séparateur */}
-                <div style={{
-                  height: '1px',
-                  backgroundColor: '#e0e0e0',
-                  width: '80%',
-                  margin: '5px auto'
-                }}></div>
-                
-                {/* Logo */}
-                <div style={{ 
-                  width: `${photoSize * 0.8}px`, 
-                  height: `${photoSize * 0.5}px`, 
-                  overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '5px auto'
-                }}>
-                  <img 
-                    src={logoUrl} 
-                    alt="Logo" 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '100%', 
-                      objectFit: 'contain'
-                    }} 
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Partie centrale - Informations personnelles et réseaux sociaux */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: '0 10px 0 0',
-            textAlign: 'left',
-            gap: `${effectiveVerticalSpacing}px`
-          }}>
-            {/* Informations personnelles */}
-            {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
-            {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
-            {companyName && <p style={{...companyNameStyle, margin: '0'}}>{companyName}</p>}
-            
-            {/* Réseaux sociaux sous les informations personnelles */}
-            <div style={{ marginTop: '5px' }}>
-              {renderSocialLinks(false)}
-            </div>
-          </div>
-          
-          {/* Séparateur vertical */}
-          <div style={{
-            width: '1px',
-            height: 'auto',
-            backgroundColor: '#e0e0e0',
-            alignSelf: 'stretch',
-            margin: '0 0 0 10px'
-          }}></div>
-          
-          {/* Partie droite - Informations de contact */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: '0 0 0 20px',
-            gap: `${effectiveVerticalSpacing}px`
-          }}>
-            <ContactInfo
-              phone={phone}
-              mobilePhone={mobilePhone}
-              email={email}
-              website={website}
-              address={address}
-              showEmailIcon={showEmailIcon}
-              showPhoneIcon={showPhoneIcon}
-              showAddressIcon={showAddressIcon}
-              showWebsiteIcon={showWebsiteIcon}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor || '#333333'}
-              fontSize={fontSize}
-              textStyle={textStyle}
-              fontFamily={fontFamily}
-              textAlignment="left"
-              isHorizontalLayout={true}
-              verticalSpacing={effectiveVerticalSpacing}
-              iconTextSpacing={iconTextSpacing}
-            />
-          </div>
-        </div>
-      );
-    }
-    
-    // Si la position des réseaux sociaux est à droite, les afficher à côté des informations de contact
-    // Cas non utilisé dans la version simplifiée
-    if (false) {
-      return (
-        <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
-          {/* Partie gauche - Photo de profil et logo */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '10px'
-          }}>
-            {/* Photo de profil */}
-            <div style={{ 
-              width: `${photoSize}px`, 
-              height: `${photoSize}px`, 
-              borderRadius: '50%',
-              overflow: 'hidden',
-              backgroundColor: '#f0eeff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {profilePhotoSource ? (
-                <img 
-                  src={profilePhotoSource} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
-              ) : (
-                <img 
-                  src="/images/logo_newbi/SVG/Logo_Texte_Purple.svg" 
-                  alt="Newbi" 
-                  style={{ 
-                    width: '80%', 
-                    height: '80%', 
-                    objectFit: 'contain'
-                  }} 
-                />
-              )}
-            </div>
-            
-            {/* Logo d'entreprise sous la photo de profil */}
-            {showLogo && logoUrl && (
-              <div style={{ marginTop: '10px', width: '100%' }}>
-                {/* Trait séparateur */}
-                <div style={{
-                  height: '1px',
-                  backgroundColor: '#e0e0e0',
-                  width: '80%',
-                  margin: '5px auto'
-                }}></div>
-                
-                {/* Logo */}
-                <div style={{ 
-                  width: `${photoSize * 0.8}px`, 
-                  height: `${photoSize * 0.5}px`, 
-                  overflow: 'hidden',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '5px auto'
-                }}>
-                  <img 
-                    src={logoUrl} 
-                    alt="Logo" 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '100%', 
-                      objectFit: 'contain'
-                    }} 
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* Informations personnelles sous la photo de profil */}
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              textAlign: 'left',
-              gap: `${effectiveVerticalSpacing}px`
-            }}>
-              {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
-              {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
-              {companyName && <p style={{...companyNameStyle, margin: '0'}}>{companyName}</p>}
-            </div>
-          </div>
-          
-          {/* Séparateur vertical */}
-          <div style={{
-            width: '1px',
-            height: 'auto',
-            backgroundColor: '#e0e0e0',
-            alignSelf: 'stretch',
-            margin: '0 0 0 10px'
-          }}></div>
-          
-          {/* Partie droite - Informations de contact */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: '0 0 0 20px',
-            gap: `${effectiveVerticalSpacing}px`
-          }}>
-            <ContactInfo
-              phone={phone}
-              mobilePhone={mobilePhone}
-              email={email}
-              website={website}
-              address={address}
-              showEmailIcon={showEmailIcon}
-              showPhoneIcon={showPhoneIcon}
-              showAddressIcon={showAddressIcon}
-              showWebsiteIcon={showWebsiteIcon}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor || '#333333'}
-              fontSize={fontSize}
-              textStyle={textStyle}
-              fontFamily={fontFamily}
-              textAlignment="left"
-              isHorizontalLayout={true}
-              verticalSpacing={effectiveVerticalSpacing}
-              iconTextSpacing={iconTextSpacing}
-            />
-          </div>
-          
-          {/* Séparateur vertical */}
-          <div style={{
-            width: '1px',
-            height: 'auto',
-            backgroundColor: '#e0e0e0',
-            alignSelf: 'stretch',
-            margin: '0 0 0 10px'
-          }}></div>
-          
-          {/* Réseaux sociaux à droite */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: '0 0 0 20px',
-            alignSelf: 'center',
-            gap: `${effectiveVerticalSpacing}px`
-          }}>
-            {renderSocialLinks(true)}
-          </div>
-        </div>
-      );
-    }
-    
     // Si la position des réseaux sociaux est en bas, les afficher sous les informations de contact (comportement par défaut)
     return (
       <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
-        {/* Partie gauche - Photo de profil */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          padding: '10px'
-        }}>
-          <div style={{ 
-            width: `${photoSize}px`, 
-            height: `${photoSize}px`, 
-            borderRadius: '50%',
-            overflow: 'hidden',
-            backgroundColor: '#f0eeff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {profilePhotoSource ? (
-              <img 
-                src={profilePhotoSource} 
-                alt="Profile" 
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'cover'
-                }} 
-              />
-            ) : (
-              <img 
-                src="/images/logo_newbi/SVG/Logo_Texte_Purple.svg" 
-                alt="Newbi" 
-                style={{ 
-                  width: '80%', 
-                  height: '80%', 
-                  objectFit: 'contain'
-                }} 
-              />
-            )}
-          </div>
-        </div>
-        
-        {/* Partie centrale - Informations personnelles */}
+        {/* Partie gauche - Photo de profil avec informations personnelles en dessous */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
-          justifyContent: 'flex-start',
-          padding: '0 10px 0 0',
-          textAlign: 'left',
-          gap: `${effectiveVerticalSpacing}px`
+          alignItems: 'center',
+          padding: '10px',
+          width: 'auto'
         }}>
-          {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
-          {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
-          {companyName && <p style={{...companyNameStyle, margin: '0'}}>{companyName}</p>}
+          {/* Photo de profil avec ImageContainer pour uniformiser */}
+          <div style={{ marginBottom: '10px' }}>
+            <ImageContainer
+              profilePhotoSource={profilePhotoSource}
+              photoSize={photoSize * 1.2}
+              imagesLayout="stacked"
+            />
+          </div>
+          
+          {/* Informations personnelles sous la photo */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            textAlign: 'left',
+            gap: `${Math.max(4, effectiveVerticalSpacing / 2)}px`,
+            minWidth: `${photoSize * 1.2}px`
+          }}>
+            {fullName && <h3 style={{...nameStyle, margin: '0', whiteSpace: 'nowrap'}}>{fullName}</h3>}
+            {jobTitle && <p style={{...jobTitleStyle, margin: '0', whiteSpace: 'nowrap'}}>{jobTitle}</p>}
+            {companyName && <p style={{...companyNameStyle, margin: '0', whiteSpace: 'nowrap'}}>{companyName}</p>}
+          </div>
         </div>
         
         {/* Séparateur vertical */}
@@ -603,153 +280,6 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
     );
   }
 
-  // Débogage des valeurs
-  const layoutType = signatureLayout as string;
-  console.log('SignatureLayout Debug:', { 
-    signatureLayout, 
-    showLogo, 
-    logoUrl, 
-    isHorizontal: layoutType === 'horizontal',
-    isVertical: layoutType === 'vertical',
-    typeofSignatureLayout: typeof signatureLayout
-  });
-  
-  // Fonction unique pour le rendu horizontal avec les informations personnelles en dessous de la photo
-  const renderHorizontalLayout = () => {
-    console.log('renderHorizontalLayout est appelée !', { fullName, jobTitle, companyName });
-    
-    // Modèle unique pour le mode horizontal
-    return (
-      <div style={containerStyle}>
-        <div style={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%'
-        }}>
-          {/* Partie supérieure - Photo de profil uniquement */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center', 
-            marginBottom: '15px'
-          }}>
-            {/* Photo de profil */}
-            <div style={{ 
-              width: `${photoSize}px`, 
-              height: `${photoSize}px`, 
-              borderRadius: '50%',
-              overflow: 'hidden',
-              backgroundColor: '#f0eeff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {profilePhotoSource ? (
-                <img 
-                  src={profilePhotoSource} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
-              ) : (
-                <img 
-                  src="/images/logo_newbi/SVG/Logo_Texte_Purple.svg" 
-                  alt="Newbi" 
-                  style={{ 
-                    width: '80%', 
-                    height: '80%', 
-                    objectFit: 'contain'
-                  }} 
-                />
-              )}
-            </div>
-          </div>
-          
-          {/* Informations personnelles en dessous de la photo */}
-          <div style={{ 
-            textAlign: 'center', 
-            marginBottom: '15px',
-            width: '100%'
-          }}>
-            {fullName && <h3 style={{...nameStyle, margin: '0'}}>{fullName}</h3>}
-            {jobTitle && <p style={{...jobTitleStyle, margin: '0'}}>{jobTitle}</p>}
-            {companyName && <p style={{ ...companyNameStyle, margin: '5px 0' }}>{companyName}</p>}
-          </div>
-          
-          {/* Logo d'entreprise sous les informations personnelles */}
-          {showLogo && logoUrl && (
-            <div style={{
-              width: `${photoSize * 0.8}px`,
-              height: `${photoSize * 0.5}px`,
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: '5px',
-              marginBottom: '15px',
-              border: '1px solid #f0eeff',
-              borderRadius: '4px',
-              padding: '4px'
-            }}>
-              <img 
-                src={logoUrl} 
-                alt="Logo" 
-                style={{ 
-                  maxWidth: '100%', 
-                  maxHeight: '100%', 
-                  objectFit: 'contain'
-                }} 
-              />
-            </div>
-          )}
-        </div>
-        
-        {/* Séparateur horizontal */}
-        <div style={{
-          height: '1px',
-          backgroundColor: '#e0e0e0',
-          width: '60%',
-          alignSelf: 'center',
-          margin: '0 auto 15px'
-        }}></div>
-        
-        {/* Informations de contact */}
-        <ContactInfo
-          phone={phone}
-          mobilePhone={mobilePhone}
-          email={email}
-          website={website}
-          address={address}
-          companyName={undefined} // Déjà affiché au-dessus
-          showEmailIcon={showEmailIcon}
-          showPhoneIcon={showPhoneIcon}
-          showAddressIcon={showAddressIcon}
-          showWebsiteIcon={showWebsiteIcon}
-          primaryColor={primaryColor}
-          secondaryColor={secondaryColor || '#333333'}
-          textAlignment="center"
-          isHorizontalLayout={false}
-          fontSize={fontSize}
-          textStyle={textStyle}
-          fontFamily={fontFamily}
-          verticalSpacing={effectiveVerticalSpacing}
-          iconTextSpacing={iconTextSpacing}
-        />
-        
-        {/* Liens sociaux en bas */}
-        {renderSocialLinks()}
-      </div>
-    );
-  };
-  
-  // Utiliser la fonction renderHorizontalLayout pour le mode horizontal
-  if (signatureLayout === 'horizontal') {
-    return renderHorizontalLayout();
-  }
   
   // Mode vertical pour les autres cas
   return (
@@ -758,38 +288,10 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         {/* Conteneur d'images */}
         <ImageContainer
           profilePhotoSource={profilePhotoSource}
-          logoUrl={logoUrl}
           photoSize={photoSize}
           imagesLayout={imagesLayout}
-          showLogo={false} /* Désactiver le logo dans ImageContainer */
-          signatureLayout={signatureLayout}
         />
-        
-        {/* Logo d'entreprise en mode vertical */}
-        {logoUrl && showLogo && (
-          <div style={{
-            width: `${photoSize * 0.8}px`,
-            height: `${photoSize * 0.5}px`,
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: '10px',
-            border: '1px solid #f0eeff',
-            borderRadius: '4px',
-            padding: '4px'
-          }}>
-            <img 
-              src={logoUrl || "/images/logo_newbi/SVG/Logo_Texte_Purple.svg"} 
-              alt="Logo" 
-              style={{ 
-                maxWidth: '100%', 
-                maxHeight: '100%', 
-                objectFit: 'contain'
-              }} 
-            />
-          </div>
-        )}
+        {/* Logo d'entreprise supprimé */}
       </div>
       
       {/* Informations personnelles en mode vertical */}
@@ -804,6 +306,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
         height: '1px',
         backgroundColor: '#e0e0e0',
         width: signatureLayout === 'vertical' && effectiveTextAlignment === 'center' ? '40%' : '60%',
+        margin: '5px 0',
         alignSelf: signatureLayout === 'vertical' ? (
           effectiveTextAlignment === 'center' ? 'center' : 
           effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start'

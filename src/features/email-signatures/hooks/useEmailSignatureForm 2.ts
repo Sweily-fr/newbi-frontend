@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useCompany } from '../../../hooks/useCompany';
 import { EMAIL_PATTERN, NAME_REGEX } from '../../../constants/formValidations';
-import { Notification } from '../../../components/common/Notification';
-import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
+import { Notification } from '../../../components/feedback/Notification';
 
 // Nous importerons les types depuis le dossier types une fois qu'ils seront créés
 interface SocialLinks {
@@ -156,22 +156,7 @@ export function useEmailSignatureForm({
   onChange
 }: UseEmailSignatureFormProps): UseEmailSignatureFormReturn {
   // Récupérer les informations de l'entreprise
-  // Implémentation directe pour remplacer useCompany
-  const company = {
-    name: '',
-    logo: '',
-    address: {
-      street: '',
-      postalCode: '',
-      city: '',
-      country: ''
-    },
-    website: '',
-    phone: ''
-  };
-  
-  // Note: Dans une implémentation réelle, ces données pourraient être récupérées
-  // depuis une API GraphQL ou un store global
+  const { company } = useCompany();
   
   // États pour les champs du formulaire
   const id = initialData?.id;
@@ -205,7 +190,7 @@ export function useEmailSignatureForm({
   const [profilePhotoBase64, setProfilePhotoBase64] = useState<string | null>(null);
   const [previewProfilePhoto, setPreviewProfilePhoto] = useState<string | null>(null);
   const [profilePhotoToDelete, setProfilePhotoToDelete] = useState(false);
-  const [profilePhotoSize, setProfilePhotoSize] = useState(initialData?.profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE);
+  const [profilePhotoSize, setProfilePhotoSize] = useState(initialData?.profilePhotoSize || 80);
   
   // Disposition de la signature (horizontale ou verticale)
   const [layout, setLayout] = useState(initialData?.layout || 'vertical');
