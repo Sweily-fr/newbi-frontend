@@ -3,6 +3,7 @@ import { Button } from '../components/';
 import { useInvoices, TabType } from '../features/factures/hooks/useInvoices';
 import { TabNavigation } from '../components/specific/navigation/TabNavigation';
 import { SearchInput } from '../components/';
+import { DocumentText, DocumentCopy, DocumentLike, ClipboardTick } from 'iconsax-react';
 import { InvoiceSidebar } from '../features/factures/components/business/InvoiceSidebar';
 import { InvoicesTable } from '../features/factures/components/business/InvoicesTable';
 import { useQuery } from '@apollo/client';
@@ -138,10 +139,30 @@ export const InvoicesPage = () => {
           <div className="flex justify-between items-center mb-4">
             <TabNavigation
               tabs={[
-                { id: null, label: 'Toutes', count: statsData?.invoiceStats.totalCount || 0 },
-                { id: 'DRAFT', label: 'Brouillons', count: statsData?.invoiceStats.draftCount || 0 },
-                { id: 'PENDING', label: 'À encaisser', count: statsData?.invoiceStats.pendingCount || 0 },
-                { id: 'COMPLETED', label: 'Terminées', count: statsData?.invoiceStats.completedCount || 0 }
+                { 
+                  id: null, 
+                  label: 'Toutes', 
+                  count: statsData?.invoiceStats.totalCount || 0,
+                  icon: <DocumentText size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'DRAFT', 
+                  label: 'Brouillons', 
+                  count: statsData?.invoiceStats.draftCount || 0,
+                  icon: <DocumentCopy size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'PENDING', 
+                  label: 'À encaisser', 
+                  count: statsData?.invoiceStats.pendingCount || 0,
+                  icon: <DocumentLike size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'COMPLETED', 
+                  label: 'Terminées', 
+                  count: statsData?.invoiceStats.completedCount || 0,
+                  icon: <ClipboardTick size={20} variant="Outline" color="currentColor" />
+                }
               ]}
               activeTab={activeTab}
               onTabChange={(tabId) => {
@@ -149,7 +170,7 @@ export const InvoicesPage = () => {
                 setActiveTab(tabId as TabType);
                 setCurrentPage(1);
               }}
-              variant="simple-tabs"
+              variant="modern"
             />
           
             <SearchInput

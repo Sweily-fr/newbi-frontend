@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../components/common/Button';
 import { useQuotes, TabType } from '../features/devis/hooks';
 import { TabNavigation } from '../components/specific/navigation/TabNavigation';
+import { DocumentText, DocumentCopy, DocumentLike, ClipboardTick, CloseCircle } from 'iconsax-react';
 import { SearchInput } from '../components/';
 import { QuoteSidebar } from '../features/devis/components/business/QuoteSidebar';
 import { QuotesTable } from '../features/devis/components/business/QuotesTable';
@@ -125,22 +126,47 @@ export const QuotesPage = () => {
           <div className="flex justify-between items-center mb-4">
             <TabNavigation
               tabs={[
-                { id: null, label: 'Tous', count: statsData?.quoteStats.totalCount || 0 },
-                { id: 'DRAFT', label: 'Brouillons', count: statsData?.quoteStats.draftCount || 0 },
-                { id: 'PENDING', label: 'En attente', count: statsData?.quoteStats.pendingCount || 0 },
-                { id: 'CANCELED', label: 'Annulés', count: statsData?.quoteStats.canceledCount || 0 },
-                { id: 'COMPLETED', label: 'Acceptés', count: statsData?.quoteStats.completedCount || 0 }
+                { 
+                  id: null, 
+                  label: 'Tous', 
+                  count: statsData?.quoteStats.totalCount || 0,
+                  icon: <DocumentText size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'DRAFT', 
+                  label: 'Brouillons', 
+                  count: statsData?.quoteStats.draftCount || 0,
+                  icon: <DocumentCopy size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'PENDING', 
+                  label: 'En attente', 
+                  count: statsData?.quoteStats.pendingCount || 0,
+                  icon: <DocumentLike size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'CANCELED', 
+                  label: 'Annulés', 
+                  count: statsData?.quoteStats.canceledCount || 0,
+                  icon: <CloseCircle size={20} variant="Outline" color="currentColor" />
+                },
+                { 
+                  id: 'COMPLETED', 
+                  label: 'Acceptés', 
+                  count: statsData?.quoteStats.completedCount || 0,
+                  icon: <ClipboardTick size={20} variant="Outline" color="currentColor" />
+                }
               ]}
               activeTab={activeTab}
               onTabChange={(tabId) => {
                 setActiveTab(tabId as TabType);
                 setCurrentPage(1);
               }}
-              variant="simple-tabs"
+              variant="modern"
             />
           
             <SearchInput
-              placeholder="Rechercher par numéro, client, date, ou montant..."
+              placeholder="Rechercher par numéro, client..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               width="w-72"
