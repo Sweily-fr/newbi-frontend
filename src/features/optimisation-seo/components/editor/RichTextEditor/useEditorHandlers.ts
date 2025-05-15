@@ -424,10 +424,60 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
   const handleImageButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Sauvegarder la sélection actuelle pour pouvoir insérer l'image au bon endroit
+    // S'assurer que l'éditeur a le focus avant de vérifier la sélection
+    if (editorRef.current && document.activeElement !== editorRef.current) {
+      editorRef.current.focus();
+    }
+    
+    // Vérifier si une image est sélectionnée
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
-      setSavedRange(selection.getRangeAt(0).cloneRange());
+      const range = selection.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      
+      // Trouver l'image sélectionnée
+      let imageElement: HTMLImageElement | null = null;
+      
+      // Vérifier si le conteneur est une image
+      if (container.nodeType === Node.ELEMENT_NODE) {
+        const element = container as Element;
+        if (element.tagName === 'IMG') {
+          imageElement = element as HTMLImageElement;
+        } else {
+          // Rechercher l'image dans le conteneur
+          imageElement = (container as HTMLElement).querySelector('img');
+        }
+      } else if (container.nodeType === Node.TEXT_NODE) {
+        // Rechercher l'image dans le parent
+        const parent = container.parentElement;
+        if (parent) {
+          imageElement = parent.querySelector('img');
+        }
+      }
+      
+      if (imageElement) {
+        // Si une image est sélectionnée, ouvrir la popup de modification
+        setSelectedImage(imageElement);
+        setIsEditImagePopupOpen(true);
+        return;
+      }
+      
+      // Sauvegarder la sélection pour l'insertion d'image
+      setSavedRange(range.cloneRange());
+    } else if (editorRef.current) {
+      // Si aucune sélection n'est active, créer une sélection à la fin du contenu
+      const range = document.createRange();
+      range.selectNodeContents(editorRef.current);
+      range.collapse(false); // Collapse à la fin
+      
+      // Appliquer la sélection
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      
+      // Sauvegarder cette sélection
+      setSavedRange(range.cloneRange());
     }
     
     // Ouvrir la popup d'image
@@ -438,13 +488,28 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
   const handleAnalyzeContent = () => {
     setIsAnalyzing(true);
     
-    // Obtenir le contenu actuel de l'éditeur
+    // Sauvegarder le contenu actuel de l'éditeur
     if (editorRef.current) {
       const currentContent = editorRef.current.innerHTML;
       
+      // Stocker le contenu actuel pour pouvoir le restaurer après l'analyse
+      const savedContent = currentContent;
+      
       // Passer directement le contenu actuel à la fonction analyzeContent du contexte
-      // Cela évite le problème de timing avec les mises à jour d'état asynchrones
       analyzeContent(currentContent);
+      
+      // S'assurer que le contenu est préservé après l'analyse
+      setTimeout(() => {
+        if (editorRef.current && editorRef.current.innerHTML !== savedContent) {
+          // Restaurer le contenu si nécessaire
+          editorRef.current.innerHTML = savedContent;
+          
+          // Mettre à jour le contenu dans le contexte
+          if (typeof setContent === 'function') {
+            setContent(savedContent);
+          }
+        }
+      }, 500); // Délai pour s'assurer que l'analyse est terminée
     } else {
       // Si editorRef.current n'existe pas, appeler quand même analyzeContent
       // avec le contenu actuel du state
