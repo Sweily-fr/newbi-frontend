@@ -31,7 +31,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     selectedImage,
     setSelectedImage,
     activeFormats,
-    setActiveFormats,
+    // setActiveFormats n'est plus nécessaire car nous vérifions l'état actif directement dans le DOM
     currentWordCount,
     setCurrentWordCount,
     objectUrlsRef,
@@ -278,8 +278,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [state.content, state.keywords, editorRef]);
 
   return (
-    <div className="flex flex-col">
-      <div className="relative bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="flex flex-col h-full">
+      <div className="relative bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
         {/* Compteur de mots avec évaluation */}
         <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-md px-2 py-1 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
           <span className="text-xs text-gray-500">Mots:</span>
@@ -305,10 +305,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {/* Zone d'édition */}
         <div
           ref={editorRef}
-          className="p-6 min-h-[400px] max-h-[800px] overflow-y-auto focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 empty:before:italic"
+          className="p-6 flex-1 overflow-y-auto focus:outline-none empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 empty:before:italic"
           data-placeholder={placeholder}
           contentEditable="true"
-          style={{ minHeight: '400px', maxHeight: '800px' }}
           onClick={() => {
             // Mettre le focus uniquement lors du clic dans l'éditeur
             if (editorRef.current) {

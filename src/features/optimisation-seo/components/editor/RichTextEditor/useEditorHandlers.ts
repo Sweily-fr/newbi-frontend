@@ -160,24 +160,98 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
 
   // Barre d'outils simplifiée
   const handleFormatAction = (action: string, value?: string) => {
+    // Cas spécial pour vérifier les formats sans appliquer de formatage
+    if (action === 'checkFormat') {
+      checkActiveFormats();
+      return;
+    }
+    
     // S'assurer que l'éditeur a le focus avant d'appliquer le formatage
-    if (editorRef.current && document.activeElement !== editorRef.current) {
+    if (!editorRef.current) return;
+    if (document.activeElement !== editorRef.current) {
       editorRef.current.focus();
     }
     
     // Sauvegarder la sélection actuelle
     const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
+    if (!selection || selection.rangeCount === 0) return;
     
-    // Obtenir l'élément actuellement sélectionné avant de le modifier
-    let currentNode = range?.commonAncestorContainer as Node | null;
-    // Remonter jusqu'à trouver un élément HTML (pas un noeud de texte)
-    while (currentNode && currentNode.nodeType === Node.TEXT_NODE) {
-      currentNode = currentNode.parentNode as Node | null;
+    // Créer une copie profonde de la sélection actuelle
+    const originalRange = selection.getRangeAt(0).cloneRange();
+    
+    // Cas spécial pour les titres (h1, h2, h3) - si on clique sur un titre déjà actif,
+    // on le transforme en paragraphe au lieu de simplement le désactiver
+    if (action === 'formatBlock' && value && ['<h1>', '<h2>', '<h3>'].includes(value)) {
+      // Vérifier si le format est déjà actif en vérifiant directement le noeud parent
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const parentNode = selection.anchorNode?.parentElement;
+        if (parentNode) {
+          const tagName = value.replace(/[<>]/g, '').toLowerCase();
+          const isActive = !!parentNode.closest(tagName);
+          
+          if (isActive) {
+            // Si le format est déjà actif, appliquer le format paragraphe à la place
+            document.execCommand('formatBlock', false, '<p>');
+            // Mettre à jour les formats actifs après un court délai
+            setTimeout(() => {
+              checkActiveFormats();
+            }, 10);
+            return;
+          }
+        }
+      }
     }
     
-    // Exécuter la commande de formatage
-    if (action === 'formatBlock' && value) {
+    // Pour les commandes de formatage simple (bold, italic, underline), utiliser une approche différente
+    // pour préserver la position du curseur
+    if (['bold', 'italic', 'underline'].includes(action)) {
+      // Créer un marqueur pour la position actuelle
+      const markerStart = document.createElement('span');
+      markerStart.id = 'format-marker-start';
+      const markerEnd = document.createElement('span');
+      markerEnd.id = 'format-marker-end';
+      
+      try {
+        // Insérer les marqueurs au début et à la fin de la sélection
+        const rangeClone = originalRange.cloneRange();
+        rangeClone.collapse(true); // Collapse au début
+        rangeClone.insertNode(markerStart);
+        
+        // Insérer le marqueur de fin à la fin de la sélection
+        originalRange.collapse(false); // Collapse à la fin
+        originalRange.insertNode(markerEnd);
+        
+        // Appliquer la commande de formatage
+        document.execCommand(action, false);
+        
+        // Trouver les marqueurs après le formatage
+        const startMarker = document.getElementById('format-marker-start');
+        const endMarker = document.getElementById('format-marker-end');
+        
+        // Restaurer la sélection à la fin du texte formaté
+        if (endMarker && endMarker.parentNode) {
+          // Placer le curseur après le marqueur de fin
+          const newRange = document.createRange();
+          newRange.setStartAfter(endMarker);
+          newRange.collapse(true);
+          
+          // Appliquer la nouvelle sélection
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+          
+          // Supprimer les marqueurs
+          if (startMarker && startMarker.parentNode) {
+            startMarker.parentNode.removeChild(startMarker);
+          }
+          endMarker.parentNode.removeChild(endMarker);
+        }
+      } catch (e) {
+        console.error('Erreur lors du formatage avec marqueurs:', e);
+        // En cas d'erreur, revenir à la méthode standard
+        document.execCommand(action, false);
+      }
+    } else if (action === 'formatBlock' && value) {
       // Appliquer le formatage de bloc (titres ou paragraphe)
       document.execCommand(action, false, value);
       
@@ -191,9 +265,9 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
           let formattedElement: HTMLElement | null = null;
           
           // Si nous avons l'élément précédent, essayons de trouver le nouvel élément qui l'a remplacé
-          if (range && range.startContainer) {
+          if (originalRange && originalRange.startContainer) {
             // Trouver l'élément actuel à la position de la sélection
-            let node = range.startContainer as Node;
+            let node = originalRange.startContainer as Node;
             while (node && node.nodeType !== Node.ELEMENT_NODE) {
               node = node.parentNode as Node;
             }
@@ -309,23 +383,11 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
         
         // Appliquer la mise en évidence des mots-clés dans les titres
         highlightHeadingsWithKeywords();
+        
+        // Restaurer le focus sur l'éditeur
+        editorRef.current.focus();
       }
     }, 10);
-    
-    // Restaurer le focus sur l'éditeur
-    if (editorRef.current) {
-      editorRef.current.focus();
-      
-      // Restaurer la sélection si possible
-      if (range) {
-        try {
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-        } catch {
-          // Ignorer les erreurs de sélection
-        }
-      }
-    }
   };
 
   // Gestionnaire pour le bouton de lien
