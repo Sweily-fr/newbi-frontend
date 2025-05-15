@@ -5,13 +5,33 @@ import { Sidebar } from "../../../../components/layout/Sidebar";
 import { Button } from "../../../../components/";
 import { InvoicePreview } from "../forms/InvoicePreview";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
+import { 
+  InfoCircle, 
+  Profile2User, 
+  DocumentText, 
+  TickCircle, 
+  CloseCircle, 
+  Edit2, 
+  Trash, 
+  ArrowRight, 
+  Money, 
+  Calendar, 
+  Clock, 
+  Receipt21, 
+  Wallet, 
+  ReceiptItem, 
+  Sms
+} from "iconsax-react";
+
+// Type pour le statut de la facture
+type InvoiceStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CANCELED";
 
 interface InvoiceSidebarProps {
   invoice: {
     id: string;
     prefix: string;
     number: string;
-    status: string;
+    status: "DRAFT" | "PENDING" | "COMPLETED" | "CANCELED";
     totalHT: number;
     totalTTC: number;
     totalVAT: number;
@@ -114,14 +134,23 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
 
   if (!invoice) return null;
 
-  // Palette de couleurs pour les statuts (non utilisée actuellement)
-  // const statusColors = {
-  //   DRAFT: "bg-gray-100 text-gray-800",
-  //   PENDING: "bg-yellow-100 text-yellow-800",
-  //   COMPLETED: "bg-green-100 text-green-800",
-  // };
+  // Palette de couleurs pour les statuts avec la charte graphique Newbi
+  const statusColors = {
+    DRAFT: "bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]",
+    PENDING: "bg-[#fff8e6] text-[#e6a700] border border-[#ffe7a0]",
+    COMPLETED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
+    CANCELED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]"
+  };
+  
+  // Texte des statuts en français
+  const statusText = {
+    DRAFT: "Brouillon",
+    PENDING: "À encaisser",
+    COMPLETED: "Payée",
+    CANCELED: "Annulée"
+  };
 
-  const getNextStatus = (currentStatus: string) => {
+  const getNextStatus = (currentStatus: InvoiceStatus): InvoiceStatus | null => {
     switch (currentStatus) {
       case "DRAFT":
         return "PENDING";
@@ -185,43 +214,86 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
 
   // Contenu de la sidebar
   const content = (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Statut de la facture */}
+      <div className="mb-8 animate-fadeIn">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium text-gray-600 flex items-center">
+            <div className="w-7 h-7 rounded-full bg-[#f0eeff] flex items-center justify-center mr-2">
+              <TickCircle size={18} color="#5b50ff" variant="Bold" />
+            </div>
+            Statut
+          </span>
+          <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[invoice.status as keyof typeof statusColors]} shadow-sm transition-all duration-300 hover:shadow-md badge-transition flex items-center`}>
+            <span className="w-2 h-2 rounded-full bg-current mr-2 animate-pulse"></span>
+            {statusText[invoice.status as keyof typeof statusText]}
+          </span>
+        </div>
+        <div className="mt-4 h-4 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
+          <div 
+            className={`h-full ${invoice.status === 'DRAFT' ? 'w-1/3' : 
+              invoice.status === 'PENDING' ? 'w-2/3' : 
+              invoice.status === 'COMPLETED' ? 'w-full' : 
+              'w-0'} bg-[#5b50ff]`}
+            style={{ transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+          />
+        </div>
+        <div className="flex justify-between mt-2 text-xs font-medium text-gray-600">
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            Création
+          </span>
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            En attente
+          </span>
+          <span className="flex flex-col items-center">
+            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
+            Finalisée
+          </span>
+        </div>
+      </div>
       {/* Informations générales */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-2">Informations générales</h3>
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <InfoCircle size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Informations générales
+        </h3>
+        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
           <dl>
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-              <dt className="text-sm font-medium text-gray-500">Date d'émission</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Calendar size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'émission</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
                 {formatDate(invoice.issueDate)}
               </dd>
             </div>
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Date d'échéance</dt>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Clock size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'échéance</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                 {formatDate(invoice.dueDate)}
               </dd>
             </div>
             {invoice.executionDate && (
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Date d'exécution</dt>
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><Calendar size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'exécution</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {formatDate(invoice.executionDate)}
                 </dd>
               </div>
             )}
             {invoice.purchaseOrderNumber && (
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">N° de commande</dt>
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><Receipt21 size={16} color="#5b50ff" className="mr-4" variant="Linear" /> N° de commande</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {invoice.purchaseOrderNumber}
                 </dd>
               </div>
             )}
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-              <dt className="text-sm font-medium text-gray-500">Montant HT</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Wallet size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant HT</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
                 {invoice.totalHT?.toFixed(2) || '0.00'} €
               </dd>
             </div>
@@ -234,17 +306,17 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
                 return (
                   <>
                     {vatDetails.map((vatDetail, index) => (
-                      <div key={index} className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt className="text-sm font-medium text-gray-500">
-                          TVA {vatDetail.rate}%
+                      <div key={index} className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                        <dt className="text-sm font-medium text-gray-600 flex items-center">
+                          <ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA {vatDetail.rate}%
                         </dt>
                         <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                           {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
                         </dd>
                       </div>
                     ))}
-                    <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                      <dt className="text-sm font-medium text-gray-500">Total TVA</dt>
+                    <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                      <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Total TVA</dt>
                       <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
                         {invoice.totalVAT?.toFixed(2) || '0.00'} €
                       </dd>
@@ -254,8 +326,8 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               } else {
                 // Afficher seulement le total de TVA si un seul taux est utilisé
                 return (
-                  <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">TVA</dt>
+                  <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                    <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA</dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {invoice.totalVAT?.toFixed(2) || '0.00'} €
                     </dd>
@@ -263,9 +335,9 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
                 );
               }
             })()}
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-              <dt className="text-sm font-medium text-gray-500">Montant TTC</dt>
-              <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Money size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant TTC</dt>
+              <dd className="mt-1 text-sm font-bold text-[#5b50ff] sm:mt-0 sm:col-span-2 transition-transform duration-300 rounded-lg inline-block">
                 {invoice.finalTotalTTC?.toFixed(2) || '0.00'} €
               </dd>
             </div>
@@ -274,41 +346,46 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       </div>
 
       {/* Client */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-2">Client</h3>
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <Profile2User size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Client
+        </h3>
+        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
           <dl>
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-              <dt className="text-sm font-medium text-gray-500">Nom</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Profile2User size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Nom</dt>
+              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
                 {invoice.client.name}
               </dd>
             </div>
-            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
+            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+              <dt className="text-sm font-medium text-gray-600 flex items-center"><Sms size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Email</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                 {invoice.client.email}
               </dd>
             </div>
             {invoice.client.siret && (
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">SIRET</dt>
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" /> SIRET</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {invoice.client.siret}
                 </dd>
               </div>
             )}
             {invoice.client.vatNumber && (
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">N° TVA</dt>
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><Receipt21 size={16} color="#5b50ff" className="mr-4" variant="Linear" /> N° TVA</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {invoice.client.vatNumber}
                 </dd>
               </div>
             )}
             {invoice.client.address && (
-              <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-gray-50">
-                <dt className="text-sm font-medium text-gray-500">Adresse</dt>
+              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
+                <dt className="text-sm font-medium text-gray-600 flex items-center"><InfoCircle size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Adresse</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {invoice.client.address.street}<br />
                   {invoice.client.address.postalCode} {invoice.client.address.city}<br />
@@ -321,21 +398,33 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       </div>
 
       {/* Éléments de la facture */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 mb-2">Éléments de la facture</h3>
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="rounded-xl">
+        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+            <DocumentText size={18} color="#5b50ff" variant="Bold" />
+          </div>
+          Éléments de la facture
+        </h3>
+        <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
           <ul className="divide-y divide-gray-200">
             {invoice.items && invoice.items.map((item, index) => (
-              <li key={index} className="px-4 py-3">
+              <li key={index} className={`px-4 py-4 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-all duration-300 hover:bg-gray-100`}>
                 <div className="flex justify-between">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{item.description}</p>
-                    <p className="text-sm text-gray-500">
-                      {item.quantity} {getUnitAbbreviation(item.unit) || 'u'} x {item.unitPrice.toFixed(2)} € 
-                      {item.discount && item.discount > 0 && ` (-${item.discount}${item.discountType === 'PERCENTAGE' ? '%' : '€'})`}
+                    <p className="text-sm font-medium text-gray-900 flex items-center">
+                      <DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" />
+                      {item.description}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700 mr-2">
+                        {item.quantity} {getUnitAbbreviation(item.unit) || 'u'}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700">
+                        {item.unitPrice.toFixed(2)} €
+                      </span>
                     </p>
                   </div>
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className="text-sm font-medium text-gray-800 px-3 py-1 rounded-lg">
                     {((item.quantity * item.unitPrice) * (1 - (item.discountType === 'PERCENTAGE' && item.discount ? item.discount / 100 : 0))).toFixed(2)} €
                   </div>
                 </div>
@@ -349,21 +438,22 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       {(invoice.headerNotes || invoice.footerNotes || invoice.termsAndConditions) && (
         <div>
           <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
+            <div className="divide-y divide-gray-200">
             {invoice.headerNotes && (
-              <div className="px-4 py-3">
+              <div className="px-4 py-4 border-b border-gray-200">
                 <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">En-tête</h4>
                 <p className="text-sm text-gray-900">{invoice.headerNotes}</p>
               </div>
             )}
             {invoice.footerNotes && (
-              <div className="px-4 py-3 border-t border-gray-200">
+              <div className="px-4 py-4 border-b border-gray-200">
                 <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Pied de page</h4>
                 <p className="text-sm text-gray-900">{invoice.footerNotes}</p>
               </div>
             )}
             {invoice.termsAndConditions && (
-              <div className="px-4 py-3 border-t border-gray-200">
+              <div className="px-4 py-4 border-b border-gray-200">
                 <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Conditions générales</h4>
                 <p className="text-sm text-gray-900">{invoice.termsAndConditions}</p>
                 {invoice.termsAndConditionsLink && (
@@ -371,13 +461,14 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
                     href={invoice.termsAndConditionsLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-block"
+                    className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center"
                   >
-                    {invoice.termsAndConditionsLinkTitle || 'Voir les conditions générales'}
+                    {invoice.termsAndConditionsLinkTitle || 'Voir les conditions générales'} <ArrowRight size={14} className="ml-1" variant="Bold" />
                   </a>
                 )}
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
@@ -387,74 +478,68 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
   // Actions de la sidebar
   const actions = (
     <>
-    {/* Statut et actions */}
-    <div className="bg-gray-50 p-4 rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-sm font-medium text-gray-500">Statut</h3>
-          <div className="flex items-center">
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-              invoice.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-              invoice.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-              invoice.status === 'CANCELED' ? 'bg-red-100 text-red-800' :
-              'bg-green-100 text-green-800'
-            }`}>
-              {invoice.status === 'DRAFT' ? 'Brouillon' :
-               invoice.status === 'PENDING' ? 'À encaisser' :
-               invoice.status === 'CANCELED' ? 'Annulée' :
-               'Payée'}
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-2 mt-2">
-          {nextStatus && (
+      <div className="space-y-4">
+        <div className="flex flex-col space-y-3">
+          {invoice.status === 'DRAFT' && nextStatus && (
             <Button
-              variant="outline"
-              color={nextStatus === "PENDING" ? "yellow" : "green"}
+              variant="primary"
               fullWidth
+              className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
               onClick={() => onStatusChange(nextStatus)}
             >
-              {nextStatus === "PENDING" ? "Marquer à encaisser" : "Indiquer comme payée"}
+              <Money size={20} color="#fff" className="mr-2" variant="Linear" />
+              Marquer à encaisser
+              <ArrowRight size={18} className="ml-2" variant="Bold" />
             </Button>
           )}
-          {invoice.status === "PENDING" && (
+          {invoice.status === 'PENDING' && nextStatus && (
+            <Button
+              variant="primary"
+              fullWidth
+              className="bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
+              onClick={() => onStatusChange(nextStatus)}
+            >
+              <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />
+              Indiquer comme payée
+              <ArrowRight size={18} className="ml-2" variant="Bold" />
+            </Button>
+          )}
+          {invoice.status === 'PENDING' && (
             <Button
               variant="outline"
               color="red"
               fullWidth
+              className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
               onClick={cancelInvoice}
             >
+              <CloseCircle size={20} color="#f44336" className="mr-2" variant="Bold" />
               Annuler la facture
             </Button>
           )}
         </div>
       </div>
       {invoice.status === 'DRAFT' && (
-        <Button
-          variant="outline"
-          onClick={onEdit}
-          fullWidth
-          className="flex items-center justify-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-          </svg>
-          Modifier
-        </Button>
-      )}
-      {invoice.status === 'DRAFT' && (
-        <Button
-          variant="outline"
-          color="red"
-          onClick={onDelete}
-          fullWidth
-          className="flex items-center justify-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          Supprimer
-        </Button>
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <Button
+            variant="outline"
+            onClick={onEdit}
+            fullWidth
+            className="border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
+          >
+            <Edit2 size={20} color="#5b50ff" className="mr-2" variant="Linear" />
+            Modifier
+          </Button>
+          <Button
+            variant="outline"
+            color="red"
+            onClick={onDelete}
+            fullWidth
+            className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
+          >
+            <Trash size={20} color="#f44336" className="mr-2" variant="Linear" />
+            Supprimer
+          </Button>
+        </div>
       )}
     </>
   );
@@ -479,12 +564,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       {/* Prévisualisation de la facture */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[9999] transition-opacity duration-300 ${
-            isOpen ? "opacity-100" : "opacity-0"
+          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[999] border-r border-gray-100 transition-all duration-500 ${
+            isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
           }`}
-          style={{ display: isOpen ? "block" : "none" }}
+          style={{ display: isOpen ? "block" : "none", boxShadow: "5px 0 15px rgba(0,0,0,0.1)" }}
         >
-          <div className="h-full overflow-auto">
+          <div className="h-full overflow-auto custom-scrollbar animate-slideInLeft">
             <InvoicePreview
               invoice={invoice}
               items={invoice.items}
@@ -494,7 +579,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               dueDate={invoice.dueDate}
               executionDate={invoice.executionDate}
               purchaseOrderNumber={invoice.purchaseOrderNumber}
-              companyInfo={invoice.companyInfo as any}
+              companyInfo={invoice.companyInfo}
               calculateTotals={calculateTotals}
               headerNotes={invoice.headerNotes}
               footerNotes={invoice.footerNotes}
@@ -516,8 +601,11 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         width="w-1/2"
         position="right"
         actions={actions}
+        className="custom-scrollbar bg-white shadow-xl"
       >
-        {content}
+        <div className="animate-fadeIn space-y-6 px-1">
+          {content}
+        </div>
       </Sidebar>
     </>
   );

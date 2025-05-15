@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Overlay */}
       {showOverlay && isOpen && (
         <div
-          className={`fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ease-in-out z-40 ${
+          className={`fixed inset-0 bg-gray-700 bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 ease-in-out z-40 ${
             isOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={onClose}
@@ -113,36 +113,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 ${positionClass} ${width} bg-white shadow-lg transform transition-all duration-300 ease-in-out z-[1000] ${transformClass} ${className}`}
+        className={`fixed inset-y-0 ${positionClass} ${width} bg-white shadow-xl transform transition-all duration-400 ease-out z-[1000] ${transformClass} ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="sidebar-title"
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 id="sidebar-title" className="text-lg font-medium">{title}</h2>
+          <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+            <h2 id="sidebar-title" className="text-xl font-semibold text-gray-900">{title}</h2>
             <Button
               onClick={onClose}
               variant="outline"
               size="sm"
-              className="text-gray-400 hover:text-gray-500 p-1"
+              className="text-gray-900 hover:text-[#4a41e0] hover:bg-[#f0eeff] rounded-full p-2 transition-all duration-200"
               aria-label="Fermer"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </Button>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             {children}
           </div>
 
           {/* Actions */}
           {actions && (
-            <div className="border-t border-gray-200 p-6 space-y-3">
+            <div className="border-t border-gray-100 bg-[#f8f7ff] p-6 space-y-3">
               {actions}
             </div>
           )}
