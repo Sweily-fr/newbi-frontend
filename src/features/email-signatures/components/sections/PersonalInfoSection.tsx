@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SignatureData } from '../../types';
 import { Checkbox } from '../../../../components/common';
 import { ImageUploader } from '../../../../components/common/ImageUploader';
+import { NAME_REGEX, EMAIL_REGEX, PHONE_REGEX } from '../../../../utils/validators';
 
 interface PersonalInfoSectionProps {
   signatureData: SignatureData;
@@ -17,10 +18,42 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     signatureData.profilePhotoBase64 || signatureData.profilePhotoUrl || null
   );
   
+  // États pour gérer les erreurs de validation
+  const [errors, setErrors] = useState({
+    name: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    mobilePhone: ''
+  });
+  
   // Mettre à jour la prévisualisation lorsque les données de signature changent
   useEffect(() => {
     setProfilePhotoPreview(signatureData.profilePhotoBase64 || signatureData.profilePhotoUrl || null);
   }, [signatureData.profilePhotoBase64, signatureData.profilePhotoUrl]);
+  
+  // Fonctions de validation
+  const validateName = (value: string) => {
+    if (!value.trim()) return "Le nom de la signature est requis";
+    return "";
+  };
+  
+  const validateFullName = (value: string) => {
+    if (!value.trim()) return "Le nom complet est requis";
+    if (!NAME_REGEX.test(value)) return "Le nom ne doit contenir que des lettres, espaces, tirets ou apostrophes";
+    return "";
+  };
+  
+  const validateEmail = (value: string) => {
+    if (!value.trim()) return "L'email est requis";
+    if (!EMAIL_REGEX.test(value)) return "Format d'email invalide";
+    return "";
+  };
+  
+  const validatePhone = (value: string) => {
+    if (value.trim() && !PHONE_REGEX.test(value)) return "Format de téléphone invalide";
+    return "";
+  };
 
   return (
     <>
@@ -33,11 +66,23 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <input 
                   type="text" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="Ex: Signature professionnelle"
                   value={signatureData.name}
-                  onChange={(e) => updateSignatureData('name', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('name', value);
+                    const error = validateName(value);
+                    setErrors(prev => ({ ...prev, name: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateName(e.target.value);
+                    setErrors(prev => ({ ...prev, name: error }));
+                  }}
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                )}
               </div>
               
               <div className="col-span-2">
@@ -145,11 +190,23 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <input 
                   type="text" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="Ex: Jean Dupont"
                   value={signatureData.fullName}
-                  onChange={(e) => updateSignatureData('fullName', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('fullName', value);
+                    const error = validateFullName(value);
+                    setErrors(prev => ({ ...prev, fullName: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateFullName(e.target.value);
+                    setErrors(prev => ({ ...prev, fullName: error }));
+                  }}
                 />
+                {errors.fullName && (
+                  <p className="mt-1 text-sm text-red-500">{errors.fullName}</p>
+                )}
               </div>
               
               {/* Fonction */}
@@ -173,11 +230,23 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <input 
                   type="email" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="jean.dupont@exemple.com"
                   value={signatureData.email}
-                  onChange={(e) => updateSignatureData('email', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('email', value);
+                    const error = validateEmail(value);
+                    setErrors(prev => ({ ...prev, email: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateEmail(e.target.value);
+                    setErrors(prev => ({ ...prev, email: error }));
+                  }}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
               
               {/* Téléphone */}
@@ -187,11 +256,23 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <input 
                   type="tel" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="01 23 45 67 89"
                   value={signatureData.phone}
-                  onChange={(e) => updateSignatureData('phone', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('phone', value);
+                    const error = validatePhone(value);
+                    setErrors(prev => ({ ...prev, phone: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validatePhone(e.target.value);
+                    setErrors(prev => ({ ...prev, phone: error }));
+                  }}
                 />
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+                )}
               </div>
               
               {/* Téléphone mobile */}
@@ -201,11 +282,23 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <input 
                   type="tel" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.mobilePhone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="06 12 34 56 78"
-                  value={signatureData.mobilePhone}
-                  onChange={(e) => updateSignatureData('mobilePhone', e.target.value)}
+                  value={signatureData.mobilePhone || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('mobilePhone', value);
+                    const error = validatePhone(value);
+                    setErrors(prev => ({ ...prev, mobilePhone: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validatePhone(e.target.value);
+                    setErrors(prev => ({ ...prev, mobilePhone: error }));
+                  }}
                 />
+                {errors.mobilePhone && (
+                  <p className="mt-1 text-sm text-red-500">{errors.mobilePhone}</p>
+                )}
               </div>
               
               {/* Section pour les options d'affichage des icônes */}

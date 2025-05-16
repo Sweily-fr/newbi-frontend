@@ -5,6 +5,7 @@ import { HexColorPicker } from 'react-colorful';
 // Import uniquement du nouveau composant de prévisualisation
 import { EmailSignaturePreview } from '../components/EmailSignaturePreview/EmailSignaturePreviewNew';
 import { Button } from '../../../components/common/Button';
+import { ConfirmationModal } from '../../../components/common/ConfirmationModal';
 import { PersonalInfoSection } from './sections/PersonalInfoSection';
 import { SignatureData, EmailSignature } from '../types';
 import { CompanyInfoSection } from './sections/CompanyInfoSection';
@@ -49,6 +50,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   
   // Référence pour la transition CSS
   const nodeRef = useRef(null);
+  
+  // État pour gérer l'affichage de la modale de confirmation d'annulation
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   
   // Fermer les sélecteurs de couleur lors d'un clic à l'extérieur
   useEffect(() => {
@@ -301,6 +305,23 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
 
   return (
     <div className="w-full">
+      {/* Modale de confirmation d'annulation */}
+      <ConfirmationModal
+        isOpen={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+        onConfirm={() => {
+          setShowCancelConfirmation(false);
+          if (onCancel) {
+            onCancel();
+          }
+        }}
+        title="Annuler les modifications"
+        message="Êtes-vous sûr de vouloir annuler ? Toutes les modifications non enregistrées seront perdues."
+        confirmButtonText="Oui, annuler"
+        cancelButtonText="Non, continuer"
+        confirmButtonVariant="danger"
+      />
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x">
         {/* Colonne gauche: formulaire (10px plus large) */}
         <div className="space-y-8 pr-8" style={{ width: 'calc(100% + 15px)' }}>
@@ -324,7 +345,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
             <Button 
               variant="outline"
               size="md"
-              onClick={onCancel}
+              onClick={() => setShowCancelConfirmation(true)}
             >
               Annuler
             </Button>

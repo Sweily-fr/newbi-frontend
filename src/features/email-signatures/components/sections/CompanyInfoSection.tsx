@@ -4,6 +4,7 @@ import { SignatureData } from '../../types';
 import { useCompany } from '../../../profile/hooks';
 import { Notification } from '../../../../components/';
 import { Checkbox } from '../../../../components/common/Checkbox';
+import { NAME_REGEX, URL_REGEX } from '../../../../utils/validators';
 
 interface CompanyInfoSectionProps {
   signatureData: SignatureData;
@@ -27,6 +28,28 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   
   // État pour gérer l'affichage du logo dans la prévisualisation
   const [showLogo, setShowLogo] = useState(signatureData.showLogo !== false);
+  
+  // États pour gérer les erreurs de validation
+  const [errors, setErrors] = useState({
+    companyName: '',
+    companyWebsite: '',
+    companyAddress: ''
+  });
+  
+  // Fonctions de validation
+  const validateCompanyName = (value: string) => {
+    if (value.trim() && !NAME_REGEX.test(value)) {
+      return "Le nom de l'entreprise ne doit contenir que des lettres, espaces, tirets ou apostrophes";
+    }
+    return "";
+  };
+  
+  const validateWebsite = (value: string) => {
+    if (value.trim() && !URL_REGEX.test(value)) {
+      return "Format d'URL invalide";
+    }
+    return "";
+  };
   
   // S'assurer que la valeur initiale de showLogo est correctement définie dans les données de signature
   useEffect(() => {
@@ -226,11 +249,23 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                 </label>
                 <input 
                   type="text" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="Newbi"
                   value={localCompanyName}
-                  onChange={(e) => setLocalCompanyName(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setLocalCompanyName(value);
+                    const error = validateCompanyName(value);
+                    setErrors(prev => ({ ...prev, companyName: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateCompanyName(e.target.value);
+                    setErrors(prev => ({ ...prev, companyName: error }));
+                  }}
                 />
+                {errors.companyName && (
+                  <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
+                )}
               </div>
               
               {/* Site web */}
@@ -240,11 +275,23 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                 </label>
                 <input 
                   type="url" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
+                  className={`w-full h-10 px-3 py-2 border ${errors.companyWebsite ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
                   placeholder="https://www.exemple.com"
                   value={localCompanyWebsite}
-                  onChange={(e) => setLocalCompanyWebsite(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setLocalCompanyWebsite(value);
+                    const error = validateWebsite(value);
+                    setErrors(prev => ({ ...prev, companyWebsite: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateWebsite(e.target.value);
+                    setErrors(prev => ({ ...prev, companyWebsite: error }));
+                  }}
                 />
+                {errors.companyWebsite && (
+                  <p className="mt-1 text-sm text-red-500">{errors.companyWebsite}</p>
+                )}
               </div>
               
               {/* Adresse */}
