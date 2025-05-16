@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FieldGroup, TextArea } from '../../../../../components/';
+import { TextArea } from '../../../../../components/';
+import { Add } from 'iconsax-react';
 import { FOOTER_NOTES_PATTERN, FOOTER_NOTES_ERROR_MESSAGE } from '../../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_QUOTES } from '../../../graphql/quotes';
@@ -61,22 +62,30 @@ export const QuoteFooterNotes: React.FC<QuoteFooterNotesProps> = ({
   }, [quotesData, footerNotes, setFooterNotes, defaultFooterNotesSet]);
 
   return (
-    <div className="space-y-4">
-      <FieldGroup>
-        <div className="flex justify-between items-center mb-2">
-          <label htmlFor="footerNotes" className="block text-sm font-medium text-gray-700">
-            Notes de bas de page
-          </label>
-          {hasDefaults && onApplyDefaults && (
-            <button
-              type="button"
-              onClick={onApplyDefaults}
-              className="text-sm text-[#5b50ff] hover:underline"
-            >
-              Appliquer les paramètres par défaut
-            </button>
-          )}
-        </div>
+    <div className="mb-6">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff] text-lg font-semibold">03</span>
+          Notes de pied de page
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
+      </div>
+      
+      <div className="flex justify-between items-center mb-3">
+        <label htmlFor="footerNotes" className="block text-sm font-medium text-gray-700">
+          Texte des notes
+        </label>
+        {hasDefaults && onApplyDefaults && (
+          <button
+            type="button"
+            onClick={onApplyDefaults}
+            className="text-sm text-[#5b50ff] hover:text-[#4a41e0] flex items-center gap-1"
+          >
+            <Add size="16" color="#5b50ff" variant="Linear" />
+            Appliquer les paramètres par défaut
+          </button>
+        )}
+      </div>
         <TextArea
           id="footerNotes"
           name="footerNotes"
@@ -85,12 +94,11 @@ export const QuoteFooterNotes: React.FC<QuoteFooterNotesProps> = ({
             setFooterNotes(e.target.value);
             validateFooterNotes(e.target.value);
           }}
-          placeholder="Notes à afficher en bas du devis"
+          placeholder="Ajoutez des notes qui apparaîtront en bas du devis..."
           rows={3}
           error={error ? { message: error } : undefined}
-          helpText="Maximum 2000 caractères"
+          helpText={`${footerNotes?.length || 0}/2000 caractères - Les sauts de ligne seront préservés dans l'aperçu`}
         />
-      </FieldGroup>
     </div>
   );
 };

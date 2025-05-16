@@ -503,8 +503,8 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
   return (
     <div className="mb-8 space-y-6">
       <div className="flex items-center mb-3">
-        <h4 className="text-xl font-medium text-gray-600 flex items-center">
-          <span className="mr-2 text-[#5b50ff]">01</span>
+        <h4 className="text-lg font-semibold text-gray-600 flex items-center">
+          <span className="mr-2 text-[#5b50ff] text-lg font-semibold">01</span>
           Sélection du client
         </h4>
       </div>
@@ -664,8 +664,8 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
         <FieldGroup spacing="normal" className="space-y-8">
           <div className="mb-10">
             <div className="flex items-center mb-4">
-              <h4 className="text-md font-medium text-gray-600 flex items-center">
-                <span className="mr-2 text-[#5b50ff]">02</span>
+              <h4 className="text-lg font-semibold text-gray-600 flex items-center">
+                <span className="mr-2 text-[#5b50ff] text-lg font-semibold">02</span>
                 Type de client
               </h4>
             </div>

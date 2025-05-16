@@ -473,16 +473,16 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                 <div className="flex-grow mb-4 px-10 overflow-y-auto">
                   {activeSection === "generalInfo" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
                         <DocumentText 
                           size="20" 
-                          variant="Outline" 
+                          variant="Bold" 
                           color={sectionErrors.generalInfo ? '#ef4444' : '#5b50ff'} 
-                          className="mr-2" 
+                          className="mr-4" 
                         />
                         Informations générales
                       </h2>
-                      <p className="text-gray-500 mb-4">Informations de base de la facture</p>
+                      <p className="text-gray-500 mb-8">Informations de base de la facture</p>
                       <InvoiceGeneralInfo
                         isDeposit={isDeposit}
                         setIsDeposit={setIsDeposit}
@@ -507,13 +507,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   
                   {activeSection === "client" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <User size="20" color={sectionErrors.client ? '#ef4444' : '#5b50ff'} variant={sectionErrors.client ? 'Bold' : 'Linear'} />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span className={`mr-4 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <User size="20" color={sectionErrors.client ? '#ef4444' : '#5b50ff'} variant="Bold" />
                         </span>
                         Informations client
                       </h2>
-                      <p className="text-gray-500 mb-4">Sélection ou création d'un client pour la facture</p>
+                      <p className="text-gray-500 mb-8">Sélection ou création d'un client pour la facture</p>
                       <ClientSelection
                         isNewClient={isNewClient}
                         setIsNewClient={handleClientModeChange}
@@ -530,13 +530,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   
                   {activeSection === "companyInfo" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <Building size="20" color={sectionErrors.companyInfo ? '#ef4444' : '#5b50ff'} variant={sectionErrors.companyInfo ? 'Bold' : 'Linear'} />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span className={`mr-4 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <Building size="20" color={sectionErrors.companyInfo ? '#ef4444' : '#5b50ff'} variant="Bold" />
                         </span>
                         Informations société
                       </h2>
-                      <p className="text-gray-500 mb-4">Coordonnées et informations de votre entreprise</p>
+                      <p className="text-gray-500 mb-8">Coordonnées et informations de votre entreprise</p>
                       <InvoiceCompanyInfo
                         companyInfo={companyInfo}
                         userData={userData}
@@ -549,13 +549,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   
                   {activeSection === "items" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <ShoppingCart size="20" color={sectionErrors.items ? '#ef4444' : '#5b50ff'} variant={sectionErrors.items ? 'Bold' : 'Linear'} />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span className={`mr-4 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                          <ShoppingCart size="20" color={sectionErrors.items ? '#ef4444' : '#5b50ff'} variant="Bold" />
                         </span>
                         Produits et services
                       </h2>
-                      <p className="text-gray-500 mb-4">Articles, quantités et prix à facturer</p>
+                      <p className="text-gray-500 mb-8">Articles, quantités et prix à facturer</p>
                       <InvoiceItems
                         items={items}
                         handleAddItem={handleAddItem}
@@ -573,13 +573,13 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   
                   {activeSection === "discountAndTotals" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span className={`mr-4 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
                           <Calculator size="20" color="#5b50ff" variant="Bold" />
                         </span>
                         Remise et totaux
                       </h2>
-                      <p className="text-gray-500 mb-4">Remises, taxes et champs personnalisés</p>
+                      <p className="text-gray-500 mb-8">Remises, taxes et champs personnalisés</p>
                       <InvoiceDiscountAndTotals
                         discount={discount}
                         setDiscount={setDiscount}
@@ -596,11 +596,11 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   
                   {activeSection === "bankDetails" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <Notepad2 size="20" color="#5b50ff" className="mr-2" variant="Linear" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <Notepad2 size="20" color="#5b50ff" className="mr-4" variant="Bold" />
                         Notes de bas de page
                       </h2>
-                      <p className="text-gray-500 mb-4">Coordonnées bancaires, conditions et notes</p>
+                      <p className="text-gray-500 mb-8">Coordonnées bancaires, conditions et notes</p>
                       <div className="mb-10">
                         <InvoiceBankDetails
                           userData={userData}

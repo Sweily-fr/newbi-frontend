@@ -1,12 +1,24 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { useQuoteForm } from "../../hooks/useQuoteForm";
-import { useBodyScrollLock, useDocumentSettings, useBeforeUnload } from "../../../../hooks";
+import {
+  useBodyScrollLock,
+  useDocumentSettings,
+  useBeforeUnload,
+} from "../../../../hooks";
 import { QuoteFormModalProps } from "../../types";
 import { Button, Form } from "../../../../components/";
 import { DocumentSettings } from "../../../../components/specific/DocumentSettings";
 import { NavigationSidebar } from "../../../../components/common/NavigationSidebar/NavigationSidebar";
-import { DocumentText, Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2 } from "iconsax-react";
+import {
+  DocumentText,
+  Profile2User,
+  Building,
+  ShoppingCart,
+  Calculator,
+  MessageText,
+  Setting2,
+} from "iconsax-react";
 import {
   ClientSelection,
   QuoteGeneralInfo,
@@ -29,14 +41,17 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
   useBodyScrollLock(true);
   // État pour la popup de confirmation
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"close" | "configureInfo" | "configureBankDetails" | null>(null);
-  
+  const [pendingAction, setPendingAction] = useState<
+    "close" | "configureInfo" | "configureBankDetails" | null
+  >(null);
+
   // Utiliser le hook useBeforeUnload pour empêcher la navigation non intentionnelle avec le modal de confirmation personnalisé
-  const { showConfirmModal, confirmNavigation, cancelNavigation } = useBeforeUnload(true);
-  
+  const { showConfirmModal, confirmNavigation, cancelNavigation } =
+    useBeforeUnload(true);
+
   // État pour afficher/masquer les paramètres
   const [showSettings, setShowSettings] = useState(false);
-  
+
   // Utiliser le hook pour les paramètres de document
   const {
     defaultHeaderNotes,
@@ -50,9 +65,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     defaultTermsAndConditionsLink,
     setDefaultTermsAndConditionsLink,
     handleSaveSettings,
-    isSaving: isSavingSettings
+    isSaving: isSavingSettings,
   } = useDocumentSettings("QUOTE");
-  
+
   // Fonction pour sauvegarder les paramètres
   const handleSaveDocumentSettings = async () => {
     await handleSaveSettings();
@@ -68,9 +83,16 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     discountAndTotals: false,
     bankDetails: false,
   });
-  
+
   // État pour suivre la section active dans la navigation
-  const [activeSection, setActiveSection] = useState<"generalInfo" | "client" | "companyInfo" | "items" | "discountAndTotals" | "bankDetails">("generalInfo");
+  const [activeSection, setActiveSection] = useState<
+    | "generalInfo"
+    | "client"
+    | "companyInfo"
+    | "items"
+    | "discountAndTotals"
+    | "bankDetails"
+  >("generalInfo");
 
   // Utiliser le hook personnalisé pour gérer la logique du formulaire
   const {
@@ -140,16 +162,34 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
   const applyDefaultSettingsToForm = useCallback(() => {
     if (defaultHeaderNotes && !headerNotes) setHeaderNotes(defaultHeaderNotes);
     if (defaultFooterNotes && !footerNotes) setFooterNotes(defaultFooterNotes);
-    if (defaultTermsAndConditions && !termsAndConditions) setTermsAndConditions(defaultTermsAndConditions);
-    if (defaultTermsAndConditionsLinkTitle && !termsAndConditionsLinkTitle) setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
-    if (defaultTermsAndConditionsLink && !termsAndConditionsLink) setTermsAndConditionsLink(defaultTermsAndConditionsLink);
-  }, [defaultHeaderNotes, defaultFooterNotes, defaultTermsAndConditions, defaultTermsAndConditionsLinkTitle, defaultTermsAndConditionsLink, 
-      headerNotes, footerNotes, termsAndConditions, termsAndConditionsLinkTitle, termsAndConditionsLink, 
-      setHeaderNotes, setFooterNotes, setTermsAndConditions, setTermsAndConditionsLinkTitle, setTermsAndConditionsLink]);
-  
+    if (defaultTermsAndConditions && !termsAndConditions)
+      setTermsAndConditions(defaultTermsAndConditions);
+    if (defaultTermsAndConditionsLinkTitle && !termsAndConditionsLinkTitle)
+      setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+    if (defaultTermsAndConditionsLink && !termsAndConditionsLink)
+      setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+  }, [
+    defaultHeaderNotes,
+    defaultFooterNotes,
+    defaultTermsAndConditions,
+    defaultTermsAndConditionsLinkTitle,
+    defaultTermsAndConditionsLink,
+    headerNotes,
+    footerNotes,
+    termsAndConditions,
+    termsAndConditionsLinkTitle,
+    termsAndConditionsLink,
+    setHeaderNotes,
+    setFooterNotes,
+    setTermsAndConditions,
+    setTermsAndConditionsLinkTitle,
+    setTermsAndConditionsLink,
+  ]);
+
   // Appliquer les paramètres par défaut au chargement du formulaire
   useEffect(() => {
-    if (!quote) { // Seulement pour les nouveaux devis
+    if (!quote) {
+      // Seulement pour les nouveaux devis
       applyDefaultSettingsToForm();
     }
   }, [quote, applyDefaultSettingsToForm]);
@@ -209,9 +249,13 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
       errors.items = true;
     } else {
       const hasInvalidItem = items.some(
-        (item) => !item.description || !item.quantity || !item.unitPrice || 
-        // Vérifier si un item a une TVA à 0 mais pas de texte d'exemption
-        (item.vatRate === 0 && (!item.vatExemptionText || item.vatExemptionText.trim() === ''))
+        (item) =>
+          !item.description ||
+          !item.quantity ||
+          !item.unitPrice ||
+          // Vérifier si un item a une TVA à 0 mais pas de texte d'exemption
+          (item.vatRate === 0 &&
+            (!item.vatExemptionText || item.vatExemptionText.trim() === ""))
       );
       if (hasInvalidItem) {
         errors.items = true;
@@ -226,7 +270,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
 
     if (!hasErrors) {
       // Passer directement asDraft à handleSubmit pour éviter les problèmes de synchronisation
-      handleSubmit(new Event('submit') as unknown as React.FormEvent, asDraft);
+      handleSubmit(new Event("submit") as unknown as React.FormEvent, asDraft);
     }
   };
 
@@ -260,7 +304,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     } else if (pendingAction === "configureBankDetails") {
       window.location.href = "/settings/bank";
     }
-    
+
     setShowConfirmationModal(false);
     setPendingAction(null);
   };
@@ -309,34 +353,80 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             items={[
               {
                 id: "generalInfo",
-                icon: <DocumentText size="24" color={activeSection === "generalInfo" ? "#5b50ff" : "#222"} variant={activeSection === "generalInfo" ? "Bold" : "Linear"} />,
-                tooltip: "Informations générales"
+                icon: (
+                  <DocumentText
+                    size="24"
+                    color={activeSection === "generalInfo" ? "#5b50ff" : "#222"}
+                    variant={
+                      activeSection === "generalInfo" ? "Bold" : "Linear"
+                    }
+                  />
+                ),
+                tooltip: "Informations générales",
               },
               {
                 id: "client",
-                icon: <Profile2User size="24" color={activeSection === "client" ? "#5b50ff" : "#222"} variant={activeSection === "client" ? "Bold" : "Linear"} />,
-                tooltip: "Informations client"
+                icon: (
+                  <Profile2User
+                    size="24"
+                    color={activeSection === "client" ? "#5b50ff" : "#222"}
+                    variant={activeSection === "client" ? "Bold" : "Linear"}
+                  />
+                ),
+                tooltip: "Informations client",
               },
               {
                 id: "companyInfo",
-                icon: <Building size="24" color={activeSection === "companyInfo" ? "#5b50ff" : "#222"} variant={activeSection === "companyInfo" ? "Bold" : "Linear"} />,
-                tooltip: "Informations société"
+                icon: (
+                  <Building
+                    size="24"
+                    color={activeSection === "companyInfo" ? "#5b50ff" : "#222"}
+                    variant={
+                      activeSection === "companyInfo" ? "Bold" : "Linear"
+                    }
+                  />
+                ),
+                tooltip: "Informations société",
               },
               {
                 id: "items",
-                icon: <ShoppingCart size="24" color={activeSection === "items" ? "#5b50ff" : "#222"} variant={activeSection === "items" ? "Bold" : "Linear"} />,
-                tooltip: "Produits et services"
+                icon: (
+                  <ShoppingCart
+                    size="24"
+                    color={activeSection === "items" ? "#5b50ff" : "#222"}
+                    variant={activeSection === "items" ? "Bold" : "Linear"}
+                  />
+                ),
+                tooltip: "Produits et services",
               },
               {
                 id: "discountAndTotals",
-                icon: <Calculator size="24" color={activeSection === "discountAndTotals" ? "#5b50ff" : "#222"} variant={activeSection === "discountAndTotals" ? "Bold" : "Linear"} />,
-                tooltip: "Remise et totaux"
+                icon: (
+                  <Calculator
+                    size="24"
+                    color={
+                      activeSection === "discountAndTotals" ? "#5b50ff" : "#222"
+                    }
+                    variant={
+                      activeSection === "discountAndTotals" ? "Bold" : "Linear"
+                    }
+                  />
+                ),
+                tooltip: "Remise et totaux",
               },
               {
                 id: "bankDetails",
-                icon: <MessageText size="24" color={activeSection === "bankDetails" ? "#5b50ff" : "#222"} variant={activeSection === "bankDetails" ? "Bold" : "Linear"} />,
-                tooltip: "Notes de bas de page"
-              }
+                icon: (
+                  <MessageText
+                    size="24"
+                    color={activeSection === "bankDetails" ? "#5b50ff" : "#222"}
+                    variant={
+                      activeSection === "bankDetails" ? "Bold" : "Linear"
+                    }
+                  />
+                ),
+                tooltip: "Notes de bas de page",
+              },
             ]}
             activeItemId={activeSection}
             onItemClick={(id) => setActiveSection(id as typeof activeSection)}
@@ -345,29 +435,35 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             fixed={false}
           />
         )}
-        
+
         {/* Formulaire à gauche */}
         <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200">
           <Form onSubmit={(e) => e.preventDefault()}>
             {showSettings ? (
-            <div className="p-6">
-              <DocumentSettings
-                documentType="QUOTE"
-                defaultHeaderNotes={defaultHeaderNotes}
-                setDefaultHeaderNotes={setDefaultHeaderNotes}
-                defaultFooterNotes={defaultFooterNotes}
-                setDefaultFooterNotes={setDefaultFooterNotes}
-                defaultTermsAndConditions={defaultTermsAndConditions}
-                setDefaultTermsAndConditions={setDefaultTermsAndConditions}
-                defaultTermsAndConditionsLinkTitle={defaultTermsAndConditionsLinkTitle}
-                setDefaultTermsAndConditionsLinkTitle={setDefaultTermsAndConditionsLinkTitle}
-                defaultTermsAndConditionsLink={defaultTermsAndConditionsLink}
-                setDefaultTermsAndConditionsLink={setDefaultTermsAndConditionsLink}
-                onSave={handleSaveDocumentSettings}
-                onCancel={() => setShowSettings(false)}
-                isSaving={isSavingSettings}
-              />
-            </div>
+              <div className="p-6">
+                <DocumentSettings
+                  documentType="QUOTE"
+                  defaultHeaderNotes={defaultHeaderNotes}
+                  setDefaultHeaderNotes={setDefaultHeaderNotes}
+                  defaultFooterNotes={defaultFooterNotes}
+                  setDefaultFooterNotes={setDefaultFooterNotes}
+                  defaultTermsAndConditions={defaultTermsAndConditions}
+                  setDefaultTermsAndConditions={setDefaultTermsAndConditions}
+                  defaultTermsAndConditionsLinkTitle={
+                    defaultTermsAndConditionsLinkTitle
+                  }
+                  setDefaultTermsAndConditionsLinkTitle={
+                    setDefaultTermsAndConditionsLinkTitle
+                  }
+                  defaultTermsAndConditionsLink={defaultTermsAndConditionsLink}
+                  setDefaultTermsAndConditionsLink={
+                    setDefaultTermsAndConditionsLink
+                  }
+                  onSave={handleSaveDocumentSettings}
+                  onCancel={() => setShowSettings(false)}
+                  isSaving={isSavingSettings}
+                />
+              </div>
             ) : (
               <>
                 <div className="flex justify-end mb-4 px-10 pt-10">
@@ -382,16 +478,28 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                   </Button>
                 </div>
                 {/* Section dynamique basée sur la navigation */}
-                <div className="mb-4 px-10 pt-10">
+                <div className="mb-4 px-10">
                   {activeSection === "generalInfo" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.generalInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <DocumentText color="#5b50ff" size="20" variant="Bold" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.generalInfo
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <DocumentText
+                            color="#5b50ff"
+                            size="24"
+                            variant="Bold"
+                          />
                         </span>
                         Informations générales
                       </h2>
-                      <p className="text-gray-500 mb-4">Informations de base du devis</p>
+                      <p className="text-gray-500 mb-8">
+                        Informations de base du devis
+                      </p>
                       <QuoteGeneralInfo
                         quotePrefix={quotePrefix}
                         setQuotePrefix={setQuotePrefix}
@@ -407,16 +515,28 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                       />
                     </div>
                   )}
-                  
+
                   {activeSection === "client" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <Profile2User color="#5b50ff" size="20" variant="Bold"  />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.client
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <Profile2User
+                            color="#5b50ff"
+                            size="24"
+                            variant="Bold"
+                          />
                         </span>
                         Informations client
                       </h2>
-                      <p className="text-gray-500 mb-4">Sélection ou création d'un client pour le devis</p>
+                      <p className="text-gray-500 mb-8">
+                        Sélection ou création d'un client pour le devis
+                      </p>
                       <ClientSelection
                         isNewClient={isNewClient}
                         setIsNewClient={handleClientModeChange}
@@ -426,20 +546,32 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                         setSelectedClient={setSelectedClient}
                         clientsData={clientsData}
                         quote={quote}
-                        selectedClientData={clientsData?.clients?.items?.find((c: any) => c.id === selectedClient) || null}
+                        selectedClientData={
+                          clientsData?.clients?.items?.find(
+                            (c: any) => c.id === selectedClient
+                          ) || null
+                        }
                       />
                     </div>
                   )}
-                  
+
                   {activeSection === "companyInfo" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <Building color="#5b50ff" size="20" variant="Bold" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.companyInfo
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <Building color="#5b50ff" size="24" variant="Bold" />
                         </span>
                         Informations société
                       </h2>
-                      <p className="text-gray-500 mb-4">Coordonnées et informations de votre entreprise</p>
+                      <p className="text-gray-500 mb-8">
+                        Coordonnées et informations de votre entreprise
+                      </p>
                       <QuoteCompanyInfo
                         companyInfo={companyInfo}
                         userData={userData}
@@ -449,16 +581,28 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                       />
                     </div>
                   )}
-                  
+
                   {activeSection === "items" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <ShoppingCart color="#5b50ff" size="20" variant="Bold" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.items
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <ShoppingCart
+                            color="#5b50ff"
+                            size="24"
+                            variant="Bold"
+                          />
                         </span>
                         Produits et services
                       </h2>
-                      <p className="text-gray-500 mb-4">Articles, quantités et prix à facturer</p>
+                      <p className="text-gray-500 mb-8">
+                        Articles, quantités et prix à facturer
+                      </p>
                       <QuoteItems
                         items={items}
                         handleAddItem={handleAddItem}
@@ -468,16 +612,28 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                       />
                     </div>
                   )}
-                  
+
                   {activeSection === "discountAndTotals" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <Calculator color="#5b50ff" size="20" variant="Bold" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.discountAndTotals
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <Calculator
+                            color="#5b50ff"
+                            size="24"
+                            variant="Bold"
+                          />
                         </span>
                         Remise et totaux
                       </h2>
-                      <p className="text-gray-500 mb-4">Remises, taxes et champs personnalisés</p>
+                      <p className="text-gray-500 mb-8">
+                        Remises, taxes et champs personnalisés
+                      </p>
                       <QuoteDiscountAndTotals
                         discount={discount}
                         setDiscount={setDiscount}
@@ -491,53 +647,87 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                       />
                     </div>
                   )}
-                  
+
                   {activeSection === "bankDetails" && (
                     <div>
-                      <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.bankDetails ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <MessageText color="#5b50ff" size="20" variant="Bold" />
+                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+                        <span
+                          className={`mr-4 ${
+                            sectionErrors.bankDetails
+                              ? "text-red-500"
+                              : "text-[#5b50ff]"
+                          }`}
+                        >
+                          <MessageText
+                            color="#5b50ff"
+                            size="24"
+                            variant="Bold"
+                          />
                         </span>
                         Notes de bas de page
                       </h2>
-                      <p className="text-gray-500 mb-4">Coordonnées bancaires, conditions et notes</p>
-                      <QuoteBankDetails
-                        userData={userData}
-                        useBankDetails={useBankDetails}
-                        setUseBankDetails={setUseBankDetails}
-                        setCompanyInfo={setCompanyInfo}
-                        onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
-                      />
-                      <QuoteTermsAndConditions
-                        termsAndConditions={termsAndConditions}
-                        setTermsAndConditions={setTermsAndConditions}
-                        termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
-                        setTermsAndConditionsLinkTitle={setTermsAndConditionsLinkTitle}
-                        termsAndConditionsLink={termsAndConditionsLink}
-                        setTermsAndConditionsLink={setTermsAndConditionsLink}
-                        onApplyDefaults={() => {
-                          if (defaultTermsAndConditions) {
-                            setTermsAndConditions(defaultTermsAndConditions);
+                      <p className="text-gray-500 mb-8">
+                        Coordonnées bancaires, conditions et notes
+                      </p>
+                      <div className="mb-10">
+                        <QuoteBankDetails
+                          userData={userData}
+                          useBankDetails={useBankDetails}
+                          setUseBankDetails={setUseBankDetails}
+                          setCompanyInfo={setCompanyInfo}
+                          onConfigureBankDetailsClick={
+                            handleConfigureBankDetailsRequest
                           }
-                          if (defaultTermsAndConditionsLinkTitle) {
-                            setTermsAndConditionsLinkTitle(defaultTermsAndConditionsLinkTitle);
+                        />
+                      </div>
+                      <div className="mb-10">
+                        <QuoteTermsAndConditions
+                          termsAndConditions={termsAndConditions}
+                          setTermsAndConditions={setTermsAndConditions}
+                          termsAndConditionsLinkTitle={
+                            termsAndConditionsLinkTitle
                           }
-                          if (defaultTermsAndConditionsLink) {
-                            setTermsAndConditionsLink(defaultTermsAndConditionsLink);
+                          setTermsAndConditionsLinkTitle={
+                            setTermsAndConditionsLinkTitle
                           }
-                        }}
-                        hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
-                      />
-                      <QuoteFooterNotes
-                        footerNotes={footerNotes}
-                        setFooterNotes={setFooterNotes}
-                        onApplyDefaults={() => {
-                          if (defaultFooterNotes) {
-                            setFooterNotes(defaultFooterNotes);
+                          termsAndConditionsLink={termsAndConditionsLink}
+                          setTermsAndConditionsLink={setTermsAndConditionsLink}
+                          onApplyDefaults={() => {
+                            if (defaultTermsAndConditions) {
+                              setTermsAndConditions(defaultTermsAndConditions);
+                            }
+                            if (defaultTermsAndConditionsLinkTitle) {
+                              setTermsAndConditionsLinkTitle(
+                                defaultTermsAndConditionsLinkTitle
+                              );
+                            }
+                            if (defaultTermsAndConditionsLink) {
+                              setTermsAndConditionsLink(
+                                defaultTermsAndConditionsLink
+                              );
+                            }
+                          }}
+                          hasDefaults={
+                            !!(
+                              defaultTermsAndConditions ||
+                              defaultTermsAndConditionsLinkTitle ||
+                              defaultTermsAndConditionsLink
+                            )
                           }
-                        }}
-                        hasDefaults={!!defaultFooterNotes}
-                      />
+                        />
+                      </div>
+                      <div className="mb-10">
+                        <QuoteFooterNotes
+                          footerNotes={footerNotes}
+                          setFooterNotes={setFooterNotes}
+                          onApplyDefaults={() => {
+                            if (defaultFooterNotes) {
+                              setFooterNotes(defaultFooterNotes);
+                            }
+                          }}
+                          hasDefaults={!!defaultFooterNotes}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -587,9 +777,13 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             calculateTotals={calculateTotals}
             isNewClient={isNewClient}
             newClient={newClient}
-            selectedClient={Array.isArray(clientsData?.clients?.items) 
-              ? clientsData?.clients?.items.find((c: any) => c.id === selectedClient)
-              : null}
+            selectedClient={
+              Array.isArray(clientsData?.clients?.items)
+                ? clientsData?.clients?.items.find(
+                    (c: any) => c.id === selectedClient
+                  )
+                : null
+            }
             useBankDetails={useBankDetails}
           />
         </div>
@@ -605,7 +799,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         cancelButtonText="Annuler"
         confirmButtonVariant="danger"
       />
-      
+
       {/* Modal de confirmation pour la navigation entre pages */}
       <ConfirmationModal
         isOpen={showConfirmModal}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { TextField, TextArea, Tooltip, Button } from '../../../../../components/';
+import { Add, InfoCircle } from 'iconsax-react';
 import {
   INVOICE_PREFIX_PATTERN,
   INVOICE_NUMBER_PATTERN,
@@ -56,7 +56,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
     
     // Vérifier que la date d'émission est présente
     if (!issueDate || issueDate.trim() === '') {
-      setIssueDateError('La date d\'\u00e9mission est requise');
+      setIssueDateError('La date d\'émission est requise');
       isValid = false;
     }
     
@@ -72,7 +72,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
       const validUntilObj = new Date(validUntil);
       
       if (validUntilObj < issueDateObj) {
-        setValidUntilError('La date de validité doit être postérieure ou égale à la date d\'\u00e9mission');
+        setValidUntilError('La date de validité doit être postérieure ou égale à la date d\'émission');
         isValid = false;
       }
     }
@@ -186,153 +186,169 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
   }, [quotePrefix, quoteNumber, headerNotes, validateQuotePrefix, validateQuoteNumber, validateHeaderNotes]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
       {/* Identification */}
-      <div className="mb-4">
-        <div className="flex items-center mb-3">
-          <h4 className="text-xl font-medium text-gray-600">Informations du devis</h4>
-          <div className="flex items-center">
+      <div>
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">01</span>
+          Informations du devis
+          <div className="flex items-center ml-2">
             <Tooltip content="Le numéro de devis est automatiquement séquentiel pour assurer la conformité légale" position="right">
-              <InformationCircleIcon className="h-6 w-6 ml-2 text-[#5b50ff] cursor-help" />
+              <InfoCircle size="18" color="#5b50ff" variant="Linear" className="cursor-help" />
             </Tooltip>
           </div>
-        </div>
-        <p className="text-xs text-gray-400 italic mb-3">Conformément à la législation française, les numéros de facture doivent suivre une séquence chronologique continue sans interruption. Cette numérotation séquentielle est obligatoire pour assurer la conformité fiscale et la traçabilité des transactions.</p>
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
+        <p className="text-xs text-gray-500 italic mb-4 bg-[#f9f8ff] p-3 rounded-lg border border-[#5b50ff]/20 flex items-start gap-2">
+          <InfoCircle size="16" color="#5b50ff" variant="Linear" className="mt-0.5 shrink-0" />
+          <span>Conformément à la législation française, les numéros de facture doivent suivre une séquence chronologique continue sans interruption. Cette numérotation séquentielle est obligatoire pour assurer la conformité fiscale et la traçabilité des transactions.</span>
+        </p>
       </div>
 
-      <div className="flex gap-4">
-        <div className="w-1/2">
-          <TextField
-            id="quotePrefix"
-            name="quotePrefix"
-            label="Préfixe"
-            value={quotePrefix}
-            onChange={(e) => {
-              // Remplacer automatiquement AAAA et MM par les valeurs actuelles
-              const newValue = replaceDatePlaceholders(e.target.value);
-              setQuotePrefix(newValue);
-              validateQuotePrefix(newValue);
-            }}
-            required
-            onBlur={(e) => {
-              // S'assurer que les placeholders sont remplacés lors de la perte de focus
-              const newValue = replaceDatePlaceholders(e.target.value);
-              setQuotePrefix(newValue);
-              validateQuotePrefix(newValue);
-            }}
-            placeholder="D-AAAAMM-"
-            error={quotePrefixError || undefined}
-          />
-          <p className="text-xs text-gray-500">Astuce : Saisissez "AAAA" pour insérer l'année actuelle et "MM" pour insérer le mois actuel.</p>
-        </div>
-        <div className="w-1/2">
-          <TextField
-            id="quoteNumber"
-            name="quoteNumber"
-            label="Numéro"
-            value={quoteNumber}
-            onChange={(e) => {
-              setQuoteNumber(e.target.value);
-              validateQuoteNumber(e.target.value);
-            }}
-            onBlur={(e) => validateQuoteNumber(e.target.value)}
-            placeholder="00001"
-            required
-            error={quoteNumberError || undefined}
-          />
+      <div className="mb-10">
+        <h4 className="text-md font-medium text-gray-700 mb-3 flex items-center">
+          Numérotation
+        </h4>
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <TextField
+              id="quotePrefix"
+              name="quotePrefix"
+              label="Préfixe"
+              value={quotePrefix}
+              onChange={(e) => {
+                // Remplacer automatiquement AAAA et MM par les valeurs actuelles
+                const newValue = replaceDatePlaceholders(e.target.value);
+                setQuotePrefix(newValue);
+                validateQuotePrefix(newValue);
+              }}
+              required
+              onBlur={(e) => {
+                // S'assurer que les placeholders sont remplacés lors de la perte de focus
+                const newValue = replaceDatePlaceholders(e.target.value);
+                setQuotePrefix(newValue);
+                validateQuotePrefix(newValue);
+              }}
+              placeholder="D-AAAAMM-"
+              error={quotePrefixError || undefined}
+            />
+            <p className="text-xs text-gray-500">Astuce : Saisissez "AAAA" pour insérer l'année actuelle et "MM" pour insérer le mois actuel.</p>
+          </div>
+          <div className="w-1/2">
+            <TextField
+              id="quoteNumber"
+              name="quoteNumber"
+              label="Numéro"
+              value={quoteNumber}
+              onChange={(e) => {
+                setQuoteNumber(e.target.value);
+                validateQuoteNumber(e.target.value);
+              }}
+              onBlur={(e) => validateQuoteNumber(e.target.value)}
+              placeholder="00001"
+              required
+              error={quoteNumberError || undefined}
+            />
+          </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <div className="w-full">
-          <TextField
-            id="issueDate"
-            name="issueDate"
-            label="Date d'émission"
-            type="date"
-            value={issueDate}
-            onChange={(e) => {
-              setIssueDate(e.target.value);
-              validateDates();
-            }}
-            onBlur={() => validateDates()}
-            required
-            error={issueDateError || undefined}
-          />
-        </div>
-        <div className="w-full">
-          <TextField
-            id="validUntil"
-            name="validUntil"
-            label="Valide jusqu'au"
-            type="date"
-            value={validUntil}
-            onChange={(e) => {
-              setValidUntil(e.target.value);
-              validateDates();
-              // Réinitialiser le bouton actif si la date est modifiée manuellement
-              if (activeValidityButton) {
-                setActiveValidityButton('');
-              }
-            }}
-            onBlur={() => validateDates()}
-            required
-            error={validUntilError || undefined}
-          />
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Button 
-              size="sm"
-              variant={activeValidityButton === '15' ? 'primary' : 'outline'}
-              className={`min-w-[90px] ${activeValidityButton === '15' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
-              onClick={() => {
-                const newDate = calculateFutureDate(15);
-                setValidUntil(newDate);
+
+      <div className="mb-10">
+        <h4 className="text-md font-medium text-gray-700 mb-3 flex items-center">
+          Dates
+        </h4>
+        <div className="flex flex-col gap-4">
+          <div className="w-full">
+            <TextField
+              id="issueDate"
+              name="issueDate"
+              label="Date d'émission"
+              type="date"
+              value={issueDate}
+              onChange={(e) => {
+                setIssueDate(e.target.value);
                 validateDates();
-                setActiveValidityButton('15');
               }}
-            >
-              15 jours
-            </Button>
-            
-            <Button 
-              size="sm"
-              variant={activeValidityButton === '30' ? 'primary' : 'outline'}
-              className={`min-w-[90px] ${activeValidityButton === '30' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
-              onClick={() => {
-                const newDate = calculateFutureDate(30);
-                setValidUntil(newDate);
+              onBlur={() => validateDates()}
+              required
+              error={issueDateError || undefined}
+            />
+          </div>
+          <div className="w-full">
+            <TextField
+              id="validUntil"
+              name="validUntil"
+              label="Valide jusqu'au"
+              type="date"
+              value={validUntil}
+              onChange={(e) => {
+                setValidUntil(e.target.value);
                 validateDates();
-                setActiveValidityButton('30');
+                // Réinitialiser le bouton actif si la date est modifiée manuellement
+                if (activeValidityButton) {
+                  setActiveValidityButton('');
+                }
               }}
-            >
-              30 jours
-            </Button>
-            
-            <Button 
-              size="sm"
-              variant={activeValidityButton === '90' ? 'primary' : 'outline'}
-              className={`min-w-[90px] ${activeValidityButton === '90' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
-              onClick={() => {
-                const newDate = calculateFutureDate(90);
-                setValidUntil(newDate);
-                validateDates();
-                setActiveValidityButton('90');
-              }}
-            >
-              90 jours
-            </Button>
-            
-            <Button 
-              size="sm"
-              variant={activeValidityButton === 'custom' ? 'primary' : 'outline'}
-              className={`min-w-[110px] ${activeValidityButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
-              onClick={() => {
-                setActiveValidityButton('custom');
-                // Focus sur le champ de date
-                document.getElementById('validUntil')?.focus();
-              }}
-            >
-              Personnaliser
-            </Button>
+              onBlur={() => validateDates()}
+              required
+              error={validUntilError || undefined}
+            />
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Button 
+                size="sm"
+                variant={activeValidityButton === '15' ? 'primary' : 'outline'}
+                className={`min-w-[90px] ${activeValidityButton === '15' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+                onClick={() => {
+                  const newDate = calculateFutureDate(15);
+                  setValidUntil(newDate);
+                  validateDates();
+                  setActiveValidityButton('15');
+                }}
+              >
+                15 jours
+              </Button>
+              
+              <Button 
+                size="sm"
+                variant={activeValidityButton === '30' ? 'primary' : 'outline'}
+                className={`min-w-[90px] ${activeValidityButton === '30' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+                onClick={() => {
+                  const newDate = calculateFutureDate(30);
+                  setValidUntil(newDate);
+                  validateDates();
+                  setActiveValidityButton('30');
+                }}
+              >
+                30 jours
+              </Button>
+              
+              <Button 
+                size="sm"
+                variant={activeValidityButton === '90' ? 'primary' : 'outline'}
+                className={`min-w-[90px] ${activeValidityButton === '90' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+                onClick={() => {
+                  const newDate = calculateFutureDate(90);
+                  setValidUntil(newDate);
+                  validateDates();
+                  setActiveValidityButton('90');
+                }}
+              >
+                90 jours
+              </Button>
+              
+              <Button 
+                size="sm"
+                variant={activeValidityButton === 'custom' ? 'primary' : 'outline'}
+                className={`min-w-[110px] ${activeValidityButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+                onClick={() => {
+                  setActiveValidityButton('custom');
+                  // Focus sur le champ de date
+                  document.getElementById('validUntil')?.focus();
+                }}
+              >
+                Personnaliser
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -340,7 +356,10 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
       {/* Notes d'en-tête */}
       <div className="mt-4">
         <div className="flex justify-between items-center mb-3">
-          <h4 className="text-xl font-medium text-gray-600">Notes</h4>
+          <h3 className="text-lg font-semibold flex items-center">
+            <span className="mr-2 text-[#5b50ff]">02</span>
+            Notes d'en-tête
+          </h3>
           {defaultHeaderNotes && (
             <button
               type="button"
@@ -350,28 +369,32 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
                   validateHeaderNotes(defaultHeaderNotes);
                 }
               }}
-              className="text-sm text-[#5b50ff] hover:underline"
+              className="text-sm text-[#5b50ff] hover:text-[#4a41e0] flex items-center gap-1"
             >
+              <Add size="16" color="#5b50ff" variant="Linear" />
               Appliquer les paramètres par défaut
             </button>
           )}
         </div>
-        <TextArea
-          id="headerNotes"
-          name="headerNotes"
-          label="Notes d'en-tête"
-          value={headerNotes}
-          onChange={(e) => {
-            setHeaderNotes(e.target.value);
-            validateHeaderNotes(e.target.value);
-            // Réinitialiser le bouton actif si le texte est modifié manuellement
-            if (activeHeaderNoteButton && e.target.value !== '') {
-              setActiveHeaderNoteButton('');
-            }
-          }}
-          placeholder="Notes à afficher en haut du devis"
-          rows={3}
-        />
+        <hr className="border-t border-gray-200 mb-4" />
+        <div className="mb-3">
+          <TextArea
+            id="headerNotes"
+            name="headerNotes"
+            label="Texte des notes"
+            value={headerNotes}
+            onChange={(e) => {
+              setHeaderNotes(e.target.value);
+              validateHeaderNotes(e.target.value);
+              // Réinitialiser le bouton actif si le texte est modifié manuellement
+              if (activeHeaderNoteButton && e.target.value !== '') {
+                setActiveHeaderNoteButton('');
+              }
+            }}
+            placeholder="Notes à afficher en haut du devis"
+            rows={3}
+          />
+        </div>
         {headerNotesError && (
           <p className="mt-1 text-sm text-red-600 font-medium">{headerNotesError}</p>
         )}
@@ -381,7 +404,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'validite' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'validite' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'validite' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Ce devis est valable 30 jours à compter de sa date d'émission. Passé ce délai, les prix sont susceptibles d'être modifiés.";
               setHeaderNotes(text);
@@ -395,7 +418,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'conditions' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'conditions' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'conditions' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Conditions de paiement : 30% à la commande, solde à la livraison. Délai d'exécution : à convenir ensemble après acceptation du devis.";
               setHeaderNotes(text);
@@ -409,7 +432,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'reference' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'reference' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'reference' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               const text = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre acceptation du devis.";
               setHeaderNotes(text);
@@ -423,7 +446,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
           <Button 
             size="sm"
             variant={activeHeaderNoteButton === 'custom' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]' : ''}`}
+            className={`min-w-[110px] ${activeHeaderNoteButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               setHeaderNotes('');
               validateHeaderNotes('');

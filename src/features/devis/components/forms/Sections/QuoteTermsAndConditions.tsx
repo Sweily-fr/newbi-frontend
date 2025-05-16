@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { TextField, TextArea, Button } from '../../../../../components/';
+import { TextField, TextArea } from '../../../../../components/';
+import { Add } from 'iconsax-react';
 import { 
   getTermsAndConditionsValidationRules, 
   getTermsAndConditionsLinkTitleValidationRules, 
@@ -95,19 +96,25 @@ export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = (
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Conditions générales */}
       <div>
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">01</span>
+          Conditions générales
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
         <div className="flex justify-between items-center mb-2">
           <label htmlFor="termsAndConditions" className="block text-sm font-medium text-gray-700">
-            Conditions générales
+            Texte des conditions
           </label>
           {hasDefaults && onApplyDefaults && (
             <button
               type="button"
               onClick={onApplyDefaults}
-              className="text-sm text-[#5b50ff] hover:underline"
+              className="text-sm text-[#5b50ff] hover:text-[#4a41e0] flex items-center gap-1"
             >
+              <Add size="16" color="#5b50ff" variant="Linear" />
               Appliquer les paramètres par défaut
             </button>
           )}
@@ -119,58 +126,59 @@ export const QuoteTermsAndConditions: React.FC<QuoteTermsAndConditionsProps> = (
           onChange={handleTermsAndConditionsChange}
           register={register ? () => register('termsAndConditions', getTermsAndConditionsValidationRules()) : undefined}
           error={errors?.termsAndConditions || localErrors.termsAndConditions}
-          placeholder="Conditions générales du devis"
-          rows={4}
+          placeholder="Ajoutez des conditions générales qui apparaîtront en bas du devis..."
+          rows={5}
           helpText={`${termsAndConditions?.length || 0}/2000 caractères - Les sauts de ligne seront préservés dans l'aperçu`}
         />
-      </div>
       
-      {/* Suggestions pour les conditions générales */}
-      <div className="mt-2 mb-4">
-        <div className="flex flex-wrap gap-2">
-          {termsAndConditionsSuggestions.map((suggestion, index) => (
-            <Button
-              key={index}
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => insertSuggestion(suggestion.text)}
-              className="text-xs"
-              title={suggestion.text}
-            >
-              {suggestion.keyword}
-            </Button>
-          ))}
+        {/* Suggestions pour les conditions générales */}
+        <div className="mt-3 mb-4">
+          <p className="text-xs text-gray-500 mb-2">Suggestions rapides :</p>
+          <div className="flex flex-wrap gap-2">
+            {termsAndConditionsSuggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => insertSuggestion(suggestion.text)}
+                className="text-xs bg-[#f0eeff] hover:bg-[#e6e1ff] text-[#5b50ff] py-1 px-3 rounded-full transition-colors border border-[#5b50ff]/20"
+                title={suggestion.text}
+              >
+                {suggestion.keyword}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Lien vers les conditions générales */}
-      <div className="flex gap-4">
-        <div className="w-1/2">
-          <TextField
-            id="termsAndConditionsLinkTitle"
-            name="termsAndConditionsLinkTitle"
-            label="Titre du lien"
-            value={termsAndConditionsLinkTitle}
-            onChange={handleTermsAndConditionsLinkTitleChange}
-            register={register ? () => register('termsAndConditionsLinkTitle', getTermsAndConditionsLinkTitleValidationRules()) : undefined}
-            error={errors?.termsAndConditionsLinkTitle || localErrors.termsAndConditionsLinkTitle}
-            placeholder="Voir nos CGV"
-            helpText={`${termsAndConditionsLinkTitle?.length || 0}/100 caractères`}
-          />
+      <div className="mt-6">
+        <div className="flex items-center mb-3">
+          <span className="mr-2 text-[#5b50ff] text-lg font-semibold">02</span>
+          <h3 className="text-lg font-semibold">Lien vers les conditions</h3>
         </div>
-        <div className="w-1/2">
-          <TextField
-            id="termsAndConditionsLink"
-            name="termsAndConditionsLink"
-            label="URL du lien"
-            value={termsAndConditionsLink}
-            onChange={handleTermsAndConditionsLinkChange}
-            register={register ? () => register('termsAndConditionsLink', getTermsAndConditionsLinkValidationRules()) : undefined}
-            error={errors?.termsAndConditionsLink || localErrors.termsAndConditionsLink}
-            placeholder="https://example.com/cgv"
-          />
-        </div>
+        <hr className="border-t border-gray-200 mb-4" />
+        <TextField
+          id="termsAndConditionsLinkTitle"
+          name="termsAndConditionsLinkTitle"
+          label="Lien vers les conditions générales"
+          value={termsAndConditionsLinkTitle}
+          onChange={handleTermsAndConditionsLinkTitleChange}
+          register={register ? () => register('termsAndConditionsLinkTitle', getTermsAndConditionsLinkTitleValidationRules()) : undefined}
+          error={errors?.termsAndConditionsLinkTitle || localErrors.termsAndConditionsLinkTitle}
+          placeholder="Titre du lien"
+          className="mb-2"
+          helpText={`${termsAndConditionsLinkTitle?.length || 0}/100 caractères`}
+        />
+        <TextField
+          id="termsAndConditionsLink"
+          name="termsAndConditionsLink"
+          label=""
+          value={termsAndConditionsLink}
+          onChange={handleTermsAndConditionsLinkChange}
+          register={register ? () => register('termsAndConditionsLink', getTermsAndConditionsLinkValidationRules()) : undefined}
+          error={errors?.termsAndConditionsLink || localErrors.termsAndConditionsLink}
+          placeholder="URL du lien (ex: https://example.com)"
+        />
       </div>
     </div>
   );
