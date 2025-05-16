@@ -3,15 +3,30 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonLink } from "../components/";
 import { SEOHead } from "../components/specific/SEO/SEOHead";
-import { SchemaMarkup, FAQSchema } from "../components/specific/SEO/SchemaMarkup";
+import {
+  SchemaMarkup,
+  FAQSchema,
+} from "../components/specific/SEO/SchemaMarkup";
 import {
   StarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  CreditCardIcon,
-  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowRight2,
+  Note1,
+  TickCircle,
+  Timer,
+  ClipboardTick,
+  Document,
+  ArrowRight,
+  Card,
+  Star1,
+  DocumentText,
+  ArchiveMinus,
+  ArrowDown2,
+  ArrowUp2,
+} from "iconsax-react";
 
 export const HomePage = () => {
   const { isAuthenticated } = useAuth();
@@ -156,31 +171,25 @@ export const HomePage = () => {
                       variant="primary"
                       size="md"
                       fullWidth
-                      className="sm:w-auto px-8 py-4 text-lg font-medium"
+                      className="sm:w-auto px-8 py-4 text-lg font-normal"
                     >
-                      <CheckCircleIcon className="h-5 w-5 mr-2 inline-block" />
+                      <TickCircle
+                        color="white"
+                        size={20}
+                        className="mr-3 inline-block"
+                      />
                       COMMENCER GRATUITEMENT
                     </ButtonLink>
                     <a
                       href="#pricing-section"
                       onClick={scrollToSection("pricing-section")}
-                      className="w-full sm:w-auto flex items-center justify-center px-8 py-4 border border-gray-300 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm"
+                      className="w-full sm:w-auto rounded-2xl flex items-center justify-center px-8 py-4 border border-gray-300 text-md font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm"
                     >
                       <span>Tarifs</span>
-                      <svg
-                        className="w-5 h-5 ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        ></path>
-                      </svg>
+                      <ArrowRight2
+                        className="h-5 w-5 ml-2 inline-block"
+                        color="gray"
+                      />
                     </a>
                   </div>
                 </div>
@@ -221,9 +230,9 @@ export const HomePage = () => {
               <div className="bg-transparent py-16 sm:py-24" id="how-it-works">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   {/* Interface de gestion de tâches */}
-                  <div className="rounded-xl shadow-2xl overflow-visible border border-gray-200 bg-transparent backdrop-blur-[2px] relative">
+                  <div className="rounded-[24px] shadow-lg overflow-visible border border-gray-200 bg-transparent backdrop-blur-[2px] relative">
                     {/* Petites cartes flottantes */}
-                    <div className="absolute top-12 -right-16 w-40 h-26 bg-white rounded-lg shadow-lg transform -rotate-6 z-40 overflow-hidden border border-gray-200">
+                    <div className="absolute top-12 -right-16 w-40 h-26 bg-white rounded-2xl shadow-lg transform -rotate-6 z-40 overflow-hidden border border-gray-200">
                       <div className="h-1.5 w-full bg-gradient-to-r from-red-500 to-amber-500"></div>
                       <div className="p-3">
                         <div className="flex items-center justify-between mb-2">
@@ -243,7 +252,7 @@ export const HomePage = () => {
                       </div>
                     </div>
 
-                    <div className="absolute bottom-20 -left-12 w-36 h-24 bg-white rounded-lg shadow-lg transform rotate-12 z-40 overflow-hidden border border-gray-200">
+                    <div className="absolute bottom-20 -left-12 w-36 h-24 bg-white rounded-2xl shadow-lg transform rotate-12 z-40 overflow-hidden border border-gray-200">
                       <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 to-purple-600"></div>
                       <div className="p-3">
                         <div className="flex items-center justify-between mb-2">
@@ -258,7 +267,7 @@ export const HomePage = () => {
                     </div>
 
                     {/* Carte flottante supplémentaire */}
-                    <div className="absolute top-40 -left-20 w-32 h-34 bg-white rounded-lg shadow-lg transform -rotate-12 z-40 overflow-hidden border border-gray-200">
+                    <div className="absolute top-40 -left-20 w-32 h-34 bg-white rounded-2xl shadow-lg transform -rotate-12 z-40 overflow-hidden border border-gray-200">
                       <div className="h-1.5 w-full bg-gradient-to-r from-purple-600 via-red-500 to-amber-500"></div>
                       <div className="p-3">
                         <div className="flex items-center justify-between mb-2">
@@ -283,21 +292,8 @@ export const HomePage = () => {
                     {/* Header de l'interface */}
                     <div className="bg-white/30 p-4 border-b border-gray-200 flex items-center justify-between relative z-20">
                       <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 text-emerald-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                            />
-                          </svg>
+                        <div className="h-10 w-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
+                          <Note1 color="green" size={24} />
                         </div>
                         <div>
                           <h3 className="text-lg font-medium text-gray-900">
@@ -370,7 +366,13 @@ export const HomePage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#ecfdf5] text-[#10b981] border border-[#d1fae5]">
+                                <ClipboardTick
+                                  size={16}
+                                  variant="Bold"
+                                  className="mr-2"
+                                  color="#10b981"
+                                />
                                 Payée
                               </span>
                             </td>
@@ -394,7 +396,13 @@ export const HomePage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#fffbeb] text-[#f59e0b] border border-[#fef3c7]">
+                                <Timer
+                                  size={16}
+                                  variant="Bold"
+                                  className="mr-2"
+                                  color="#f59e0b"
+                                />
                                 En attente
                               </span>
                             </td>
@@ -418,8 +426,14 @@ export const HomePage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                Échue
+                              <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#ecfdf5] text-[#10b981] border border-[#d1fae5]">
+                                <ClipboardTick
+                                  size={16}
+                                  variant="Bold"
+                                  className="mr-2"
+                                  color="#10b981"
+                                />
+                                Payée
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -442,7 +456,13 @@ export const HomePage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                              <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]">
+                                <TickCircle
+                                  size={16}
+                                  variant="Bold"
+                                  className="mr-2"
+                                  color="#5b50ff"
+                                />
                                 Accepté
                               </span>
                             </td>
@@ -466,8 +486,14 @@ export const HomePage = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                                En cours
+                              <span className="px-2.5 py-1 inline-flex items-center text-xs font-medium rounded-[16px] shadow-sm transition-all duration-200 bg-[#fffbeb] text-[#f59e0b] border border-[#fef3c7]">
+                                <Timer
+                                  size={16}
+                                  variant="Bold"
+                                  className="mr-2"
+                                  color="#f59e0b"
+                                />
+                                En attente
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -511,12 +537,13 @@ export const HomePage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 px-4 sm:px-6 lg:px-8 lg:grid-cols-3 gap-6 mb-16">
                 {/* Bénéfice 1 - Gestion des factures */}
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-emerald-100">
-                      <DocumentTextIcon
+                      <Document
                         className="h-5 w-5 text-emerald-600"
                         aria-hidden="true"
+                        color="#10b981"
                       />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900">
@@ -529,11 +556,11 @@ export const HomePage = () => {
                   </p>
 
                   {/* Exemple de facture */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-4 relative flex-grow">
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-4 relative flex-grow">
                     <div className="absolute top-0 right-0 p-1">
                       <span className="inline-block w-4 h-4 bg-gray-200 rounded-full"></span>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-sm">
+                    <div className="bg-white border border-gray-200 rounded-2xl p-3 text-sm">
                       <div className="flex justify-between mb-2">
                         <span className="font-bold">Facture #2023-42</span>
                         <span>28/03/2025</span>
@@ -561,21 +588,22 @@ export const HomePage = () => {
                       className="text-base font-medium text-emerald-600 hover:text-emerald-800 group"
                     >
                       Créer une facture{" "}
-                      <span
+                      <ArrowRight
+                        color="#10b981"
+                        size={20}
                         aria-hidden="true"
                         className="inline-block transform group-hover:translate-x-1 transition-transform duration-200"
-                      >
-                        &rarr;
-                      </span>
+                      />
                     </Link>
                   </div>
                 </div>
 
                 {/* Bénéfice 2 - Gestion des devis */}
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-amber-100">
-                      <CreditCardIcon
+                      <Card
+                        color="#f59e0b"
                         className="h-5 w-5 text-amber-600"
                         aria-hidden="true"
                       />
@@ -590,22 +618,22 @@ export const HomePage = () => {
                   </p>
 
                   {/* Bulle de chat */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-4 relative flex-grow">
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-4 relative flex-grow">
                     <div className="absolute top-0 right-0 p-1">
                       <span className="inline-block w-4 h-4 bg-gray-200 rounded-full"></span>
                     </div>
-                    <div className="mb-2 bg-yellow-100 rounded-lg p-2 text-sm inline-block max-w-[90%]">
+                    <div className="mb-2 bg-yellow-100 rounded-2xl p-2 text-sm inline-block max-w-[90%]">
                       <p className="text-gray-700">
                         Comment personnaliser mes devis ?
                       </p>
                     </div>
-                    <div className="mb-2 bg-gray-200 rounded-lg p-2 text-sm inline-block max-w-[90%]">
+                    <div className="mb-2 bg-gray-200 rounded-2xl p-2 text-sm inline-block max-w-[90%]">
                       <p className="text-gray-700">
                         Vous pouvez ajouter votre logo et modifier les
                         conditions.
                       </p>
                     </div>
-                    <div className="mb-2 bg-gray-200 rounded-lg p-2 text-sm inline-block max-w-[90%]">
+                    <div className="mb-2 bg-gray-200 rounded-2xl p-2 text-sm inline-block max-w-[90%]">
                       <p className="text-gray-700">
                         Essayez notre éditeur de devis dans les outils.
                       </p>
@@ -618,21 +646,22 @@ export const HomePage = () => {
                       className="text-base font-medium text-amber-600 hover:text-amber-800 group"
                     >
                       Créer un devis{" "}
-                      <span
+                      <ArrowRight
+                        color="#f59e0b"
+                        size={20}
                         aria-hidden="true"
                         className="inline-block transform group-hover:translate-x-1 transition-transform duration-200"
-                      >
-                        &rarr;
-                      </span>
+                      />
                     </Link>
                   </div>
                 </div>
 
                 {/* Bénéfice 3 - Créateur de Signature Email */}
-                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out h-full flex flex-col">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-indigo-100">
-                      <StarIcon
+                      <Star1
+                        color="#60a5fa"
                         className="h-5 w-5 text-indigo-600"
                         aria-hidden="true"
                       />
@@ -647,11 +676,11 @@ export const HomePage = () => {
                   </p>
 
                   {/* Exemple de signature */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-4 relative flex-grow">
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-4 relative flex-grow">
                     <div className="absolute top-0 right-0 p-1">
                       <span className="inline-block w-4 h-4 bg-gray-200 rounded-full"></span>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-sm">
+                    <div className="bg-white border border-gray-200 rounded-2xl p-3 text-sm">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
                           JD
@@ -679,15 +708,15 @@ export const HomePage = () => {
                   <div className="mt-auto">
                     <Link
                       to={getRedirectPath("/signatures-email")}
-                      className="text-base font-medium text-indigo-600 hover:text-indigo-800 group"
+                      className="text-base font-medium text-[#5b50ff] hover:text-[#5b50ff] group"
                     >
                       Créer ma signature{" "}
-                      <span
+                      <ArrowRight
+                        color="#5b50ff"
+                        size={20}
                         aria-hidden="true"
                         className="inline-block transform group-hover:translate-x-1 transition-transform duration-200"
-                      >
-                        &rarr;
-                      </span>
+                      />
                     </Link>
                   </div>
                 </div>
@@ -723,8 +752,8 @@ export const HomePage = () => {
                     size="lg"
                     className="inline-flex items-center"
                   >
-                    Découvrir NEWBI GRATUITEMENT{" "}
-                    <span className="ml-2">&rarr;</span>
+                    NEWBI GRATUITEMENT
+                    <ArrowRight size={20} color="#fff" className="ml-2" />
                   </ButtonLink>
                 </div>
               </div>
@@ -763,21 +792,8 @@ export const HomePage = () => {
                       <div className="space-y-4">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 mr-3">
-                            <div className="h-5 w-5 bg-gradient-to-r from-blue-400 to-blue-500 rounded flex items-center justify-center">
-                              <svg
-                                className="h-3 w-3 text-white"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4 7V17C4 19.2091 5.79086 21 8 21H16C18.2091 21 20 19.2091 20 17V7M4 7H20M4 7L6 3H18L20 7"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
+                            <div className="h-7 w-7 bg-red-500 rounded-lg flex items-center justify-center">
+                              <DocumentText size={20} color="#fff" />
                             </div>
                           </div>
                           <span className="text-sm font-medium text-gray-700">
@@ -786,21 +802,8 @@ export const HomePage = () => {
                         </div>
                         <div className="flex items-center">
                           <div className="flex-shrink-0 mr-3">
-                            <div className="h-5 w-5 bg-gradient-to-r from-green-400 to-green-500 rounded flex items-center justify-center">
-                              <svg
-                                className="h-3 w-3 text-white"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M4 7V17C4 19.2091 5.79086 21 8 21H16C18.2091 21 20 19.2091 20 17V7M4 7H20M4 7L6 3H18L20 7"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
+                            <div className="h-7 w-7 bg-green-500 rounded-lg flex items-center justify-center">
+                              <DocumentText size={20} color="#fff" />
                             </div>
                           </div>
                           <span className="text-sm font-medium text-gray-700">
@@ -809,21 +812,8 @@ export const HomePage = () => {
                         </div>
                         <div className="flex items-center">
                           <div className="flex-shrink-0 mr-3">
-                            <div className="h-5 w-5 bg-gradient-to-r from-purple-400 to-purple-500 rounded flex items-center justify-center">
-                              <svg
-                                className="h-3 w-3 text-white"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M11.0489 2.92707C11.3483 2.00576 12.6517 2.00576 12.9511 2.92707L14.9187 9.03623C15.0526 9.46809 15.4554 9.75 15.9084 9.75H22.3303C23.3016 9.75 23.7065 11.0004 22.9228 11.5623L17.7076 15.3459C17.3376 15.6095 17.1754 16.0668 17.3093 16.4987L19.2768 22.6078C19.5763 23.5291 18.5041 24.3004 17.7204 23.7385L12.5052 19.9549C12.1351 19.6914 11.8649 19.6914 11.4948 19.9549L6.27957 23.7385C5.49591 24.3004 4.42371 23.5291 4.72324 22.6078L6.69074 16.4987C6.82465 16.0668 6.66239 15.6095 6.29236 15.3459L1.07722 11.5623C0.293552 11.0004 0.698378 9.75 1.66968 9.75H8.09163C8.54459 9.75 8.94744 9.46809 9.08135 9.03623L11.0489 2.92707Z"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
+                            <div className="h-7 w-7 bg-[#5b50ff] rounded-lg flex items-center justify-center">
+                              <Star1 size={20} color="#fff" />
                             </div>
                           </div>
                           <span className="text-sm font-medium text-gray-700">
@@ -835,20 +825,9 @@ export const HomePage = () => {
                   </div>
                 </div>
 
-                <div className="md:w-3/4 bg-gradient-to-r from-red-400 to-red-500 rounded-lg overflow-hidden relative">
-                  <div className="absolute top-4 right-4 bg-white rounded-full p-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-gray-500"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4H7V5zm8 8v2h1v1H4v-1h1v-2a1 1 0 011-1h8a1 1 0 011 1zM9 5v4h2V5H9z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                <div className="md:w-3/4 bg-gradient-to-r from-red-400 to-red-500 rounded-2xl overflow-hidden relative">
+                  <div className="absolute top-4 right-4 bg-white rounded-full p-2">
+                    <ArchiveMinus size={20} color="red" variant="Bulk" />
                   </div>
                   <div className="p-8 text-white">
                     <div className="flex items-center mb-6">
@@ -871,9 +850,10 @@ export const HomePage = () => {
                     </p>
                     <a
                       href="/auth"
-                      className="text-white font-medium hover:underline"
+                      className="text-white font-medium hover:underline flex items-center"
                     >
-                      S'inscrire gratuitement &rarr;
+                      S'inscrire gratuitement
+                      <ArrowRight size={20} color="#fff" className="ml-2" />
                     </a>
                   </div>
                 </div>
@@ -881,7 +861,7 @@ export const HomePage = () => {
 
               <div className="mt-24 border-t border-gray-200 pt-12 flex justify-between items-center px-4 sm:px-6 lg:px-8 flex-wrap gap-12">
                 <div className="grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 w-1/5 max-w-[180px]">
-                  <div className="h-16 w-full bg-white rounded-sm px-6 py-2 flex items-center justify-center">
+                  <div className="h-16 w-full bg-white rounded-sm py-2 flex items-center justify-center">
                     <img
                       src="/images/reference/heritage_logo.png"
                       alt="Heritage Logo"
@@ -899,7 +879,7 @@ export const HomePage = () => {
                   </div>
                 </div>
                 <div className="grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 w-1/5 max-w-[180px]">
-                  <div className="h-16 w-full bg-white rounded-sm px-6 py-2 flex items-center justify-center">
+                  <div className="h-16 w-full bg-white rounded-sm py-2 flex items-center justify-center">
                     <img
                       src="/images/reference/mademoisellelilli_logo.png"
                       alt="Mademoiselle Lilli Logo"
@@ -937,7 +917,7 @@ export const HomePage = () => {
 
               <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 sm:px-6 lg:px-8">
                 {/* Témoignage 1 */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-2xl shadow-md p-6">
                   <div className="flex items-center mb-4">
                     <div className="h-12 w-12 rounded-full overflow-hidden">
                       <img
@@ -968,7 +948,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Témoignage 2 */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-2xl shadow-md p-6">
                   <div className="flex items-center mb-4">
                     <div className="h-12 w-12 rounded-full overflow-hidden">
                       <img
@@ -997,7 +977,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Témoignage 3 */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-2xl shadow-md p-6">
                   <div className="flex items-center mb-4">
                     <div className="h-12 w-12 rounded-full overflow-hidden">
                       <img
@@ -1027,7 +1007,7 @@ export const HomePage = () => {
               </div>
 
               {/* CTA en dessous des avis */}
-              <div className="mt-16 bg-[#5b50ff] rounded-lg shadow-xl mx-4 sm:mx-6 lg:mx-8 overflow-hidden">
+              <div className="mt-16 bg-[#5b50ff] rounded-2xl shadow-xl mx-4 sm:mx-6 lg:mx-8 overflow-hidden">
                 <div className="px-6 py-12 sm:px-12 lg:px-16 flex flex-col md:flex-row items-center justify-between">
                   <div className="text-center md:text-left mb-8 md:mb-0">
                     <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
@@ -1042,7 +1022,7 @@ export const HomePage = () => {
                   <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                     <Link
                       to="/auth"
-                      className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 md:py-4 md:text-lg md:px-10 transition-all duration-200 shadow-lg whitespace-nowrap"
+                      className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-2xl text-[#5b50ff] bg-white md:py-4 md:text-lg md:px-10 transition-all duration-200 shadow-lg whitespace-nowrap"
                     >
                       S'inscrire gratuitement
                     </Link>
@@ -1133,11 +1113,11 @@ export const HomePage = () => {
 
                     <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8">
                       {/* Carte Standard */}
-                      <div className="bg-white rounded-xl shadow-md p-8 flex-1 max-w-md mx-auto lg:mx-0 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <div className="bg-white rounded-2xl shadow-md p-8 flex-1 max-w-md mx-auto lg:mx-0 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
                         <h3 className="text-xl font-semibold text-gray-900 mb-4">
                           Premium
                         </h3>
-                        <p className="text-gray-600 mb-6 h-24">
+                        <p className="text-gray-600 h-24">
                           Accédez à tous les outils de Newbi avec une
                           tarification simple et transparente. Sans frais
                           cachés.
@@ -1208,17 +1188,7 @@ export const HomePage = () => {
                         <ul className="space-y-3 mb-8">
                           <li className="flex items-start">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-[#5b50ff]"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#5b50ff" variant="Bold" size={24}/>
                             </div>
                             <span className="ml-3 text-gray-600">
                               Accès à tous les outils
@@ -1226,17 +1196,7 @@ export const HomePage = () => {
                           </li>
                           <li className="flex items-start">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-[#5b50ff]"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#5b50ff" variant="Bold" size={24}/>
                             </div>
                             <span className="ml-3 text-gray-600">
                               Facturation et devis illimités
@@ -1244,17 +1204,7 @@ export const HomePage = () => {
                           </li>
                           <li className="flex items-start">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-[#5b50ff]"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#5b50ff" variant="Bold" size={24}/>
                             </div>
                             <span className="ml-3 text-gray-600">
                               Signatures email personnalisées
@@ -1262,17 +1212,7 @@ export const HomePage = () => {
                           </li>
                           <li className="flex items-start">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-[#5b50ff]"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#5b50ff" variant="Bold" size={24}/>
                             </div>
                             <span className="ml-3 text-gray-600">
                               Support client prioritaire
@@ -1291,40 +1231,20 @@ export const HomePage = () => {
 
                         <div className="mt-6 space-y-3">
                           {/* Mise en avant du mois gratuit */}
-                          <li className="flex items-start bg-blue-50 p-2 rounded-lg mb-2">
+                          <li className="flex items-start bg-blue-50 p-3 rounded-2xl mb-2">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-[#5b50ff]"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#5b50ff" variant="Bold" size={24}/>
                             </div>
                             <span className="ml-3 text-[#5b50ff] font-medium">
                               14 jours d'essais gratuits
                             </span>
                           </li>
                           {/* Mise en avant du sans engagement */}
-                          <li className="flex items-start bg-green-50 p-2 rounded-lg mb-4">
+                          <li className="flex items-start bg-green-50 p-3 rounded-2xl mb-4">
                             <div className="flex-shrink-0">
-                              <svg
-                                className="h-5 w-5 text-green-600"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TickCircle color="#22c55b" variant="Bold" size={24}/>
                             </div>
-                            <span className="ml-3 text-green-700 font-medium">
+                            <span className="ml-3 text-[#22c55b] font-medium">
                               Sans engagement - résiliez à tout moment
                             </span>
                           </li>
@@ -1338,7 +1258,7 @@ export const HomePage = () => {
           </div>
 
           {/* FAQ section */}
-          <div id="faq-section" className="bg-[#5b50ff]/5 py-16 sm:py-24">
+          <div id="faq-section" className="bg-[#f0eeff] py-16 sm:py-24">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center px-4 sm:px-6 lg:px-8">
                 <h2 className="text-base font-semibold text-[#5b50ff] tracking-wide uppercase">
@@ -1365,9 +1285,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(0) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1399,9 +1319,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(1) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1433,9 +1353,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(2) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1468,9 +1388,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(3) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1502,9 +1422,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(4) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1537,9 +1457,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(5) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1566,9 +1486,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(6) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1595,9 +1515,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(7) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1625,9 +1545,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(8) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1653,9 +1573,9 @@ export const HomePage = () => {
                       </h3>
                       <span className="ml-6 flex-shrink-0">
                         {openFAQs.includes(9) ? (
-                          <ChevronUpIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowUp2 color="#5b50ff" variant="Outline" size={24}/>
                         ) : (
-                          <ChevronDownIcon className="h-5 w-5 text-blue-500" />
+                          <ArrowDown2 color="#5b50ff" variant="Outline" size={24}/>
                         )}
                       </span>
                     </button>
@@ -1686,7 +1606,7 @@ export const HomePage = () => {
                 </span>
               </h2>
               <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0 px-4 sm:px-6 lg:px-8">
-                <div className="inline-flex rounded-md shadow">
+                <div className="inline-flex rounded-2xl">
                   <ButtonLink
                     to="/auth"
                     variant="primary"
@@ -1696,7 +1616,7 @@ export const HomePage = () => {
                     Commencer GRATUITEMENT
                   </ButtonLink>
                 </div>
-                <div className="ml-3 inline-flex rounded-md shadow">
+                <div className="ml-3 inline-flex rounded-2xl">
                   <ButtonLink
                     to={isAuthenticated ? "/outils" : "/auth"}
                     variant="outline"

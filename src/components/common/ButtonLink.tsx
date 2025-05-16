@@ -23,7 +23,7 @@ export const ButtonLink: React.FC<ButtonLinkProps> = ({
   ...props
 }) => {
   // Classes de base pour tous les boutons
-  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium focus:outline-none transition-all duration-200';
+  const baseClasses = 'inline-flex items-center justify-center rounded-2xl font-medium focus:outline-none transition-all duration-200';
   
   // Classes spécifiques à la variante
   const variantClasses = {

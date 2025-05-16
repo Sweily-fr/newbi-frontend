@@ -1,10 +1,16 @@
 import React from 'react';
 import { ButtonProps } from '../../types/ui';
 
+interface NewbiButtonProps extends ButtonProps {
+  iconBg?: boolean; // Pour activer le cercle semi-transparent autour de l'icône
+  withArrow?: boolean; // Pour ajouter une flèche à droite du texte
+  icon?: React.ReactNode; // Icône à afficher
+}
+
 /**
- * Composant Button réutilisable
+ * Composant Button réutilisable avec le design Newbi
  */
-export const Button: React.FC<ButtonProps> = ({
+export const Button: React.FC<NewbiButtonProps> = ({
   variant = 'primary',
   size = 'md',
   isLoading = false,
@@ -14,10 +20,13 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   disabled,
   type = 'button',
+  iconBg = false,
+  withArrow = false,
+  icon,
   ...props
 }) => {
   // Classes de base pour tous les boutons
-  const baseClasses = 'inline-flex items-center justify-center rounded-[16px] font-light focus:outline-none transition-colors duration-200';
+  const baseClasses = 'inline-flex items-center justify-center rounded-full font-light focus:outline-none transition-all duration-300 shadow-md transform hover:translate-y-[-2px]';
   
   // Classes spécifiques à la variante
   const variantClasses = {
@@ -51,6 +60,13 @@ export const Button: React.FC<ButtonProps> = ({
     </svg>
   );
 
+  // Composant flèche pour les boutons d'action principale
+  const Arrow = () => (
+    <svg className="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+      <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+    </svg>
+  );
+
   return (
     <button
       type={type}
@@ -59,7 +75,21 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {isLoading && loaderPosition === 'left' && <Loader />}
+      
+      {/* Icône avec cercle semi-transparent si iconBg est true */}
+      {icon && iconBg ? (
+        <div className="bg-white bg-opacity-20 rounded-full p-1 mr-3">
+          {icon}
+        </div>
+      ) : icon ? (
+        <span className="mr-2">{icon}</span>
+      ) : null}
+      
       {children}
+      
+      {/* Flèche pour les boutons d'action principale */}
+      {withArrow && !isLoading && <Arrow />}
+      
       {isLoading && loaderPosition === 'right' && <Loader />}
     </button>
   );
