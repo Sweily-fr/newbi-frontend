@@ -649,7 +649,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="sticky bottom-0 bg-white border-t border-l border-gray-200 p-4 mt-8">
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-8">
                   <div className="max-w-7xl mx-auto flex justify-end items-center">
                     <InvoiceActionButtons 
                       onValidateForm={onValidateForm}
