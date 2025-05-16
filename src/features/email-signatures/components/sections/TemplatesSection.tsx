@@ -244,7 +244,7 @@ export const TemplatesSection: React.FC<TemplatesSectionProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Choisissez un modèle</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-8">Choisissez un modèle</h3>
       <p className="text-sm text-gray-600 mb-6">
         Sélectionnez un modèle de signature qui correspond à votre style professionnel. Vous pourrez personnaliser tous les détails par la suite.
       </p>

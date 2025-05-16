@@ -4,6 +4,7 @@ import './animations.css';
 import { HexColorPicker } from 'react-colorful';
 // Import uniquement du nouveau composant de prévisualisation
 import { EmailSignaturePreview } from '../components/EmailSignaturePreview/EmailSignaturePreviewNew';
+import { Button } from '../../../components/common/Button';
 import { PersonalInfoSection } from './sections/PersonalInfoSection';
 import { SignatureData, EmailSignature } from '../types';
 import { CompanyInfoSection } from './sections/CompanyInfoSection';
@@ -301,8 +302,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x">
-        {/* Colonne gauche: formulaire */}
-        <div className="space-y-8 pr-8">
+        {/* Colonne gauche: formulaire (10px plus large) */}
+        <div className="space-y-8 pr-8" style={{ width: 'calc(100% + 15px)' }}>
           {/* Animation de transition entre les sections */}
           <SwitchTransition mode="out-in">
             <CSSTransition
@@ -312,7 +313,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
               classNames="section"
               unmountOnExit
             >
-              <div ref={nodeRef} className="transition-container">
+              <div ref={nodeRef} className="py-8 transition-container">
                 {renderContent()}
               </div>
             </CSSTransition>
@@ -320,16 +321,16 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
           
           {/* Boutons d'action */}
           <div className="flex justify-end space-x-4 pt-4 mt-8">
-            <button 
-              type="button" 
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            <Button 
+              variant="outline"
+              size="md"
               onClick={onCancel}
             >
               Annuler
-            </button>
-            <button 
-              type="button" 
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+            </Button>
+            <Button 
+              variant="primary"
+              size="md"
               onClick={() => {
                 if (onSave) {
                   onSave(signatureData);
@@ -337,13 +338,13 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
               }}
             >
               Enregistrer
-            </button>
+            </Button>
           </div>
         </div>
         
         {/* Colonne droite: prévisualisation */}
-        <div className="pl-8 h-fit sticky top-28">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Aperçu</h3>
+        <div className="py-8 pl-8 h-fit sticky top-28">
+          <h3 className="text-lg font-semibold text-gray-900 mb-8">Aperçu</h3>
           <div className="flex items-center justify-center">
             {/* Utiliser une clé unique basée sur profilePhotoSize pour forcer un nouveau rendu */}
             <EmailSignaturePreview 

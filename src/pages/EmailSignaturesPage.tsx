@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { EmailSignatureFormLayout } from '../features/email-signatures/components/EmailSignatureFormLayout';
-import { PageHeader } from '../components/layout/PageHeader';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { Personalcard, Instagram, Paintbucket, Grid5, AddCircle, Sms, ArrowLeft } from 'iconsax-react';
 import { NavigationSidebar } from '../components/common/NavigationSidebar/NavigationSidebar';
@@ -239,25 +238,44 @@ const EmailSignaturesPage: React.FC = () => {
       
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          {/* En-tête unique qui change dynamiquement */}
+          <div className="px-4 sm:px-0 mb-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-semibold text-gray-900">Gestion des Signatures Email</h1>
+              {showForm ? (
+                <Button
+                  variant="outline"
+                  onClick={handleBackToList}
+                  className="hover:bg-[#f0eeff] text-[#5b50ff]"
+                >
+                  <ArrowLeft size="20" color="#5b50ff" variant="Linear" className="mr-2" />
+                  Retour au tableau
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={handleAddSignature}
+                >
+                  <svg
+                    className="-ml-1 mr-2 h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Nouvelle Signature
+                </Button>
+              )}
+            </div>
+          </div>
+          
           {showForm ? (
             <>
-              {/* En-tête pour le formulaire avec bouton de retour */}
-              <div className="px-4 sm:px-0 mb-6">
-                <div className="flex items-center justify-between">
-                  <PageHeader
-                    title="Signatures Email"
-                    description="Créez et gérez vos signatures email professionnelles"
-                  />
-                  <button
-                    onClick={handleBackToList}
-                    className="inline-flex items-center justify-center rounded-lg font-medium focus:outline-none text-[#5b50ff] hover:bg-[#f0eeff] py-2 px-4 text-sm font-medium"
-                  >
-                    <ArrowLeft size="20" color="#5b50ff" variant="Linear" className="mr-2" />
-                    Retour au tableau
-                  </button>
-                </div>
-              </div>
-              
               {/* Sidebar de navigation réutilisable */}
               <NavigationSidebar
                 items={[
@@ -304,31 +322,6 @@ const EmailSignaturesPage: React.FC = () => {
             </>
           ) : (
             <>
-              {/* En-tête avec titre et bouton */}
-              <div className="px-4 sm:px-0 mb-6">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-2xl font-semibold text-gray-900">Gestion des Signatures Email</h1>
-                  <Button
-                    variant="primary"
-                    onClick={handleAddSignature}
-                  >
-                    <svg
-                      className="-ml-1 mr-2 h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Nouvelle Signature
-                  </Button>
-                </div>
-              </div>
-              
               {/* Barre de recherche */}
               <div className="mb-6 px-4 sm:px-0">
                 <div className="flex justify-end items-center">
