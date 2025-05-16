@@ -611,7 +611,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                         />
                       </div>
                       
-                      <div className="mb-10">
+                      <div className="mb-8">
                         <InvoiceTermsAndConditions
                         termsAndConditions={termsAndConditions}
                         setTermsAndConditions={setTermsAndConditions}
@@ -634,7 +634,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                         />
                       </div>
                       
-                      <div className="mb-10">
+                      <div className="mb-8">
                         <InvoiceFooterNotes
                         footerNotes={footerNotes}
                         setFooterNotes={setFooterNotes}
