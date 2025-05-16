@@ -246,7 +246,7 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
     <div className="space-y-4">
      
       
-      <div className="relative bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="relative bg-white shadow overflow-hidden rounded-2xl sm:rounded-2xl">
         {localLoading && (
           <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-10">
             <Spinner size="lg" />

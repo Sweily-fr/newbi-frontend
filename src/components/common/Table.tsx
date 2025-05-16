@@ -80,7 +80,7 @@ export function Table<T>({
   // Si les données sont vides et qu'un état vide est fourni, afficher l'état vide
   if (data.length === 0 && emptyState) {
     return (
-      <div className="bg-white shadow-sm border border-gray-100 overflow-hidden rounded-lg">
+      <div className="bg-white shadow-sm border border-gray-100 overflow-hidden rounded-2xl">
         <div className="text-center py-12 px-4">
           <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-[#f0eeff]">
             {emptyState.icon || <EmptyWallet size={24} variant="Bulk" color="#5b50ff" />}
@@ -95,11 +95,11 @@ export function Table<T>({
 
   return (
     <TableMenuContext.Provider value={{ activeMenuId, setActiveMenuId }}>
-      <div className="bg-white shadow-sm border border-gray-100 rounded-lg">
-        <div className="overflow-x-auto overflow-visible">
-          <table className={`min-w-full divide-y divide-gray-100 ${className}`}>
-          <thead className="bg-[#f9f8ff]">
-            <tr>
+      <div className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto overflow-visible rounded-2xl">
+          <table className={`min-w-full divide-y divide-gray-100 rounded-2xl ${className}`}>
+          <thead className="bg-[#f9f8ff] rounded-t-2xl">
+            <tr className="rounded-t-2xl">
               {columns.map((column, index) => {
                 const isSorted = sortConfig?.key === column.accessor && typeof column.accessor !== 'function';
                 const sortDirection = isSorted ? sortConfig.direction : null;
@@ -107,7 +107,7 @@ export function Table<T>({
                 return (
                   <th
                     key={index}
-                    className={`px-6 py-4 text-${column.align || 'left'} text-xs font-medium text-gray-600 tracking-wider ${column.className || ''}`}
+                    className={`px-6 py-4 text-${column.align || 'left'} text-xs font-medium text-gray-600 tracking-wider ${index === 0 ? 'first:rounded-tl-2xl' : ''} ${index === columns.length - 1 ? 'last:rounded-tr-2xl' : ''} ${column.className || ''}`}
                     style={{ textAlign: column.align || 'left' }}
                   >
                     <div className="flex items-center gap-2">
@@ -140,12 +140,12 @@ export function Table<T>({
               })}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="bg-white divide-y divide-gray-100 rounded-b-2xl">
             {data.map((item) => (
               <tr 
                 key={keyExtractor(item)}
                 onClick={onRowClick ? () => onRowClick(item) : undefined}
-                className={onRowClick ? 'cursor-pointer hover:bg-[#f0eeff]/50 transition-colors duration-150' : ''}
+                className={`${onRowClick ? 'cursor-pointer hover:bg-[#f0eeff]/50 transition-colors duration-150' : ''} ${data.length === 1 ? 'rounded-b-2xl' : ''} ${data.indexOf(item) === data.length - 1 ? 'last:rounded-b-2xl' : ''}`}
               >
                 {columns.map((column, index) => {
                   const value = typeof column.accessor === 'function' 
@@ -155,7 +155,7 @@ export function Table<T>({
                   return (
                     <td 
                       key={index} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${column.isAction ? 'overflow-visible' : ''} ${column.className || ''}`}
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-700 ${column.isAction ? 'overflow-visible' : ''} ${data.indexOf(item) === data.length - 1 && index === 0 ? 'last:first:rounded-bl-2xl' : ''} ${data.indexOf(item) === data.length - 1 && index === columns.length - 1 ? 'last:last:rounded-br-2xl' : ''} ${column.className || ''}`}
                       style={{ textAlign: column.align || 'left', position: column.isAction ? 'relative' : 'static' }}
                     >
                       {column.isAction && actionItems ? (
@@ -182,7 +182,7 @@ export function Table<T>({
         </table>
         </div>
         
-        {pagination && (
+        {pagination && data.length > 0 && (
           <Pagination
             currentPage={pagination.currentPage}
             totalItems={pagination.totalItems}
@@ -191,7 +191,7 @@ export function Table<T>({
             rowsPerPageOptions={pagination.rowsPerPageOptions}
             onItemsPerPageChange={pagination.onItemsPerPageChange}
             hasNextPage={pagination.hasNextPage}
-            className="border-t border-gray-100"
+            className="border-t border-gray-100 rounded-b-2xl overflow-hidden"
           />
         )}
       </div>
