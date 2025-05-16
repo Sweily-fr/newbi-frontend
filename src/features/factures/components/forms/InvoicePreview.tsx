@@ -195,7 +195,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       <div
         className="p-6 pb-0 max-w-full"
         style={{
-          minHeight: "auto",
+          minHeight: "calc(100vh - 120px)",
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
