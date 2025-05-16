@@ -92,7 +92,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
     : 'relative';
   
   return (
-    <div className={`w-20 bg-white flex flex-col items-center py-8 shadow-[2px_0px_5px_rgba(0,0,0,0.05)] ${sidebarPositionClasses}`}>
+    <div className={`w-20 bg-white flex flex-col items-center py-8 shadow-[2px_0px_5px_rgba(0,0,0,0.05)] h-[calc(100vh-80px)] ${sidebarPositionClasses}`}>
       <div className="flex flex-col items-center space-y-8">
         {/* Logo en haut */}
         {logo ? (

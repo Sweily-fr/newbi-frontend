@@ -3,7 +3,7 @@ import { EmailSignatureFormLayout } from '../features/email-signatures/component
 import { PageHeader } from '../components/layout/PageHeader';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { Personalcard, Instagram, Paintbucket, Grid5, AddCircle, Sms, ArrowLeft } from 'iconsax-react';
-import { NavigationSidebar } from '../components/common/NavigationSidebar';
+import { NavigationSidebar } from '../components/common/NavigationSidebar/NavigationSidebar';
 import { useSignatureProgress } from '../features/email-signatures/hooks/useSignatureProgress';
 import { useSaveSignature } from '../features/email-signatures/hooks';
 import { SignatureData } from '../features/email-signatures/types';
