@@ -1,5 +1,6 @@
 export * from './EmailSignatureForm';
 export * from './EmailSignaturePreview';
-export * from './EmailSignatureEditor';
+// EmailSignatureEditor a été supprimé car redondant avec EmailSignatureFormLayout
 export * from './EmailSignatureFormModal';
-export * from './EmailSignatureManager';
+// EmailSignatureManager a été supprimé car non utilisé
+export * from './EmailSignaturesTable';

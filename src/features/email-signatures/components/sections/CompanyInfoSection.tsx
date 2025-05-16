@@ -58,7 +58,6 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
       return;
     }
     
-    console.log('Début de l\'importation des données d\'entreprise');
     
     // Formater l'URL du logo si elle existe
     let logoUrl = '';
@@ -92,27 +91,13 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
       ? `${company.address.street || ''}, ${company.address.postalCode || ''} ${company.address.city || ''}, ${company.address.country || ''}`
       : '';
     
-    console.log('Données formatées pour l\'importation:', {
-      companyName,
-      companyWebsite,
-      companyAddress,
-      logoUrl
-    });
-    
     try {
       // Mettre à jour les états locaux au lieu de mettre à jour directement signatureData
       // Cela déclenchera les effets qui mettront à jour signatureData
-      console.log('Valeur de l\'adresse avant mise à jour:', localCompanyAddress);
-      console.log('Nouvelle valeur d\'adresse à importer:', companyAddress);
       
       setLocalCompanyName(companyName);
       setLocalCompanyWebsite(companyWebsite);
       setLocalCompanyAddress(companyAddress);
-      
-      // Vérifier que l'adresse a bien été mise à jour
-      setTimeout(() => {
-        console.log('Valeur de l\'adresse après mise à jour:', localCompanyAddress);
-      }, 0);
       
       // Mettre à jour le logo directement car il n'a pas d'état local
       if (logoUrl) {
@@ -128,9 +113,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
         position: 'bottom-left'
       });
       
-      console.log('Importation terminée avec succès');
     } catch (error) {
-      console.error('Erreur lors de l\'importation des données:', error);
       Notification.error('Erreur lors de l\'importation des données');
     }
   };
@@ -140,7 +123,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   // Surveiller les changements dans les données de l'entreprise
   useEffect(() => {
     if (company) {
-      console.log('Données d\'entreprise chargées:', company);
+      console.log('Données d\'entreprise chargées:');
     }
   }, [company]);
   
@@ -184,9 +167,6 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                           alt="Logo entreprise" 
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.error('Erreur de chargement de l\'image:', e);
-                            // Afficher un message d'erreur dans la console
-                            console.log('URL du logo qui a échoué:', signatureData.customLogoUrl);
                             // Afficher un message d'erreur à la place de l'image
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -229,7 +209,6 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                           setShowLogo(isChecked);
                           // Mettre à jour les données de signature avec la nouvelle valeur
                           updateSignatureData('showLogo', isChecked);
-                          console.log('Mise à jour de showLogo:', isChecked);
                         }}
                       />
                     </div>
@@ -278,7 +257,6 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                   placeholder="Ex: 123 Rue Exemple, 75000 Paris, France"
                   value={localCompanyAddress}
                   onChange={(e) => {
-                    console.log('Changement manuel de l\'adresse:', e.target.value);
                     setLocalCompanyAddress(e.target.value);
                   }}
                   rows={2}

@@ -179,13 +179,14 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
    * @returns Les données au format EmailSignature
    */
   const convertSignatureDataToEmailSignature = (data: SignatureData): Partial<EmailSignature> => {
-    // Ajouter des logs pour déboguer les valeurs
-    console.log('Conversion des données de signature:', {
-      socialLinksDisplayMode: data.socialLinksDisplayMode,
-      socialLinksIconStyle: data.socialLinksIconStyle,
-      socialLinksIconColor: data.socialLinksIconColor // Ajouter le log de la couleur des icônes
+    console.log('[DEBUG] EmailSignatureFormLayout - Données reçues pour conversion:', {
+      profilePhotoBase64: !!data.profilePhotoBase64,
+      profilePhotoUrl: data.profilePhotoUrl,
+      profilePhotoSize: data.profilePhotoSize,
+      profilePhotoSizeType: typeof data.profilePhotoSize,
+      profilePhotoToDelete: data.profilePhotoToDelete
     });
-    
+
     return {
       name: data.name,
       isDefault: data.isDefault,
@@ -235,7 +236,10 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       // Transmettre l'espacement entre icônes et texte
       iconTextSpacing: data.iconTextSpacing,
       // Ajouter la propriété showLogo pour contrôler l'affichage du logo
-      showLogo: data.showLogo
+      showLogo: data.showLogo,
+      // Transmettre l'état de suppression de la photo de profil
+      // Utiliser une expression booléenne explicite pour éviter les problèmes de type
+      profilePhotoToDelete: data.profilePhotoToDelete === true ? true : false
     } as Partial<EmailSignature>; // Cast pour éviter les erreurs TypeScript dues aux conflits de fusion
   };
 
@@ -327,11 +331,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
               type="button" 
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
               onClick={() => {
-                console.log('Bouton Enregistrer cliqué');
-                console.log('onSave existe:', !!onSave);
-                console.log('signatureData:', signatureData);
                 if (onSave) {
-                  console.log('Appel de onSave avec les données');
                   onSave(signatureData);
                 }
               }}
@@ -345,7 +345,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
         <div className="pl-8 h-fit sticky top-28">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Aperçu</h3>
           <div className="flex items-center justify-center">
+            {/* Utiliser une clé unique basée sur profilePhotoSize pour forcer un nouveau rendu */}
             <EmailSignaturePreview 
+              key={`preview-${signatureData?.profilePhotoSize || 'default'}-${Date.now()}`}
               signature={convertSignatureDataToEmailSignature(signatureData)} 
               showEmailIcon={Boolean(signatureData?.showEmailIcon)}
               showPhoneIcon={Boolean(signatureData?.showPhoneIcon)}

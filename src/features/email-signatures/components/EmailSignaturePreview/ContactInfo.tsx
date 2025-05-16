@@ -1,5 +1,4 @@
 import React from 'react';
-import { log } from 'console';
 
 interface ContactInfoProps {
   phone?: string;
@@ -84,8 +83,6 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
     opacity: 1 // Assurer une opacité complète
   };
 
-  console.log(linkStyle, "linkStyle");
-  console.log(getTextStyleProps(textStyle), "getTextStyleProps(textStyle)")
   // Style pour le conteneur principal des informations de contact
   const containerStyle: React.CSSProperties = {
     display: 'flex',

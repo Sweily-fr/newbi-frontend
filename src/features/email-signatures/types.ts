@@ -15,7 +15,7 @@ export interface SignatureData {
   profilePhotoUrl?: string;
   profilePhotoBase64?: string;
   profilePhotoSize?: number;
-  
+  profilePhotoToDelete?: boolean; // Indique si la photo de profil doit être supprimée  
   // Informations entreprise
   companyName: string;
   companyWebsite: string;
