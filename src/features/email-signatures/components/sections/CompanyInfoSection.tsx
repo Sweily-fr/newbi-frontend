@@ -133,7 +133,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   return (
     <>
       <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-semibold text-gray-900">Informations de l'entreprise</h3>
               <div className="flex space-x-2">
                 <button 

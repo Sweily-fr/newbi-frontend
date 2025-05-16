@@ -59,7 +59,7 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({
   return (
     <>
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Apparence</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-8">Apparence</h3>
         
         {/* Barre d'outils moderne */}
         <div className="mb-6">

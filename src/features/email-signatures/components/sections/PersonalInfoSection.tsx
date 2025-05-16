@@ -25,7 +25,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   return (
     <>
       <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Informations générales</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-8">Informations générales</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">

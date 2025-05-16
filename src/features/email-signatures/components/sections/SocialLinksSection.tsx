@@ -40,7 +40,7 @@ export const SocialLinksSection: React.FC<SocialLinksSectionProps> = ({
 
   return (
     <>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Réseaux sociaux</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-8">Réseaux sociaux</h3>
                  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
         {/* LinkedIn */}

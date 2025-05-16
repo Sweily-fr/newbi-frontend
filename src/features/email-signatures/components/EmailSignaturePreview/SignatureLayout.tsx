@@ -161,15 +161,13 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
     if (!showLogo || !logoUrl) return null;
     
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: effectiveTextAlignment === 'center' ? 'center' : effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start' }}>
         {/* Trait séparateur */}
         <div style={{
           height: '1px',
           backgroundColor: '#e0e0e0',
           width: effectiveTextAlignment === 'center' ? '40%' : '60%',
-          margin: '10px 0',
-          alignSelf: effectiveTextAlignment === 'center' ? 'center' : 
-                   effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start'
+          margin: '10px 0'
         }}></div>
         
         {/* Logo d'entreprise */}
