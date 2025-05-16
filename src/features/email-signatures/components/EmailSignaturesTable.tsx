@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Table, Column, ActionMenuItem } from '../../../common/Table';
-import { Button, SearchInput } from '../../..';
+import { Table, Column, ActionMenuItem } from '../../../components/common/Table';
+import { Button, SearchInput } from '../../../components';
 import { Add, Sms, Edit2, Trash, TickCircle } from 'iconsax-react';
-import { formatDateShort } from '../../../../utils/date';
-import { Spinner } from '../../../common/Spinner';
+import { formatDateShort } from '../../../utils/date';
+import { Spinner } from '../../../components/common/Spinner';
 
 // Type pour une signature email
 export interface EmailSignature {
@@ -57,10 +57,9 @@ export interface EmailSignature {
 }
 
 interface EmailSignaturesTableProps {
-  signatures?: EmailSignature[];
-  totalCount?: number;
-  hasNextPage?: boolean;
-  loading?: boolean;
+  signatures: EmailSignature[];
+  totalCount: number;
+  loading: boolean;
   onAddSignature?: () => void;
   onEditSignature?: (signature: EmailSignature) => void;
   onDeleteSignature?: (signature: EmailSignature) => void;
@@ -71,7 +70,6 @@ interface EmailSignaturesTableProps {
 export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({ 
   signatures = [],
   totalCount = 0,
-  hasNextPage = false,
   loading = false,
   onAddSignature,
   onEditSignature,
@@ -200,19 +198,19 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
       className: 'w-2/12'
     },
     {
-      header: 'Poste',
+      header: 'Fonction',
       accessor: 'jobTitle',
       className: 'w-2/12'
     },
     {
-      header: 'Email',
-      accessor: 'email',
-      className: 'w-2/12'
+      header: 'Créée le',
+      accessor: (signature) => formatDateShort(signature.createdAt),
+      className: 'w-1/12'
     },
     {
-      header: 'Date de création',
-      accessor: (signature) => formatDateShort(signature.createdAt),
-      className: 'w-2/12'
+      header: 'Modifiée le',
+      accessor: (signature) => formatDateShort(signature.updatedAt),
+      className: 'w-1/12'
     },
     {
       header: 'Actions',
@@ -233,71 +231,37 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
         variant="primary"
         className="inline-flex items-center"
       >
-        <Add size={20} color='#ffffff' variant="Linear" className="-ml-1 mr-2" />
+        <Add size={20} variant="Linear" color="#ffffff" className="-ml-1 mr-2" />
         Créer une signature
       </Button>
     ) : undefined
   };
 
-  // Afficher un message d'erreur si nécessaire (à implémenter si besoin)
-  // if (errorMessage) return <div className="py-10 text-center text-red-500">Erreur: {errorMessage}</div>;
-
   return (
     <div>
-      <div className="mb-2">
-        <h2 className="text-lg font-medium text-gray-900">Signatures Email</h2>
-      </div>
-      
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          {/* Barre de recherche */}
-          <SearchInput
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Rechercher une signature..."
-            className="w-full md:w-[20rem] lg:w-[24rem]"
-            ref={searchInputRef}
-          />
-        </div>
-        <div>
-          {onAddSignature && (
-            <Button
-              onClick={onAddSignature}
-              variant="primary"
-              className="inline-flex items-center"
-            >
-              <Add size={20} variant="Linear" color="#ffffff" className="-ml-1 mr-2" />
-              Créer une signature
-            </Button>
-          )}
-        </div>
-      </div>
-      
-      <div className="relative">
-        {localLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center z-10">
+      <div className="py-5">
+        {localLoading ? (
+          <div className="flex justify-center items-center py-20">
             <Spinner size="lg" />
           </div>
+        ) : (
+          <Table
+            data={signatures}
+            columns={columns}
+            emptyState={emptyState}
+            keyExtractor={(signature) => signature.id}
+            pagination={{
+              currentPage: page,
+              totalItems: totalCount,
+              itemsPerPage: limit,
+              onPageChange: setPage,
+              rowsPerPageOptions: [5, 10, 20, 50],
+              onItemsPerPageChange: setLimit
+            }}
+            actionItems={getActionItems()}
+            actionButtonLabel={actionButtonLabel}
+          />
         )}
-        
-        <Table
-          columns={columns}
-          data={signatures}
-          keyExtractor={(item) => item.id}
-          onRowClick={onEditSignature ? (item) => onEditSignature(item) : undefined}
-          emptyState={emptyState}
-          pagination={{
-            currentPage: page,
-            totalItems: totalCount,
-            itemsPerPage: limit,
-            onPageChange: setPage,
-            hasNextPage: hasNextPage,
-            rowsPerPageOptions: [5, 10, 20, 50],
-            onItemsPerPageChange: setLimit
-          }}
-          actionItems={getActionItems()}
-          actionButtonLabel={actionButtonLabel}
-        />
       </div>
     </div>
   );

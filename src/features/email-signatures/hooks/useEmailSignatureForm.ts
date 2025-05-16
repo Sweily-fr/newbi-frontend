@@ -381,10 +381,26 @@ export function useEmailSignatureForm({
   
   // Fonction pour supprimer la photo de profil
   const handleProfilePhotoDelete = useCallback(() => {
+    // Réinitialiser toutes les valeurs liées à la photo de profil avec null explicitement
     setProfilePhotoBase64(null);
     setPreviewProfilePhoto(null);
+    setProfilePhotoUrl(null as any); // Forcer null au lieu de chaîne vide
     setProfilePhotoToDelete(true);
-  }, []);
+    
+    // Forcer une mise à jour du formulaire si onChange est défini
+    if (onChange) {
+      onChange({
+        profilePhotoBase64: null,
+        profilePhotoUrl: null as any, // Forcer null au lieu de chaîne vide
+        profilePhotoToDelete: true
+      });
+    }
+    
+    // Forcer un re-rendu en déclenchant un autre changement d'état
+    setTimeout(() => {
+      setProfilePhotoToDelete(true); // Redéclencher pour forcer un re-rendu
+    }, 50);
+  }, [onChange, setProfilePhotoUrl]);
   
   // Validation du formulaire
   const validateForm = useCallback((): EmailSignatureFormErrors => {

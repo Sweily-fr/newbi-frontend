@@ -248,7 +248,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       </div>
       {/* Affichage du texte d'aide */}
       {helpText && (
-        <p className="text-sm text-gray-500 mt-1">{helpText}</p>
+        <p className="text-xs text-gray-500 mt-1">{helpText}</p>
       )}
     </div>
   );

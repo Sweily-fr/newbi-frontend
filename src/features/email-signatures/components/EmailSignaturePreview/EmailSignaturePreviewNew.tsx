@@ -20,8 +20,9 @@ interface EmailSignaturePreviewProps {
   address?: string;
   logoUrl?: string;
   profilePhotoUrl?: string;
-  profilePhotoBase64?: string;
+  profilePhotoBase64?: string | null;
   profilePhotoSize?: number;
+  profilePhotoToDelete?: boolean; // Indique si la photo de profil doit être supprimée
   layout?: string;
   horizontalSpacing?: number;
   verticalSpacing?: number;
@@ -62,6 +63,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   profilePhotoUrl: propProfilePhotoUrl,
   profilePhotoBase64: propProfilePhotoBase64,
   profilePhotoSize: propProfilePhotoSize,
+  profilePhotoToDelete: propProfilePhotoToDelete,
   layout: propLayout,
   horizontalSpacing: propHorizontalSpacing,
   verticalSpacing: propVerticalSpacing,
@@ -123,16 +125,15 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   // Si signature?.showLogo est explicitement défini (même à false), on l'utilise
   // Sinon, on utilise propShowLogo si défini, sinon true par défaut
   const showLogo = signature?.showLogo !== undefined ? signature.showLogo : (propShowLogo !== undefined ? propShowLogo : true);
-  console.log('EmailSignaturePreviewNew - signature?.showLogo:', signature?.showLogo, 'type:', typeof signature?.showLogo);
-  console.log('EmailSignaturePreviewNew - propShowLogo:', propShowLogo, 'type:', typeof propShowLogo);
-  console.log('EmailSignaturePreviewNew - showLogo (calculé):', showLogo, 'type:', typeof showLogo);
+  // Déterminer si le logo doit être affiché
   const fontSize = signature?.fontSize || propFontSize || 14;
   const textStyle = signature?.textStyle || propTextStyle || 'normal';
   const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
   const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
 
   // Définir la taille de la photo de profil avec une valeur par défaut
-  const photoSize = profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE;
+  // Convertir explicitement en nombre pour éviter les problèmes de type
+  const photoSize = Number(profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE);
 
   // Définir l'alignement effectif en fonction de la disposition
   const effectiveTextAlignment = textAlignment as 'left' | 'center' | 'right';
@@ -143,12 +144,34 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
 
   // Définir le type de disposition de la signature
   const signatureLayout = layout as 'horizontal' | 'vertical';
-  // Débogage du changement de mode
-  console.log('EmailSignaturePreviewNew Debug - Layout changed:', { layout, signatureLayout });
 
-  // Utiliser profilePhotoBase64 s'il est disponible, sinon utiliser profilePhotoUrl
-  // Si aucune image personnalisée n'est fournie, profilePhotoSource sera null pour afficher l'icône Profile
-  const profilePhotoSource = profilePhotoBase64 || (profilePhotoUrl && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg' ? profilePhotoUrl : null);
+  
+  // Déterminer la source de la photo de profil
+  // Si aucune image n'est fournie, profilePhotoSource sera null pour que ImageContainer affiche l'icône Profile par défaut
+  // Traitement des données de l'image de profil
+  
+  let profilePhotoSource = null;
+  
+  // Déterminer si la photo est marquée comme supprimée
+  // Forcer la conversion en booléen pour éviter les problèmes de type
+  const photoDeleted = propProfilePhotoToDelete === true || signature?.profilePhotoToDelete === true;
+  
+  // IMPORTANT: Forcer profilePhotoSource à null si l'image a été supprimée
+  if (photoDeleted) {
+    console.log('[DEBUG] EmailSignaturePreviewNew - Photo supprimée, profilePhotoSource forcé à null');
+    profilePhotoSource = null;
+  } else {
+    // Vérifier d'abord s'il y a une image en base64
+    if (profilePhotoBase64) {
+      profilePhotoSource = profilePhotoBase64;
+    } 
+    // Sinon, vérifier s'il y a une URL valide
+    else if (profilePhotoUrl && profilePhotoUrl !== '' && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') {
+      profilePhotoSource = profilePhotoUrl;
+    }
+  }
+  
+  // Si l'image a été supprimée ou si aucune des conditions n'est remplie, profilePhotoSource reste null
   
   // Définir le logo Newbi par défaut si aucun logo n'est fourni
   const defaultLogoUrl = '/images/logo_newbi/SVG/Logo_Texte_Purple.svg';
@@ -260,8 +283,9 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
                 address={address}
                 logoUrl={effectiveLogoUrl}
                 profilePhotoSource={profilePhotoSource ? getFullProfilePhotoUrl(profilePhotoSource) : null}
-                photoSize={photoSize}
+                profilePhotoSize={photoSize}
                 imagesLayout={imagesLayout as 'stacked' | 'side-by-side'}
+                profilePhotoToDelete={photoDeleted}
                 showLogo={showLogo}
                 showEmailIcon={showEmailIcon}
                 showPhoneIcon={showPhoneIcon}

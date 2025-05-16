@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SignatureData } from '../../types';
 import { Checkbox } from '../../../../components/common';
 import { ImageUploader } from '../../../../components/common/ImageUploader';
@@ -85,16 +85,25 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     }
                   }}
                   onDelete={() => {
-                    // Supprimer la photo de profil
-                    setProfilePhotoPreview(null); // Mettre à jour l'état local
+                    // Réinitialiser l'aperçu local
+                    setProfilePhotoPreview(null);
+                    
+                    // Effacer les données de l'image
                     updateSignatureData('profilePhotoBase64' as any, null);
-                    updateSignatureData('profilePhotoUrl' as any, '');
+                    updateSignatureData('profilePhotoUrl' as any, null);
+                    
+                    // Réinitialiser la taille de la photo à la valeur par défaut
+                    updateSignatureData('profilePhotoSize', 80);
+                    
+                    // Marquer comme supprimé
                     updateSignatureData('profilePhotoToDelete' as any, true);
+                    
+                    console.log('[DEBUG] Photo supprimée, profilePhotoSize réinitialisé et profilePhotoToDelete mis à true');
                   }}
                 />
                 
-                {/* Slider pour la taille de la photo de profil */}
-                {(signatureData.profilePhotoUrl || signatureData.profilePhotoBase64) && (
+                {/* Slider pour la taille de la photo de profil - n'afficher que si une photo est présente et non marquée comme supprimée */}
+                {(signatureData.profilePhotoUrl || signatureData.profilePhotoBase64) && !signatureData.profilePhotoToDelete && (
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
                       Taille de la photo ({signatureData.profilePhotoSize || 80}px)
@@ -106,7 +115,19 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         max="120"
                         step="5"
                         value={signatureData.profilePhotoSize || 80}
-                        onChange={(e) => updateSignatureData('profilePhotoSize', parseInt(e.target.value))}
+                        onChange={(e) => {
+                          const newSize = parseInt(e.target.value);
+                          console.log('[DEBUG] PersonalInfoSection - Nouvelle taille de photo:', newSize);
+                          // Mettre à jour directement la taille de l'image
+                          updateSignatureData('profilePhotoSize', newSize);
+                          
+                          // Forcer un rendu en mettant à jour une autre propriété qui n'affecte pas l'apparence
+                          // mais qui force React à recalculer le rendu
+                          setTimeout(() => {
+                            // Utiliser un setTimeout pour s'assurer que la mise à jour précédente est terminée
+                            updateSignatureData('profilePhotoSize', newSize);
+                          }, 0);
+                        }}
                         className="w-2/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5b50ff]"
                       />
                       <div className="flex items-center justify-center w-10 h-8 bg-white border border-gray-300 rounded-lg text-sm">

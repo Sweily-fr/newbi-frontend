@@ -16,25 +16,31 @@ interface SignatureLayoutProps {
   phone?: string;
   mobilePhone?: string;
   email?: string;
+  logoUrl?: string;
+  showLogo?: boolean;
   website?: string;
   address?: string;
-  logoUrl?: string;
   profilePhotoSource?: string | null;
-  photoSize: number; // Valeur par défaut fournie dans le composant
-  imagesLayout: 'stacked' | 'side-by-side';
-  showLogo: boolean; // Valeur par défaut fournie dans le composant
-  showEmailIcon: boolean; // Valeur par défaut fournie dans le composant
-  showPhoneIcon: boolean; // Valeur par défaut fournie dans le composant
-  showAddressIcon: boolean; // Valeur par défaut fournie dans le composant
-  showWebsiteIcon: boolean; // Valeur par défaut fournie dans le composant
+  profilePhotoSize?: number;
+  profilePhotoToDelete?: boolean; // Ajout de cette propriété pour détecter explicitement la suppression
+  imagesLayout?: 'stacked' | 'side-by-side';
+  showEmailIcon?: boolean;
+  showPhoneIcon?: boolean;
+  showAddressIcon?: boolean;
+  showWebsiteIcon?: boolean;
   socialLinks?: SocialLinks;
-  socialLinksDisplayMode: 'icons' | 'text';
-  socialLinksIconStyle: string;
-  primaryColor: string; // Valeur par défaut fournie dans le composant
-  secondaryColor?: string; // Couleur secondaire pour les textes d'informations de contact
-  socialLinksIconColor?: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
-  effectiveTextAlignment: 'left' | 'center' | 'right';
-  effectiveHorizontalSpacing: number;
+  socialLinksDisplayMode?: 'icons' | 'text';
+  socialLinksIconStyle?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  socialLinksIconColor?: string;
+  effectiveTextAlignment?: 'left' | 'center' | 'right';
+  effectiveHorizontalSpacing?: number;
+  effectiveVerticalSpacing?: number;
+  iconTextSpacing?: number;
+  fontSize?: number;
+  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
+  fontFamily?: string;
   effectiveVerticalSpacing: number;
   iconTextSpacing: number; // Valeur par défaut fournie dans le composant
   fontSize: number; // Valeur par défaut fournie dans le composant
@@ -55,7 +61,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   website,
   address,
   profilePhotoSource,
-  photoSize = DEFAULT_PROFILE_PHOTO_SIZE, // Utilisation de la constante pour la taille de la photo
+  profilePhotoSize, // Nous gérons la valeur par défaut dans le corps de la fonction
+  profilePhotoToDelete, // Nouvelle propriété ajoutée
   imagesLayout,
   showEmailIcon = true,
   showPhoneIcon = true,
@@ -70,11 +77,24 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   effectiveTextAlignment,
   effectiveHorizontalSpacing,
   effectiveVerticalSpacing,
-  iconTextSpacing = 5, // Valeur par défaut pour l'espacement entre icônes et texte
+  iconTextSpacing = 5, 
   fontSize = 14,
   textStyle = 'normal',
   fontFamily = 'Arial, sans-serif'
 }) => {
+  // Définir les valeurs par défaut pour les propriétés optionnelles
+  // pour éviter que les valeurs par défaut n'écrasent les valeurs transmises
+  const effectivePhotoSize = profilePhotoSize !== undefined ? profilePhotoSize : 80;
+  
+  // Définir une valeur par défaut pour socialLinksDisplayMode
+  const effectiveSocialLinksDisplayMode = socialLinksDisplayMode || 'icons' as const;
+  
+  // Log pour déboguer la taille effective de la photo
+  console.log('[DEBUG] SignatureLayout - Taille effective:', {
+    profilePhotoSizeOriginal: profilePhotoSize,
+    effectivePhotoSize
+  });
+  
   // Fonction pour obtenir les styles de texte appropriés
   const getTextStyleProps = (style: 'normal' | 'overline' | 'underline' | 'strikethrough'): React.CSSProperties => {
     switch (style) {
@@ -137,7 +157,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
 
   // Rendu du logo d'entreprise en mode vertical
   const renderCompanyLogoVertical = () => {
-    console.log(showLogo, "showLogo");
+    // Afficher ou masquer le logo selon la configuration
     if (!showLogo || !logoUrl) return null;
     
     return (
@@ -160,8 +180,8 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
                         effectiveTextAlignment === 'right' ? 'flex-end' : 'flex-start'
         }}>
           <div style={{ 
-            width: `${photoSize * 1}px`, 
-            height: `${photoSize * 1}px`, 
+            width: '80px', 
+            height: '80px', 
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -187,7 +207,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
     return (
       <SocialLinksComponent 
         socialLinks={socialLinks}
-        displayMode={socialLinksDisplayMode}
+        displayMode={effectiveSocialLinksDisplayMode}
         socialLinksIconStyle={socialLinksIconStyle}
         primaryColor={primaryColor}
         backgroundColor={primaryColor} // Couleur de fond pour les icônes (carrés arrondis et cercles)
@@ -202,22 +222,27 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
     // Si la position des réseaux sociaux est en bas, les afficher sous les informations de contact (comportement par défaut)
     return (
       <div style={{ display: 'flex', width: '100%', gap: `${effectiveHorizontalSpacing}px` }}>
-        {/* Partie gauche - Photo de profil avec informations personnelles en dessous */}
+        {/* Partie gauche - Photo de profil */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
-          alignItems: 'center',
-          padding: '10px',
+          alignItems: 'flex-start',
+          padding: '0',
           width: 'auto'
         }}>
           {/* Photo de profil avec ImageContainer pour uniformiser */}
-          <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            {/* Ajouter une clé unique basée sur la taille pour forcer un re-rendu complet */}
             <ImageContainer
-              profilePhotoSource={profilePhotoSource}
-              photoSize={photoSize * 1.2}
+              key={`profile-photo-${effectivePhotoSize}`}
+              profilePhotoSource={profilePhotoSource === '' ? null : profilePhotoSource}
+              photoSize={effectivePhotoSize * 1.2} // Utiliser effectivePhotoSize pour éviter les erreurs TypeScript
               imagesLayout="stacked"
+              profilePhotoToDelete={profilePhotoToDelete}
             />
           </div>
+          {/* Ajouter ce log en dehors du JSX pour éviter l'erreur */}
+          {/* Emplacement pour la photo de profil */}
           
           {/* Informations personnelles sous la photo */}
           <div style={{ 
@@ -226,7 +251,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
             justifyContent: 'flex-start',
             textAlign: 'left',
             gap: `${Math.max(4, effectiveVerticalSpacing / 2)}px`,
-            minWidth: `${photoSize * 1.2}px`
+            minWidth: `${effectivePhotoSize * 1.2}px`
           }}>
             {fullName && <h3 style={{...nameStyle, margin: '0', whiteSpace: 'nowrap'}}>{fullName}</h3>}
             {jobTitle && <p style={{...jobTitleStyle, margin: '0', whiteSpace: 'nowrap'}}>{jobTitle}</p>}
@@ -287,9 +312,11 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
         {/* Conteneur d'images */}
         <ImageContainer
+          key={`profile-photo-${effectivePhotoSize}`}
           profilePhotoSource={profilePhotoSource}
-          photoSize={photoSize}
-          imagesLayout={imagesLayout}
+          photoSize={effectivePhotoSize}
+          imagesLayout={imagesLayout || 'stacked'}
+          profilePhotoToDelete={profilePhotoToDelete}
         />
         {/* Logo d'entreprise supprimé */}
       </div>

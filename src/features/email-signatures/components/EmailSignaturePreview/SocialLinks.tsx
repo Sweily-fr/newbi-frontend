@@ -64,7 +64,6 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
   // Toujours utiliser la couleur spécifique fournie si elle existe
   if (propIconColor) {
     iconColor = propIconColor;
-    console.log('SocialLinks - Utilisation de la couleur spécifique fournie:', propIconColor);
   } else {
     // Sinon, utiliser une couleur par défaut en fonction du style
     if (socialLinksIconStyle === 'plain') {
@@ -72,10 +71,8 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
     } else {
       iconColor = '#ffffff'; // Blanc par défaut pour les styles avec fond
     }
-    console.log('SocialLinks - Utilisation de la couleur par défaut pour le style', socialLinksIconStyle, ':', iconColor);
   }
   
-  console.log('SocialLinks - propIconColor:', propIconColor, 'iconColor final:', iconColor, 'socialLinksIconStyle:', socialLinksIconStyle);
   
   // Nous n'utilisons plus de style dynamique pour les icônes SVG
   // car nous forçons la couleur blanche (#ffffff) directement dans les balises SVG
@@ -175,8 +172,6 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
         };
     }
   }
-  // Afficher la couleur finale des icônes pour le débogage
-  console.log('SocialLinks - Couleur finale des icônes:', iconColor);
 
   return (
     <div style={socialLinksContainerStyle}>
@@ -195,7 +190,7 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
               </svg>
             </div>
-          ) : <p style={{ color: propIconColor || '#333333' }}>Linkedin</p>}
+          ) : <p style={{ color: propIconColor || '#fff' }}>Linkedin</p>}
         </a>
       )}
       {socialLinks?.twitter && (

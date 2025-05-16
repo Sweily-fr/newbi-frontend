@@ -57,11 +57,11 @@ export const TextField: React.FC<TextFieldProps> = ({
           type={type}
           {...inputProps}
           {...rest}
-          className={`block w-full border bg-white py-3 px-4 text-base ${type === 'email' ? 'pl-8' : ''} ${
+          className={`block w-full h-10 border bg-white px-3 py-2 text-base placeholder:text-sm ${type === 'email' ? 'pl-8' : ''} ${
             error
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 focus:ring-2 active:border-[#5b50ff] transition-all duration-300 ease-in-out'
-          } ${inputClassName || 'rounded-lg'}`}
+              : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent transition-all duration-300 ease-in-out'
+          } ${inputClassName || 'rounded-md'}`}
           placeholder={placeholder}
           disabled={disabled}
         />

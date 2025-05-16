@@ -1,5 +1,6 @@
 import React from 'react';
 import { CircularProgressBar } from '../CircularProgressBar';
+import { Logo } from '../../../assets/logo';
 
 // Type pour les éléments de navigation
 export interface NavigationItem {
@@ -59,6 +60,11 @@ interface NavigationSidebarProps {
    * Composant de logo à afficher en haut de la sidebar
    */
   logo?: React.ReactNode;
+
+  /**
+   * Indique si les cercles de couleurs doivent être affichés (uniquement pour la signature de mail)
+   */
+  showColorCircles?: boolean;
 }
 
 /**
@@ -75,8 +81,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
   activeBackgroundColor = '#f0eeff',
   fixed = true,
   topOffset = '80px',
-  logo
+  logo,
+  showColorCircles = false // Par défaut, les cercles de couleurs ne sont pas affichés
 }) => {
+  // Couleur fixe pour la barre de progression
+  const progressBarColor = '#5b50ff'; // Toujours utiliser la couleur Newbi pour la barre de progression
   // Classes de positionnement de la sidebar
   const sidebarPositionClasses = fixed 
     ? `fixed left-0 top-[${topOffset}] bottom-0` 
@@ -93,10 +102,23 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
         ) : (
           // Logo Newbi par défaut
           <div className="mb-8 flex items-center justify-center">
-            <div className="flex space-x-1">
-              <div className="w-3 h-3 rounded-full bg-[#b19aff]"></div>
-              <div className="w-3 h-3 rounded-full bg-[#5b50ff]"></div>
-            </div>
+            {showColorCircles ? (
+              // Afficher les cercles de couleurs uniquement pour la signature de mail
+              // Le premier cercle a la couleur primaire avec opacité réduite, le second a la couleur primaire complète
+              <div className="flex space-x-1">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: primaryColor, opacity: 0.6 }}
+                ></div>
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: primaryColor }}
+                ></div>
+              </div>
+            ) : (
+              // Afficher le logo Newbi quand showColorCircles est à false
+              <Logo variant="purple" withText={false} className="w-10 h-10" />
+            )}
           </div>
         )}
         
@@ -124,7 +146,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             size={40} 
             strokeWidth={2.5}
             circleColor="#E3E2E5"
-            progressColor={primaryColor}
+            progressColor={progressBarColor} // Utiliser la couleur fixe pour la barre de progression
           />
           <div className="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
             {progressTooltip}: {progress}%
