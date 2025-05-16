@@ -437,8 +437,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         )}
 
         {/* Formulaire à gauche */}
-        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200 custom-scrollbar">
-          <Form onSubmit={(e) => e.preventDefault()}>
+        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200 flex flex-col h-full custom-scrollbar">
+          <Form onSubmit={(e) => e.preventDefault()} className="flex flex-col flex-grow">
             {showSettings ? (
               <div className="p-6">
                 <DocumentSettings
