@@ -20,7 +20,7 @@ import { GET_QUOTE } from "../../../devis/graphql/quotes";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { Notification } from "../../../../components/";
 import { NavigationSidebar } from "../../../../components/common/NavigationSidebar/NavigationSidebar";
-import { DocumentText, Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2 } from "iconsax-react";
+import { Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2, DocumentText, User } from "iconsax-react";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,
@@ -391,7 +391,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
       </div>
 
       {/* Contenu principal avec formulaire à gauche et aperçu à droite */}
-      <div className="flex flex-1 h-full overflow-hidden">
+      <div className="flex flex-1 h-[calc(100vh-60px)] overflow-hidden">
         {/* Navigation sidebar */}
         {!showSettings && (
           <NavigationSidebar
@@ -436,10 +436,10 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
         )}
         
         {/* Formulaire à gauche */}
-        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200">
-          <Form onSubmit={(e) => e.preventDefault()}>
+        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200 flex flex-col h-full">
+          <Form onSubmit={(e) => e.preventDefault()} className="flex flex-col flex-grow">
             {showSettings ? (
-            <div className="p-6">
+            <div className="p-6 flex-grow">
               <DocumentSettings
                 documentType="INVOICE"
                 defaultHeaderNotes={defaultHeaderNotes}
@@ -459,7 +459,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
             </div>
             ) : (
               <>
-                <div className="flex justify-end mb-4 px-10 pt-10">
+                <div className="flex justify-end px-10 pt-10">
                   <Button
                     onClick={() => setShowSettings(true)}
                     variant="secondary"
@@ -470,19 +470,16 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     Paramètres
                   </Button>
                 </div>
-                <div className="mb-4 px-10 pt-10">
+                <div className="flex-grow mb-4 px-10 overflow-y-auto">
                   {activeSection === "generalInfo" && (
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.generalInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                          </svg>
-                        </span>
+                        <DocumentText 
+                          size="20" 
+                          variant="Outline" 
+                          color={sectionErrors.generalInfo ? '#ef4444' : '#5b50ff'} 
+                          className="mr-2" 
+                        />
                         Informations générales
                       </h2>
                       <p className="text-gray-500 mb-4">Informations de base de la facture</p>
@@ -512,10 +509,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
                         <span className={`mr-2 ${sectionErrors.client ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                          </svg>
+                          <User size="20" color={sectionErrors.client ? '#ef4444' : '#5b50ff'} variant={sectionErrors.client ? 'Bold' : 'Linear'} />
                         </span>
                         Informations client
                       </h2>
@@ -538,10 +532,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
                         <span className={`mr-2 ${sectionErrors.companyInfo ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                          </svg>
+                          <Building size="20" color={sectionErrors.companyInfo ? '#ef4444' : '#5b50ff'} variant={sectionErrors.companyInfo ? 'Bold' : 'Linear'} />
                         </span>
                         Informations société
                       </h2>
@@ -560,12 +551,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
                         <span className={`mr-2 ${sectionErrors.items ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                          </svg>
+                          <ShoppingCart size="20" color={sectionErrors.items ? '#ef4444' : '#5b50ff'} variant={sectionErrors.items ? 'Bold' : 'Linear'} />
                         </span>
                         Produits et services
                       </h2>
@@ -664,7 +650,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-8">
+                <div className="sticky bottom-0 bg-white border-t border-l border-gray-200 p-4 mt-8">
                   <div className="max-w-7xl mx-auto flex justify-end items-center">
                     <InvoiceActionButtons 
                       onValidateForm={onValidateForm}

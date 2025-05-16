@@ -4,6 +4,7 @@ import { TextField, Select, Button, TextArea } from '../../../../../components/'
 import { validateInvoiceItem } from '../../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '../../../../products/graphql';
+import { AddCircle, Trash, InfoCircle } from 'iconsax-react';
 
 // Liste des mentions de TVA disponibles
 const VAT_EXEMPTION_OPTIONS = [
@@ -435,9 +436,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
     <div className="mb-6">
          <div className="mb-4 p-3 bg-[#f0eeff] border border-[#e6e1ff] rounded-lg text-sm text-gray-700">
         <div className="flex items-start">
-          <svg className="h-5 w-5 text-[#5b50ff] mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <InfoCircle size="20" color="#5b50ff" variant="Linear" className="mr-2 mt-0.5" />
           <div>
             <p className="font-medium text-[#5b50ff] mb-1">Astuce</p>
             <p>Vous pouvez enregistrer vos produits et services dans le catalogue pour les réutiliser facilement dans vos factures et devis.</p>
@@ -459,9 +458,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
             disabled={items.length === 1}
             aria-label="Supprimer l'article"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash size="20" color="#ef4444" variant="Linear" />
           </Button>
           
           {/* Titre de l'élément */}
@@ -550,7 +547,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   placeholder="1"
                   min="1"
                   required
-                  className="w-3/5"
+                  className="w-1/2"
                   inputClassName="!rounded-r-none"
                   error={itemErrors[index]?.quantityError ? { message: itemErrors[index].quantityError } : undefined}
                 />
@@ -562,7 +559,7 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
                   onChange={(e) => validateItem(index, 'unit', e.target.value)}
                   options={unitOptions}
                   required
-                  className="w-2/5"
+                  className="w-1/2"
                   selectClassName="!rounded-l-none"
                   error={itemErrors[index]?.unitError ? { message: itemErrors[index].unitError } : undefined}
                 />
@@ -751,8 +748,10 @@ export const InvoiceItems: React.FC<InvoiceItemsProps> = ({
           type="button"
           onClick={handleAddItem}
           variant="outline"
+          className="flex items-center gap-2"
         >
-          + Ajouter un élément
+          <AddCircle size="18" color="#5b50ff" variant="Linear" />
+          Ajouter un élément
         </Button>
       </div>
     </div>

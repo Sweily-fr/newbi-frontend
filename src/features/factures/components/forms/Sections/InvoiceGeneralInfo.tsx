@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { InfoCircle } from "iconsax-react";
 import {
   Button,
   Checkbox,
@@ -257,7 +257,8 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
     <>
       {/* Type de facture */}
       <div className="mb-6">
-        <h4 className="text-xl font-medium mb-3 text-gray-600">
+        <h4 className="text-xl font-medium mb-3 text-gray-600 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">01</span>
           Type de facture
         </h4>
         <div>
@@ -276,11 +277,15 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
           />
         </div>
       </div>
+      
+      {/* Séparateur */}
+      <div className="border-t border-gray-200 my-6"></div>
 
       {/* Identification */}
       <div className="mb-6">
         <div className="flex items-center mb-3">
-          <h4 className="text-xl font-medium text-gray-600">
+          <h4 className="text-xl font-medium text-gray-600 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">02</span>
             Informations de la facture
           </h4>
           <div className="flex items-center">
@@ -288,7 +293,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               content="Le numéro de facture est automatiquement séquentiel pour assurer la conformité légale"
               position="right"
             >
-              <InformationCircleIcon className="h-6 w-6 ml-2 text-[#5b50ff] cursor-help" />
+              <InfoCircle size="24" color="#5b50ff" className="ml-2 cursor-help" variant="Outline" />
             </Tooltip>
           </div>
         </div>
@@ -362,10 +367,16 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
           />
         </div>
       </div>
+      
+      {/* Séparateur */}
+      <div className="border-t border-gray-200 my-6"></div>
 
       {/* Dates */}
       <div className="mb-6">
-        <h4 className="text-xl font-medium mb-3 text-gray-600">Dates</h4>
+        <h4 className="text-xl font-medium mb-3 text-gray-600 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">03</span>
+          Dates
+        </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextField
             id="issueDate"
@@ -408,7 +419,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   variant={
                     activeDueDateButton === "emission" ? "primary" : "outline"
                   }
-                  className={`min-w-[110px] flex-1 ${
+                  className={`min-w-[110px] flex-1 whitespace-nowrap ${
                     activeDueDateButton === "emission"
                       ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
@@ -428,7 +439,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   variant={
                     activeDueDateButton === "15jours" ? "primary" : "outline"
                   }
-                  className={`min-w-[110px] flex-1 ${
+                  className={`min-w-[110px] flex-1 whitespace-nowrap ${
                     activeDueDateButton === "15jours"
                       ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
@@ -449,7 +460,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   variant={
                     activeDueDateButton === "30jours" ? "primary" : "outline"
                   }
-                  className={`min-w-[110px] flex-1 ${
+                  className={`min-w-[110px] flex-1 whitespace-nowrap ${
                     activeDueDateButton === "30jours"
                       ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
@@ -470,7 +481,7 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                   variant={
                     activeDueDateButton === "custom" ? "primary" : "outline"
                   }
-                  className={`min-w-[110px] flex-1 ${
+                  className={`min-w-[110px] flex-1 whitespace-nowrap ${
                     activeDueDateButton === "custom"
                       ? "bg-[#5b50ff] hover:bg-[#5b50ff] focus:ring-[#5b50ff]"
                       : ""
@@ -514,11 +525,17 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Séparateur */}
+      <div className="border-t border-gray-200 my-6"></div>
 
       {/* Notes d'entête */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-3">
-          <h4 className="text-xl font-medium text-gray-600">Notes</h4>
+          <h4 className="text-xl font-medium text-gray-600 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">04</span>
+            Notes
+          </h4>
           {defaultHeaderNotes && (
             <button
               type="button"

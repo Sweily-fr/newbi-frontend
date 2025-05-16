@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { TextField } from '../';
+import { TextField, Button } from '../';
 import { useQuery } from '@apollo/client';
 import { GET_USER_INFO } from '../../graphql/queries';
+import { DocumentText, Setting2, InfoCircle, ArrowRight2 } from 'iconsax-react';
 
 export interface DocumentSettingsProps {
   documentType: 'INVOICE' | 'QUOTE';
@@ -116,8 +117,9 @@ const CompanyInfoAutoComplete: React.FC<{
       type="button" 
       onClick={handleAutoComplete}
       disabled={loading || !companyInfo}
-      className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="text-sm px-3 py-1 bg-[#f0eeff] text-[#5b50ff] rounded-md hover:bg-[#e6e1ff] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
     >
+      <InfoCircle size="16" color="#5b50ff" variant="Linear" />
       {loading ? 'Chargement...' : 'Infos légales entreprise'}
     </button>
   );
@@ -140,14 +142,20 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
   isSaving = false
 }) => {
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">
+    <div className="p-8 space-y-8">
+      <h2 className="text-2xl font-bold mb-6 flex items-center">
+        <DocumentText size="28" color="#5b50ff" variant="Linear" className="mr-3" />
         Paramètres {documentType === 'INVOICE' ? 'des factures' : 'des devis'}
       </h2>
       
-      <div className="space-y-6">
+      <hr className="border-t border-gray-200 my-8" />
+      
+      <div className="space-y-10">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Notes d'en-tête par défaut</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">01</span>
+            Notes d'en-tête par défaut
+          </h3>
           <textarea
             id="defaultHeaderNotes"
             name="defaultHeaderNotes"
@@ -176,7 +184,11 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-2">Notes de bas de page par défaut</h3>
+          <hr className="border-t border-gray-200 my-8" />
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">02</span>
+            Notes de bas de page par défaut
+          </h3>
           <textarea
             id="defaultFooterNotes"
             name="defaultFooterNotes"
@@ -186,9 +198,10 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
             placeholder="Saisissez les notes de bas de page qui apparaîtront par défaut sur tous vos documents"
             className="block w-full border border-gray-300 rounded-lg bg-white py-3 px-4 text-base focus:border-[#5b50ff] focus:ring-[#5b50ff] focus:ring-opacity-50 focus:ring-2 transition-all duration-300 ease-in-out"
           />
-          <div className="mt-1 mb-2">
-            <p className="text-xs text-gray-600 italic">
-              <span className="text-[#5b50ff] font-medium">Rappel important :</span> La mention des informations légales de votre entreprise (nom, forme juridique, capital social, RCS) est obligatoire sur tous vos documents commerciaux conformément à l'article R.123-237 du Code de commerce.
+          <div className="mt-3 mb-4 p-3 bg-[#f0eeff] rounded-lg border border-[#e6e1ff]">
+            <p className="text-sm text-gray-700 flex items-start">
+              <InfoCircle size="18" color="#5b50ff" variant="Linear" className="mr-2 mt-0.5 flex-shrink-0" />
+              <span><span className="text-[#5b50ff] font-medium">Rappel important :</span> La mention des informations légales de votre entreprise (nom, forme juridique, capital social, RCS) est obligatoire sur tous vos documents commerciaux conformément à l'article R.123-237 du Code de commerce.</span>
             </p>
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -214,7 +227,11 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-2">Conditions générales par défaut</h3>
+          <hr className="border-t border-gray-200 my-8" />
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">03</span>
+            Conditions générales par défaut
+          </h3>
           <textarea
             id="defaultTermsAndConditions"
             name="defaultTermsAndConditions"
@@ -370,9 +387,15 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Titre du lien des conditions générales</h3>
+        <div>
+          <hr className="border-t border-gray-200 my-8" />
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <span className="mr-2 text-[#5b50ff]">04</span>
+            Liens vers les conditions générales
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-md font-medium mb-3">Titre du lien des conditions générales</h4>
             <TextField
               id="defaultTermsAndConditionsLinkTitle"
               name="defaultTermsAndConditionsLinkTitle"
@@ -381,10 +404,10 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
               placeholder="Ex: Voir nos CGV complètes"
               className="w-full"
             />
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Lien des conditions générales</h3>
+            </div>
+            
+            <div>
+              <h4 className="text-md font-medium mb-3">Lien des conditions générales</h4>
             <TextField
               id="defaultTermsAndConditionsLink"
               name="defaultTermsAndConditionsLink"
@@ -393,27 +416,31 @@ export const DocumentSettings: React.FC<DocumentSettingsProps> = ({
               placeholder="https://exemple.com/cgv"
               className="w-full"
             />
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="mt-8 flex justify-end space-x-4">
-        <button
+      <hr className="border-t border-gray-200 my-8" />
+      
+      <div className="mt-10 flex justify-end space-x-4">
+        <Button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          variant="secondary"
           disabled={isSaving}
         >
           Annuler
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={onSave}
-          className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0]"
+          variant="primary"
           disabled={isSaving}
+          icon={<ArrowRight2 size="18" color="#ffffff" />}
         >
           {isSaving ? 'Enregistrement...' : 'Enregistrer les paramètres'}
-        </button>
+        </Button>
       </div>
     </div>
   );

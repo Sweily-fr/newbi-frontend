@@ -6,6 +6,7 @@ import {
   CUSTOM_FIELD_VALUE_PATTERN,
   CUSTOM_FIELD_VALUE_ERROR_MESSAGE,
 } from "../../../../../constants/formValidations";
+import { AddCircle, CloseCircle, DiscountShape, Calculator } from "iconsax-react";
 
 interface CustomField {
   key: string;
@@ -98,8 +99,14 @@ export const InvoiceDiscountAndTotals: React.FC<
   return (
     <>
       {/* Remise */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Remise</h3>
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">
+            <DiscountShape size="20" color="#5b50ff" variant="Linear" />
+          </span>
+          Remise
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
         <div className="flex gap-4">
           <div className="flex-1">
             <Select
@@ -154,19 +161,25 @@ export const InvoiceDiscountAndTotals: React.FC<
       </div>
 
       {/* Champs personnalisés */}
-      <div className="mt-8 mb-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium">Champs personnalisés</h3>
+      <div className="mt-8 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold flex items-center">
+            <span className="mr-2 text-[#5b50ff]">
+              <Calculator size="20" color="#5b50ff" variant="Linear" />
+            </span>
+            Champs personnalisés
+          </h3>
           <Button
             type="button"
             onClick={handleAddCustomField}
             variant="outline"
-            size="sm"
-            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+            className="flex items-center gap-2 text-[#5b50ff] border-[#5b50ff] hover:bg-[#f0eeff]"
           >
+            <AddCircle size="18" color="#5b50ff" variant="Linear" />
             Ajouter un champ
           </Button>
         </div>
+        <hr className="border-t border-gray-200 mb-4" />
 
         {customFields?.map((field, index) => (
           <div key={index} className="flex items-center space-x-4 mb-3">
@@ -231,23 +244,11 @@ export const InvoiceDiscountAndTotals: React.FC<
             <Button
               type="button"
               onClick={() => handleRemoveCustomField(index)}
-              variant="icon"
-              className="text-red-600 hover:text-red-800"
+              variant="outline"
+              className="p-1 min-w-0 text-red-600 hover:text-red-800 border-transparent hover:border-red-200 hover:bg-red-50"
               aria-label="Supprimer le champ"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <CloseCircle size="20" color="#ef4444" variant="Linear" />
             </Button>
           </div>
         ))}
@@ -255,7 +256,13 @@ export const InvoiceDiscountAndTotals: React.FC<
 
       {/* Totals */}
       <div className="mt-8 space-y-4">
-        <h3 className="text-lg font-medium">Totaux</h3>
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">
+            <Calculator size="20" color="#5b50ff" variant="Linear" />
+          </span>
+          Totaux
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
         {calculateTotals ? (
           <div>
             {/* Utiliser l'opérateur de chaînage optionnel pour éviter les erreurs si calculateTotals() retourne undefined */}
@@ -355,15 +362,20 @@ export const InvoiceCustomFields: React.FC<InvoiceCustomFieldsProps> = ({
 
   return (
     <div className="mt-8 mb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium">Champs personnalisés</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold flex items-center">
+          <span className="mr-2 text-[#5b50ff]">
+            <Calculator size="20" color="#5b50ff" variant="Bulk" />
+          </span>
+          Champs personnalisés
+        </h3>
         <Button
           type="button"
           onClick={addCustomField}
           variant="outline"
-          size="sm"
-          className="text-blue-600 border-blue-600 hover:bg-blue-50"
+          className="flex items-center gap-2 text-[#5b50ff] border-[#5b50ff] hover:bg-[#f0eeff]"
         >
+          <AddCircle size="18" color="#5b50ff" variant="Linear" />
           Ajouter un champ
         </Button>
       </div>
@@ -431,12 +443,10 @@ export const InvoiceCustomFields: React.FC<InvoiceCustomFieldsProps> = ({
             type="button"
             onClick={() => removeCustomField(index)}
             variant="outline"
-            className="text-red-600 hover:text-red-800"
+            className="p-1 min-w-0 text-red-600 hover:text-red-800 border-transparent hover:border-red-200 hover:bg-red-50"
             aria-label="Supprimer le champ personnalisé"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <CloseCircle size="20" color="#ef4444" variant="Linear" />
           </Button>
         </div>
       ))}
