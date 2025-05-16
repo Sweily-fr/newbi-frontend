@@ -6,7 +6,7 @@ import {
   CUSTOM_FIELD_VALUE_PATTERN,
   CUSTOM_FIELD_VALUE_ERROR_MESSAGE,
 } from "../../../../../constants/formValidations";
-import { AddCircle, CloseCircle, DiscountShape, Calculator } from "iconsax-react";
+import { AddCircle, CloseCircle, DiscountShape, Calculator, Magicpen } from "iconsax-react";
 
 interface CustomField {
   key: string;
@@ -165,7 +165,7 @@ export const InvoiceDiscountAndTotals: React.FC<
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold flex items-center">
             <span className="mr-2 text-[#5b50ff]">
-              <Calculator size="20" color="#5b50ff" variant="Linear" />
+              <Magicpen size="20" color="#5b50ff" variant="Linear" />
             </span>
             Champs personnalisés
           </h3>
@@ -241,15 +241,14 @@ export const InvoiceDiscountAndTotals: React.FC<
               className="flex-1"
               error={validationErrors[index]?.value}
             />
-            <Button
+            <button
               type="button"
               onClick={() => handleRemoveCustomField(index)}
-              variant="outline"
-              className="p-1 min-w-0 text-red-600 hover:text-red-800 border-transparent hover:border-red-200 hover:bg-red-50"
+              className="p-1 min-w-0 hover:text-red-800 bg-transparent border-0 cursor-pointer"
               aria-label="Supprimer le champ"
             >
               <CloseCircle size="20" color="#ef4444" variant="Linear" />
-            </Button>
+            </button>
           </div>
         ))}
       </div>
@@ -264,50 +263,52 @@ export const InvoiceDiscountAndTotals: React.FC<
         </h3>
         <hr className="border-t border-gray-200 mb-4" />
         {calculateTotals ? (
-          <div>
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
             {/* Utiliser l'opérateur de chaînage optionnel pour éviter les erreurs si calculateTotals() retourne undefined */}
-            <div className="flex justify-between">
-              <span>Total HT:</span>
-              <span>{calculateTotals()?.totalHT?.toFixed(2) || "0.00"} €</span>
+            <div className="flex justify-between py-2">
+              <span className="text-gray-600">Total HT:</span>
+              <span className="font-medium">{calculateTotals()?.totalHT?.toFixed(2) || "0.00"} €</span>
             </div>
-            <div className="flex justify-between">
-              <span>TVA:</span>
-              <span>{calculateTotals()?.totalVAT?.toFixed(2) || "0.00"} €</span>
+            <div className="flex justify-between py-2">
+              <span className="text-gray-600">TVA:</span>
+              <span className="font-medium">{calculateTotals()?.totalVAT?.toFixed(2) || "0.00"} €</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between text-red-600">
-                <span>
+              <div className="flex justify-between py-2 text-red-600">
+                <span className="flex items-center">
+                  <DiscountShape size="16" color="#ef4444" variant="Linear" className="mr-1" />
                   Remise{discountType === "PERCENTAGE" ? ` (${discount}%)` : ""}:
                 </span>
-                <span>-{calculateTotals().discountAmount.toFixed(2)} €</span>
+                <span className="font-medium">-{calculateTotals().discountAmount.toFixed(2)} €</span>
               </div>
             )}
-            <div className="flex justify-between font-bold text-lg pt-2 border-t">
-              <span>Total TTC:</span>
-              <span>{calculateTotals()?.finalTotalTTC?.toFixed(2) || "0.00"} €</span>
+            <div className="flex justify-between mt-2 pt-3 border-t border-gray-200">
+              <span className="text-lg font-semibold text-[#5b50ff]">Total TTC:</span>
+              <span className="text-lg font-bold text-[#5b50ff]">{calculateTotals()?.finalTotalTTC?.toFixed(2) || "0.00"} €</span>
             </div>
           </div>
         ) : (
-          <div>
-            <div className="flex justify-between">
-              <span>Total HT:</span>
-              <span>{totals?.totalHT?.toFixed(2) || '0.00'} €</span>
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex justify-between py-2">
+              <span className="text-gray-600">Total HT:</span>
+              <span className="font-medium">{totals?.totalHT?.toFixed(2) || '0.00'} €</span>
             </div>
-            <div className="flex justify-between">
-              <span>TVA:</span>
-              <span>{totals?.totalVAT?.toFixed(2) || '0.00'} €</span>
+            <div className="flex justify-between py-2">
+              <span className="text-gray-600">TVA:</span>
+              <span className="font-medium">{totals?.totalVAT?.toFixed(2) || '0.00'} €</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between text-red-600">
-                <span>
+              <div className="flex justify-between py-2 text-red-600">
+                <span className="flex items-center">
+                  <DiscountShape size="16" color="#ef4444" variant="Linear" className="mr-1" />
                   Remise{discountType === "PERCENTAGE" ? ` (${discount}%)` : ""}:
                 </span>
-                <span>-{totals?.discountAmount?.toFixed(2) || '0.00'} €</span>
+                <span className="font-medium">-{totals?.discountAmount?.toFixed(2) || '0.00'} €</span>
               </div>
             )}
-            <div className="flex justify-between font-bold text-lg pt-2 border-t">
-              <span>Total TTC:</span>
-              <span>{totals?.finalTotalTTC?.toFixed(2) || '0.00'} €</span>
+            <div className="flex justify-between mt-2 pt-3 border-t border-gray-200">
+              <span className="text-lg font-semibold text-[#5b50ff]">Total TTC:</span>
+              <span className="text-lg font-bold text-[#5b50ff]">{totals?.finalTotalTTC?.toFixed(2) || '0.00'} €</span>
             </div>
           </div>
         )}

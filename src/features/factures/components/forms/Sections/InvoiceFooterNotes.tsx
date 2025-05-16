@@ -3,6 +3,7 @@ import { TextArea } from '../../../../../components/';
 import { FOOTER_NOTES_PATTERN, FOOTER_NOTES_ERROR_MESSAGE } from '../../../../../constants/formValidations';
 import { useQuery } from '@apollo/client';
 import { GET_INVOICES } from '../../../graphql/invoices';
+import { NoteText, Add } from 'iconsax-react';
 
 interface InvoiceFooterNotesProps {
   footerNotes: string;
@@ -60,17 +61,28 @@ export const InvoiceFooterNotes: React.FC<InvoiceFooterNotesProps> = ({
     }
   }, [invoicesData, footerNotes, setFooterNotes, defaultFooterNotesSet]);
   return (
-    <div className="mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <label htmlFor="footer-notes" className="block text-sm font-medium text-gray-700">
+    <div className="mb-6">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">
+            <NoteText size="20" color="#5b50ff" variant="Linear" />
+          </span>
           Notes de pied de page
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
+      </div>
+      
+      <div className="flex justify-between items-center mb-3">
+        <label htmlFor="footer-notes" className="block text-sm font-medium text-gray-700">
+          Texte des notes
         </label>
         {hasDefaults && onApplyDefaults && (
           <button
             type="button"
             onClick={onApplyDefaults}
-            className="text-sm text-[#5b50ff] hover:underline"
+            className="text-sm text-[#5b50ff] hover:text-[#4a41e0] flex items-center gap-1"
           >
+            <Add size="16" color="#5b50ff" variant="Linear" />
             Appliquer les paramètres par défaut
           </button>
         )}
@@ -86,7 +98,7 @@ export const InvoiceFooterNotes: React.FC<InvoiceFooterNotesProps> = ({
         rows={3}
         placeholder="Ajoutez des notes qui apparaîtront en bas de la facture..."
         error={error ? { message: error } : undefined}
-        helpText="Maximum 2000 caractères"
+        helpText={`${footerNotes?.length || 0}/2000 caractères - Les sauts de ligne seront préservés dans l'aperçu`}
       />
     </div>
   );

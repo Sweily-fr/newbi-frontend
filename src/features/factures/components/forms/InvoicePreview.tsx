@@ -532,6 +532,20 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                 )}
               </span>
             </div>
+            
+            {/* Affichage des champs personnalisés juste après le total TTC */}
+            {customFields && customFields.length > 0 && (
+              <div className="mt-4 pt-2 border-t border-gray-200" data-pdf-keep-together="true">
+                <div className="flex flex-col space-y-1">
+                  {customFields.map((field, index) => (
+                    <div key={index} className="text-xs flex justify-between">
+                      <span className="font-medium text-gray-600">{field.key}</span>
+                      <span className="text-gray-800">{field.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -583,6 +597,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
             </p>
           </div>
         )}
+
+
 
         {(termsAndConditions || invoice?.termsAndConditions) && (
           <div

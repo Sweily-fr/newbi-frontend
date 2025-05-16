@@ -20,7 +20,7 @@ import { GET_QUOTE } from "../../../devis/graphql/quotes";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { Notification } from "../../../../components/";
 import { NavigationSidebar } from "../../../../components/common/NavigationSidebar/NavigationSidebar";
-import { Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2, DocumentText, User } from "iconsax-react";
+import { Profile2User, Building, ShoppingCart, Calculator, MessageText, Setting2, DocumentText, User, Notepad2 } from "iconsax-react";
 
 export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   invoice,
@@ -575,12 +575,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
                         <span className={`mr-2 ${sectionErrors.discountAndTotals ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                            <line x1="2" y1="7" x2="22" y2="7"></line>
-                            <line x1="12" y1="17" x2="12" y2="17"></line>
-                            <path d="M12 20v1"></path>
-                          </svg>
+                          <Calculator size="20" color="#5b50ff" variant="Bold" />
                         </span>
                         Remise et totaux
                       </h2>
@@ -602,22 +597,22 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                   {activeSection === "bankDetails" && (
                     <div>
                       <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <span className={`mr-2 ${sectionErrors.bankDetails ? 'text-red-500' : 'text-[#5b50ff]'}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                          </svg>
-                        </span>
+                        <Notepad2 size="20" color="#5b50ff" className="mr-2" variant="Linear" />
                         Notes de bas de page
                       </h2>
                       <p className="text-gray-500 mb-4">Coordonnées bancaires, conditions et notes</p>
-                      <InvoiceBankDetails
-                        userData={userData}
-                        useBankDetails={useBankDetails}
-                        setUseBankDetails={setUseBankDetails}
-                        setCompanyInfo={setCompanyInfo}
-                        onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
-                      />
-                      <InvoiceTermsAndConditions
+                      <div className="mb-10">
+                        <InvoiceBankDetails
+                          userData={userData}
+                          useBankDetails={useBankDetails}
+                          setUseBankDetails={setUseBankDetails}
+                          setCompanyInfo={setCompanyInfo}
+                          onConfigureBankDetailsClick={handleConfigureBankDetailsRequest}
+                        />
+                      </div>
+                      
+                      <div className="mb-10">
+                        <InvoiceTermsAndConditions
                         termsAndConditions={termsAndConditions}
                         setTermsAndConditions={setTermsAndConditions}
                         termsAndConditionsLinkTitle={termsAndConditionsLinkTitle}
@@ -636,8 +631,11 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                           }
                         }}
                         hasDefaults={!!(defaultTermsAndConditions || defaultTermsAndConditionsLinkTitle || defaultTermsAndConditionsLink)}
-                      />
-                      <InvoiceFooterNotes
+                        />
+                      </div>
+                      
+                      <div className="mb-10">
+                        <InvoiceFooterNotes
                         footerNotes={footerNotes}
                         setFooterNotes={setFooterNotes}
                         onApplyDefaults={() => {
@@ -646,7 +644,8 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
                           }
                         }}
                         hasDefaults={!!defaultFooterNotes}
-                      />
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

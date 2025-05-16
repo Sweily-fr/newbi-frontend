@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextArea, TextField } from '../../../../../components/';
+import { DocumentText, Link1, Add } from 'iconsax-react';
 import { 
   getTermsAndConditionsValidationRules, 
   getTermsAndConditionsLinkTitleValidationRules, 
@@ -90,19 +91,27 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
     setTermsAndConditionsLink(e.target.value);
   };
   return (
-    <>
+    <div className="space-y-6">
       {/* Conditions de vente */}
-      <div className="mb-4">
+      <div>
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <span className="mr-2 text-[#5b50ff]">
+            <DocumentText size="20" color="#5b50ff" variant="Linear" />
+          </span>
+          Conditions de vente
+        </h3>
+        <hr className="border-t border-gray-200 mb-4" />
         <div className="flex justify-between items-center mb-2">
           <label htmlFor="terms-and-conditions" className="block text-sm font-medium text-gray-700">
-            Conditions de vente
+            Texte des conditions
           </label>
           {hasDefaults && onApplyDefaults && (
             <button
               type="button"
               onClick={onApplyDefaults}
-              className="text-sm text-[#5b50ff] hover:underline"
+              className="text-sm text-[#5b50ff] hover:text-[#4a41e0] flex items-center gap-1"
             >
+              <Add size="16" color="#5b50ff" variant="Linear" />
               Appliquer les paramètres par défaut
             </button>
           )}
@@ -120,14 +129,15 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
         />
         
         {/* Suggestions pour les conditions de vente */}
-        <div className="mt-2 mb-6">
+        <div className="mt-3 mb-4">
+          <p className="text-xs text-gray-500 mb-2">Suggestions rapides :</p>
           <div className="flex flex-wrap gap-2">
             {termsAndConditionsSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => insertSuggestion(suggestion.text)}
-                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-2 rounded transition-colors"
+                className="text-xs bg-[#f0eeff] hover:bg-[#e6e1ff] text-[#5b50ff] py-1 px-3 rounded-full transition-colors border border-[#5b50ff]/20"
                 title={suggestion.text}
               >
                 {suggestion.keyword}
@@ -138,7 +148,14 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
       </div>
 
       {/* Lien vers les conditions de vente */}
-      <div className="mb-4">
+      <div className="mt-6">
+        <div className="flex items-center mb-3">
+          <span className="mr-2 text-[#5b50ff]">
+            <Link1 size="20" color="#5b50ff" variant="Linear" />
+          </span>
+          <h3 className="text-lg font-semibold">Lien vers les conditions</h3>
+        </div>
+        <hr className="border-t border-gray-200 mb-4" />
         <TextField
           id="terms-and-conditions-link-title"
           name="termsAndConditionsLinkTitle"
@@ -162,6 +179,6 @@ export const InvoiceTermsAndConditions: React.FC<InvoiceTermsAndConditionsProps>
           placeholder="URL du lien (ex: https://example.com)"
         />
       </div>
-    </>
+    </div>
   );
 };
