@@ -25,7 +25,8 @@ import {
   ReceiptItem,
   Edit2,
   Trash,
-  CloseCircle
+  CloseCircle,
+  AddCircle
 } from "iconsax-react";
 
 interface Invoice {
@@ -173,8 +174,14 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
       { rate: number; amount: number; baseAmount: number }
     > = {};
 
-    // Si nous n'avons pas d'items ou si les items sont vides, créer un taux de TVA par défaut
-    // basé sur le total de TVA du devis
+    // Initialiser les totaux
+    let subtotal = 0;
+    let totalVAT = 0;
+    let totalWithoutVAT = 0;
+    let totalWithVAT = 0;
+    let totalDiscount = 0;
+
+    // Si nous n'avons pas d'items ou si les items sont vides, utiliser les totaux du devis
     if (!quote?.items || quote.items.length === 0) {
       // Si nous avons un total de TVA mais pas d'items, créer un taux de TVA par défaut
       if (
@@ -190,23 +197,36 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
           amount: quote.totalVAT,
           baseAmount: quote.totalHT,
         };
+
+        // Utiliser les totaux du devis
+        subtotal = quote.totalHT || 0;
+        totalVAT = quote.totalVAT || 0;
+        totalWithoutVAT = quote.finalTotalHT || quote.totalHT || 0;
+        totalWithVAT = quote.finalTotalTTC || quote.totalTTC || 0;
+        totalDiscount = quote.discountAmount || 0;
       }
     } else {
       // Parcourir les items pour calculer les montants par taux de TVA
       quote.items.forEach((item: QuoteItem) => {
         const itemHT = item.quantity * item.unitPrice;
+        subtotal += itemHT;
 
-        // Appliquer la remise au niveau de l'item si elle existe
+        // Calculer la remise au niveau de l'item si elle existe
+        let itemDiscountAmount = 0;
         let itemHTAfterDiscount = itemHT;
         if (item.discount && item.discount > 0) {
           if (item.discountType === "PERCENTAGE") {
-            itemHTAfterDiscount = itemHT * (1 - item.discount / 100);
+            itemDiscountAmount = itemHT * (item.discount / 100);
+            itemHTAfterDiscount = itemHT - itemDiscountAmount;
           } else {
-            itemHTAfterDiscount = Math.max(0, itemHT - item.discount);
+            itemDiscountAmount = Math.min(itemHT, item.discount);
+            itemHTAfterDiscount = Math.max(0, itemHT - itemDiscountAmount);
           }
+          totalDiscount += itemDiscountAmount;
         }
 
         const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
+        totalVAT += itemVAT;
 
         // Ajouter les détails de TVA pour ce taux
         if (!vatDetails[item.vatRate]) {
@@ -219,15 +239,34 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         vatDetails[item.vatRate].amount += itemVAT;
         vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
       });
+
+      // Appliquer la remise globale si elle existe
+      let globalDiscountAmount = 0;
+      if (quote.discount && quote.discount > 0) {
+        if (quote.discountType === "PERCENTAGE") {
+          globalDiscountAmount = (subtotal - totalDiscount) * (quote.discount / 100);
+        } else {
+          globalDiscountAmount = Math.min(subtotal - totalDiscount, quote.discount);
+        }
+        totalDiscount += globalDiscountAmount;
+      }
+
+      // Calculer les totaux finaux
+      totalWithoutVAT = subtotal - totalDiscount;
+      totalWithVAT = totalWithoutVAT + totalVAT;
     }
 
     // Convertir l'objet vatDetails en tableau trié par taux
     const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
 
     return {
-      finalTotalHT: quote?.finalTotalHT || 0,
-      totalVAT: quote?.totalVAT || 0,
-      finalTotalTTC: quote?.finalTotalTTC || 0,
+      subtotal: subtotal,
+      totalVAT: totalVAT,
+      totalWithoutVAT: totalWithoutVAT,
+      totalWithVAT: totalWithVAT,
+      totalDiscount: totalDiscount,
+      finalTotalHT: totalWithoutVAT,
+      finalTotalTTC: totalWithVAT,
       vatRates: vatRates, // Ajouter les détails des différentes TVA
     };
   };
@@ -310,7 +349,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
           }`}
           style={{ display: isOpen ? "block" : "none" }}
         >
-          <div className="h-full overflow-auto relative">
+          <div className="h-full overflow-auto relative custom-scrollbar">
             <QuotePreview
               quote={{
                 ...quote,
@@ -405,7 +444,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                           icon = <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />;
                         } else {
                           buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
-                          icon = <ArrowRight size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
+                          icon = <AddCircle size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
                         }
                         
                         return (

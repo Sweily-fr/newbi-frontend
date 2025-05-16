@@ -4,6 +4,7 @@ import { Button } from "../../../../components/";
 import { useMutation, useQuery } from "@apollo/client";
 import { CONVERT_QUOTE_TO_INVOICE_MUTATION, GET_QUOTE } from "../../graphql/quotes";
 import { Notification } from "../../../../components/";
+import { ArrowRight, ReceiptEdit } from "iconsax-react";
 
 interface Invoice {
   id: string;
@@ -43,6 +44,22 @@ export const QuoteInvoiceCreationModal: React.FC<
   // Utiliser les données du devis récupérées par la requête si disponibles
   const currentLinkedInvoices = quoteData?.quote?.linkedInvoices || linkedInvoices;
   const currentQuoteTotal = quoteData?.quote?.finalTotalTTC || quoteTotal;
+  
+  // Calculer le montant déjà facturé avec précision
+  const calculateInvoicedAmount = () => {
+    if (!currentLinkedInvoices || currentLinkedInvoices.length === 0) return 0;
+    
+    return currentLinkedInvoices.reduce(
+      (sum: number, invoice: Invoice) => {
+        const amount = invoice.finalTotalTTC || 0;
+        // Arrondir à 2 décimales pour éviter les erreurs de calcul flottant
+        return Math.round((sum + amount) * 100) / 100;
+      },
+      0
+    );
+  };
+  
+  const invoicedAmount = calculateInvoicedAmount();
 
   // Définir le type de facture par défaut en fonction de l'existence de factures liées
   const [invoiceType, setInvoiceType] = useState<"deposit" | "regular">(
@@ -86,12 +103,10 @@ export const QuoteInvoiceCreationModal: React.FC<
   // Calculer le montant et le pourcentage restants
   useEffect(() => {
     if (currentLinkedInvoices && currentLinkedInvoices.length > 0) {
-      const invoicedAmount = currentLinkedInvoices.reduce(
-        (sum: number, invoice: Invoice) => sum + (invoice.finalTotalTTC || 0),
-        0
-      );
-      const remaining = currentQuoteTotal - invoicedAmount;
-      const remainingPercent = (remaining / currentQuoteTotal) * 100;
+      // Utiliser la fonction de calcul précise
+      const remaining = Math.round((currentQuoteTotal - invoicedAmount) * 100) / 100;
+      // Calculer le pourcentage avec précision et arrondir à 1 décimale
+      const remainingPercent = Math.round((remaining / currentQuoteTotal) * 1000) / 10;
 
       setRemainingAmount(remaining);
       setRemainingPercentage(remainingPercent);
@@ -99,37 +114,40 @@ export const QuoteInvoiceCreationModal: React.FC<
       // Si c'est la dernière facture possible (déjà 2 factures liées), utiliser automatiquement le solde restant
       if (currentLinkedInvoices.length === 2) {
         setUseRemainingBalance(true);
-        setDepositPercentage(remainingPercent);
+        setDepositPercentage(Math.floor(remainingPercent));
       } else {
         // Pour les autres cas, si le pourcentage restant est inférieur à la valeur par défaut
         // ajuster le pourcentage par défaut pour ne pas dépasser le restant
         if (remainingPercent < depositPercentage) {
-          setDepositPercentage(Math.max(5, remainingPercent));
+          setDepositPercentage(Math.max(5, Math.floor(remainingPercent)));
         }
       }
     } else {
       setRemainingAmount(currentQuoteTotal);
       setRemainingPercentage(100);
     }
-  }, [currentLinkedInvoices, currentQuoteTotal, depositPercentage]);
+  }, [currentLinkedInvoices, currentQuoteTotal, depositPercentage, invoicedAmount]);
 
   // Gérer le changement de pourcentage d'acompte
   const handleDepositPercentageChange = (value: number) => {
-    // Limiter entre 5% et le pourcentage restant (ou 95% max)
-    const maxPercentage = useRemainingBalance
-      ? remainingPercentage
-      : Math.min(95, remainingPercentage);
-    const validValue = Math.max(5, Math.min(maxPercentage, value));
-    setDepositPercentage(validValue);
+    // Limiter le pourcentage à la valeur restante si on utilise le solde restant
+    if (useRemainingBalance) {
+      // Arrondir à l'entier inférieur pour éviter de dépasser le montant restant
+      setDepositPercentage(Math.min(value, Math.floor(remainingPercentage)));
+    } else {
+      setDepositPercentage(value);
+    }
   };
 
   // Utiliser le solde restant pour la facture
   const handleToggleUseRemainingBalance = () => {
     setUseRemainingBalance(!useRemainingBalance);
     if (!useRemainingBalance) {
-      setDepositPercentage(remainingPercentage);
+      // Si on active l'option, utiliser le solde restant
+      setDepositPercentage(Math.floor(remainingPercentage));
     } else {
-      setDepositPercentage(Math.min(30, remainingPercentage));
+      // Si on désactive l'option, revenir à une valeur par défaut raisonnable
+      setDepositPercentage(Math.min(30, Math.floor(remainingPercentage)));
     }
   };
 
@@ -149,38 +167,41 @@ export const QuoteInvoiceCreationModal: React.FC<
       skipValidation?: boolean;
     }
 
-    const variables: ConvertVariables = { id: quoteId };
+    // Vérifier que le pourcentage ne dépasse pas le montant restant
+    const safePercentage = useRemainingBalance 
+      ? Math.min(depositPercentage, Math.floor(remainingPercentage))
+      : depositPercentage;
+      
+    const variables: ConvertVariables = {
+      id: quoteId,
+      skipValidation: true, // Ignorer la validation pour permettre la création même si le devis est déjà converti
+      // Toujours envoyer le pourcentage sélectionné, que ce soit pour une facture standard ou d'acompte
+      distribution: [safePercentage]
+    };
 
+    // Si c'est une facture d'acompte, ajouter le flag isDeposit
     if (invoiceType === "deposit") {
-      // Pour une facture d'acompte
-      variables.distribution = [depositPercentage];
       variables.isDeposit = true;
-      variables.skipValidation = true;
-    } else {
-      // Pour une facture régulière
-      const percentageToUse = useRemainingBalance ? remainingPercentage : depositPercentage;
-      
-      // S'assurer que le pourcentage ne dépasse pas le solde restant
-      const safePercentage = Math.min(percentageToUse, remainingPercentage);
-      
-      variables.distribution = [safePercentage];
-      variables.isDeposit = false;
-      variables.skipValidation = useRemainingBalance;
     }
 
-    convertToInvoice({ variables });
+    // Appeler la mutation pour convertir le devis en facture
+    convertToInvoice({
+      variables,
+    });
   };
 
-  // Calculer le montant correspondant au pourcentage
+  // Calculer le montant correspondant au pourcentage de manière précise
   const calculateAmount = (percentage: number) => {
-    return (quoteTotal * percentage) / 100;
+    // Utiliser currentQuoteTotal qui est mis à jour avec les données du serveur
+    // Arrondir à 2 décimales pour éviter les erreurs de calcul flottant
+    return Math.round((currentQuoteTotal * percentage) / 100 * 100) / 100;
   };
 
   // Vérifier si on peut créer une nouvelle facture
   const canCreateInvoice = currentLinkedInvoices.length < 3;
 
-  // Calculer le pourcentage total facturé
-  const invoicedPercentage = 100 - remainingPercentage;
+  // Calculer le pourcentage total facturé (arrondi à 1 décimale)
+  const invoicedPercentage = Math.round((100 - remainingPercentage) * 10) / 10;
   
   // Déterminer si la modal est en cours de chargement
   const loading = quoteLoading || mutationLoading;
@@ -191,16 +212,29 @@ export const QuoteInvoiceCreationModal: React.FC<
       onClose={onClose}
       title="Création de facture à partir du devis"
       footer={
-        <div className="flex justify-end space-x-3">
-          <Button variant="outline" onClick={onClose}>
+        <div className="px-6 py-4 bg-gray-50 border-t flex justify-end space-x-3">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={mutationLoading}
+            className="hover:bg-gray-100"
+          >
             Annuler
           </Button>
           <Button
+            variant="primary"
             onClick={handleCreateInvoice}
-            isLoading={loading}
-            disabled={!canCreateInvoice}
+            isLoading={mutationLoading}
+            disabled={
+              mutationLoading ||
+              (invoiceType === "deposit" && depositPercentage <= 0) ||
+              (currentLinkedInvoices.length > 0 &&
+                remainingAmount <= 0)
+            }
+            className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white flex items-center"
           >
-            Créer
+            Créer la facture
+            <ArrowRight size="18" className="ml-1" variant="Bold" />
           </Button>
         </div>
       }
@@ -208,7 +242,7 @@ export const QuoteInvoiceCreationModal: React.FC<
       <div className="space-y-6">
         {loading ? (
           <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5b50ff]"></div>
           </div>
         ) : !canCreateInvoice ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 text-yellow-800">
@@ -216,79 +250,80 @@ export const QuoteInvoiceCreationModal: React.FC<
             davantage.
           </div>
         ) : (
-          <>
+          <div className="p-6">
+            {/* Titre et description */}
+            <div className="flex items-center mb-4">
+              <div className="mr-3 p-2 rounded-full bg-[#f0eeff]">
+                <ReceiptEdit size="24" color="#5b50ff" variant="Bulk" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Créer une facture à partir de ce devis
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Vous pouvez créer une facture standard ou une facture d'acompte à
+                  partir de ce devis.
+                </p>
+              </div>
+            </div>
+
             {/* Progression des factures */}
             <div className="mb-4">
               <div className="flex justify-between mb-1">
                 <span className="text-sm font-medium text-gray-700">
                   Progression de facturation
                 </span>
-                <span className="text-sm font-medium text-gray-700">
-                  {invoicedPercentage.toFixed(1)}%
+                <span className="text-sm text-gray-600">
+                  {Math.round(invoicedAmount * 100) / 100} € / {currentQuoteTotal.toFixed(2)} €
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  style={{ width: `${invoicedPercentage}%` }}
+                  className="bg-[#5b50ff] h-2.5 rounded-full"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      (invoicedAmount / currentQuoteTotal) * 100
+                    )}%`,
+                  }}
                 ></div>
               </div>
               <div className="flex justify-between mt-1 text-xs text-gray-500">
-                <span>0€</span>
-                <span>{quoteTotal.toFixed(2)}€</span>
-              </div>
-              <div className="mt-2 text-sm text-gray-600">
-                {linkedInvoices.length > 0 ? (
-                  <span>
-                    {linkedInvoices.length} facture(s) existante(s) pour un
-                    total de {(quoteTotal - remainingAmount).toFixed(2)}€
-                  </span>
-                ) : (
-                  <span>Aucune facture existante</span>
-                )}
+                <span>{invoicedPercentage.toFixed(1)}% facturé</span>
+                <span>{remainingPercentage.toFixed(1)}% restant</span>
               </div>
             </div>
 
             {/* Type de facture */}
-            <div className="mb-4">
+            <div className="mb-5">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Type de facture
               </label>
-                <div className="flex space-x-4">
-              {currentLinkedInvoices.length === 0 && (
-                  <label
-                    className={`inline-flex items-center ${
-                      currentLinkedInvoices.length > 0
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      className="form-radio"
-                      name="invoiceType"
-                      value="deposit"
-                      checked={invoiceType === "deposit"}
-                      onChange={() =>
-                        currentLinkedInvoices.length === 0 && setInvoiceType("deposit")
-                      }
-                      disabled={currentLinkedInvoices.length > 0}
-                    />
-                    <span className="ml-2">Facture d'acompte</span>
-                  </label>
-                  )}
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      className="form-radio"
-                      name="invoiceType"
-                      value="regular"
-                      checked={invoiceType === "regular"}
-                      onChange={() => setInvoiceType("regular")}
-                    />
-                    <span className="ml-2">Facture standard</span>
-                  </label>
-                </div>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    invoiceType === "regular"
+                      ? "bg-[#f0eeff] text-[#4a41e0] border border-[#e6e1ff]"
+                      : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setInvoiceType("regular")}
+                >
+                  Facture standard
+                </button>
+                <button
+                  type="button"
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    invoiceType === "deposit"
+                      ? "bg-[#f0eeff] text-[#4a41e0] border border-[#e6e1ff]"
+                      : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                  onClick={() => setInvoiceType("deposit")}
+                  disabled={currentLinkedInvoices.length > 0}
+                >
+                  Facture d'acompte
+                </button>
+              </div>
             </div>
 
             {/* Pourcentage */}
@@ -304,7 +339,7 @@ export const QuoteInvoiceCreationModal: React.FC<
                     variant="outline"
                     size="sm"
                     onClick={handleToggleUseRemainingBalance}
-                    className={useRemainingBalance ? "border-blue-600 text-blue-600" : ""}
+                    className="mt-2 text-[#5b50ff] border-[#e6e1ff] hover:bg-[#f0eeff]"
                   >
                     {useRemainingBalance
                       ? "Utiliser un pourcentage personnalisé"
@@ -319,14 +354,14 @@ export const QuoteInvoiceCreationModal: React.FC<
                     min="5"
                     max={
                       useRemainingBalance
-                        ? remainingPercentage
-                        : Math.min(95, remainingPercentage)
+                        ? Math.floor(remainingPercentage)
+                        : Math.min(95, Math.floor(remainingPercentage))
                     }
                     value={depositPercentage}
                     onChange={(e) =>
                       handleDepositPercentageChange(parseInt(e.target.value))
                     }
-                    className="w-full"
+                    className="w-full accent-[#5b50ff]"
                     disabled={
                       useRemainingBalance && linkedInvoices.length === 2
                     }
@@ -338,14 +373,14 @@ export const QuoteInvoiceCreationModal: React.FC<
                     min="5"
                     max={
                       useRemainingBalance
-                        ? remainingPercentage
-                        : Math.min(95, remainingPercentage)
+                        ? Math.floor(remainingPercentage)
+                        : Math.min(95, Math.floor(remainingPercentage))
                     }
                     value={depositPercentage}
                     onChange={(e) =>
                       handleDepositPercentageChange(parseInt(e.target.value))
                     }
-                    className="w-16 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                    className="w-16 px-2 py-1 border border-gray-300 rounded-md text-sm focus:border-[#5b50ff] focus:ring-1 focus:ring-[#e6e1ff] focus:outline-none"
                     disabled={
                       useRemainingBalance && linkedInvoices.length === 2
                     }
@@ -353,7 +388,7 @@ export const QuoteInvoiceCreationModal: React.FC<
                   <span className="text-sm text-gray-600">%</span>
                 </div>
                 <div className="w-24 text-right">
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium text-[#4a41e0]">
                     {calculateAmount(depositPercentage).toFixed(2)} €
                   </span>
                 </div>
@@ -370,7 +405,7 @@ export const QuoteInvoiceCreationModal: React.FC<
                   {currentLinkedInvoices.map((invoice: Invoice, index: number) => (
                     <li
                       key={invoice.id}
-                      className="flex justify-between text-sm"
+                      className="flex justify-between text-sm p-2 rounded-md hover:bg-[#f0eeff] transition-colors"
                     >
                       <span>
                         {invoice.isDeposit
@@ -382,7 +417,7 @@ export const QuoteInvoiceCreationModal: React.FC<
                       <span className="font-medium">
                         {invoice.finalTotalTTC?.toFixed(2)} € (
                         {(
-                          ((invoice.finalTotalTTC || 0) / quoteTotal) *
+                          ((invoice.finalTotalTTC || 0) / currentQuoteTotal) *
                           100
                         ).toFixed(1)}
                         %)
@@ -394,18 +429,24 @@ export const QuoteInvoiceCreationModal: React.FC<
             )}
 
             {/* Informations sur le solde restant */}
-            <div className="mt-4 bg-gray-50 p-3 rounded-md">
+            <div className="mt-4 bg-[#f0eeff] p-4 rounded-md">
               <div className="flex justify-between text-sm">
                 <span className="font-medium text-gray-700">
                   Solde restant à facturer :
                 </span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-[#4a41e0]">
                   {remainingAmount.toFixed(2)} € (
                   {remainingPercentage.toFixed(1)}%)
                 </span>
               </div>
+              <div className="mt-2 text-xs text-gray-600">
+                <span>Montant à facturer avec le pourcentage sélectionné : </span>
+                <span className="font-medium">
+                  {calculateAmount(depositPercentage).toFixed(2)} €
+                </span>
+              </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </Modal>
