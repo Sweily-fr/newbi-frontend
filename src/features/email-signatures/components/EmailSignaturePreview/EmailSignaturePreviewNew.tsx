@@ -187,10 +187,60 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
     width: '100%'
   };
 
-  // Fonction pour copier la signature dans le presse-papier
+  // Fonction pour copier la signature dans le presse-papier avec préservation des images
   const copySignatureToClipboard = () => {
     if (signatureRef.current) {
-      // Sélectionner le contenu de la signature
+      try {
+        // Créer une copie du contenu pour préserver les images
+        const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
+        
+        // S'assurer que toutes les images ont des URL absolues
+        const images = signatureContent.querySelectorAll('img');
+        images.forEach(img => {
+          // Convertir les URL relatives en URL absolues
+          if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
+            img.src = new URL(img.src, window.location.origin).href;
+          }
+        });
+        
+        // Obtenir le HTML avec styles inline
+        const htmlContent = signatureContent.outerHTML;
+        
+        // Créer un blob avec le type MIME HTML
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        
+        // Créer un ClipboardItem avec le blob
+        const data = new ClipboardItem({
+          'text/html': blob
+        });
+        
+        // Utiliser l'API Clipboard moderne pour copier
+        navigator.clipboard.write([data])
+          .then(() => {
+            // Afficher un message de succès
+            setCopySuccess(true);
+            
+            // Réinitialiser le message après 3 secondes
+            setTimeout(() => {
+              setCopySuccess(false);
+            }, 3000);
+          })
+          .catch(err => {
+            console.error('Erreur lors de la copie avec API moderne:', err);
+            // Fallback à la méthode traditionnelle en cas d'échec
+            fallbackCopyMethod();
+          });
+      } catch (err) {
+        console.error('Erreur lors de la préparation de la copie:', err);
+        // Utiliser la méthode de secours en cas d'erreur
+        fallbackCopyMethod();
+      }
+    }
+  };
+  
+  // Méthode de secours utilisant l'ancienne API
+  const fallbackCopyMethod = () => {
+    if (signatureRef.current) {
       const range = document.createRange();
       range.selectNode(signatureRef.current);
       
@@ -200,21 +250,15 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
         selection.addRange(range);
         
         try {
-          // Copier le contenu sélectionné
           document.execCommand('copy');
-          
-          // Afficher un message de succès
           setCopySuccess(true);
-          
-          // Réinitialiser le message après 3 secondes
           setTimeout(() => {
             setCopySuccess(false);
           }, 3000);
         } catch (err) {
-          console.error('Erreur lors de la copie:', err);
+          console.error('Erreur lors de la copie avec méthode de secours:', err);
         }
         
-        // Nettoyer la sélection
         window.getSelection()?.removeAllRanges();
       }
     }
@@ -241,7 +285,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
             className="flex items-center gap-1 text-xs"
           >
             <ClipboardDocumentIcon className="h-3 w-3" />
-            {copySuccess ? 'Copié !' : 'Copier'}
+            {copySuccess ? 'Copié !' : 'Copier la signature'}
           </Button>
         </div>
         
