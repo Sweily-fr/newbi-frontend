@@ -199,7 +199,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
-          paddingBottom: "120px" /* Espace pour le footer en mode impression */,
+          paddingBottom: "40px",
         }}
         data-pdf-body="true"
         data-pdf-scale="1"
@@ -682,7 +682,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   return (
     <div
       className="bg-white overflow-hidden flex flex-col"
-      style={{ height: "100vh" }}
+      style={{ height: "100%" }}
     >
       {showButtons && (
         <div className="flex justify-between items-center p-4 border-b">
@@ -716,7 +716,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
         </div>
       )}
-      <div className="flex-grow bg-[#f0eeff] overflow-x-hidden w-full relative">
+      <div className="flex-grow bg-[#f0eeff] overflow-y-auto overflow-x-hidden w-full relative custom-scrollbar" style={{ paddingBottom: "40px" }}>
         {isGeneratingPDF && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#f0eeff] bg-opacity-90 z-10">
             {pdfSuccess ? (
@@ -752,8 +752,8 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
         )}
         <div
-          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl"
-          style={{ height: "auto", minHeight: "297mm" }}
+          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl pb-20"
+          style={{ height: "auto" }}
         >
           {documentContent}
         </div>
