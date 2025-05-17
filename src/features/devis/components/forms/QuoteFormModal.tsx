@@ -356,9 +356,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 icon: (
                   <DocumentText
                     size="24"
-                    color={activeSection === "generalInfo" ? "#5b50ff" : "#222"}
+                    color={sectionErrors.generalInfo ? "#ff4d4f" : (activeSection === "generalInfo" ? "#5b50ff" : "#222")}
                     variant={
-                      activeSection === "generalInfo" ? "Bold" : "Linear"
+                      sectionErrors.generalInfo || activeSection === "generalInfo" ? "Bold" : "Linear"
                     }
                   />
                 ),
@@ -369,8 +369,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 icon: (
                   <Profile2User
                     size="24"
-                    color={activeSection === "client" ? "#5b50ff" : "#222"}
-                    variant={activeSection === "client" ? "Bold" : "Linear"}
+                    color={sectionErrors.client ? "#ff4d4f" : (activeSection === "client" ? "#5b50ff" : "#222")}
+                    variant={sectionErrors.client || activeSection === "client" ? "Bold" : "Linear"}
                   />
                 ),
                 tooltip: "Informations client",
@@ -380,9 +380,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 icon: (
                   <Building
                     size="24"
-                    color={activeSection === "companyInfo" ? "#5b50ff" : "#222"}
+                    color={sectionErrors.companyInfo ? "#ff4d4f" : (activeSection === "companyInfo" ? "#5b50ff" : "#222")}
                     variant={
-                      activeSection === "companyInfo" ? "Bold" : "Linear"
+                      sectionErrors.companyInfo || activeSection === "companyInfo" ? "Bold" : "Linear"
                     }
                   />
                 ),
@@ -393,8 +393,8 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 icon: (
                   <ShoppingCart
                     size="24"
-                    color={activeSection === "items" ? "#5b50ff" : "#222"}
-                    variant={activeSection === "items" ? "Bold" : "Linear"}
+                    color={sectionErrors.items ? "#ff4d4f" : (activeSection === "items" ? "#5b50ff" : "#222")}
+                    variant={sectionErrors.items || activeSection === "items" ? "Bold" : "Linear"}
                   />
                 ),
                 tooltip: "Produits et services",
@@ -405,10 +405,10 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                   <Calculator
                     size="24"
                     color={
-                      activeSection === "discountAndTotals" ? "#5b50ff" : "#222"
+                      sectionErrors.discountAndTotals ? "#ff4d4f" : (activeSection === "discountAndTotals" ? "#5b50ff" : "#222")
                     }
                     variant={
-                      activeSection === "discountAndTotals" ? "Bold" : "Linear"
+                      sectionErrors.discountAndTotals || activeSection === "discountAndTotals" ? "Bold" : "Linear"
                     }
                   />
                 ),
@@ -419,9 +419,9 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                 icon: (
                   <MessageText
                     size="24"
-                    color={activeSection === "bankDetails" ? "#5b50ff" : "#222"}
+                    color={sectionErrors.bankDetails ? "#ff4d4f" : (activeSection === "bankDetails" ? "#5b50ff" : "#222")}
                     variant={
-                      activeSection === "bankDetails" ? "Bold" : "Linear"
+                      sectionErrors.bankDetails || activeSection === "bankDetails" ? "Bold" : "Linear"
                     }
                   />
                 ),

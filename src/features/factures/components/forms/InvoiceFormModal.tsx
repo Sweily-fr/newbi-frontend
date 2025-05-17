@@ -398,32 +398,32 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
             items={[
               {
                 id: "generalInfo",
-                icon: <DocumentText size="24" color={activeSection === "generalInfo" ? "#5b50ff" : "#222"} variant={activeSection === "generalInfo" ? "Bold" : "Linear"} />,
+                icon: <DocumentText size="24" color={sectionErrors.generalInfo ? "#ff4d4f" : (activeSection === "generalInfo" ? "#5b50ff" : "#222")} variant={sectionErrors.generalInfo || activeSection === "generalInfo" ? "Bold" : "Linear"} />,
                 tooltip: "Informations générales"
               },
               {
                 id: "client",
-                icon: <Profile2User size="24" color={activeSection === "client" ? "#5b50ff" : "#222"} variant={activeSection === "client" ? "Bold" : "Linear"} />,
+                icon: <Profile2User size="24" color={sectionErrors.client ? "#ff4d4f" : (activeSection === "client" ? "#5b50ff" : "#222")} variant={sectionErrors.client || activeSection === "client" ? "Bold" : "Linear"} />,
                 tooltip: "Informations client"
               },
               {
                 id: "companyInfo",
-                icon: <Building size="24" color={activeSection === "companyInfo" ? "#5b50ff" : "#222"} variant={activeSection === "companyInfo" ? "Bold" : "Linear"} />,
+                icon: <Building size="24" color={sectionErrors.companyInfo ? "#ff4d4f" : (activeSection === "companyInfo" ? "#5b50ff" : "#222")} variant={sectionErrors.companyInfo || activeSection === "companyInfo" ? "Bold" : "Linear"} />,
                 tooltip: "Informations société"
               },
               {
                 id: "items",
-                icon: <ShoppingCart size="24" color={activeSection === "items" ? "#5b50ff" : "#222"} variant={activeSection === "items" ? "Bold" : "Linear"} />,
+                icon: <ShoppingCart size="24" color={sectionErrors.items ? "#ff4d4f" : (activeSection === "items" ? "#5b50ff" : "#222")} variant={sectionErrors.items || activeSection === "items" ? "Bold" : "Linear"} />,
                 tooltip: "Produits et services"
               },
               {
                 id: "discountAndTotals",
-                icon: <Calculator size="24" color={activeSection === "discountAndTotals" ? "#5b50ff" : "#222"} variant={activeSection === "discountAndTotals" ? "Bold" : "Linear"} />,
+                icon: <Calculator size="24" color={sectionErrors.discountAndTotals ? "#ff4d4f" : (activeSection === "discountAndTotals" ? "#5b50ff" : "#222")} variant={sectionErrors.discountAndTotals || activeSection === "discountAndTotals" ? "Bold" : "Linear"} />,
                 tooltip: "Remise et totaux"
               },
               {
                 id: "bankDetails",
-                icon: <MessageText size="24" color={activeSection === "bankDetails" ? "#5b50ff" : "#222"} variant={activeSection === "bankDetails" ? "Bold" : "Linear"} />,
+                icon: <MessageText size="24" color={sectionErrors.bankDetails ? "#ff4d4f" : (activeSection === "bankDetails" ? "#5b50ff" : "#222")} variant={sectionErrors.bankDetails || activeSection === "bankDetails" ? "Bold" : "Linear"} />,
                 tooltip: "Notes de bas de page"
               }
             ]}

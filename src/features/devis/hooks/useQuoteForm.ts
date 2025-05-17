@@ -778,12 +778,12 @@ export const useQuoteForm = ({
             postalCode: companyInfo.address?.postalCode || "",
             country: companyInfo.address?.country || "",
           },
-          legalForm: companyInfo.legalForm || "",
+          // Suppression du champ legalForm qui n'est pas défini dans le schéma GraphQL
           siret: companyInfo.siret || "",
           vatNumber: companyInfo.vatNumber || "",
           logo: companyInfo.logo || "",
         },
-        useBankDetails,
+        // Suppression du champ useBankDetails qui n'est pas défini dans le schéma GraphQL
         items: items.map((item) => ({
           description: item.description,
           quantity: item.quantity,
