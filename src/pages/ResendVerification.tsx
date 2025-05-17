@@ -4,6 +4,8 @@ import { gql, useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Form, TextField, Button } from '../components/';
+import { Logo } from '../assets';
+import { TickCircle } from 'iconsax-react';
 
 
 // Définition de la mutation GraphQL
@@ -52,14 +54,15 @@ const ResendVerification: React.FC = () => {
   };
 
   return (
-    <div className="py-6 px-4 w-full mx-auto">
-      <div className="text-center mb-8">
+    <div className="py-10 pb-32 px-4 w-full mx-auto">
+      <div className="text-center mb-8 flex flex-col items-center">
+        <Logo className='h-24 w-auto' variant="purple" withText={false} />
         <h1 className="text-3xl font-semibold text-gray-700 mb-2">Renvoyer l'email de vérification</h1>
         <p className="text-gray-500 text-lg">Saisissez votre adresse email pour recevoir un nouveau lien de vérification</p>
       </div>
 
       <div className="max-w-lg mx-auto">
-        <div className="bg-white py-8 px-6 shadow rounded-lg border border-[#f0eeff]">
+        <div className="bg-white py-8 px-6 shadow-sm rounded-2xl border border-[#f0eeff]">
           {!isSubmitted ? (
             <Form onSubmit={handleSubmit(onSubmit)} spacing="normal">
               <TextField
@@ -85,7 +88,8 @@ const ResendVerification: React.FC = () => {
                 isLoading={loading}
                 loaderPosition="left"
                 fullWidth
-                className="mt-4 bg-[#5b50ff] hover:bg-[#4a41e0] py-3 rounded-lg"
+                variant="primary"
+                className="mt-4 py-4"
               >
                 Envoyer l'email de vérification
               </Button>
@@ -98,7 +102,7 @@ const ResendVerification: React.FC = () => {
             </Form>
           ) : (
             <div className="flex flex-col items-center space-y-6 py-4">
-              <CheckCircleIcon className="h-20 w-20 text-[#5b50ff]" />
+              <TickCircle size="100" variant="Linear" color="#5b50ff" />
               <h3 className="text-xl font-semibold text-gray-800">Email envoyé</h3>
               <p className="text-center text-gray-600 mb-4">
                 Si votre adresse email existe dans notre système et n'est pas encore vérifiée, un nouvel email de vérification a été envoyé. Veuillez vérifier votre boîte de réception.
@@ -107,7 +111,7 @@ const ResendVerification: React.FC = () => {
                 variant="primary"
                 fullWidth
                 onClick={() => navigate('/auth')}
-                className="bg-[#5b50ff] hover:bg-[#4a41e0] py-3 rounded-lg"
+                className="py-4"
               >
                 Retour à la page de connexion
               </Button>

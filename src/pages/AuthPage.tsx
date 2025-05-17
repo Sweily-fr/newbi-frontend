@@ -5,6 +5,7 @@ import { LoginForm, RegisterForm } from '../features/auth/components/';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../assets/logo';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { ArrowLeft2 } from 'iconsax-react';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -32,11 +33,9 @@ export const AuthPage = () => {
         <div className="absolute top-8 left-8">
           <Link 
             to={ROUTES.HOME}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <ArrowLeft2 size="20" variant="Linear" color="gray" />
             <span>Retour à l'accueil</span>
           </Link>
         </div>

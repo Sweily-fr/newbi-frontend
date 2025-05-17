@@ -256,7 +256,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       isOpen={isOpen} 
       onClose={onClose}
       title={isEditMode ? 'Modifier le produit' : 'Ajouter un produit'}
-      maxWidth="2xl"
+      size="2xl"
       footer={
         <div className="flex justify-end space-x-4">
           <Button
@@ -264,6 +264,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             variant="secondary"
             onClick={() => setIsCancelConfirmationOpen(true)}
             disabled={loading}
+            className="rounded-2xl"
           >
             Annuler
           </Button>
@@ -272,16 +273,23 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             variant="primary"
             form="productForm"
             disabled={loading}
+            className="rounded-2xl"
           >
             {loading ? 'Enregistrement...' : isEditMode ? 'Modifier' : 'Ajouter'}
           </Button>
         </div>
       }
     >
-      <div className="bg-white pb-4">
+      <div className="bg-white pb-4 rounded-2xl">
         <div className="sm:flex sm:items-start">
           <div className="text-center sm:text-left w-full">
               <form id="productForm" onSubmit={handleSubmit} className="px-4">
+                <div className="bg-[#f0eeff] p-4 rounded-2xl border border-[#e6e1ff] mb-6">
+                  <p className="text-sm text-gray-600">
+                    <span className="text-[#5b50ff] font-medium">Astuce :</span>{" "}
+                    Remplissez soigneusement les informations de votre produit ou service. Ces données seront utilisées pour générer automatiquement vos factures et devis.
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
                   {/* Nom du produit */}
                   <TextField
@@ -293,7 +301,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     error={errors.name}
                     required
                     className="mb-0"
-                    helpText={errors.name ? undefined : "Nom du produit ou service"}
+                    inputClassName="rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                   />
                   
                   {/* Référence */}
@@ -305,7 +313,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                     onChange={handleChange}
                     error={errors.reference}
                     className="mb-0"
-                    helpText={errors.reference ? undefined : "Référence interne (optionnel)"}
+                    inputClassName="rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                   />
                 </div>
                 
@@ -325,9 +333,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       min="0"
                       placeholder="0.00"
                       className="mb-0"
-                      inputClassName="pl-7"
+                      inputClassName="pl-7 rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                       prefix="€"
-                      helpText={errors.unitPrice ? undefined : "Prix HT (décimal accepté)"}
                     />
                   </div>
                   
@@ -347,7 +354,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         { value: "20", label: "20%" }
                       ]}
                       className="mb-0"
-                      helpText={errors.vatRate ? undefined : "TVA applicable"}
+                      selectClassName="rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                     />
                   </div>
                 </div>
@@ -405,7 +412,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                         { value: 'année', label: 'année' }
                       ]}
                       className="mb-0"
-                      helpText={errors.unit ? undefined : "Unité de mesure"}
+                      selectClassName="rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                     />
                   </div>
                   
@@ -418,7 +425,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       onChange={handleChange}
                       error={errors.category}
                       className="mb-0"
-                      helpText={errors.category ? undefined : "Catégorie (optionnel)"}
+                      inputClassName="rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                     />
                   </div>
                 </div>
@@ -431,8 +438,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   value={formData.description}
                   onChange={handleChange}
                   rows={2}
-                  className="mb-6"
-                  helpText="Description détaillée du produit ou service (optionnel)"
+                  className="mb-6 rounded-xl focus:ring-[#5b50ff] focus:border-[#5b50ff]"
                 />
                 
 
