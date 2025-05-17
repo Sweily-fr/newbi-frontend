@@ -1,10 +1,11 @@
 import React from "react";
 import { Tool } from "../../../constants/tools";
-import { CheckBadgeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
+import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { Button } from "../../../components";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { Link } from "react-router-dom";
+import { Verify } from "iconsax-react";
 
 interface ToolCardProps {
   tool: Tool;
@@ -56,8 +57,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
               
               {/* Badge premium stylisé */}
               {tool.premium && (
-                <div className="flex items-center justify-center p-0.5 rounded-full bg-[#f0eeff] border border-[#5b50ff] text-[#5b50ff]">
-                  <CheckBadgeIcon className="w-4 h-4 text-[#5b50ff]" />
+                <div className="flex items-center justify-center rounded-full text-[#5b50ff]">
+                  <Verify size="20" variant="Bold" color="#FFD700" />
                 </div>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { Box, Designtools, DocumentText1, Google, I3Dcube, I3DSquare, Send2, ShieldTick, Trello } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -22,19 +23,7 @@ export const TOOLS: Tool[] = [
     category: "Marketing",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-        />
-      </svg>
+      <Google size="20" variant="Bold" color="#5b50ff" />
     ),
     href: "/blog-seo-optimizer",
   },
@@ -45,19 +34,7 @@ export const TOOLS: Tool[] = [
     category: "Communication",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-        />
-      </svg>
+      <Designtools size="20" variant="Bold" color="#5b50ff" />
     ),
     href: "/signatures-email",
   },
@@ -69,19 +46,7 @@ export const TOOLS: Tool[] = [
     category: "Factures",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-        />
-      </svg>
+      <DocumentText1 size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/factures",
   },
@@ -93,19 +58,7 @@ export const TOOLS: Tool[] = [
     category: "Devis",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-        />
-      </svg>
+      <DocumentText1 size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/devis",
   },
@@ -116,19 +69,7 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-        />
-      </svg>
+      <ShieldTick size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/generator-politique-confidentialite",
   },
@@ -139,19 +80,7 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-        />
-      </svg>
+      <ShieldTick size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/generator-mentions-legales",
   },
@@ -164,19 +93,7 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-        />
-      </svg>
+      <Send2 size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/transfert-fichiers-volumineux",
   },
@@ -189,19 +106,7 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-        />
-      </svg>
+     <Trello size="24" variant="Bold" color="#5b50ff" />
     ),
     href: "/gestion-taches",
   },

@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
 import { PremiumModal } from "../components/specific/subscription/PremiumModal";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { Building } from 'iconsax-react';
+import { ArrowDown, ArrowDown2, ArrowUp2, Building, InfoCircle, Verify } from 'iconsax-react';
 import { SEOHead } from "../components/specific/SEO/SEOHead";
 
 export const ToolsPage = () => {
@@ -53,22 +53,7 @@ export const ToolsPage = () => {
               title="Trier de A à Z"
             >
               <span>A → Z</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-4 w-4 ${
-                  sortDirection === "asc" ? "text-[#5b50ff]" : "text-gray-500"
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+             <ArrowDown2 size="16" variant="Linear" color="#5b50ff"/>
             </button>
             <button
               className={`flex items-center gap-1 border rounded-md px-3 py-1.5 text-sm ${
@@ -80,23 +65,7 @@ export const ToolsPage = () => {
               title="Trier de Z à A"
             >
               <span>Z → A</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-4 w-4 ${
-                  sortDirection === "desc" ? "text-[#5b50ff]" : "text-gray-500"
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                style={{ transform: "rotate(180deg)" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              <ArrowUp2 size="16" variant="Linear" color="#5b50ff"/>
             </button>
           </div>
 
@@ -123,7 +92,7 @@ export const ToolsPage = () => {
             {/* Badge Premium */}
             {isAuthenticated && subscription && !hasActiveSubscription && (
               <span className="absolute -top-4 -right-2 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs p-1 rounded-full font-semibold shadow-sm">
-                <CheckBadgeIcon className="h-6 w-6" />
+                <Verify size="16" variant="Linear" color="#5b50ff"/>
               </span>
             )}
             <Building color="currentColor" size="16" variant="Outline" />
@@ -187,24 +156,13 @@ export const ToolsPage = () => {
               </div>
               {/* Note d'information pour les outils de facture et devis */}
               {isAuthenticated && (
-                <div className="bg-purple-50 border-l-4 border-[#5b50ff] p-4 mb-6 rounded-md shadow-sm">
+                <div className="bg-purple-50 border border-[#5b50ff]/20 p-4 mb-6 rounded-2xl shadow-sm">
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="h-5 w-5 text-gray-600"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <InfoCircle size="24" variant="Linear" color="#5b50ff"/>
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-gray-800">
+                      <h3 className="text-md font-medium text-[#5b50ff]">
                         Information importante
                       </h3>
                       <div className="mt-1 text-sm text-gray-700">
