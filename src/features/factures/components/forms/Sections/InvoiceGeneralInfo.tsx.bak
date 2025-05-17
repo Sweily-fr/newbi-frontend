@@ -515,8 +515,35 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
               type="button"
               onClick={() => {
                 if (defaultHeaderNotes) {
+                  // Appliquer les paramètres par défaut et mettre à jour les boutons actifs
                   setHeaderNotes(defaultHeaderNotes);
                   validateHeaderNotes(defaultHeaderNotes);
+                  
+                  // Désactiver le mode personnalisation si actif
+                  if (activeHeaderNoteButtons.includes("custom")) {
+                    setActiveHeaderNoteButtons([]);
+                  }
+                  
+                  // Activer les boutons correspondant au texte par défaut
+                  const conditionsText = "Conditions de paiement : paiement à réception de facture. Pénalités de retard : 3 fois le taux d'intérêt légal.";
+                  const delaiText = "Délai de paiement : 30 jours à compter de la date d'émission de la facture.";
+                  const referenceText = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre paiement.";
+                  
+                  const newActiveButtons = [];
+                  if (defaultHeaderNotes.includes(conditionsText)) {
+                    newActiveButtons.push("conditions");
+                  }
+                  if (defaultHeaderNotes.includes(delaiText)) {
+                    newActiveButtons.push("delai");
+                  }
+                  if (defaultHeaderNotes.includes(referenceText)) {
+                    newActiveButtons.push("reference");
+                  }
+                  if (newActiveButtons.length === 0 && defaultHeaderNotes.trim() !== "") {
+                    newActiveButtons.push("custom");
+                  }
+                  
+                  setActiveHeaderNoteButtons(newActiveButtons);
                 }
               }}
               className="text-sm text-[#5b50ff] hover:underline"
@@ -532,7 +559,10 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
             label="Notes d'entête"
             value={headerNotes}
             onChange={(e) => {
+              // Récupérer la valeur exacte du champ
               const newText = e.target.value;
+              
+              // Toujours mettre à jour l'état avec exactement ce que l'utilisateur a tapé
               setHeaderNotes(newText);
               validateHeaderNotes(newText);
               
@@ -542,32 +572,24 @@ export const InvoiceGeneralInfo: React.FC<InvoiceGeneralInfoProps> = ({
                 return;
               }
               
-              // Vérifier quels boutons doivent rester actifs en fonction du texte
+              // Sinon, mettre à jour les boutons actifs
               const conditionsText = "Conditions de paiement : paiement à réception de facture. Pénalités de retard : 3 fois le taux d'intérêt légal.";
               const delaiText = "Délai de paiement : 30 jours à compter de la date d'émission de la facture.";
               const referenceText = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre paiement.";
               
               const newActiveButtons = [];
-              
-              // Vérifier si le texte contient chacune des suggestions
-              if (newText.includes(conditionsText)) {
-                newActiveButtons.push("conditions");
-              }
-              
-              if (newText.includes(delaiText)) {
-                newActiveButtons.push("delai");
-              }
-              
-              if (newText.includes(referenceText)) {
-                newActiveButtons.push("reference");
-              }
-              
-              // Si aucune suggestion n'est trouvée mais il y a du texte, activer le mode personnalisation
-              if (newActiveButtons.length === 0 && newText.trim() !== "") {
-                newActiveButtons.push("custom");
-              }
+              if (newText.includes(conditionsText)) newActiveButtons.push("conditions");
+              if (newText.includes(delaiText)) newActiveButtons.push("delai");
+              if (newText.includes(referenceText)) newActiveButtons.push("reference");
+              if (newActiveButtons.length === 0 && newText.trim() !== "") newActiveButtons.push("custom");
               
               setActiveHeaderNoteButtons(newActiveButtons);
+            }}
+            rows={3}
+            placeholder="Ajoutez des notes qui apparaîtront en haut de la facture..."
+            error={headerNotesError ? { message: headerNotesError } : undefined}
+            helpText="Maximum 1000 caractères"
+          />
             }}
             rows={3}
             placeholder="Ajoutez des notes qui apparaîtront en haut de la facture..."

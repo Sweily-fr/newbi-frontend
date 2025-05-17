@@ -43,7 +43,7 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
   const [headerNotesError, setHeaderNotesError] = useState<string | null>(null);
   const [issueDateError, setIssueDateError] = useState<string | null>(null);
   const [validUntilError, setValidUntilError] = useState<string | null>(null);
-  const [activeHeaderNoteButton, setActiveHeaderNoteButton] = useState<string>('');
+  const [activeHeaderNoteButtons, setActiveHeaderNoteButtons] = useState<string[]>([]);
   const [activeValidityButton, setActiveValidityButton] = useState<string>('');
   
   // Fonction pour valider les dates
@@ -384,12 +384,42 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
             label="Texte des notes"
             value={headerNotes}
             onChange={(e) => {
-              setHeaderNotes(e.target.value);
-              validateHeaderNotes(e.target.value);
-              // Réinitialiser le bouton actif si le texte est modifié manuellement
-              if (activeHeaderNoteButton && e.target.value !== '') {
-                setActiveHeaderNoteButton('');
+              const newText = e.target.value;
+              setHeaderNotes(newText);
+              validateHeaderNotes(newText);
+              
+              // Si le champ est vide, désactiver tous les boutons
+              if (!newText || newText.trim() === '') {
+                setActiveHeaderNoteButtons([]);
+                return;
               }
+              
+              // Vérifier quels boutons doivent rester actifs en fonction du texte
+              const validiteText = "Ce devis est valable 30 jours à compter de sa date d'émission. Passé ce délai, les prix sont susceptibles d'être modifiés.";
+              const conditionsText = "Conditions de paiement : 30% à la commande, solde à la livraison. Délai d'exécution : à convenir ensemble après acceptation du devis.";
+              const referenceText = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre acceptation du devis.";
+              
+              const newActiveButtons = [];
+              
+              // Vérifier si le texte contient chacune des suggestions
+              if (newText.includes(validiteText)) {
+                newActiveButtons.push('validite');
+              }
+              
+              if (newText.includes(conditionsText)) {
+                newActiveButtons.push('conditions');
+              }
+              
+              if (newText.includes(referenceText)) {
+                newActiveButtons.push('reference');
+              }
+              
+              // Si aucune suggestion n'est trouvée mais il y a du texte, activer le mode personnalisation
+              if (newActiveButtons.length === 0 && newText.trim() !== '') {
+                newActiveButtons.push('custom');
+              }
+              
+              setActiveHeaderNoteButtons(newActiveButtons);
             }}
             placeholder="Notes à afficher en haut du devis"
             rows={3}
@@ -401,56 +431,189 @@ export const QuoteGeneralInfo: React.FC<QuoteGeneralInfoProps> = ({
         <p className="text-xs text-gray-500 mt-1">Ces notes apparaîtront en haut du devis, juste après les informations de base.</p>
         
         <div className="flex flex-wrap gap-2 mt-2">
+          {/* Bouton pour la validité */}
           <Button 
             size="sm"
-            variant={activeHeaderNoteButton === 'validite' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'validite' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+            variant={activeHeaderNoteButtons.includes('validite') ? 'primary' : 'outline'}
+            className={`min-w-[110px] ${activeHeaderNoteButtons.includes('validite') ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
-              const text = "Ce devis est valable 30 jours à compter de sa date d'émission. Passé ce délai, les prix sont susceptibles d'être modifiés.";
-              setHeaderNotes(text);
-              validateHeaderNotes(text);
-              setActiveHeaderNoteButton('validite');
+              const validiteText = "Ce devis est valable 30 jours à compter de sa date d'émission. Passé ce délai, les prix sont susceptibles d'être modifiés.";
+              
+              // Si le bouton est déjà actif, le désactiver et supprimer le texte
+              if (activeHeaderNoteButtons.includes('validite')) {
+                // Supprimer ce bouton de la liste des boutons actifs
+                const newButtons = activeHeaderNoteButtons.filter(id => id !== 'validite');
+                setActiveHeaderNoteButtons(newButtons);
+                
+                // Supprimer le texte correspondant
+                let newText = headerNotes;
+                if (newText.includes(validiteText)) {
+                  if (newText.includes("\n\n" + validiteText)) {
+                    newText = newText.replace("\n\n" + validiteText, "");
+                  } else if (newText.includes(validiteText + "\n\n")) {
+                    newText = newText.replace(validiteText + "\n\n", "");
+                  } else {
+                    newText = newText.replace(validiteText, "");
+                  }
+                  
+                  // Nettoyer les sauts de ligne en trop
+                  newText = newText.replace(/^\n+|\n+$/g, "");
+                  newText = newText.replace(/\n{3,}/g, "\n\n");
+                  
+                  setHeaderNotes(newText);
+                  validateHeaderNotes(newText);
+                }
+              } else {
+                // Si le bouton "custom" est actif, le désactiver
+                if (activeHeaderNoteButtons.includes('custom')) {
+                  setActiveHeaderNoteButtons(['validite']);
+                  setHeaderNotes(validiteText);
+                  validateHeaderNotes(validiteText);
+                  return;
+                }
+                
+                // Activer ce bouton
+                setActiveHeaderNoteButtons([...activeHeaderNoteButtons, 'validite']);
+                
+                // Ajouter le texte
+                if (headerNotes && headerNotes.trim() !== "") {
+                  setHeaderNotes(headerNotes + "\n\n" + validiteText);
+                  validateHeaderNotes(headerNotes + "\n\n" + validiteText);
+                } else {
+                  setHeaderNotes(validiteText);
+                  validateHeaderNotes(validiteText);
+                }
+              }
             }}
           >
             Validité
           </Button>
           
+          {/* Bouton pour les conditions */}
           <Button 
             size="sm"
-            variant={activeHeaderNoteButton === 'conditions' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'conditions' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+            variant={activeHeaderNoteButtons.includes('conditions') ? 'primary' : 'outline'}
+            className={`min-w-[110px] ${activeHeaderNoteButtons.includes('conditions') ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
-              const text = "Conditions de paiement : 30% à la commande, solde à la livraison. Délai d'exécution : à convenir ensemble après acceptation du devis.";
-              setHeaderNotes(text);
-              validateHeaderNotes(text);
-              setActiveHeaderNoteButton('conditions');
+              const conditionsText = "Conditions de paiement : 30% à la commande, solde à la livraison. Délai d'exécution : à convenir ensemble après acceptation du devis.";
+              
+              // Si le bouton est déjà actif, le désactiver et supprimer le texte
+              if (activeHeaderNoteButtons.includes('conditions')) {
+                // Supprimer ce bouton de la liste des boutons actifs
+                const newButtons = activeHeaderNoteButtons.filter(id => id !== 'conditions');
+                setActiveHeaderNoteButtons(newButtons);
+                
+                // Supprimer le texte correspondant
+                let newText = headerNotes;
+                if (newText.includes(conditionsText)) {
+                  if (newText.includes("\n\n" + conditionsText)) {
+                    newText = newText.replace("\n\n" + conditionsText, "");
+                  } else if (newText.includes(conditionsText + "\n\n")) {
+                    newText = newText.replace(conditionsText + "\n\n", "");
+                  } else {
+                    newText = newText.replace(conditionsText, "");
+                  }
+                  
+                  // Nettoyer les sauts de ligne en trop
+                  newText = newText.replace(/^\n+|\n+$/g, "");
+                  newText = newText.replace(/\n{3,}/g, "\n\n");
+                  
+                  setHeaderNotes(newText);
+                  validateHeaderNotes(newText);
+                }
+              } else {
+                // Si le bouton "custom" est actif, le désactiver
+                if (activeHeaderNoteButtons.includes('custom')) {
+                  setActiveHeaderNoteButtons(['conditions']);
+                  setHeaderNotes(conditionsText);
+                  validateHeaderNotes(conditionsText);
+                  return;
+                }
+                
+                // Activer ce bouton
+                setActiveHeaderNoteButtons([...activeHeaderNoteButtons, 'conditions']);
+                
+                // Ajouter le texte
+                if (headerNotes && headerNotes.trim() !== "") {
+                  setHeaderNotes(headerNotes + "\n\n" + conditionsText);
+                  validateHeaderNotes(headerNotes + "\n\n" + conditionsText);
+                } else {
+                  setHeaderNotes(conditionsText);
+                  validateHeaderNotes(conditionsText);
+                }
+              }
             }}
           >
             Conditions
           </Button>
           
+          {/* Bouton pour la référence projet */}
           <Button 
             size="sm"
-            variant={activeHeaderNoteButton === 'reference' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'reference' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+            variant={activeHeaderNoteButtons.includes('reference') ? 'primary' : 'outline'}
+            className={`min-w-[110px] ${activeHeaderNoteButtons.includes('reference') ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
-              const text = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre acceptation du devis.";
-              setHeaderNotes(text);
-              validateHeaderNotes(text);
-              setActiveHeaderNoteButton('reference');
+              const referenceText = "Référence du projet : [Référence]. Merci de mentionner cette référence lors de votre acceptation du devis.";
+              
+              // Si le bouton est déjà actif, le désactiver et supprimer le texte
+              if (activeHeaderNoteButtons.includes('reference')) {
+                // Supprimer ce bouton de la liste des boutons actifs
+                const newButtons = activeHeaderNoteButtons.filter(id => id !== 'reference');
+                setActiveHeaderNoteButtons(newButtons);
+                
+                // Supprimer le texte correspondant
+                let newText = headerNotes;
+                if (newText.includes(referenceText)) {
+                  if (newText.includes("\n\n" + referenceText)) {
+                    newText = newText.replace("\n\n" + referenceText, "");
+                  } else if (newText.includes(referenceText + "\n\n")) {
+                    newText = newText.replace(referenceText + "\n\n", "");
+                  } else {
+                    newText = newText.replace(referenceText, "");
+                  }
+                  
+                  // Nettoyer les sauts de ligne en trop
+                  newText = newText.replace(/^\n+|\n+$/g, "");
+                  newText = newText.replace(/\n{3,}/g, "\n\n");
+                  
+                  setHeaderNotes(newText);
+                  validateHeaderNotes(newText);
+                }
+              } else {
+                // Si le bouton "custom" est actif, le désactiver
+                if (activeHeaderNoteButtons.includes('custom')) {
+                  setActiveHeaderNoteButtons(['reference']);
+                  setHeaderNotes(referenceText);
+                  validateHeaderNotes(referenceText);
+                  return;
+                }
+                
+                // Activer ce bouton
+                setActiveHeaderNoteButtons([...activeHeaderNoteButtons, 'reference']);
+                
+                // Ajouter le texte
+                if (headerNotes && headerNotes.trim() !== "") {
+                  setHeaderNotes(headerNotes + "\n\n" + referenceText);
+                  validateHeaderNotes(headerNotes + "\n\n" + referenceText);
+                } else {
+                  setHeaderNotes(referenceText);
+                  validateHeaderNotes(referenceText);
+                }
+              }
             }}
           >
             Référence projet
           </Button>
           
+          {/* Bouton pour personnaliser */}
           <Button 
             size="sm"
-            variant={activeHeaderNoteButton === 'custom' ? 'primary' : 'outline'}
-            className={`min-w-[110px] ${activeHeaderNoteButton === 'custom' ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
+            variant={activeHeaderNoteButtons.includes('custom') ? 'primary' : 'outline'}
+            className={`min-w-[110px] ${activeHeaderNoteButtons.includes('custom') ? 'bg-[#5b50ff] hover:bg-[#4a41e0] focus:ring-[#5b50ff]' : ''}`}
             onClick={() => {
               setHeaderNotes('');
               validateHeaderNotes('');
-              setActiveHeaderNoteButton('custom');
+              setActiveHeaderNoteButtons(['custom']);
               // Focus sur le champ de texte
               document.getElementById('headerNotes')?.focus();
             }}

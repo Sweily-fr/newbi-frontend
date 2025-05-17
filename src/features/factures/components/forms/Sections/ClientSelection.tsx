@@ -508,7 +508,7 @@ export const ClientSelection: React.FC<ClientSelectionProps> = ({
           Sélection du client
         </h4>
       </div>
-      <p className="text-xs text-gray-400 italic mb-3">
+      <p className="text-sm text-gray-400 italic mb-3">
         Sélectionnez un client existant ou créez un nouveau client pour cette
         facture.
       </p>
