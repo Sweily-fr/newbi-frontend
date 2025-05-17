@@ -1,17 +1,19 @@
 import { useQuery } from "@apollo/client";
 import { useState, useContext, useEffect } from "react";
-import { GET_PROFILE, PersonalInfoForm, CompanyInfoForm } from "../features/profile";
+import {
+  GET_PROFILE,
+  PersonalInfoForm,
+  CompanyInfoForm,
+} from "../features/profile";
 import { ClientsManager } from "../features/clients";
 import { ProductsManager } from "../features/products";
 import { IntegrationsManager } from "../features/integrations";
-import { TabNavigation, TabItem } from "../components/specific/navigation/TabNavigation";
 import {
-  UserIcon,
-  BuildingOfficeIcon,
+  TabNavigation,
+  TabItem,
+} from "../components/specific/navigation/TabNavigation";
+import {
   CreditCardIcon,
-  ShoppingBagIcon,
-  LockClosedIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { SubscriptionContext } from "../context/SubscriptionContext.context";
@@ -20,6 +22,16 @@ import { PremiumModal } from "../components/specific/subscription/PremiumModal";
 import axios from "axios";
 import { SEOHead } from "../components/specific/SEO/SEOHead";
 import { LogoLoader } from "../components/common/LogoLoader";
+import {
+  Building,
+  Card,
+  InfoCircle,
+  Lock1,
+  Profile2User,
+  ShoppingBag,
+  User,
+  Verify,
+} from "iconsax-react";
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);
@@ -82,12 +94,24 @@ export const ProfilePage = () => {
 
   // Nous n'avons plus besoin de cette icône personnalisée car nous utilisons directement CheckBadgeIcon
 
+  // Fonction pour déterminer la couleur des icônes en fonction de l'état actif
+  const getIconColor = (tabId: string | null) => {
+    return activeTab === tabId ? "#fff" : "#000";
+  };
+
   // Définir les onglets en fonction de l'état d'abonnement
   const tabs: TabItem[] = [
     {
       id: "profile",
       label: "Profile",
-      icon: <UserIcon className="w-5 h-5" />,
+      icon: (
+        <User
+          size="20"
+          variant="Linear"
+          color={getIconColor("profile")}
+          className="w-5 h-5"
+        />
+      ),
     },
   ];
 
@@ -98,8 +122,18 @@ export const ProfilePage = () => {
       label: "Entreprise",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <BuildingOfficeIcon className="w-5 h-5" />
-          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+          <Building
+            size="20"
+            variant="Linear"
+            color={getIconColor("company")}
+            className="w-5 h-5"
+          />
+          <Verify
+            size="20"
+            variant="Bold"
+            color="#FFD700"
+            className="w-5 h-5 ml-4 absolute right-8"
+          />
         </div>
       ),
     });
@@ -110,8 +144,18 @@ export const ProfilePage = () => {
       label: "Catalogue",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <ShoppingBagIcon className="w-5 h-5" />
-          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+          <ShoppingBag
+            size="20"
+            variant="Linear"
+            color={getIconColor("products")}
+            className="w-5 h-5"
+          />
+          <Verify
+            size="20"
+            variant="Bold"
+            color="#FFD700"
+            className="w-5 h-5 ml-4 absolute right-8"
+          />
         </div>
       ),
     });
@@ -122,8 +166,18 @@ export const ProfilePage = () => {
       label: "Mes clients",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <UsersIcon className="w-5 h-5" />
-          <CheckBadgeIcon className="w-5 h-5 text-yellow-500 ml-4 absolute right-8" />
+          <Profile2User
+            size="20"
+            variant="Linear"
+            color={getIconColor("clients")}
+            className="w-5 h-5"
+          />
+          <Verify
+            size="20"
+            variant="Bold"
+            color="#FFD700"
+            className="w-5 h-5 ml-4 absolute right-8"
+          />
         </div>
       ),
     });
@@ -134,8 +188,18 @@ export const ProfilePage = () => {
       label: "Entreprise",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <BuildingOfficeIcon className="w-5 h-5" />
-          <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
+          <Building
+            size="20"
+            variant="Linear"
+            color={getIconColor("company_locked")}
+            className="w-5 h-5"
+          />
+          <Lock1
+            size="20"
+            variant="Linear"
+            color={getIconColor("company_locked")}
+            className="w-4 h-4 text-gray-400 ml-4"
+          />
         </div>
       ),
     });
@@ -146,8 +210,18 @@ export const ProfilePage = () => {
       label: "Catalogue",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <UsersIcon className="w-5 h-5" />
-          <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
+          <ShoppingBag
+            size="20"
+            variant="Linear"
+            color={getIconColor("products_locked")}
+            className="w-5 h-5"
+          />
+          <Lock1
+            size="20"
+            variant="Linear"
+            color={getIconColor("products_locked")}
+            className="w-4 h-4 text-gray-400 ml-4"
+          />
         </div>
       ),
     });
@@ -158,8 +232,18 @@ export const ProfilePage = () => {
       label: "Mes clients",
       icon: (
         <div className="flex items-center justify-between w-full">
-          <UsersIcon className="w-5 h-5" />
-          <LockClosedIcon className="w-4 h-4 text-gray-400 ml-4" />
+          <Profile2User
+            size="20"
+            variant="Linear"
+            color={getIconColor("clients_locked")}
+            className="w-5 h-5"
+          />
+          <Lock1
+            size="20"
+            variant="Linear"
+            color={getIconColor("clients_locked")}
+            className="w-4 h-4 text-gray-400 ml-4"
+          />
         </div>
       ),
     });
@@ -262,7 +346,7 @@ export const ProfilePage = () => {
               variant={subscription?.licence ? "secondary" : "primary"}
               className="flex items-center gap-2"
             >
-              <CreditCardIcon className="h-5 w-5" />
+              <Card size="20" variant="Bold" color="#fff" />
               {subscription?.licence
                 ? "Gérer mon abonnement"
                 : "Passer Premium"}
@@ -273,13 +357,14 @@ export const ProfilePage = () => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Navigation à gauche */}
           <div className="w-full md:w-80 flex-shrink-0">
-            <div className="sticky top-[100px] bg-white shadow-sm rounded-lg p-4">
+            <div className="sticky top-[100px] bg-white shadow-sm rounded-2xl p-4">
               <div className="flex flex-col items-center justify-center mb-6">
-                <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden relative mb-2">
+                <div className="w-32 h-32 rounded-full bg-[#5b50ff]/10 flex items-center justify-center overflow-hidden relative mb-2">
                   {data?.me?.profile?.profilePicture ? (
                     <img
                       src={
-                        import.meta.env.VITE_API_URL + "/" +
+                        import.meta.env.VITE_API_URL +
+                        "/" +
                         data.me.profile.profilePicture
                       }
                       alt={`${data?.me?.profile?.firstName || ""} ${
@@ -302,19 +387,7 @@ export const ProfilePage = () => {
                       {data?.me?.profile?.lastName?.[0] || ""}
                     </span>
                   ) : (
-                    <svg
-                      className="w-10 h-10 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
+                    <User size="40" variant="Linear" color="#5b50ff" />
                   )}
                   {data?.me?.unreadNotifications > 0 && (
                     <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4">
@@ -347,11 +420,17 @@ export const ProfilePage = () => {
             {activeTab === "profile" && (
               <>
                 {/* Informations personnelles */}
-                <div className="bg-white shadow sm:rounded-lg">
+                <div className="bg-white shadow-sm rounded-2xl">
                   <div className="px-4 py-5 sm:p-6">
-                    <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                    <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4 flex items-center gap-2">
+                      <InfoCircle size="20" variant="Linear" color="#5b50ff" />
                       Informations personnelles
                     </h2>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Les informations personnelles sont utilisées dans les
+                      outils et pour garantir une expérience utilisateur
+                      optimale.
+                    </p>
                     <PersonalInfoForm initialData={profileData} />
                   </div>
                 </div>
@@ -361,12 +440,12 @@ export const ProfilePage = () => {
             {activeTab === "company" && subscription?.licence && (
               <>
                 {/* Informations de l'entreprise */}
-                <div className="bg-white shadow sm:rounded-lg">
+                <div className="bg-white shadow-sm rounded-2xl">
                   <div className="px-4 py-5 sm:p-6">
                     <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                       Informations de l'entreprise
                     </h2>
-                    <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                    <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
                       <p className="text-sm text-gray-600">
                         <span className="text-[#5b50ff] font-medium">
                           Important :
@@ -382,19 +461,20 @@ export const ProfilePage = () => {
                         garantissant leur conformité légale.
                       </p>
                     </div>
-                    <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-10">
-                    <p className="text-sm text-amber-600 mb-4">
-                      <span className="text-amber-600 font-medium">
-                        Rappel :
-                      </span>{" "}
-                      Bien que Newbi facilite la génération de documents
-                      commerciaux, nous vous recommandons vivement de faire
-                      relire tous vos documents par un professionnel compétent
-                      (expert-comptable, avocat) avant leur utilisation
-                      officielle. Newbi ne peut être tenu responsable des
-                      conséquences juridiques ou fiscales résultant de
-                      l'utilisation des documents générés par notre plateforme.
-                    </p>
+                    <div className="bg-amber-50 p-3 rounded-2xl border border-amber-200 mb-10">
+                      <p className="text-sm text-amber-600 mb-4">
+                        <span className="text-amber-600 font-medium">
+                          Rappel :
+                        </span>{" "}
+                        Bien que Newbi facilite la génération de documents
+                        commerciaux, nous vous recommandons vivement de faire
+                        relire tous vos documents par un professionnel compétent
+                        (expert-comptable, avocat) avant leur utilisation
+                        officielle. Newbi ne peut être tenu responsable des
+                        conséquences juridiques ou fiscales résultant de
+                        l'utilisation des documents générés par notre
+                        plateforme.
+                      </p>
                     </div>
                     <CompanyInfoForm initialData={companyData} />
                   </div>
@@ -403,12 +483,12 @@ export const ProfilePage = () => {
             )}
 
             {activeTab === "clients" && subscription?.licence && (
-              <div className="bg-white shadow sm:rounded-lg">
+              <div className="bg-white shadow-sm rounded-2xl">
                 <div className="px-4 py-5 sm:p-6">
                   <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                     Gestion des clients
                   </h2>
-                  <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                  <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
                     <p className="text-sm text-gray-600">
                       <span className="text-[#5b50ff] font-medium">
                         Astuce :
@@ -429,7 +509,7 @@ export const ProfilePage = () => {
             {(activeTab === "company_locked" ||
               activeTab === "products_locked" ||
               activeTab === "clients_locked") && (
-              <div className="bg-white shadow sm:rounded-lg">
+              <div className="bg-white shadow-sm rounded-2xl">
                 <div className="px-4 py-5 sm:p-6 flex flex-col items-center justify-center text-center">
                   <CheckBadgeIcon className="w-12 h-12 text-yellow-500 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -455,12 +535,12 @@ export const ProfilePage = () => {
             )}
 
             {activeTab === "products" && subscription?.licence && (
-              <div className="bg-white shadow sm:rounded-lg">
+              <div className="bg-white shadow-sm rounded-2xl">
                 <div className="px-4 py-5 sm:p-6">
                   <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                     Gestion des produits
                   </h2>
-                  <div className="bg-[#f0eeff] p-3 rounded-md border border-[#e6e1ff] mb-4">
+                  <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
                     <p className="text-sm text-gray-600">
                       <span className="text-[#5b50ff] font-medium">
                         Astuce :
@@ -481,7 +561,7 @@ export const ProfilePage = () => {
             )}
 
             {activeTab === "integrations" && subscription?.licence && (
-              <div className="bg-white shadow sm:rounded-lg">
+              <div className="bg-white shadow-sm rounded-2xl">
                 <div className="px-4 py-5 sm:p-6">
                   <IntegrationsManager />
                 </div>

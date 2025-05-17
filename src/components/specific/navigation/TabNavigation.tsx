@@ -137,7 +137,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 onTabChange(tab.id);
               }}
               className={`
-                px-4 py-2 text-sm font-medium transition-all duration-200 ease-in-out
+                px-4 py-2 text-sm font-medium transition-all rounded-2xl duration-200 ease-in-out
                 ${activeTab === tab.id 
                   ? 'bg-[#5b50ff] text-white' 
                   : 'bg-white text-black hover:bg-gray-50'}
@@ -183,7 +183,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 onTabChange(tab.id);
               }}
               className={`
-                px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out
+                px-3 py-1.5 rounded-2xl text-sm font-medium transition-all duration-200 ease-in-out
                 ${activeTab === tab.id 
                   ? 'bg-[#5b50ff] text-white' 
                   : 'text-black hover:bg-white'}
@@ -216,7 +216,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
     // Variante pills
     if (variant === 'pills') {
       return (
-        <div className={`flex space-x-1 border-b border-gray-200 ${className} relative overflow-hidden`}>
+        <div className={`flex space-x-1 border-b border-gray-200 rounded-2xl ${className} relative overflow-hidden`}>
           {tabs.map((tab) => {
             // Déterminer la couleur du badge directement dans le JSX
             const getBadgeColor = () => {
@@ -280,7 +280,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
               e.stopPropagation();
               onTabChange(tab.id);
             }}
-            className={`px-4 py-3 rounded-md w-full text-left flex items-center transition-all duration-300 ease-in-out ${
+            className={`px-4 py-4 rounded-2xl w-full text-left flex items-center transition-all duration-300 ease-in-out ${
               activeTab === tab.id
                 ? 'bg-[#5b50ff] text-white font-medium shadow-sm'
                 : 'bg-transparent text-black hover:text-black'

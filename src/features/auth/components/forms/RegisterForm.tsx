@@ -299,8 +299,9 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
           type="submit"
           disabled={loading}
           isLoading={loading}
+          loaderPosition="left" 
+          variant="primary"
           fullWidth
-          className="bg-[#5b50ff] hover:bg-[#4a41d0] py-3 rounded-lg"
         >
           S'inscrire
         </Button>

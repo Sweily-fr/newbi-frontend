@@ -7,6 +7,7 @@ import { Form, TextField, Button, Checkbox, PasswordField } from "../../../../co
 import { Notification } from "../../../../components/";
 import { ReactivateAccountModal } from "./ReactivateAccountModal";
 import CryptoJS from "crypto-js";
+import { InfoCircle } from "iconsax-react";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -197,21 +198,10 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
 
       {/* Afficher un message d'information pour les utilisateurs qui viennent de s'inscrire */}
       {isEmailVerificationMessage && (
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md mb-6 max-w-lg mx-auto">
+        <div className="bg-[#5b50FF]/10 border border-[#5b50FF]/20 p-4 rounded-2xl mb-6 max-w-lg mx-auto">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-blue-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <InfoCircle size="20" variant="Linear" color="#5b50ff" />
             </div>
             <div className="ml-3">
               <p className="text-sm text-blue-700">
@@ -226,22 +216,10 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
 
       {/* Afficher l'erreur de vérification d'email si elle existe */}
       {emailVerificationError && (
-        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-md mb-6 max-w-lg mx-auto">
+        <div className="bg-[#FFC600]/10 border border-[#FFC600]/20 p-4 rounded-2xl mb-6 max-w-lg mx-auto">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-amber-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <InfoCircle size="20" variant="Linear" color="#FFC600" />
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-amber-800">
@@ -325,9 +303,9 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
           type="submit"
           disabled={isSubmitting}
           isLoading={isSubmitting}
+          variant="primary"
           loaderPosition="left"
           fullWidth
-          className="bg-[#5b50ff] hover:bg-[#4a41d0] py-3 rounded-lg"
         >
           Connexion
         </Button>

@@ -6,6 +6,7 @@ import { Button, SearchInput } from '../../../../components/';
 import { PlusIcon, DocumentTextIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatPrice } from '../../../../utils/formatters';
 import { Spinner } from '../../../../components/common/Spinner';
+import { Add, AddSquare, Edit, Trash } from 'iconsax-react';
 
 // Type pour un produit
 export interface Product {
@@ -110,7 +111,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
               className="p-1 text-[#5b50ff] hover:text-[#4a41e0] rounded-full hover:bg-[#f0eeff]"
               title="Modifier"
             >
-              <PencilIcon className="h-5 w-5" />
+              <Edit size="20" color="#5b50ff" />
             </button>
           )}
           {onDeleteProduct && (
@@ -119,7 +120,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
               className="p-1 text-red-600 hover:text-red-800 rounded-full hover:bg-red-100"
               title="Supprimer"
             >
-              <TrashIcon className="h-5 w-5" />
+              <Trash size="20" color="red" />
             </button>
           )}
         </div>
@@ -139,7 +140,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
         variant="primary"
         className="inline-flex items-center"
       >
-        <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+        <Add size="20" color="#fff" className="mr-2" />
         Ajouter un produit
       </Button>
     ) : undefined
@@ -184,7 +185,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
               variant="primary"
               className="inline-flex items-center"
             >
-              <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              <Add size="20" color="#fff" className="mr-2" />
               Ajouter un produit
             </Button>
           )}
