@@ -14,28 +14,40 @@ export const useDeviceDetection = (): DeviceDetection => {
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
+    const detectDevice = () => {
+      // Détection basée sur l'User-Agent
+      const userAgent = navigator.userAgent.toLowerCase();
       
-      // Définitions des seuils pour les différents appareils
-      // Mobile: < 768px
-      // Tablet: >= 768px et < 1024px
-      // Desktop: >= 1024px
-      const isMobile = width < 768;
-      const isTablet = width >= 768 && width < 1024;
-      const isDesktop = width >= 1024;
+      // Expressions régulières pour détecter les appareils mobiles et tablettes
+      const mobileRegex = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i;
+      const tabletRegex = /ipad|android(?!.*mobile)|tablet|kindle|playbook|silk|(?=.*android)(?=.*mobile)/i;
+      
+      // Détection basée sur l'User-Agent
+      const isMobileByUA = mobileRegex.test(userAgent) && !tabletRegex.test(userAgent);
+      const isTabletByUA = tabletRegex.test(userAgent);
+      
+      // Détection basée sur la largeur d'écran
+      const width = window.innerWidth;
+      const isMobileByWidth = width < 768;
+      const isTabletByWidth = width >= 768 && width < 1024;
+      
+      // Combinaison des deux méthodes de détection
+      // Privilégier la détection par User-Agent, mais utiliser la largeur comme fallback
+      const isMobile = isMobileByUA || (isMobileByWidth && !isTabletByUA);
+      const isTablet = isTabletByUA || (isTabletByWidth && !isMobileByUA);
+      const isDesktop = !isMobile && !isTablet;
 
       setDeviceType({ isMobile, isTablet, isDesktop });
     };
 
     // Vérification initiale
-    handleResize();
+    detectDevice();
 
     // Ajout de l'écouteur d'événement pour les changements de taille
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', detectDevice);
 
     // Nettoyage
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', detectDevice);
   }, []);
 
   return deviceType;
