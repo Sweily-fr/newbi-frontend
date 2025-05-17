@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BlogSeoProvider } from '../context';
 import { RichTextEditor } from '../components/editor';
 import { ExportPanel, KeywordsMetaForm, SeoScorePanel } from '../components/business';
@@ -13,10 +14,11 @@ export const BlogSeoOptimizerContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'keywords' | 'score' | 'recommendations'>('keywords');
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   
-  // Activer les onglets si une analyse a été effectuée
+  // Activer les onglets et changer vers l'onglet Score SEO après une analyse
   useEffect(() => {
     if (state.analysisResults && Object.keys(state.analysisResults).length > 0) {
       setHasAnalyzed(true);
+      setActiveTab('score'); // Changer automatiquement vers l'onglet Score SEO
     }
   }, [state.analysisResults]);
   
@@ -100,21 +102,47 @@ export const BlogSeoOptimizerContent: React.FC = () => {
             
             {/* Contenu des onglets */}
             <div className="flex-1 overflow-y-auto rounded-b-xl">
-              {activeTab === 'keywords' && (
-                <KeywordsMetaForm />
-              )}
-              
-              {activeTab === 'score' && (
-                <SeoScorePanel />
-              )}
-              
-              {activeTab === 'recommendations' && (
-                <RecommendationsPanel 
-                  analysisResults={state.analysisResults}
-                  expandedCategories={expandedCategories}
-                  setExpandedCategories={setExpandedCategories}
-                />
-              )}
+              <AnimatePresence mode="wait">
+                {activeTab === 'keywords' && (
+                  <motion.div
+                    key="keywords"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <KeywordsMetaForm />
+                  </motion.div>
+                )}
+                
+                {activeTab === 'score' && (
+                  <motion.div
+                    key="score"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <SeoScorePanel />
+                  </motion.div>
+                )}
+                
+                {activeTab === 'recommendations' && (
+                  <motion.div
+                    key="recommendations"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <RecommendationsPanel 
+                      analysisResults={state.analysisResults}
+                      expandedCategories={expandedCategories}
+                      setExpandedCategories={setExpandedCategories}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 

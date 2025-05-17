@@ -62,6 +62,32 @@ export const EditorStyles: React.FC = () => {
           color: #4b5563;
         }
         
+        /* Styles pour les listes à puces */
+        [contenteditable] ul {
+          list-style-type: disc;
+          margin-left: 2rem;
+          margin-top: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        [contenteditable] ul li {
+          margin-bottom: 0.25rem;
+          color: #4b5563;
+        }
+        
+        /* Styles pour les listes numérotées */
+        [contenteditable] ol {
+          list-style-type: decimal;
+          margin-left: 2rem;
+          margin-top: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        [contenteditable] ol li {
+          margin-bottom: 0.25rem;
+          color: #4b5563;
+        }
+        
         /* Style pour le placeholder */
         [contenteditable].empty:before {
           content: attr(data-placeholder);

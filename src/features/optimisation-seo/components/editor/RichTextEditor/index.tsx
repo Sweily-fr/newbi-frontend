@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { RichTextEditorProps } from './types';
-import LinkPopup from './LinkPopup';
-import ImagePopup from './ImagePopup';
-import EditImagePopup from './EditImagePopup';
-import EditorToolbar from './EditorToolbar';
-import EditorStyles from './EditorStyles';
+import LinkPopup from './components/LinkPopup';
+import ImagePopup from './components/ImagePopup';
+import EditImagePopup from './components/EditImagePopup';
+import EditorToolbar from './components/EditorToolbar';
+import EditorStyles from './components/EditorStyles';
 import { useEditorHandlers } from './useEditorHandlers';
 import { getWordCountRating, calculateWordCount } from './utils';
 // Le hook useBlogSeo sera réintégré après la refactorisation complète
@@ -60,15 +60,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const wordCount = calculateWordCount(editorRef.current.innerText);
       setCurrentWordCount(wordCount);
     }
-    
-    // Nettoyage des URL d'objets lors du démontage du composant
-    return () => {
-      if (objectUrlsRef.current.length > 0) {
-        objectUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
-        objectUrlsRef.current = [];
-      }
-    };
-  }, [state.content, objectUrlsRef, setCurrentWordCount]);
+  }, [state.content, setCurrentWordCount]);
 
   useEffect(() => {
     if (editorRef.current) {
@@ -414,94 +406,86 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         isOpen={isImagePopupOpen} 
         onClose={() => setIsImagePopupOpen(false)}
         onSubmit={(file, alt, width, height) => {
-          // Créer un URL pour l'image
-          const imageUrl = URL.createObjectURL(file);
-          
-          // Stocker l'URL d'objet pour pouvoir le libérer plus tard
-          objectUrlsRef.current.push(imageUrl);
-          
-          // Restaurer le focus et la sélection
-          if (editorRef.current && savedRange) {
-            editorRef.current.focus();
+          // Convertir l'image en base64 pour une persistance améliorée
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
             
-            const selection = window.getSelection();
-            if (selection) {
-              selection.removeAllRanges();
-              selection.addRange(savedRange);
+            // Restaurer le focus et la sélection
+            if (editorRef.current && savedRange) {
+              editorRef.current.focus();
               
-              // Insérer l'image
-              document.execCommand('insertImage', false, imageUrl);
-              
-              // Ajouter les attributs à l'image
-              setTimeout(() => {
-                if (editorRef.current) {
-                  // Sélectionner toutes les images avec cette URL
-                  const images = editorRef.current.querySelectorAll(`img[src="${imageUrl}"]`);
-                  
-                  images.forEach(img => {
-                    // Ajouter l'attribut alt
-                    img.setAttribute('alt', alt);
+              const selection = window.getSelection();
+              if (selection) {
+                selection.removeAllRanges();
+                selection.addRange(savedRange);
+                
+                // Insérer l'image avec la source en base64
+                document.execCommand('insertImage', false, base64String);
+                
+                // Ajouter les attributs à l'image
+                setTimeout(() => {
+                  if (editorRef.current) {
+                    // Sélectionner toutes les images avec cette source base64
+                    // Utilisons une approche plus robuste pour trouver l'image nouvellement insérée
+                    const images = editorRef.current.querySelectorAll('img');
+                    const newImages = Array.from(images).filter((img: HTMLImageElement) => 
+                      img.src === base64String || 
+                      img.getAttribute('src') === base64String
+                    );
                     
-                    // Ajouter des attributs supplémentaires pour référence
-                    img.setAttribute('data-file-name', file.name);
-                    img.setAttribute('data-file-size', file.size.toString());
-                    img.setAttribute('data-file-type', file.type);
-                    img.setAttribute('data-processed', 'true');
-                    img.setAttribute('data-timestamp', Date.now().toString());
+                    newImages.forEach((img: HTMLImageElement) => {
+                      // Ajouter l'attribut alt
+                      img.setAttribute('alt', alt);
+                      
+                      // Ajouter des attributs supplémentaires pour référence
+                      img.setAttribute('data-file-name', file.name);
+                      img.setAttribute('data-file-size', file.size.toString());
+                      img.setAttribute('data-file-type', file.type);
+                      img.setAttribute('data-processed', 'true');
+                      img.setAttribute('data-timestamp', Date.now().toString());
+                      img.setAttribute('data-persistent', 'true'); // Marquer comme persistant
+                      
+                      // Ajouter des styles pour une meilleure présentation
+                      if (img instanceof HTMLElement) {
+                        // Appliquer les dimensions spécifiées
+                        if (width) {
+                          img.style.width = `${width}px`;
+                          img.setAttribute('width', width);
+                        } else {
+                          img.style.maxWidth = '100%';
+                        }
+                        
+                        if (height) {
+                          img.style.height = `${height}px`;
+                          img.setAttribute('height', height);
+                        } else if (!height && !width) {
+                          img.style.height = 'auto';
+                        }
+                        
+                        img.classList.add('blog-image');
+                      }
+                    });
                     
-                    // Ajouter des styles pour une meilleure présentation
-                    if (img instanceof HTMLElement) {
-                      // Appliquer les dimensions spécifiées
-                      if (width) {
-                        img.style.width = `${width}px`;
-                        img.setAttribute('width', width);
-                      } else {
-                        img.style.maxWidth = '100%';
-                      }
-                      
-                      if (height) {
-                        img.style.height = `${height}px`;
-                        img.setAttribute('height', height);
-                      } else if (!height && !width) {
-                        img.style.height = 'auto';
-                      }
-                      
-                      img.classList.add('blog-image');
+                    // Mettre à jour le contenu via le contexte
+                    if (setContent) {
+                      setContent(editorRef.current.innerHTML);
                     }
-                  });
-                  
-                  // Mettre à jour le contenu via le contexte
-                  if (setContent) {
-                    setContent(editorRef.current.innerHTML);
+                    
+                    // Mettre à jour le nombre de mots
+                    setCurrentWordCount(calculateWordCount(editorRef.current.innerHTML));
                   }
-                  
-                  // Mettre à jour le nombre de mots
-                  setCurrentWordCount(calculateWordCount(editorRef.current.innerHTML));
-                }
-              }, 100);
-            }
-          }
-          
-          // Réinitialiser et fermer la popup
-          setSavedRange(null);
-          setIsImagePopupOpen(false);
-          
-          // Nettoyer les URLs d'objets obsolètes
-          const cleanupObjectUrls = () => {
-            const currentImages = editorRef.current?.querySelectorAll('img') || [];
-            const currentImageUrls = Array.from(currentImages).map(img => img.getAttribute('src'));
-            
-            objectUrlsRef.current = objectUrlsRef.current.filter(url => {
-              if (!currentImageUrls.includes(url)) {
-                URL.revokeObjectURL(url);
-                return false;
+                }, 100);
               }
-              return true;
-            });
+            }
+            
+            // Réinitialiser et fermer la popup
+            setSavedRange(null);
+            setIsImagePopupOpen(false);
           };
           
-          // Nettoyer les URLs d'objets obsolètes après un délai
-          setTimeout(cleanupObjectUrls, 1000);
+          // Lire le fichier en tant que Data URL (base64)
+          reader.readAsDataURL(file);
         }}
       />
       

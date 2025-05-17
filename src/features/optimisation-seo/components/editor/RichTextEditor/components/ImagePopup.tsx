@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal } from '../../../../../components/common/Modal';
+import { Modal } from "@/components/common/Modal";
 import { ImagePopupProps } from './types';
 
 const ImagePopup: React.FC<ImagePopupProps> = ({ isOpen, onClose, onSubmit }) => {

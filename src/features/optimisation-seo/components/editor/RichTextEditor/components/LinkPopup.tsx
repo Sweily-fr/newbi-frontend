@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal } from '../../../../../components/common/Modal';
+import { Modal } from "@/components/common/Modal";
 import { LinkPopupProps } from './types';
 
 const LinkPopup: React.FC<LinkPopupProps> = ({ 
