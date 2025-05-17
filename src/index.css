@@ -46,4 +46,80 @@
     background-color: currentColor;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  
+  /* Animations pour les ToolCards */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes float-slow {
+    0%, 100% {
+      transform: translateY(0) rotate(-5deg);
+    }
+    50% {
+      transform: translateY(-5px) rotate(5deg);
+    }
+  }
+  
+  .animate-float-slow {
+    animation: float-slow 4s ease-in-out infinite;
+  }
+  
+  @keyframes float-medium {
+    0%, 100% {
+      transform: translateY(0) rotate(5deg);
+    }
+    50% {
+      transform: translateY(-3px) rotate(-5deg);
+    }
+  }
+  
+  .animate-float-medium {
+    animation: float-medium 3s ease-in-out infinite;
+  }
+  
+  @keyframes float-fast {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-2px) rotate(10deg);
+    }
+  }
+  
+  .animate-float-fast {
+    animation: float-fast 2.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-width {
+    0%, 100% {
+      width: 60%;
+      opacity: 0.8;
+    }
+    50% {
+      width: 40%;
+      opacity: 0.6;
+    }
+  }
+  
+  .animate-pulse-width {
+    animation: pulse-width 2s ease-in-out infinite;
+  }
+  
+  /* Classe pour limiter le nombre de lignes de texte */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

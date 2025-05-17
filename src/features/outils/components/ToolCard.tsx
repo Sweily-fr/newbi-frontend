@@ -5,14 +5,15 @@ import { Button } from "../../../components";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { Link } from "react-router-dom";
-import { Verify } from "iconsax-react";
+import { ArrowRight2 } from "iconsax-react";
 
 interface ToolCardProps {
   tool: Tool;
   onClick?: () => void;
+  className?: string;
 }
 
-export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
+export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '' }) => {
   const { isAuthenticated } = useAuth();
   const { hasActiveSubscription } = useSubscription();
 
@@ -22,65 +23,90 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
   return (
     <Link
       to={tool.href}
-      className={`relative group bg-white rounded-2xl shadow-md border transition-all duration-200 overflow-hidden block
-        hover:shadow-lg hover:border-[#5b50ff] hover:bg-[#f0eeff]/30
-        ${tool.premium ? 'border-[#5b50ff]/40 bg-[#f0eeff]/20' : 'border-gray-100'}
-        ${tool.comingSoon ? 'opacity-70 grayscale pointer-events-none' : ''}
+      className={`relative group bg-white rounded-2xl shadow-md border transition-all duration-300 overflow-hidden block
+        hover:shadow-xl hover:border-gray-300 hover:bg-gray-50 hover:transform hover:scale-[1.01]
+        ${tool.premium ? 'border-gray-200 bg-gray-50/30' : 'border-gray-100'}
+        ${tool.comingSoon ? 'opacity-75 grayscale pointer-events-none' : ''}
         ${!tool.comingSoon && hasAccess ? 'cursor-pointer' : ''}
+        ${className}
       `}
       onClick={onClick}
+      aria-label={`Accéder à l'outil ${tool.name}${tool.premium ? ' (Premium)' : ''}`}
     >
-      <div className="p-4 flex flex-col h-full justify-between">
+      {/* Aucun indicateur premium en haut à droite */}
+      
+      <div className="p-5 flex flex-col h-full justify-between">
         {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
-        <div className="flex items-center gap-3 mb-3 pl-1">
-          {/* Icône dans un cercle avec fond blanc */}
+        <div className="flex items-center gap-4 mb-4 pl-1">
+          {/* Icône dans un cercle avec fond et effet de brillance */}
           <div className={`
-            h-14 w-14 rounded-full
+            h-16 w-16 rounded-full
             flex items-center justify-center
             border transition-all flex-shrink-0
-            shadow-sm
-            ${tool.premium ? 'bg-[#f0eeff] border-[#5b50ff]/40' : 'bg-white border-gray-200'}
-            group-hover:border-[#5b50ff] group-hover:bg-[#e6e1ff]
+            shadow-sm relative overflow-hidden
+            ${tool.premium ? 'bg-gray-50 border-gray-300' : 'bg-white border-gray-200'}
+            group-hover:border-gray-400 group-hover:bg-white
+            before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
           `}>
-            <div className="w-7 h-7 flex items-center justify-center">
-              <div className={`transform scale-125 ${tool.premium ? 'text-[#5b50ff]' : ''}`}>{tool.icon}</div>
+
+            <div className="w-8 h-8 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-110">
+              <div className="text-gray-700">{tool.icon}</div>
             </div>
           </div>
           
           {/* Titre et catégorie */}
           <div className="flex flex-col">
-            <h3 className={`text-lg font-medium tracking-wide text-gray-800`}>
+            <h3 className="text-lg font-semibold tracking-wide text-gray-800 group-hover:text-gray-900 transition-colors duration-300">
               {tool.name}
             </h3>
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-[#5b50ff] font-medium">{tool.category}</p>
-              
-              {/* Badge premium stylisé */}
-              {tool.premium && (
-                <div className="flex items-center justify-center rounded-full text-[#5b50ff]">
-                  <Verify size="20" variant="Bold" color="#FFD700" />
-                </div>
-              )}
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 shadow-sm transition-all duration-300 group-hover:shadow group-hover:bg-gray-200">{tool.category}</p>
+                {tool.premium && (
+                  <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#f0eeff]/50 text-[#5b50ff]/80">Premium</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="text-sm mb-3 min-h-[42px]">
-          {tool.comingSoon
-            ? <span className="italic text-[#4a41e0] font-semibold">{tool.name} bientôt disponible</span>
-            : <span className={`${tool.premium ? 'text-gray-600' : 'text-gray-500'}`}>{tool.description}</span>}
+        <div className="text-sm mb-4 min-h-[42px]">
+          {tool.comingSoon ? (
+            <div className="flex items-center gap-2">
+              <span className="italic text-gray-600 font-medium">{tool.name} bientôt disponible</span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-gray-700 line-clamp-2">{tool.description}</p>
+              {/* Informations pertinentes supplémentaires */}
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Utilisation rapide</span>
+                </div>
+                {tool.premium && (
+                  <div className="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Modèles personnalisables</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Bouton décoratif (n'est pas un vrai lien, juste visuel) */}
+        {/* Bouton avec transition secondary -> primary au survol */}
         <div className="mt-auto pt-3">
           <Button
-            variant="outline"
+            variant="secondary"
             size="md"
             fullWidth
-            className={`font-medium transition-all duration-300 
-              ${tool.premium ? 'text-[#5b50ff]' : ''}
-              group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:transform group-hover:translate-y-[-2px]
-              pointer-events-none
+            className={`font-medium transition-all duration-300 rounded-2xl relative overflow-hidden
+              group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md
             `}
             disabled={tool.comingSoon}
           >
@@ -88,10 +114,22 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
               "Vous serez notifié au lancement"
             ) : (
               <div className="flex items-center justify-center gap-2">
-                {tool.premium && isAuthenticated && !hasActiveSubscription && (
-                  <LockClosedIcon className="h-4 w-4 text-[#e6e1ff]" />
+                {tool.premium && isAuthenticated && !hasActiveSubscription ? (
+                  <>
+                    <LockClosedIcon className="h-4 w-4" />
+                    <span>Débloquer</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Explorer</span>
+                    <ArrowRight2 
+                      size="16" 
+                      color="currentColor" 
+                      variant="Linear" 
+                      className="ml-1 transition-all duration-300 group-hover:translate-x-1 relative z-10" 
+                    />
+                  </>
                 )}
-                <span>{tool.name}</span>
               </div>
             )}
           </Button>
