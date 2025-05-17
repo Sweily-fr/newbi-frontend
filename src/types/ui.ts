@@ -198,6 +198,9 @@ export interface DropdownItem {
   hasDivider?: boolean;
   className?: string;
   icon?: React.ReactNode;
+  variant?: 'default' | 'danger';
+  disabled?: boolean;
+  tooltip?: string;
 }
 
 export interface DropdownProps {

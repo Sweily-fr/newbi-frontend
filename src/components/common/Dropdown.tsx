@@ -3,6 +3,7 @@ import { DropdownProps } from '../../types/ui';
 
 /**
  * Composant Dropdown réutilisable
+ * Redesigné pour correspondre au style moderne de Newbi
  */
 export const Dropdown: React.FC<DropdownProps> = ({
   trigger,
@@ -48,10 +49,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className={`absolute ${positionClass} top-full mt-2 ${width} rounded-md bg-white border border-[#e6e1ff] z-[9999] transform origin-top-${position} transition-all duration-200 ease-out ${className}`}
+          className={`absolute ${positionClass} top-full mt-2 ${width} rounded-lg bg-white border border-gray-100 z-[9999] transform origin-top-${position} transition-all duration-200 ease-out ${className}`}
           style={{ boxShadow: '0 4px 20px rgba(91, 80, 255, 0.15)' }}
         >
-          <div className="py-1">
+          <div className="py-0">
             {items.map((item, index) => (
               <button
                 key={index}
@@ -59,12 +60,19 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   item.onClick();
                   setIsOpen(false);
                 }}
-                className={`block w-full text-left px-4 py-3 text-base text-gray-700 hover:bg-purple-50 ${item.hasDivider ? 'border-t border-gray-100 mt-1 pt-3' : ''} ${item.className || ''}`}
+                className={`block w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors duration-150 
+                  ${item.variant === 'danger' ? 'text-red-600 hover:bg-red-50' : 'text-gray-700 hover:bg-[#f0eeff]'}
+                  ${item.hasDivider ? 'border-t border-gray-100 mt-1 pt-3' : ''} 
+                  ${item.className || ''}`}
+                disabled={item.disabled}
+                title={item.tooltip}
               >
-                <div className="flex items-center">
-                  {item.icon && <span className="mr-2">{item.icon}</span>}
-                  <span>{item.label}</span>
-                </div>
+                {item.icon && (
+                  <span className="flex items-center justify-center w-5 h-5">
+                    {item.icon}
+                  </span>
+                )}
+                <span className="font-medium">{item.label}</span>
               </button>
             ))}
           </div>

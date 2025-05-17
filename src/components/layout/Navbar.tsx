@@ -8,9 +8,9 @@ import { ButtonLink } from '../';
 import { useQuery } from '@apollo/client';
 import { GET_PROFILE } from '../../features/profile/graphql';
 import axios from 'axios';
-import { UserCircleIcon, CreditCardIcon, ArrowRightOnRectangleIcon, QuestionMarkCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { PremiumModal } from '../specific/subscription/PremiumModal';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
+import { ArrowRight, Verify, Profile, LogoutCurve, People, Card, InfoCircle } from 'iconsax-react';
 
 export const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -75,13 +75,12 @@ export const Navbar = () => {
     {
       label: 'Mon profil',
       onClick: handleProfileClick,
-      icon: <UserCircleIcon className="h-5 w-5 text-gray-500" />
+      icon: <Profile size="20" variant="Linear" color="#5b50ff" />
     }
   ];
   
   // Ajouter l'option d'abonnement si l'utilisateur a un ID client Stripe
   if (subscription?.stripeCustomerId) {
-
     
     // Ajouter l'option de gestion d'abonnement
     dropdownItems.push({
@@ -93,45 +92,37 @@ export const Navbar = () => {
           setIsPremiumModalOpen(true);
         }
       },
-      icon: <CreditCardIcon className="h-5 w-5 text-gray-500" />
+      icon: <Card size="20" variant="Linear" color="#5b50ff" />
     });
     
     // Ajouter l'option Communauté uniquement pour les membres premium
     if (isPremium) {
       dropdownItems.push({
-        label: (
-          <div className="flex items-center">
-            <span>Communauté</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </div>
-        ),
+        label: 'Communauté',
         onClick: () => {
           window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');
         },
-        icon: <UserGroupIcon className="h-5 w-5 text-gray-500" />
+        icon: <People size="20" variant="Linear" color="#5b50ff" />
       });
     }
   }
   
-
-  
-  // Ajouter l'option de support
+  // Ajouter l'option Aide
   dropdownItems.push({
-    label: 'Support',
+    label: 'Aide',
     onClick: () => {
-      window.location.href = 'mailto:contact@newbi.fr?subject=Demande de support - Newbi';
+      window.open('https://newbi.fr/faq', '_blank');
     },
-    icon: <QuestionMarkCircleIcon className="h-5 w-5 text-gray-500" />
+    icon: <InfoCircle size="20" variant="Linear" color="#5b50ff" />
   });
   
   // Ajouter l'option de déconnexion
   dropdownItems.push({
     label: 'Déconnexion',
     onClick: handleLogout,
-    icon: <ArrowRightOnRectangleIcon className="h-5 w-5 text-gray-500" />,
-    hasDivider: true
+    icon: <LogoutCurve size="20" variant="Linear" color="#ef4444" />,
+    hasDivider: true,
+    variant: 'danger'
   });
 
   // Construire le nom pour l'avatar à partir des données du profil
@@ -207,9 +198,10 @@ export const Navbar = () => {
                 {!isAuthenticated && (
                   <ButtonLink
                     to="/auth"
-                    className="bg-[#5b50ff] text-white hover:bg-[#4a41d0] px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="bg-[#5b50ff] text-white hover:bg-[#4a41d0] px-4 py-2 rounded-2xl text-md font-medium transition-colors duration-200"
                   >
-                    Inscription/Connexion
+                    Commencer gratuitement
+                    <ArrowRight size={20} color="white" className="ml-2" />
                   </ButtonLink>
                 )}
                 
@@ -221,10 +213,11 @@ export const Navbar = () => {
                         items={dropdownItems}
                         position="right"
                         width="w-72"
+                        className="shadow-md rounded-2xl overflow-hidden"
                       />
                       {subscription && subscription.licence && (
-                        <div className="absolute -bottom-1 -right-1">
-                          <CheckBadgeIcon className="h-5 w-5 text-yellow-400 drop-shadow-md" />
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full shadow-sm">
+                          <Verify size={20} color="#FFD700" variant='Bold'/>
                         </div>
                       )}
                     </div>

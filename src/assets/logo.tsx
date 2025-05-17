@@ -13,36 +13,37 @@ export const Logo: React.FC<LogoProps> = ({
   variant = 'default', 
   withText = true 
 }) => {
-  // Fonction pour obtenir le chemin de l'image SVG en fonction de la variante et du mode texte
+  // Fonction pour obtenir le chemin de l'image en fonction de la variante et du mode texte
   const getLogoPath = (): string => {
     switch (variant) {
       case 'white':
-        return withText ? '/images/logo_newbi/SVG/Logo_Texte_White.svg' : '/images/logo_newbi/SVG/Logo_NI_White.svg';
+        return withText ? '/images/logo_newbi/PNG/Logo_Texte_White.png' : '/images/logo_newbi/PNG/Logo_NI_White.png';
       case 'black':
-        return withText ? '/images/logo_newbi/SVG/Logo_Texte_Black.svg' : '/images/logo_newbi/SVG/Logo_NI_Black.svg';
+        return withText ? '/images/logo_newbi/PNG/Logo_Texte_Black.png' : '/images/logo_newbi/PNG/Logo_NI_Black.png';
       case 'purple':
-        return withText ? '/images/logo_newbi/SVG/Logo_Texte_Purple.svg' : '/images/logo_newbi/SVG/Logo_NI_Purple.svg';
+        return withText ? '/images/logo_newbi/PNG/Logo_Texte_Purple.png' : '/images/logo_newbi/PNG/Logo_NI_Purple.png';
       case 'square-white':
-        return '/images/logo_newbi/SVG/Logo_square_WB.svg';
+        return '/images/logo_newbi/PNG/Logo_square_WB.png';
       case 'square-black':
-        return '/images/logo_newbi/SVG/Logo_square_BW.svg';
+        return '/images/logo_newbi/PNG/Logo_square_BW.png';
       case 'square-purple':
-        return '/images/logo_newbi/SVG/Logo_square_PB.svg';
+        return '/images/logo_newbi/PNG/Logo_square_PB.png';
       default:
         // Par défaut, utiliser le logo noir avec texte
-        return withText ? '/images/logo_newbi/SVG/Logo_Texte_Black.svg' : '/images/logo_newbi/SVG/Logo_NI_Black.svg';
+        return withText ? '/images/logo_newbi/PNG/Logo_Texte_Black.png' : '/images/logo_newbi/PNG/Logo_NI_Black.png';
     }
   };
 
   // Déterminer la hauteur en fonction du mode (avec ou sans texte)
-  const height = withText ? 'h-10' : 'h-12';
+  const height = withText ? 'h-12' : 'h-14';
   
   return (
     <div className={`flex items-center ${className}`}>
       <img 
         src={getLogoPath()} 
         alt="Newbi" 
-        className={`${height} w-auto object-contain`} 
+        className={`${height} w-auto`}
+        style={{ objectFit: 'contain' }}
       />
     </div>
   );
