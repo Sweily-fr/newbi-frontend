@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogSeoProvider } from '../context';
 import { RichTextEditor } from '../components/editor';
-import { ExportPanel, KeywordsMetaForm, SeoScorePanel } from '../components/business';
+import { KeywordsMetaForm, SeoScorePanel } from '../components/business';
 import RecommendationsPanel from '../components/editor/RichTextEditor/RecommendationsPanel';
 import { useBlogSeo } from '../hooks/useBlogSeo';
 import { ToolLayout } from '../../../components/layout/ToolLayout';
@@ -151,13 +151,6 @@ export const BlogSeoOptimizerContent: React.FC = () => {
             <div className="h-full bg-white rounded-xl shadow-sm">
               <RichTextEditor placeholder="Commencez à rédiger votre contenu ici..." />
             </div>
-          </div>
-        </div>
-        
-        {/* Panneau d'export en bas */}
-        <div className="mt-4 p-4 sticky bottom-0 z-20 w-full">
-          <div className="bg-white p-4 rounded-xl shadow-sm">
-            <ExportPanel />
           </div>
         </div>
       </div>
