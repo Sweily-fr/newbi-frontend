@@ -99,8 +99,29 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   };
 
   // Déterminer les informations du client à afficher
-  const clientInfo = isNewClient
-    ? newClient
+  const clientInfo: Partial<Client> & {
+    address?: {
+      street?: string;
+      city?: string;
+      postalCode?: string;
+      country?: string;
+    };
+    shippingAddress?: {
+      street?: string;
+      city?: string;
+      postalCode?: string;
+      country?: string;
+    };
+  } = isNewClient
+    ? {
+        ...newClient,
+        address: {
+          street: newClient?.street || "",
+          city: newClient?.city || "",
+          postalCode: newClient?.postalCode || "",
+          country: newClient?.country || ""
+        }
+      }
     : selectedClient || quote.client || {};
 
   // Déterminer si le client a une adresse de livraison différente

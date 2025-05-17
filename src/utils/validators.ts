@@ -5,8 +5,8 @@
 // Regex pour la validation du numéro de téléphone (format international ou français)
 export const PHONE_REGEX = /^(\+\d{1,3}\s?\d{9,}|0[67]\d{8})$/;
 
-// Regex pour la validation des noms et prénoms (lettres, espaces, tirets, apostrophes)
-export const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-']{2,50}$/;
+// Regex pour la validation des noms et prénoms (lettres, chiffres, espaces, tirets, apostrophes)
+export const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\-']{2,50}$/;
 
 // Regex pour la validation d'email
 export const EMAIL_REGEX = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -42,7 +42,7 @@ export const POSTAL_CODE_FR_REGEX = /^(0[1-9]|[1-8]\d|9[0-8])\d{3}$/;
 export const getNameValidationRules = (fieldName: string = 'Ce champ') => ({
   pattern: {
     value: NAME_REGEX,
-    message: `${fieldName} ne doit contenir que des lettres, espaces, tirets ou apostrophes (2-50 caractères)`
+    message: `${fieldName} ne doit contenir que des lettres, chiffres, espaces, tirets ou apostrophes (2-50 caractères)`
   }
 });
 

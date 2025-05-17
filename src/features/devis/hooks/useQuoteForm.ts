@@ -534,26 +534,37 @@ export const useQuoteForm = ({
       };
     };
 
-    // Fonction pour obtenir les données du client
-    const getClientData = () => {
+    // Fonction pour obtenir les données du client sans créer de nouveau client
+    const getClientData = async () => {
       // Si c'est un nouveau client, retourner les données du formulaire
       if (isNewClient) {
+        // Préparer l'objet d'adresse de livraison si nécessaire
+        const shippingAddressData = newClient.hasDifferentShippingAddress && newClient.shippingAddress ? {
+          street: newClient.shippingAddress.street || "",
+          city: newClient.shippingAddress.city || "",
+          postalCode: newClient.shippingAddress.postalCode || "",
+          country: newClient.shippingAddress.country || ""
+        } : undefined;
+
+        // Retourner les données du formulaire sans créer de client
         return {
           id: "", // ID vide, sera géré côté serveur
           type: newClient.type,
+          name: newClient.name,
+          email: newClient.email,
           firstName: newClient.type === "INDIVIDUAL" ? newClient.firstName : undefined,
           lastName: newClient.type === "INDIVIDUAL" ? newClient.lastName : undefined,
           address: {
-            street: newClient.street,
-            city: newClient.city,
-            postalCode: newClient.postalCode,
-            country: newClient.country,
+            street: newClient.street || "",
+            city: newClient.city || "",
+            postalCode: newClient.postalCode || "",
+            country: newClient.country || "",
           },
           hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
-          shippingAddress: newClient.hasDifferentShippingAddress ? cleanAddressObject(newClient.shippingAddress) : undefined,
+          shippingAddress: shippingAddressData,
           siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
           vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
-        };
+        }
       } else if (quote && quote.client) {
         // Si on modifie un devis existant et que le client est déjà dans le devis
         return {
@@ -663,17 +674,17 @@ export const useQuoteForm = ({
         };
       }
       
-      // Cas par défaut si aucune condition n'est remplie
+      // Si aucune des conditions ci-dessus n'est remplie, retourner un client par défaut
       return {
         id: "",
         type: "COMPANY",
-        name: "",
-        email: "",
+        name: "Client par défaut",
+        email: "client@example.com",
         address: {
           street: "",
           city: "",
           postalCode: "",
-          country: "",
+          country: "France",
         },
         hasDifferentShippingAddress: false,
         siret: "",
@@ -682,101 +693,61 @@ export const useQuoteForm = ({
         lastName: "",
       };
     };
-      
+
     try {
+
       // Créer un nouveau client si nécessaire
+      let clientId = "";
       if (isNewClient) {
-        const { data: clientData } = await createClient({
-          variables: {
-            input: {
-              name: newClient.name,
-              email: newClient.email,
-              address: {
-                street: newClient.street,
-                city: newClient.city,
-                postalCode: newClient.postalCode,
-                country: newClient.country,
+        try {
+          // Préparer l'objet d'adresse de livraison si nécessaire
+          const shippingAddressData = newClient.hasDifferentShippingAddress && newClient.shippingAddress ? {
+            street: newClient.shippingAddress.street || "",
+            city: newClient.shippingAddress.city || "",
+            postalCode: newClient.shippingAddress.postalCode || "",
+            country: newClient.shippingAddress.country || ""
+          } : undefined;
+
+          // Créer un nouveau client dans la base de données
+          const { data } = await createClient({
+            variables: {
+              input: {
+                type: newClient.type,
+                name: newClient.name,
+                email: newClient.email,
+                address: {
+                  street: newClient.street || "",
+                  city: newClient.city || "",
+                  postalCode: newClient.postalCode || "",
+                  country: newClient.country || "",
+                },
+                hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+                shippingAddress: shippingAddressData,
+                siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
+                vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
+                firstName: newClient.type === "INDIVIDUAL" ? newClient.firstName : undefined,
+                lastName: newClient.type === "INDIVIDUAL" ? newClient.lastName : undefined,
               },
-              hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
-              shippingAddress: newClient.hasDifferentShippingAddress ? cleanAddressObject(newClient.shippingAddress) : undefined,
-              // Utiliser le type exact du client s'il existe, sinon déterminer en fonction des champs
-              type:
-                newClient.type ||
-                (newClient.firstName && newClient.lastName
-                  ? "INDIVIDUAL"
-                  : quote?.client?.type || "COMPANY"),
-              // Champs spécifiques aux entreprises
-              siret: newClient.siret,
-              vatNumber: newClient.vatNumber,
-              // Champs spécifiques aux particuliers
-              firstName: newClient.firstName,
-              lastName: newClient.lastName,
             },
-          },
-        });
+          });
+          
+          // Récupérer l'ID du client nouvellement créé
+          clientId = data.createClient.id;
+          console.log("Nouveau client créé avec l'ID:", clientId);
+        } catch (error) {
+          console.error("Erreur lors de la création du client:", error);
+          // En cas d'erreur, on continue avec un ID vide
+          clientId = "";
+        }
       }
 
-      // Préparer les données communes du devis
-      const commonQuoteData = {
-        prefix: quotePrefix,
-        status: isDraft ? "DRAFT" : status,
-        issueDate,
-        validUntil,
-        companyInfo: {
-          name: companyInfo.name,
-          email: companyInfo.email,
-          phone: companyInfo.phone,
-          website: companyInfo.website,
-          siret: companyInfo.siret,
-          vatNumber: companyInfo.vatNumber,
-          logo: companyInfo.logo,
-          transactionCategory: companyInfo.transactionCategory,
-          address: {
-            street: companyInfo.address.street,
-            city: companyInfo.address.city,
-            postalCode: companyInfo.address.postalCode,
-            country: companyInfo.address.country,
-          },
-          bankDetails: useBankDetails
-            ? {
-                iban: companyInfo.bankDetails?.iban,
-                bic: companyInfo.bankDetails?.bic,
-                bankName: companyInfo.bankDetails?.bankName,
-              }
-            : null,
-        },
-        items: items.map((item) => ({
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          vatRate: item.vatRate,
-          unit: item.unit,
-          discount: item.discount,
-          discountType: item.discountType,
-          details: item.details,
-          vatExemptionText: item.vatExemptionText || '',
-        })),
-        discount,
-        discountType,
-        headerNotes,
-        footerNotes,
-        termsAndConditions,
-        termsAndConditionsLinkTitle,
-        termsAndConditionsLink,
-        customFields: customFields
-          .filter((field) => field.key && field.value)
-          .map(({ key, value }) => ({ key, value })),
-        client: {
-          ...getClientData(),
-          // S'assurer que le type est toujours défini, même pour les clients existants
-          type: getClientData().type || "COMPANY",
-        },
-      };
-
-      let result;
-
-      // Logs détaillés pour vérifier les données du client avant envoi
-      const clientDataToSend = getClientData();
+      // Récupérer les données du client
+      const clientDataToSend = await getClientData();
+      
+      // Si un nouveau client a été créé, mettre à jour son ID
+      if (isNewClient && clientId) {
+        clientDataToSend.id = clientId;
+      }
 
       // Alerte si le type n'est pas défini correctement
       if (
@@ -789,6 +760,55 @@ export const useQuoteForm = ({
           "ATTENTION: Le type de client devrait être INDIVIDUAL mais n'est pas défini!"
         );
       }
+      
+      // Préparer les données communes du devis
+      const commonQuoteData = {
+        prefix: quotePrefix,
+        status: isDraft ? "DRAFT" : status,
+        issueDate,
+        validUntil,
+        companyInfo: {
+          name: companyInfo.name,
+          email: companyInfo.email,
+          phone: companyInfo.phone,
+          website: companyInfo.website,
+          address: {
+            street: companyInfo.address?.street || "",
+            city: companyInfo.address?.city || "",
+            postalCode: companyInfo.address?.postalCode || "",
+            country: companyInfo.address?.country || "",
+          },
+          legalForm: companyInfo.legalForm || "",
+          siret: companyInfo.siret || "",
+          vatNumber: companyInfo.vatNumber || "",
+          logo: companyInfo.logo || "",
+        },
+        useBankDetails,
+        items: items.map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          vatRate: item.vatRate,
+          unit: item.unit,
+          discount: item.discount,
+          discountType: item.discountType,
+          details: item.details,
+          vatExemptionText: item.vatExemptionText,
+        })),
+        discount,
+        discountType,
+        headerNotes,
+        footerNotes,
+        termsAndConditions,
+        termsAndConditionsLinkTitle,
+        termsAndConditionsLink,
+        customFields: customFields
+          .filter((field) => field.key && field.value)
+          .map(({ key, value }) => ({ key, value })),
+        client: clientDataToSend,
+      };
+
+      let result;
 
       if (!quote) {
         // Pour la création, on laisse le backend générer un numéro unique

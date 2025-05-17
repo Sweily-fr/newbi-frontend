@@ -776,7 +776,32 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
             }}
             calculateTotals={calculateTotals}
             isNewClient={isNewClient}
-            newClient={newClient}
+            newClient={{
+              ...newClient,
+              // S'assurer que les informations d'adresse sont correctement structurées
+              name: newClient.name,
+              email: newClient.email,
+              type: newClient.type,
+              firstName: newClient.firstName,
+              lastName: newClient.lastName,
+              siret: newClient.siret,
+              vatNumber: newClient.vatNumber,
+              // Structurer l'adresse principale
+              address: {
+                street: newClient.street,
+                city: newClient.city,
+                postalCode: newClient.postalCode,
+                country: newClient.country
+              },
+              // Structurer l'adresse de livraison si nécessaire
+              hasDifferentShippingAddress: newClient.hasDifferentShippingAddress,
+              shippingAddress: newClient.hasDifferentShippingAddress && newClient.shippingAddress ? {
+                street: newClient.shippingAddress.street,
+                city: newClient.shippingAddress.city,
+                postalCode: newClient.shippingAddress.postalCode,
+                country: newClient.shippingAddress.country
+              } : undefined
+            }}
             selectedClient={
               Array.isArray(clientsData?.clients?.items)
                 ? clientsData?.clients?.items.find(
