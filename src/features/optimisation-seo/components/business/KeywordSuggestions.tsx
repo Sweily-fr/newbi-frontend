@@ -30,7 +30,7 @@ const SuggestionGroup = ({
             onClick={() => onSelectSuggestion(suggestion)}
             className={`px-3 py-1 rounded-full text-sm ${
               selectedKeywords.includes(suggestion)
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#5b50ff] text-white'
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
             }`}
           >

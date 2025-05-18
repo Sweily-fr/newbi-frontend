@@ -24,4 +24,5 @@ export interface EditImagePopupProps {
 
 export interface RichTextEditorProps {
   placeholder?: string;
+  className?: string;
 }

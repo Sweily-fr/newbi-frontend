@@ -42,7 +42,7 @@ const SeoScorePanel: React.FC = () => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
       {/* Score global */}
       <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold mb-4">Score SEO global</h2>
+        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff]">Score SEO global</h2>
         <div className="flex items-center">
           <div className={`text-4xl font-bold rounded-full w-20 h-20 flex items-center justify-center shadow-sm ${getScoreBackgroundColor(overallScore.color)}`}>
             {overallScore.value}

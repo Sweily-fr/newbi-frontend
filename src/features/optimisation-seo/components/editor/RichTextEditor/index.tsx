@@ -11,7 +11,8 @@ import { getWordCountRating, calculateWordCount } from './utils';
 import { Notification } from '../../../../../components/common/Notification';
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ 
-  placeholder = 'Commencez à rédiger votre contenu ici...' 
+  placeholder = 'Commencez à rédiger votre contenu ici...', 
+  className = ''
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   
@@ -270,8 +271,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [state.content, state.keywords, editorRef]);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="relative bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+    <div className={`flex flex-col h-full ${className}`}>
+      <div className="relative bg-white flex flex-col h-full overflow-hidden">
         {/* Compteur de mots avec évaluation */}
         <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-md px-2 py-1 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
           <span className="text-xs text-gray-500">Mots:</span>

@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useBlogSeo } from '../../hooks/useBlogSeo';
 import { KeywordSuggestions } from './KeywordSuggestions';
+import Tooltip from '../../../../components/common/Tooltip';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 const KeywordsMetaForm: React.FC = () => {
   const { state, setKeywords, setMetaTags } = useBlogSeo();
@@ -97,40 +99,56 @@ const KeywordsMetaForm: React.FC = () => {
   }, [state.metaTags, setMetaTags]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
-      <div className="p-6 border-b border-[#f0eeff]">
-        <h2 className="text-xl font-semibold mb-4">Mots-clés</h2>
+    <div className="bg-white shadow-md overflow-hidden border border-[#f0eeff] h-full flex flex-col">
+      <div className="p-6 border-b border-[#f0eeff] flex-shrink-0">
+        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff]">Mots-clés</h2>
         
         {/* Mot-clé principal */}
         <div className="mb-4">
-          <label htmlFor="main-keyword" className="block text-sm font-medium text-gray-700 mb-1">
-            Mot-clé principal <span className="text-xs text-gray-500">(1 maximum)</span>
-          </label>
+          <div className="flex items-center mb-1">
+            <label htmlFor="main-keyword" className="block text-sm font-medium text-gray-700">
+              Mot-clé principal <span className="text-xs text-gray-500">(1 maximum)</span>
+            </label>
+            <div className="flex items-center h-full">
+              <Tooltip content="Ce mot-clé sera utilisé pour l'analyse principale de votre contenu." position="top">
+                <button type="button" className="p-1 -mr-1 text-[#5b50ff] hover:text-[#4a41e0] focus:outline-none cursor-pointer">
+                  <QuestionMarkCircleIcon className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
           <input
             type="text"
             id="main-keyword"
             value={state.keywords.main}
             onChange={handleMainKeywordChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
+            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200 text-gray-900"
             placeholder="Entrez votre mot-clé principal"
+            style={{ color: 'black' }}
           />
-          <p className="mt-1 text-sm text-gray-500">
-            Ce mot-clé sera utilisé pour l'analyse principale de votre contenu.
-          </p>
         </div>
         
         {/* Mots-clés secondaires */}
         <div className="mb-4">
-          <label htmlFor="secondary-keyword" className="block text-sm font-medium text-gray-700 mb-1">
-            Mots-clés secondaires <span className="text-xs text-gray-500">(5 maximum)</span>
-          </label>
+          <div className="flex items-center mb-1">
+            <label htmlFor="secondary-keyword" className="block text-sm font-medium text-gray-700">
+              Mots-clés secondaires <span className="text-xs text-gray-500">(5 maximum)</span>
+            </label>
+            <div className="flex items-center h-full">
+              <Tooltip content="Ajoutez jusqu'à 5 mots-clés secondaires pour affiner votre analyse SEO." position="top">
+                <button type="button" className="p-1 -mr-1 text-[#5b50ff] hover:text-[#4a41e0] focus:outline-none cursor-pointer">
+                  <QuestionMarkCircleIcon className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
           <div className="flex gap-2">
             <input
               type="text"
               id="secondary-keyword"
               value={secondaryKeyword}
               onChange={(e) => setSecondaryKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
+              className="flex-1 px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
               placeholder="Ajouter un mot-clé secondaire"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
@@ -143,7 +161,7 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddButtonClick}
-              className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff] disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-[#5b50ff] border border-[#5b50ff] border-opacity-30 bg-white rounded-2xl hover:border-opacity-50 focus:outline-none shadow-sm transform hover:translate-y-[-2px] disabled:text-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm font-light transition-colors duration-200"
               disabled={!secondaryKeyword.trim() || state.keywords.secondary.length >= 5}
             >
               Ajouter
@@ -154,12 +172,15 @@ const KeywordsMetaForm: React.FC = () => {
           {state.keywords.secondary.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {state.keywords.secondary.map((keyword, index) => (
-                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]">
+                <div 
+                  key={`${keyword}-${index}`}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]"
+                >
                   {keyword}
                   <button
                     type="button"
                     onClick={() => handleRemoveSecondaryKeyword(keyword)}
-                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none"
+                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none transition-colors duration-200"
                   >
                     <span className="sr-only">Supprimer</span>
                     <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
@@ -171,15 +192,11 @@ const KeywordsMetaForm: React.FC = () => {
             </div>
           )}
           
-          <p className="mt-1 text-sm text-gray-500">
-            Ces mots-clés complémentaires aideront à enrichir votre contenu.
-          </p>
-          
           {/* Suggestions de mots-clés secondaires */}
           {state.keywords.main && (
             <div className="mt-6 p-4 border border-gray-200 rounded-lg">
               <KeywordSuggestions 
-                mainKeyword={state.keywords.main}
+                mainKeyword={state.keywords.main} 
                 onSelectSuggestion={handleAddSecondaryKeyword}
                 selectedKeywords={state.keywords.secondary}
               />
@@ -189,30 +206,39 @@ const KeywordsMetaForm: React.FC = () => {
         
         {/* Mots-clés de longue traîne */}
         <div>
-          <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700 mb-1">
-            Mots-clés de longue traîne <span className="text-xs text-gray-500">(5 maximum)</span>
-          </label>
+          <div className="flex items-center mb-1">
+            <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700">
+              Mots-clés de longue traîne <span className="text-xs text-gray-500">(5 maximum)</span>
+            </label>
+            <div className="flex items-center h-full">
+              <Tooltip content="Les mots-clés de longue traîne sont des expressions plus spécifiques qui ciblent des intentions de recherche précises." position="top">
+                <button type="button" className="p-1 -mr-1 text-[#5b50ff] hover:text-[#4a41e0] focus:outline-none cursor-pointer">
+                  <QuestionMarkCircleIcon className="h-4 w-4" />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
           <div className="flex gap-2">
             <input
               type="text"
               id="long-tail-keyword"
               value={longTailKeyword}
               onChange={(e) => setLongTailKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
+              className="flex-1 px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
               placeholder="Ajouter un mot-clé de longue traîne"
-              disabled={state.keywords.longTail.length >= 5}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   handleAddLongTailKeyword();
                 }
               }}
+              disabled={state.keywords.longTail.length >= 5}
             />
             <button
               type="button"
               onClick={handleAddLongTailKeyword}
-              className="px-4 py-2 bg-[#5b50ff] text-white rounded-md hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff] disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={state.keywords.longTail.length >= 5}
+              className="px-4 py-2 text-[#5b50ff] border border-[#5b50ff] border-opacity-30 bg-white rounded-2xl hover:border-opacity-50 focus:outline-none shadow-sm transform hover:translate-y-[-2px] disabled:text-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm font-light transition-colors duration-200"
+              disabled={!longTailKeyword.trim() || state.keywords.longTail.length >= 5}
             >
               Ajouter
             </button>
@@ -222,12 +248,15 @@ const KeywordsMetaForm: React.FC = () => {
           {state.keywords.longTail.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {state.keywords.longTail.map((keyword, index) => (
-                <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]">
+                <div 
+                  key={`${keyword}-${index}`}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f0eeff] text-[#5b50ff]"
+                >
                   {keyword}
                   <button
                     type="button"
                     onClick={() => handleRemoveLongTailKeyword(keyword)}
-                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none"
+                    className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#e6e1ff] text-[#5b50ff] hover:bg-[#d6d1ff] focus:outline-none transition-colors duration-200"
                   >
                     <span className="sr-only">Supprimer</span>
                     <svg className="h-2 w-2" fill="currentColor" viewBox="0 0 8 8">
@@ -238,15 +267,11 @@ const KeywordsMetaForm: React.FC = () => {
               ))}
             </div>
           )}
-          
-          <p className="mt-1 text-sm text-gray-500">
-            Ces expressions plus longues ciblent des requêtes spécifiques et peuvent attirer un trafic qualifié.
-          </p>
         </div>
       </div>
       
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Méta-données</h2>
+      <div className="p-6 flex-1 overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff] sticky top-0 bg-white pb-2 z-10">Méta-données</h2>
         
         {/* Titre */}
         <div className="mb-4">
@@ -259,41 +284,25 @@ const KeywordsMetaForm: React.FC = () => {
             name="title"
             value={state.metaTags.title}
             onChange={handleMetaTagChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
-            placeholder="Entrez le titre de votre page"
+            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+            placeholder="Titre de votre page"
           />
-          <div className="mt-1 flex justify-between">
-            <p className="text-sm text-gray-500">
-              Idéalement entre 50 et 60 caractères.
-            </p>
-            <p className={`text-sm ${state.metaTags.title.length > 60 ? 'text-red-500' : 'text-gray-500'}`}>
-              {state.metaTags.title.length}/60
-            </p>
-          </div>
         </div>
         
         {/* Description */}
         <div>
           <label htmlFor="meta-description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description (meta description)
+            Description (balise meta description)
           </label>
           <textarea
             id="meta-description"
             name="description"
             value={state.metaTags.description}
             onChange={handleMetaTagChange}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff]"
-            placeholder="Entrez la description de votre page"
+            rows={6}
+            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+            placeholder="Description de votre page"
           />
-          <div className="mt-1 flex justify-between">
-            <p className="text-sm text-gray-500">
-              Idéalement entre 120 et 155 caractères.
-            </p>
-            <p className={`text-sm ${state.metaTags.description.length > 155 ? 'text-red-500' : 'text-gray-500'}`}>
-              {state.metaTags.description.length}/155
-            </p>
-          </div>
         </div>
       </div>
     </div>
