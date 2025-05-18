@@ -34,7 +34,7 @@ const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({
   return (
     <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
       <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Recommandations</h2>
+        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff]">Recommandations</h2>
         
         {Object.entries(groupedResults).map(([category, results]) => (
           results.length > 0 && (
