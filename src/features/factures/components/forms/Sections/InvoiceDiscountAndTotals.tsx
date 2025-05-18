@@ -279,7 +279,7 @@ export const InvoiceDiscountAndTotals: React.FC<
                   <DiscountShape size="16" color="#ef4444" variant="Linear" className="mr-1" />
                   Remise{discountType === "PERCENTAGE" ? ` (${discount}%)` : ""}:
                 </span>
-                <span className="font-medium">-{calculateTotals().discountAmount.toFixed(2)} €</span>
+                <span className="font-medium">-{calculateTotals()?.discountAmount?.toFixed(2) || '0.00'} €</span>
               </div>
             )}
             <div className="flex justify-between mt-2 pt-3 border-t border-gray-200">
