@@ -34,7 +34,7 @@ export const BlogSeoOptimizerContent: React.FC = () => {
     <div className="min-h-screen w-full flex flex-col bg-gray-50 p-6 pb-0 mb-12">
       <div className="flex w-full gap-6 h-full">
         {/* Colonne de gauche - Onglets (4/12) */}
-        <div className="w-4/12 flex flex-col bg-white shadow-sm rounded-lg">
+        <div className="w-4/12 flex flex-col bg-white shadow-sm rounded-2xl">
           {/* Onglets */}
           <div className="flex border-b border-gray-100">
             <button
@@ -110,7 +110,7 @@ export const BlogSeoOptimizerContent: React.FC = () => {
           </div>
           
           {/* Contenu des onglets */}
-          <div className="h-[calc(100%-48px)] overflow-auto flex-1">
+          <div className="h-[calc(100%-48px)] rounded-b-2xl overflow-auto flex-1">
             <AnimatePresence mode="wait">
               {activeTab === 'keywords' && (
                 <motion.div
@@ -157,7 +157,7 @@ export const BlogSeoOptimizerContent: React.FC = () => {
         </div>
 
         {/* Colonne de droite - Éditeur (8/12) */}
-        <div className="w-8/12 flex flex-col bg-white shadow-sm rounded-lg">
+        <div className="w-8/12 flex flex-col bg-white shadow-sm rounded-2xl">
           <RichTextEditor 
             placeholder="Commencez à rédiger votre contenu ici..." 
             className="flex-1" 

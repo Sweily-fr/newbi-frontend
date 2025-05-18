@@ -272,9 +272,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      <div className="relative bg-white flex flex-col h-full overflow-hidden">
+      <div className="relative bg-white rounded-2xl flex flex-col h-full overflow-hidden">
         {/* Compteur de mots avec évaluation */}
-        <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-md px-2 py-1 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
+        <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-2xl px-3 py-3 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
           <span className="text-xs text-gray-500">Mots:</span>
           <span className="text-sm font-medium">{currentWordCount}</span>
           <span className={`text-xs font-medium ${getWordCountRating(currentWordCount).color} ml-1 px-1.5 py-0.5 rounded-full text-xs bg-opacity-20 ${getWordCountRating(currentWordCount).color.replace('text-', 'bg-')}`}>({getWordCountRating(currentWordCount).label})</span>
