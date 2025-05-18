@@ -12,6 +12,7 @@ import { Button, SearchInput } from "../../../../components/";
 import { useClientsManager } from "../../hooks";
 import { Client } from "../../types";
 import { useState, useRef } from "react";
+import { Edit, Trash } from "iconsax-react";
 
 export const ClientsManager = () => {
   const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] =
@@ -94,7 +95,7 @@ export const ClientsManager = () => {
             }}
             className="text-indigo-600 hover:text-indigo-900 mr-4"
           >
-            <PencilIcon className="h-5 w-5" />
+            <Edit size="20" color="#5b50ff" />
           </button>
           <button
             onClick={(e) => {
@@ -103,7 +104,7 @@ export const ClientsManager = () => {
             }}
             className="text-red-600 hover:text-red-900"
           >
-            <TrashIcon className="h-5 w-5" />
+            <Trash size="20" color="red" />
           </button>
         </>
       ),
