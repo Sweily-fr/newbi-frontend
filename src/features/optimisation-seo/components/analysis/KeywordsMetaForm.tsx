@@ -212,7 +212,7 @@ const KeywordsMetaForm: React.FC = () => {
         {/* Mots-clés de longue traîne */}
         <div>
           <div className="flex items-center mb-1">
-            <label htmlFor="long-tail-keyword" className="block text-xs font-medium text-gray-700">
+            <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700">
               Mots-clés de longue traîne <span className="text-[10px] text-gray-500">(5 maximum)</span>
             </label>
             <div className="flex items-center h-full">
@@ -280,7 +280,7 @@ const KeywordsMetaForm: React.FC = () => {
         
         {/* Titre */}
         <div className="mb-4">
-          <label htmlFor="meta-title" className="block text-xs font-medium text-gray-700 mb-1">
+          <label htmlFor="meta-title" className="block text-sm font-medium text-gray-700 mb-1">
             Titre (balise title)
           </label>
           <input
@@ -296,7 +296,7 @@ const KeywordsMetaForm: React.FC = () => {
         
         {/* Description */}
         <div>
-          <label htmlFor="meta-description" className="block text-xs font-medium text-gray-700 mb-1">
+          <label htmlFor="meta-description" className="block text-sm font-medium text-gray-700 mb-1">
             Description (balise meta description)
           </label>
           <textarea

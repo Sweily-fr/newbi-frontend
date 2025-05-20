@@ -30,30 +30,40 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
   const groupedResults = groupResultsByCategory(analysisResults);
   const isInitialMount = React.useRef(true);
   
-  // Ouvrir le premier groupe automatiquement uniquement au premier chargement
+  // Ouvrir toutes les catégories automatiquement au chargement
   React.useEffect(() => {
-    if (isInitialMount.current) {
+    if (isInitialMount.current && analysisResults.length > 0) {
       isInitialMount.current = false;
       
+      // Vérifier si des catégories sont déjà ouvertes
       const hasOpenCategory = Object.values(expandedCategories).some(isOpen => isOpen);
-      if (!hasOpenCategory && Object.keys(groupedResults).length > 0) {
-        const firstCategory = Object.keys(groupedResults)[0];
-        setExpandedCategories(prev => ({
-          ...prev,
-          [firstCategory]: true
-        }));
+      
+      // Si aucune catégorie n'est ouverte, ouvrir toutes les catégories disponibles
+      if (!hasOpenCategory) {
+        const categories = Object.keys(groupedResults).filter(cat => groupedResults[cat].length > 0);
+        
+        if (categories.length > 0) {
+          const newExpandedCategories = { ...expandedCategories };
+          
+          // Définir toutes les catégories comme ouvertes
+          categories.forEach(category => {
+            newExpandedCategories[category] = true;
+          });
+          
+          setExpandedCategories(newExpandedCategories);
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupedResults, expandedCategories, setExpandedCategories]); // Ajout des dépendances manquantes
+  }, [analysisResults, groupedResults, expandedCategories, setExpandedCategories]);
 
   return (
     <div className="w-full bg-white rounded overflow-hidden">
       <div className="pt-3 pb-4">
         <h2 className="text-base font-semibold mb-4 text-[#5b50ff]">Suggestions</h2>
         
+        {/* Afficher toutes les catégories, même celles sans résultats */}
         {Object.entries(groupedResults).map(([category, results]) => (
-          results.length > 0 && (
             <div key={category} className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
               {/* En-tête de la catégorie (toujours visible) */}
               <button 
@@ -92,112 +102,117 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
               {/* Contenu de la catégorie (visible uniquement si déplié) */}
               {expandedCategories[category] && (
                 <div className="space-y-2 mt-2">
-                  {results
-                    .sort((a, b) => {
-                      // Trier par priorité puis par statut
-                      const priorityOrder = { high: 0, medium: 1, low: 2 };
-                      const statusOrder = { problem: 0, improvement: 1, good: 2 };
-                      
-                      if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-                        return priorityOrder[a.priority] - priorityOrder[b.priority];
-                      }
-                      
-                      return statusOrder[a.status] - statusOrder[b.status];
-                    })
-                    .map(result => (
-                      <div 
-                        key={result.id} 
-                        className="bg-[#f9f8ff] p-3 rounded-lg flex items-start"
-                      >
-                        <div className="flex items-start">
-                          <div className="flex-shrink-0 mt-0.5">
-                            {result.status === 'good' ? (
-                              <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : result.status === 'improvement' ? (
-                              <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                              </svg>
-                            ) : (
-                              <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            )}
-                          </div>
-                          <div className="ml-3">
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium text-gray-900">{result.title}</h4>
-                              <p className="text-xs text-gray-500 mt-0.5">{result.description}</p>
-                              
-                              {result.suggestions && result.suggestions.length > 0 && (
-                                <div className="mt-2 pt-2 border-t border-[#f0eeff]">
-                                  <p className="text-xs font-medium text-gray-500 mb-1">Suggestions :</p>
-                                  <ul className="space-y-1.5">
-                                    {result.suggestions.map((suggestion, index) => {
-                                      const suggestionLower = suggestion.toLowerCase();
-                                      
-                                      // Détection des liens internes avec différentes formulations possibles
-                                      const internalLinkPatterns = [
-                                        /lien\s+interne/,
-                                        /liens\s+internes/,
-                                        /lien\s+vers\s+(une\s+|)autre\s+page\s+(du\s+|de\s+votre\s+|de\s+ce\s+|du\s+même\s+)site/
-                                      ];
-                                      const isInternalLinkSuggestion = internalLinkPatterns.some(pattern => pattern.test(suggestionLower));
-                                      
-                                      // Détection des liens externes avec différentes formulations possibles
-                                      const externalLinkPatterns = [
-                                        /lien\s+externe/,
-                                        /liens\s+externes/,
-                                        /lien\s+internet/,
-                                        /liens\s+internet/,
-                                        /lien\s+vers\s+(un\s+|)autre\s+site/,
-                                        /lien\s+vers\s+(un\s+|)site\s+externe/
-                                      ];
-                                      const isExternalLinkSuggestion = externalLinkPatterns.some(pattern => pattern.test(suggestionLower));
-                                      
-                                      return (
-                                        <li key={index} className="flex items-start text-xs text-gray-600 bg-white p-2 rounded border border-[#f0eeff]">
-                                          <div className="flex items-start">
-                                            {/* Afficher un indicateur visuel pour les liens internes */}
-                                            {isInternalLinkSuggestion && (
-                                              <span className="inline-flex items-center justify-center mr-2 text-[#5b50ff] mt-0.5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                                                  <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                                                </svg>
-                                              </span>
-                                            )}
-                                            
-                                            {/* Afficher un indicateur visuel pour les liens externes */}
-                                            {isExternalLinkSuggestion && (
-                                              <span className="inline-flex items-center justify-center mr-2 text-[#8a82ff] mt-0.5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                                                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                                                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                                                </svg>
-                                              </span>
-                                            )}
-                                            
-                                            <span className={`${isInternalLinkSuggestion ? 'text-[#5b50ff]' : isExternalLinkSuggestion ? 'text-[#8a82ff]' : ''}`}>
-                                              {suggestion}
-                                            </span>
-                                          </div>
-                                        </li>
-                                      );
-                                    })}
-                                  </ul>
-                                </div>
+                  {results.length > 0 ? (
+                    results
+                      .sort((a, b) => {
+                        // Trier par priorité puis par statut
+                        const priorityOrder = { high: 0, medium: 1, low: 2 };
+                        const statusOrder = { problem: 0, improvement: 1, good: 2 };
+                        
+                        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+                          return priorityOrder[a.priority] - priorityOrder[b.priority];
+                        }
+                        
+                        return statusOrder[a.status] - statusOrder[b.status];
+                      })
+                      .map(result => (
+                        <div 
+                          key={result.id} 
+                          className="bg-[#f9f8ff] p-3 rounded-lg flex items-start"
+                        >
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0 mt-0.5">
+                              {result.status === 'good' ? (
+                                <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : result.status === 'improvement' ? (
+                                <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                              ) : (
+                                <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                               )}
+                            </div>
+                            <div className="ml-3">
+                              <div className="flex-1">
+                                <h4 className="text-sm font-medium text-gray-900">{result.title}</h4>
+                                <p className="text-xs text-gray-500 mt-0.5">{result.description}</p>
+                                
+                                {result.suggestions && result.suggestions.length > 0 && (
+                                  <div className="mt-2 pt-2 border-t border-[#f0eeff]">
+                                    <p className="text-xs font-medium text-gray-500 mb-1">Suggestions :</p>
+                                    <ul className="space-y-1.5">
+                                      {result.suggestions.map((suggestion, index) => {
+                                        const suggestionLower = suggestion.toLowerCase();
+                                        
+                                        // Détection des liens internes avec différentes formulations possibles
+                                        const internalLinkPatterns = [
+                                          /lien\s+interne/,
+                                          /liens\s+internes/,
+                                          /lien\s+vers\s+(une\s+|)autre\s+page\s+(du\s+|de\s+votre\s+|de\s+ce\s+|du\s+même\s+)site/
+                                        ];
+                                        const isInternalLinkSuggestion = internalLinkPatterns.some(pattern => pattern.test(suggestionLower));
+                                        
+                                        // Détection des liens externes avec différentes formulations possibles
+                                        const externalLinkPatterns = [
+                                          /lien\s+externe/,
+                                          /liens\s+externes/,
+                                          /lien\s+internet/,
+                                          /liens\s+internet/,
+                                          /lien\s+vers\s+(un\s+|)autre\s+site/,
+                                          /lien\s+vers\s+(un\s+|)site\s+externe/
+                                        ];
+                                        const isExternalLinkSuggestion = externalLinkPatterns.some(pattern => pattern.test(suggestionLower));
+                                        
+                                        return (
+                                          <li key={index} className="flex items-start text-xs text-gray-600 bg-white p-2 rounded border border-[#f0eeff]">
+                                            <div className="flex items-start">
+                                              {/* Afficher un indicateur visuel pour les liens internes */}
+                                              {isInternalLinkSuggestion && (
+                                                <span className="inline-flex items-center justify-center mr-2 text-[#5b50ff] mt-0.5">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+                                                  </svg>
+                                                </span>
+                                              )}
+                                              
+                                              {/* Afficher un indicateur visuel pour les liens externes */}
+                                              {isExternalLinkSuggestion && (
+                                                <span className="inline-flex items-center justify-center mr-2 text-[#8a82ff] mt-0.5">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                                                  </svg>
+                                                </span>
+                                              )}
+                                              
+                                              <span className={`${isInternalLinkSuggestion ? 'text-[#5b50ff]' : isExternalLinkSuggestion ? 'text-[#8a82ff]' : ''}`}>
+                                                {suggestion}
+                                              </span>
+                                            </div>
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                  ) : (
+                    <div className="p-3 text-center text-gray-500 text-sm">
+                      Aucune suggestion disponible pour cette catégorie.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )
-        ))}
+          ))}
         
         {analysisResults.length === 0 && (
           <div className="text-center py-8">

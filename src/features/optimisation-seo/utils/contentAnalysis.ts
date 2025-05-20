@@ -132,7 +132,7 @@ export const analyzeContent = (
       status: descContainsKeyword ? 'good' : 'problem',
       score: descContainsKeyword ? 8 : 0,
       priority: 'high',
-      category: 'meta',
+      category: 'keywords',
       suggestions: descContainsKeyword ? [] : [`Ajoutez le mot-clé "${keywords.main}" dans votre méta description.`]
     });
     
