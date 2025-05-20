@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogSeoProvider } from '../features/optimisation-seo/context';
 import { RichTextEditor } from '../features/optimisation-seo/components/editor';
-import { KeywordsMetaForm, SeoScorePanel } from '../features/optimisation-seo/components/business';
+import { KeywordsMetaForm, SeoScorePanel } from '../features/optimisation-seo/components/analysis';
 import SuggestionsPanel from '../features/optimisation-seo/components/editor/RichTextEditor/SuggestionsPanel';
 import { useBlogSeo } from '../features/optimisation-seo/hooks/useBlogSeo';
 import { ToolLayout } from '../components/layout/ToolLayout';
@@ -38,7 +38,7 @@ export const BlogSeoOptimizerContent: React.FC = () => {
           {/* Onglets */}
           <div className="flex-shrink-0 flex border-b border-gray-100">
             <button
-              className={`flex-1 py-3 text-center font-medium transition-colors ${
+              className={`flex-1 py-2 text-center text-sm font-medium transition-colors ${
                 activeTab === 'keywords' 
                   ? 'text-[#5b50ff] border-b-2 border-[#5b50ff] font-semibold' 
                   : 'text-[#5b50ff] hover:bg-gray-50'
@@ -50,7 +50,7 @@ export const BlogSeoOptimizerContent: React.FC = () => {
             
             <div className="relative group flex-1">
               <button
-                className={`w-full py-3 text-center font-medium transition-colors ${
+                className={`w-full py-2 text-center text-sm font-medium transition-colors ${
                   !hasAnalyzed 
                     ? 'text-gray-300' 
                     : activeTab === 'suggestions' 
@@ -80,12 +80,12 @@ export const BlogSeoOptimizerContent: React.FC = () => {
             
             <div className="relative group flex-1">
               <button
-                className={`w-full py-3 text-center font-medium transition-colors ${
+                className={`w-full py-2 text-center text-sm font-medium transition-colors ${
                   !hasAnalyzed 
                     ? 'text-gray-300' 
                     : activeTab === 'score' 
                       ? 'text-[#5b50ff] border-b-2 border-[#5b50ff] font-semibold' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      : 'text-[#5b50ff] hover:bg-gray-50'
                 }`}
                 onClick={() => handleTabChange('score')}
                 disabled={!hasAnalyzed}
@@ -109,51 +109,50 @@ export const BlogSeoOptimizerContent: React.FC = () => {
             </div>
           </div>
           
-          <div className="p-6 flex-1 overflow-y-auto">
-            <AnimatePresence mode="wait">
-              {activeTab === 'keywords' && (
-                <motion.div
-                  key="keywords"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="h-full"
-                >
-                  <KeywordsMetaForm />
-                </motion.div>
-              )}
-              
-              {activeTab === 'suggestions' && (
-                <motion.div
-                  key="recommendations"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="h-full"
-                >
-                  <SuggestionsPanel 
-                    analysisResults={state.analysisResults || []} 
-                    expandedCategories={expandedCategories}
-                    setExpandedCategories={setExpandedCategories}
-                  />
-                </motion.div>
-              )}
-              
-              {activeTab === 'score' && (
-                <motion.div
-                  key="score"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="h-full"
-                >
-                  <SeoScorePanel />
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="overflow-y-auto p-6">
+              <AnimatePresence mode="wait">
+                {activeTab === 'keywords' && (
+                  <motion.div
+                    key="keywords"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <KeywordsMetaForm />
+                  </motion.div>
+                )}
+                
+                {activeTab === 'suggestions' && (
+                  <motion.div
+                    key="suggestions"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <SuggestionsPanel 
+                      analysisResults={state.analysisResults || []} 
+                      expandedCategories={expandedCategories}
+                      setExpandedCategories={setExpandedCategories}
+                    />
+                  </motion.div>
+                )}
+                
+                {activeTab === 'score' && (
+                  <motion.div
+                    key="score"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <SeoScorePanel />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
         
