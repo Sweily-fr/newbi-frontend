@@ -109,7 +109,8 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   Photo de profil
                 </label>
                 <ImageUploader
-                  imageUrl="" // URL vide, comme dans CompanyInfoSection
+                  imageUrl={signatureData.profilePhotoUrl || ''} // Utiliser l'URL de la photo de profil si disponible
+                  apiBaseUrl={import.meta.env.VITE_API_URL || 'http://localhost:4000'} // Ajouter l'URL de base de l'API
                   previewImage={profilePhotoPreview} // Utiliser l'état local au lieu des données de signature directement
                   isLoading={false}
                   roundedStyle="full"
