@@ -31,8 +31,8 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
 
   return (
     <div className="w-full bg-white rounded overflow-hidden">
-      <div className="px-4 py-4">
-        <h2 className="text-base font-semibold mb-3 text-[#5b50ff]">Suggestions</h2>
+      <div className="pt-3 pb-4">
+        <h2 className="text-base font-semibold mb-4 text-[#5b50ff]">Suggestions</h2>
         
         {Object.entries(groupedResults).map(([category, results]) => (
           results.length > 0 && (
@@ -69,7 +69,7 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
               
               {/* Contenu de la catégorie (visible uniquement si déplié) */}
               {expandedCategories[category] && (
-                <div className="p-3 space-y-2">
+                <div className="space-y-2 mt-2">
                   {results
                     .sort((a, b) => {
                       // Trier par priorité puis par statut
