@@ -28,6 +28,24 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
   setExpandedCategories 
 }) => {
   const groupedResults = groupResultsByCategory(analysisResults);
+  const isInitialMount = React.useRef(true);
+  
+  // Ouvrir le premier groupe automatiquement uniquement au premier chargement
+  React.useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      
+      const hasOpenCategory = Object.values(expandedCategories).some(isOpen => isOpen);
+      if (!hasOpenCategory && Object.keys(groupedResults).length > 0) {
+        const firstCategory = Object.keys(groupedResults)[0];
+        setExpandedCategories(prev => ({
+          ...prev,
+          [firstCategory]: true
+        }));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupedResults, expandedCategories, setExpandedCategories]); // Ajout des dépendances manquantes
 
   return (
     <div className="w-full bg-white rounded overflow-hidden">

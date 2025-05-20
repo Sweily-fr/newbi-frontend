@@ -21,24 +21,35 @@ const SuggestionItem = ({
   
   return (
     <div className="relative group">
-      <button
-        onClick={onClick}
-        className={`
-          px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-          flex items-center gap-2 relative
-          ${
-            hasError
-              ? 'bg-red-100 hover:bg-red-200 text-red-800 border border-red-200 pr-8'
-              : 'bg-[#f0f4ff] hover:bg-[#e0e8ff] text-[#3b4b9b] border border-[#d6e0ff]'
-          }
-          shadow-sm
-        `}
-      >
-        <span>{suggestion}</span>
-        {hasError && (
-          <XMarkIcon className="h-4 w-4 absolute right-2 text-red-600" />
+      <div className="relative group">
+        <button
+          onClick={onClick}
+          className={`
+            px-3 py-1.5 rounded-full text-xs font-normal transition-all duration-200
+            flex items-center gap-1.5 relative max-w-[180px]
+            ${
+              hasError
+                ? 'bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 pr-7'
+                : 'bg-white hover:bg-[#f9f8ff] text-gray-700 border border-gray-200 hover:border-[#dcd7ff] hover:text-[#5b50ff]'
+            }
+            shadow-sm hover:shadow overflow-hidden
+          `}
+          title={suggestion} // Affiche le texte complet au survol
+        >
+          <span className="truncate">{suggestion}</span>
+          {hasError && (
+            <XMarkIcon className="h-3 w-3 flex-shrink-0 text-red-400" />
+          )}
+        </button>
+        
+        {/* Tooltip pour les textes tronqués */}
+        {suggestion.length > 20 && (
+          <div className="absolute z-10 hidden group-hover:block bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">
+            {suggestion}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-800"></div>
+          </div>
         )}
-      </button>
+      </div>
     </div>
   );
 };
@@ -94,20 +105,17 @@ const SuggestionGroup = ({
       )}
       </div>
       {metadata && (
-        <p className="text-xs text-gray-500 mt-3">
+        <p className="text-xs text-gray-500 mt-3 flex items-center gap-2">
+          <span className="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+            {metadata.source}
+          </span>
           {!groupHasError && (
-            <>
-              <span className="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                {metadata.count} suggestion(s)
-              </span>
-              <span className="mx-2 text-gray-300">•</span>
-            </>
+            <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#f0eeff] text-[#5b50ff]">
+              {metadata.count} suggestion{metadata.count > 1 ? 's' : ''}
+            </span>
           )}
-          <span>Source: {metadata.source}</span>
-          <span className="mx-2 text-gray-300">•</span>
-          <span>{new Date(metadata.timestamp).toLocaleTimeString()}</span>
           {metadata.error && (
-            <span className="ml-2 text-red-500">
+            <span className="text-red-500">
               Erreur: {metadata.error}
             </span>
           )}
@@ -237,8 +245,6 @@ export const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
   // Afficher les résultats
   return (
     <div className="mt-4">
-      <h2 className="text-xl font-semibold mb-4">Suggestions de mots-clés pour "{mainKeyword}"</h2>
-      
       <div className="space-y-8">
         {/* Suggestions d'autocomplétion */}
         {autocompleteSuggestions.length > 0 && (
