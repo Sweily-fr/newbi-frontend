@@ -29,6 +29,10 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   
   // Mettre à jour la prévisualisation lorsque les données de signature changent
   useEffect(() => {
+    // Utiliser un logger personnalisé plutôt que console.log pour le débogage
+    // logger.debug('Photo URL:', signatureData.profilePhotoUrl);
+    // logger.debug('Photo Base64:', signatureData.profilePhotoBase64 ? 'Présent' : 'Absent');
+    
     setProfilePhotoPreview(signatureData.profilePhotoBase64 || signatureData.profilePhotoUrl || null);
   }, [signatureData.profilePhotoBase64, signatureData.profilePhotoUrl]);
   
@@ -110,8 +114,8 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 </label>
                 <ImageUploader
                   imageUrl={signatureData.profilePhotoUrl || ''} // Utiliser l'URL de la photo de profil si disponible
-                  apiBaseUrl={import.meta.env.VITE_API_URL || 'http://localhost:4000'} // Ajouter l'URL de base de l'API
-                  previewImage={profilePhotoPreview} // Utiliser l'état local au lieu des données de signature directement
+                  apiBaseUrl={import.meta.env.VITE_API_URL || ''} // URL de base de l'API (vide car l'URL est déjà complète)
+                  previewImage={profilePhotoPreview} // Utiliser l'état local pour la prévisualisation
                   isLoading={false}
                   roundedStyle="full"
                   imageSize={80} /* Taille fixe pour l'aperçu dans le composant d'upload */

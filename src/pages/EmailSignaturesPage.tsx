@@ -114,6 +114,7 @@ const EmailSignaturesPage: React.FC = () => {
       email: signature.email || '',
       phone: signature.phone || '',
       mobilePhone: signature.mobilePhone || '',
+      // S'assurer que l'URL de la photo de profil est complète
       profilePhotoUrl: signature.profilePhotoUrl || '',
       profilePhotoBase64: signature.profilePhotoBase64 || '',
       profilePhotoSize: signature.profilePhotoSize || 80,
