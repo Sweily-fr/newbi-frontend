@@ -18,13 +18,13 @@ import {
   // Nous n'importons plus getStatusIconName ni getCategoryIcon car nous utilisons des SVG directement
 } from './utils';
 
-interface RecommendationsPanelProps {
+interface SuggestionsPanelProps {
   analysisResults: ContentAnalysisResult[];
   expandedCategories: Record<string, boolean>;
   setExpandedCategories: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
-const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ 
+const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({ 
   analysisResults, 
   expandedCategories, 
   setExpandedCategories 
@@ -32,9 +32,9 @@ const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({
   const groupedResults = groupResultsByCategory(analysisResults);
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-[#f0eeff]">
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff]">Recommandations</h2>
+    <div className="w-full bg-white rounded overflow-hidden">
+      <div className="px-3 py-2">
+        <h2 className="text-base font-semibold text-[#5b50ff]">Suggestions</h2>
         
         {Object.entries(groupedResults).map(([category, results]) => (
           results.length > 0 && (
@@ -175,7 +175,7 @@ const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
             <p className="mt-2 text-gray-500">
-              Commencez à rédiger votre contenu et ajoutez un mot-clé principal pour obtenir des recommandations.
+              Commencez à rédiger votre contenu et ajoutez un mot-clé principal pour obtenir des suggestions.
             </p>
           </div>
         )}
@@ -184,4 +184,4 @@ const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({
   );
 };
 
-export default RecommendationsPanel;
+export default SuggestionsPanel;

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
-import { BlogSeoOptimizer } from '../features/optimisation-seo';
+import BlogSeoOptimizer from './BlogSeoOptimizer';
 
 const BlogSeoOptimizerPage: React.FC = () => {
   // Définition des métadonnées pour le SEO

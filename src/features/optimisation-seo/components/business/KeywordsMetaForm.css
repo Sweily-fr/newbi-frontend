@@ -1,0 +1,17 @@
+/* Suppression des ombres des champs de formulaire */
+.input-no-shadow {
+  box-shadow: none !important;
+}
+
+/* Style pour les champs de saisie */
+.input-no-shadow input[type="text"],
+.input-no-shadow input[type="text"]:focus,
+.input-no-shadow textarea,
+.input-no-shadow textarea:focus {
+  box-shadow: none !important;
+}
+
+/* Style pour les boutons */
+.input-no-shadow button {
+  box-shadow: none !important;
+}
