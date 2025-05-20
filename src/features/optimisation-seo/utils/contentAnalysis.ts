@@ -56,13 +56,63 @@ export const analyzeContent = (
   // Vérifier si les métadonnées sont vides
   const isMetaTagsEmpty = !metaTags.title && !metaTags.description;
   
-  // Si le contenu est vide ou par défaut ET que les métadonnées sont vides,
-  // retourner un tableau vide pour obtenir un score de 0
-  if (isContentEmpty && isMetaTagsEmpty && keywords.main) {
-    return [];
+  const results: ContentAnalysisResult[] = [];
+  
+  // Vérification du contenu vide
+  if (isContentEmpty) {
+    results.push({
+      id: 'content-empty',
+      title: 'Contenu vide',
+      description: 'Votre contenu est vide. Ajoutez du contenu pour améliorer votre référencement.',
+      status: 'problem',
+      score: 0,
+      priority: 'high',
+      category: 'structure',
+      suggestions: ['Commencez à rédiger votre contenu pour améliorer votre référencement.']
+    });
   }
   
-  const results: ContentAnalysisResult[] = [];
+  // Vérification des métadonnées vides
+  if (isMetaTagsEmpty) {
+    results.push({
+      id: 'meta-tags-missing',
+      title: 'Métadonnées manquantes',
+      description: 'Aucune métadonnée (titre ou description) n\'a été définie pour votre contenu.',
+      status: 'problem',
+      score: 0,
+      priority: 'high',
+      category: 'meta',
+      suggestions: ['Ajoutez un titre et une description pour améliorer votre référencement.']
+    });
+  } else {
+    // Vérification de la longueur du titre
+    if (metaTags.title.length < 30 || metaTags.title.length > 60) {
+      results.push({
+        id: 'title-length',
+        title: 'Longueur du titre',
+        description: `Votre titre fait ${metaTags.title.length} caractères.`,
+        status: 'improvement',
+        score: 5,
+        priority: 'high',
+        category: 'meta',
+        suggestions: ['Un bon titre SEO fait entre 30 et 60 caractères.']
+      });
+    }
+    
+    // Vérification de la longueur de la description
+    if (metaTags.description.length < 70 || metaTags.description.length > 160) {
+      results.push({
+        id: 'description-length',
+        title: 'Longueur de la description',
+        description: `Votre description fait ${metaTags.description.length} caractères.`,
+        status: 'improvement',
+        score: 5,
+        priority: 'medium',
+        category: 'meta',
+        suggestions: ['Une bonne description SEO fait entre 70 et 160 caractères.']
+      });
+    }
+  }
   
   // Vérification des mots-clés secondaires
   if (keywords.secondary.length === 0) {
@@ -87,99 +137,127 @@ export const analyzeContent = (
       }
     }
     
-    if (secondaryKeywordsWithLowDensity.length > 0) {
-      results.push({
-        id: 'secondary-keywords-density',
-        title: 'Densité des mots-clés secondaires',
-        description: `${secondaryKeywordsWithLowDensity.length} mot(s)-clé(s) secondaire(s) ont une densité trop faible.`,
-        status: 'improvement',
-        score: 5,
-        priority: 'medium',
-        category: 'keywords',
-        suggestions: [
-          `Les mots-clés secondaires suivants ont une densité inférieure à 0.3% : ${secondaryKeywordsWithLowDensity.join(', ')}.`,
-          'Essayez d\'inclure ces mots-clés plus fréquemment dans votre contenu pour améliorer leur visibilité.'
-        ]
-      });
-    }
+    results.push({
+      id: 'secondary-keywords-density',
+      title: 'Densité des mots-clés secondaires',
+      description: secondaryKeywordsWithLowDensity.length > 0
+        ? `${secondaryKeywordsWithLowDensity.length} mot(s)-clé(s) secondaire(s) ont une densité trop faible.`
+        : 'La densité de vos mots-clés secondaires est bonne.',
+      status: secondaryKeywordsWithLowDensity.length > 0 ? 'improvement' : 'good',
+      score: secondaryKeywordsWithLowDensity.length > 0 ? 5 : 10,
+      priority: 'medium',
+      category: 'keywords',
+      suggestions: secondaryKeywordsWithLowDensity.length > 0
+        ? [
+            `Les mots-clés secondaires suivants ont une densité inférieure à 0.3% : ${secondaryKeywordsWithLowDensity.join(', ')}.`,
+            'Essayez d\'inclure ces mots-clés plus fréquemment dans votre contenu pour améliorer leur visibilité.'
+          ]
+        : ['La densité de vos mots-clés secondaires est optimale.']
+    });
   }
   
   // Analyse du mot-clé principal
-  if (keywords.main) {
-    // Vérification de la présence du mot-clé principal dans le titre
-    const titleContainsKeyword = metaTags.title.toLowerCase().includes(keywords.main.toLowerCase());
-    results.push({
-      id: 'keyword-in-title',
-      title: 'Mot-clé principal dans le titre',
-      description: titleContainsKeyword 
+  const hasMainKeyword = keywords.main && keywords.main.trim() !== '';
+  
+  // Vérification de la présence du mot-clé principal dans le titre
+  const titleContainsKeyword = hasMainKeyword && metaTags.title.toLowerCase().includes(keywords.main.toLowerCase());
+  results.push({
+    id: 'keyword-in-title',
+    title: 'Mot-clé principal dans le titre',
+    description: !hasMainKeyword 
+      ? 'Aucun mot-clé principal défini pour vérification.' 
+      : titleContainsKeyword 
         ? 'Votre mot-clé principal est présent dans le titre.' 
         : 'Votre mot-clé principal n\'est pas présent dans le titre.',
-      status: titleContainsKeyword ? 'good' : 'problem',
-      score: titleContainsKeyword ? 10 : 0,
-      priority: 'high',
-      category: 'keywords',
-      suggestions: titleContainsKeyword ? [] : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre.`]
-    });
-    
-    // Vérification de la présence du mot-clé principal dans la méta description
-    const descContainsKeyword = metaTags.description.toLowerCase().includes(keywords.main.toLowerCase());
-    results.push({
-      id: 'keyword-in-meta',
-      title: 'Mot-clé principal dans la méta description',
-      description: descContainsKeyword 
+    status: !hasMainKeyword ? 'improvement' : titleContainsKeyword ? 'good' : 'problem',
+    score: !hasMainKeyword ? 5 : titleContainsKeyword ? 10 : 0,
+    priority: 'high',
+    category: 'keywords',
+    suggestions: !hasMainKeyword 
+      ? ['Définissez un mot-clé principal pour activer cette vérification.'] 
+      : titleContainsKeyword 
+        ? [] 
+        : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre.`]
+  });
+  
+  // Vérification de la présence du mot-clé principal dans la méta description
+  const descContainsKeyword = hasMainKeyword && metaTags.description.toLowerCase().includes(keywords.main.toLowerCase());
+  results.push({
+    id: 'keyword-in-meta',
+    title: 'Mot-clé principal dans la méta description',
+    description: !hasMainKeyword
+      ? 'Aucun mot-clé principal défini pour vérification.'
+      : descContainsKeyword 
         ? 'Votre mot-clé principal est présent dans la méta description.' 
         : 'Votre mot-clé principal n\'est pas présent dans la méta description.',
-      status: descContainsKeyword ? 'good' : 'problem',
-      score: descContainsKeyword ? 8 : 0,
-      priority: 'high',
-      category: 'keywords',
-      suggestions: descContainsKeyword ? [] : [`Ajoutez le mot-clé "${keywords.main}" dans votre méta description.`]
-    });
-    
-    // Analyse de la densité du mot-clé principal
-    const mainKeywordDensity = stats.keywordDensity.main;
-    let keywordDensityStatus: 'good' | 'improvement' | 'problem' = 'good';
-    let keywordDensityScore = 10;
-    const keywordDensitySuggestions: string[] = [];
-    
-    if (mainKeywordDensity < 0.5) {
-      keywordDensityStatus = 'problem';
-      keywordDensityScore = 3;
-      keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop faible. Visez entre 0.5% et 2.5%.`);
-    } else if (mainKeywordDensity > 2.5) {
-      keywordDensityStatus = 'improvement';
-      keywordDensityScore = 5;
-      keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop élevée. Visez entre 0.5% et 2.5%.`);
-    }
-    
-    results.push({
-      id: 'keyword-density',
-      title: 'Densité du mot-clé principal',
-      description: `La densité du mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%.`,
-      status: keywordDensityStatus,
-      score: keywordDensityScore,
-      priority: 'medium',
-      category: 'keywords',
-      suggestions: keywordDensitySuggestions
-    });
-    
-    // Vérification de la présence du mot-clé dans le premier paragraphe
-    const firstParagraph = content.match(/<p[^>]*>(.*?)<\/p>/i)?.[1] || '';
-    const keywordInFirstParagraph = firstParagraph.toLowerCase().includes(keywords.main.toLowerCase());
-    
-    results.push({
-      id: 'keyword-in-first-paragraph',
-      title: 'Mot-clé dans le premier paragraphe',
-      description: keywordInFirstParagraph 
+    status: !hasMainKeyword ? 'improvement' : descContainsKeyword ? 'good' : 'problem',
+    score: !hasMainKeyword ? 5 : descContainsKeyword ? 8 : 0,
+    priority: 'high',
+    category: 'keywords',
+    suggestions: !hasMainKeyword
+      ? ['Définissez un mot-clé principal pour activer cette vérification.']
+      : descContainsKeyword 
+        ? [] 
+        : [`Ajoutez le mot-clé "${keywords.main}" dans votre méta description.`]
+  });
+  
+  // Analyse de la densité du mot-clé principal
+  const mainKeywordDensity = stats.keywordDensity.main || 0;
+  let keywordDensityStatus: 'good' | 'improvement' | 'problem' = !hasMainKeyword ? 'improvement' : 'good';
+  let keywordDensityScore = !hasMainKeyword ? 5 : 10;
+  const keywordDensitySuggestions: string[] = [];
+  
+  if (!hasMainKeyword) {
+    keywordDensitySuggestions.push('Définissez un mot-clé principal pour analyser sa densité.');
+  } else if (mainKeywordDensity < 0.5) {
+    keywordDensityStatus = 'problem';
+    keywordDensityScore = 3;
+    keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop faible. Visez entre 0.5% et 2.5%.`);
+  } else if (mainKeywordDensity > 2.5) {
+    keywordDensityStatus = 'improvement';
+    keywordDensityScore = 5;
+    keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop élevée. Visez entre 0.5% et 2.5%.`);
+  } else {
+    keywordDensitySuggestions.push('La densité de votre mot-clé principal est optimale.');
+  }
+  
+  results.push({
+    id: 'keyword-density',
+    title: 'Densité du mot-clé principal',
+    description: !hasMainKeyword 
+      ? 'Aucun mot-clé principal défini pour analyse.' 
+      : `La densité du mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%.`,
+    status: keywordDensityStatus,
+    score: keywordDensityScore,
+    priority: 'medium',
+    category: 'keywords',
+    suggestions: keywordDensitySuggestions.length > 0 
+      ? keywordDensitySuggestions 
+      : ['La densité de votre mot-clé principal est bonne.']
+  });
+  
+  // Vérification de la présence du mot-clé dans le premier paragraphe
+  const firstParagraph = content.match(/<p[^>]*>(.*?)<\/p>/i)?.[1] || '';
+  const keywordInFirstParagraph = hasMainKeyword && firstParagraph.toLowerCase().includes(keywords.main.toLowerCase());
+  
+  results.push({
+    id: 'keyword-in-first-paragraph',
+    title: 'Mot-clé dans le premier paragraphe',
+    description: !hasMainKeyword
+      ? 'Aucun mot-clé principal défini pour vérification.'
+      : keywordInFirstParagraph 
         ? 'Votre mot-clé principal est présent dans le premier paragraphe.' 
         : 'Votre mot-clé principal n\'est pas présent dans le premier paragraphe.',
-      status: keywordInFirstParagraph ? 'good' : 'improvement',
-      score: keywordInFirstParagraph ? 7 : 3,
-      priority: 'medium',
-      category: 'keywords',
-      suggestions: keywordInFirstParagraph ? [] : [`Ajoutez le mot-clé "${keywords.main}" dans le premier paragraphe.`]
-    });
-  }
+    status: !hasMainKeyword ? 'improvement' : keywordInFirstParagraph ? 'good' : 'improvement',
+    score: !hasMainKeyword ? 5 : keywordInFirstParagraph ? 7 : 3,
+    priority: 'medium',
+    category: 'keywords',
+    suggestions: !hasMainKeyword
+      ? ['Définissez un mot-clé principal pour activer cette vérification.']
+      : keywordInFirstParagraph 
+        ? [] 
+        : [`Ajoutez le mot-clé "${keywords.main}" dans le premier paragraphe.`]
+  });
   
   // Analyse de la structure du contenu
   
