@@ -114,8 +114,12 @@ const EmailSignaturesPage: React.FC = () => {
       email: signature.email || '',
       phone: signature.phone || '',
       mobilePhone: signature.mobilePhone || '',
-      // S'assurer que l'URL de la photo de profil est complète
-      profilePhotoUrl: signature.profilePhotoUrl || '',
+      // Ajouter l'URL de base aux chemins relatifs des photos de profil
+      profilePhotoUrl: signature.profilePhotoUrl ? 
+        (signature.profilePhotoUrl.startsWith('http') ? 
+          signature.profilePhotoUrl : 
+          `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}${signature.profilePhotoUrl}`
+        ) : '',
       profilePhotoBase64: signature.profilePhotoBase64 || '',
       profilePhotoSize: signature.profilePhotoSize || 80,
       
