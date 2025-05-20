@@ -678,6 +678,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
                           onConfigureBankDetailsClick={
                             handleConfigureBankDetailsRequest
                           }
+                          documentType="devis"
                         />
                       </div>
                       <div className="mb-10">
@@ -763,7 +764,15 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
               validUntil,
               // Utiliser le client original du devis lors de la modification
               client: quote ? quote.client : undefined,
-              companyInfo,
+              companyInfo: {
+                ...companyInfo,
+                // S'assurer que les coordonnées bancaires sont incluses si useBankDetails est true
+                bankDetails: useBankDetails && userData?.me?.company?.bankDetails ? {
+                  iban: userData.me.company.bankDetails.iban || "",
+                  bic: userData.me.company.bankDetails.bic || "",
+                  bankName: userData.me.company.bankDetails.bankName || ""
+                } : undefined
+              },
               items,
               discount,
               discountType,

@@ -5,6 +5,7 @@ import { Client } from "../../../clients/types/client";
 import { Item } from "../../../factures/types/invoice";
 import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../../utils/transactionCategoryUtils";
+import { formatIban } from "../../../../utils/ibanFormatter";
 import { PDFGenerator, Loader } from "../../../../components/";
 
 interface QuotePreviewProps {
@@ -97,6 +98,8 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
       currency: "EUR",
     }).format(amount);
   };
+  
+  // La fonction formatIban est maintenant importée depuis utils/ibanFormatter.ts
 
   // Déterminer les informations du client à afficher
   const clientInfo: Partial<Client> & {
@@ -595,12 +598,21 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                 Coordonnées bancaires
               </h3>
               <div className="text-xs grid grid-cols-[30%_70%] gap-x-2 gap-y-1">
+                {/* Nom du bénéficiaire */}
+                <span className="text-gray-600 text-xs font-normal">
+                  Nom du bénéficiaire
+                </span>
+                <span className="font-medium">{companyInfo.name}</span>
+                
+
+                
+                {/* Coordonnées bancaires */}
                 <span className="text-gray-600 text-xs font-normal">
                   Banque
                 </span>
                 <span>{companyInfo.bankDetails.bankName}</span>
                 <span className="text-gray-600 text-xs font-normal">IBAN</span>
-                <span>{companyInfo.bankDetails.iban}</span>
+                <span>{formatIban(companyInfo.bankDetails.iban)}</span>
                 <span className="text-gray-600 text-xs font-normal">BIC</span>
                 <span>{companyInfo.bankDetails.bic}</span>
               </div>

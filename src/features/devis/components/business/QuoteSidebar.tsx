@@ -353,13 +353,39 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             <QuotePreview
               quote={{
                 ...quote,
-                // Ajouter explicitement les détails des TVA au devis
-                vatRates: calculateTotals().vatRates,
                 status:
-                  quote.status === "CANCELED" ? "COMPLETED" : quote.status,
+                  quote.status === "CANCELED" ? "COMPLETED" : quote.status
               }}
               calculateTotals={calculateTotals}
               useBankDetails={true}
+              // Passer explicitement les coordonnées bancaires via companyInfo
+              companyInfo={quote.companyInfo && {
+                name: quote.companyInfo.name || "",
+                email: quote.companyInfo.email || "",
+                phone: quote.companyInfo.phone || "",
+                website: quote.companyInfo.website || "",
+                siret: quote.companyInfo.siret || "",
+                vatNumber: quote.companyInfo.vatNumber || "",
+                logo: quote.companyInfo.logo || "",
+                transactionCategory: quote.companyInfo.transactionCategory as "goods" | "services" | "mixed" | undefined,
+                address: quote.companyInfo.address ? {
+                  street: quote.companyInfo.address.street || "",
+                  city: quote.companyInfo.address.city || "",
+                  postalCode: quote.companyInfo.address.postalCode || "",
+                  country: quote.companyInfo.address.country || ""
+                } : {
+                  street: "",
+                  city: "",
+                  postalCode: "",
+                  country: ""
+                },
+                // Vérifier que les coordonnées bancaires existent et sont complètes
+                bankDetails: quote.companyInfo.bankDetails ? {
+                  iban: quote.companyInfo.bankDetails.iban || "",
+                  bic: quote.companyInfo.bankDetails.bic || "",
+                  bankName: quote.companyInfo.bankDetails.bankName || ""
+                } : undefined
+              }}
             />
           </div>
         </div>

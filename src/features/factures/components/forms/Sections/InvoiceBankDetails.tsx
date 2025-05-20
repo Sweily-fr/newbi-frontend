@@ -14,12 +14,22 @@ interface UserData {
   };
 }
 
+interface CompanyInfo {
+  bankDetails?: {
+    iban?: string;
+    bic?: string;
+    bankName?: string;
+  };
+  [key: string]: unknown;
+}
+
 interface InvoiceBankDetailsProps {
   userData: UserData;
   useBankDetails: boolean;
   setUseBankDetails: (value: boolean) => void;
-  setCompanyInfo: (updater: (prev: any) => any) => void;
+  setCompanyInfo: (updater: (prev: CompanyInfo) => CompanyInfo) => void;
   onConfigureBankDetailsClick?: () => void;
+  documentType?: 'facture' | 'devis';
 }
 
 export const InvoiceBankDetails: React.FC<InvoiceBankDetailsProps> = ({
@@ -28,6 +38,7 @@ export const InvoiceBankDetails: React.FC<InvoiceBankDetailsProps> = ({
   setUseBankDetails,
   setCompanyInfo,
   onConfigureBankDetailsClick,
+  documentType = 'facture',
 }) => {
   return (
     <div className="mb-6 col-span-2">
@@ -133,7 +144,7 @@ export const InvoiceBankDetails: React.FC<InvoiceBankDetailsProps> = ({
             <div className="flex-1">
               <p className="text-sm text-gray-700">
                 Les coordonnées bancaires de votre entreprise seront
-                automatiquement ajoutées à la facture.
+                automatiquement ajoutées {documentType === 'facture' ? 'à la facture' : 'au devis'}.
               </p>
             </div>
           </div>

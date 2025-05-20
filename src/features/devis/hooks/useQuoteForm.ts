@@ -782,6 +782,13 @@ export const useQuoteForm = ({
           siret: companyInfo.siret || "",
           vatNumber: companyInfo.vatNumber || "",
           logo: companyInfo.logo || "",
+          transactionCategory: companyInfo.transactionCategory,
+          // Inclure les coordonnées bancaires si l'option useBankDetails est activée
+          bankDetails: useBankDetails && userData?.me?.company?.bankDetails ? {
+            iban: userData.me.company.bankDetails.iban || "",
+            bic: userData.me.company.bankDetails.bic || "",
+            bankName: userData.me.company.bankDetails.bankName || ""
+          } : undefined
         },
         // Suppression du champ useBankDetails qui n'est pas défini dans le schéma GraphQL
         items: items.map((item) => ({
