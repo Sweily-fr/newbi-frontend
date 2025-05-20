@@ -3,11 +3,16 @@ import { useBlogSeo } from '../../hooks/useBlogSeo';
 import { KeywordSuggestions } from './KeywordSuggestions';
 import Tooltip from '../../../../components/common/Tooltip';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import './KeywordsMetaForm.css';
 
 const KeywordsMetaForm: React.FC = () => {
   const { state, setKeywords, setMetaTags } = useBlogSeo();
   const [secondaryKeyword, setSecondaryKeyword] = useState('');
   const [longTailKeyword, setLongTailKeyword] = useState('');
+  
+  // Styles communs
+  const inputStyle = "px-3 py-1.5 text-sm border border-[#5b50ff] border-opacity-30 rounded-2xl focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200 text-gray-900";
+  const buttonStyle = "px-4 py-1.5 text-sm text-[#5b50ff] border border-[#5b50ff] border-opacity-30 bg-white rounded-2xl hover:border-opacity-50 focus:outline-none transform hover:translate-y-[-1px] disabled:text-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed font-light transition-colors duration-200";
 
   // Référence pour suivre si un champ est en cours de modification
   const isUpdatingRef = useRef(false);
@@ -99,15 +104,15 @@ const KeywordsMetaForm: React.FC = () => {
   }, [state.metaTags, setMetaTags]);
 
   return (
-    <div className="bg-white shadow-md overflow-hidden border border-[#f0eeff] h-full flex flex-col">
-      <div className="p-6 border-b border-[#f0eeff] flex-shrink-0">
-        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff]">Mots-clés</h2>
+    <div className="bg-white h-full flex flex-col px-1.5">
+      <div className="pt-3 pb-1 flex-shrink-0">
+        <h2 className="text-base font-semibold mb-2 text-[#5b50ff]">Mots-clés</h2>
         
         {/* Mot-clé principal */}
         <div className="mb-4">
           <div className="flex items-center mb-1">
             <label htmlFor="main-keyword" className="block text-sm font-medium text-gray-700">
-              Mot-clé principal <span className="text-xs text-gray-500">(1 maximum)</span>
+              Mot-clé principal <span className="text-[10px] text-gray-500">(1 maximum)</span>
             </label>
             <div className="flex items-center h-full">
               <Tooltip content="Ce mot-clé sera utilisé pour l'analyse principale de votre contenu." position="top">
@@ -122,7 +127,7 @@ const KeywordsMetaForm: React.FC = () => {
             id="main-keyword"
             value={state.keywords.main}
             onChange={handleMainKeywordChange}
-            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200 text-gray-900"
+            className={`w-full ${inputStyle}`}
             placeholder="Entrez votre mot-clé principal"
             style={{ color: 'black' }}
           />
@@ -148,7 +153,7 @@ const KeywordsMetaForm: React.FC = () => {
               id="secondary-keyword"
               value={secondaryKeyword}
               onChange={(e) => setSecondaryKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+              className={`flex-1 ${inputStyle}`}
               placeholder="Ajouter un mot-clé secondaire"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
@@ -161,7 +166,7 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddButtonClick}
-              className="px-4 py-2 text-[#5b50ff] border border-[#5b50ff] border-opacity-30 bg-white rounded-2xl hover:border-opacity-50 focus:outline-none shadow-sm transform hover:translate-y-[-2px] disabled:text-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm font-light transition-colors duration-200"
+              className={buttonStyle}
               disabled={!secondaryKeyword.trim() || state.keywords.secondary.length >= 5}
             >
               Ajouter
@@ -207,8 +212,8 @@ const KeywordsMetaForm: React.FC = () => {
         {/* Mots-clés de longue traîne */}
         <div>
           <div className="flex items-center mb-1">
-            <label htmlFor="long-tail-keyword" className="block text-sm font-medium text-gray-700">
-              Mots-clés de longue traîne <span className="text-xs text-gray-500">(5 maximum)</span>
+            <label htmlFor="long-tail-keyword" className="block text-xs font-medium text-gray-700">
+              Mots-clés de longue traîne <span className="text-[10px] text-gray-500">(5 maximum)</span>
             </label>
             <div className="flex items-center h-full">
               <Tooltip content="Les mots-clés de longue traîne sont des expressions plus spécifiques qui ciblent des intentions de recherche précises." position="top">
@@ -224,7 +229,7 @@ const KeywordsMetaForm: React.FC = () => {
               id="long-tail-keyword"
               value={longTailKeyword}
               onChange={(e) => setLongTailKeyword(e.target.value)}
-              className="flex-1 px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+              className={`flex-1 ${inputStyle}`}
               placeholder="Ajouter un mot-clé de longue traîne"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
@@ -237,7 +242,7 @@ const KeywordsMetaForm: React.FC = () => {
             <button
               type="button"
               onClick={handleAddLongTailKeyword}
-              className="px-4 py-2 text-[#5b50ff] border border-[#5b50ff] border-opacity-30 bg-white rounded-2xl hover:border-opacity-50 focus:outline-none shadow-sm transform hover:translate-y-[-2px] disabled:text-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm font-light transition-colors duration-200"
+              className={buttonStyle}
               disabled={!longTailKeyword.trim() || state.keywords.longTail.length >= 5}
             >
               Ajouter
@@ -270,12 +275,12 @@ const KeywordsMetaForm: React.FC = () => {
         </div>
       </div>
       
-      <div className="p-6 flex-1 overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-4 text-[#5b50ff] sticky top-0 bg-white pb-2 z-10">Méta-données</h2>
+      <div className="flex-1 overflow-y-auto pt-3">
+        <h2 className="text-base font-semibold mb-2 text-[#5b50ff] sticky top-0 bg-white pb-1 z-10">Méta-données</h2>
         
         {/* Titre */}
         <div className="mb-4">
-          <label htmlFor="meta-title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="meta-title" className="block text-xs font-medium text-gray-700 mb-1">
             Titre (balise title)
           </label>
           <input
@@ -284,14 +289,14 @@ const KeywordsMetaForm: React.FC = () => {
             name="title"
             value={state.metaTags.title}
             onChange={handleMetaTagChange}
-            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+            className={`w-full ${inputStyle}`}
             placeholder="Titre de votre page"
           />
         </div>
         
         {/* Description */}
         <div>
-          <label htmlFor="meta-description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="meta-description" className="block text-xs font-medium text-gray-700 mb-1">
             Description (balise meta description)
           </label>
           <textarea
@@ -299,8 +304,8 @@ const KeywordsMetaForm: React.FC = () => {
             name="description"
             value={state.metaTags.description}
             onChange={handleMetaTagChange}
-            rows={6}
-            className="w-full px-3 py-2 border border-[#5b50ff] border-opacity-30 rounded-2xl shadow-sm focus:outline-none focus:ring-[#5b50ff] focus:border-[#5b50ff] hover:border-opacity-50 transition-colors duration-200"
+            rows={4}
+            className={`w-full ${inputStyle} min-h-[120px]`}
             placeholder="Description de votre page"
           />
         </div>

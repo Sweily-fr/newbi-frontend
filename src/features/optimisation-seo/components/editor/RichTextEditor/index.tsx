@@ -328,7 +328,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onClose={() => setIsLinkPopupOpen(false)} 
         initialSelection={selectedText}
         noSelection={!selectedText.trim()}
-        onSubmit={(url, isInternal, linkText) => {
+        onSubmit={(url: string, isInternal: boolean, linkText?: string) => {
           // Ajouter le lien avec un attribut data-link-type pour distinguer les liens internes et externes
           if (url && savedRange) {
             // Focus sur l'éditeur
