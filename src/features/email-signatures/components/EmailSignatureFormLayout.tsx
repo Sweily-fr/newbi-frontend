@@ -27,6 +27,7 @@ interface EmailSignatureFormLayoutProps {
   onSave?: (data: SignatureData) => void;
   onCancel?: () => void;
   initialData?: SignatureData;
+  selectedSignature?: EmailSignature; // Ajout de la signature sélectionnée pour le mode édition
 }
 
 export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> = ({
@@ -35,7 +36,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   onSignatureDataChange,
   onSave,
   onCancel,
-  initialData
+  initialData,
+  selectedSignature
 }) => {
 
   // La section active est maintenant fournie par le composant parent
@@ -92,15 +94,15 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     // Informations personnelles
     fullName: 'Jean Dupont',
     jobTitle: 'Fondateur & CEO',
-    email: 'jean.dupont@newbi.fr',
+    email: 'jean.dupont@exemple.fr',
     phone: '+33 7 34 64 06 18',
     mobilePhone: '+33 6 12 34 56 78',
     primaryColor: '#5b50ff',
     secondaryColor: '#f0eeff',
     
     // Informations entreprise
-    companyName: 'Newbi',
-    companyWebsite: 'https://www.newbi.fr',
+    companyName: 'Mon Entreprise',
+    companyWebsite: 'https://www.exemple.fr',
     companyAddress: '123 Avenue des Entrepreneurs, 75000 Paris, France',
     
     // Réseaux sociaux
@@ -139,15 +141,32 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   });
   
   
-  // Notifier le composant parent des données initiales
+  // Notifier le composant parent des données initiales uniquement au montage initial
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    // Notification initiale uniquement, pas à chaque changement
     if (onSignatureDataChange) {
       onSignatureDataChange(signatureData);
     }
   }, []);
 
   // Fonction pour mettre à jour les données de la signature
+  // Utilisation d'une référence pour éviter les mises à jour en cascade
+  const isUpdatingRef = useRef(false);
+  
   const updateSignatureData = <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => {
+    // Éviter les mises à jour redondantes si la valeur n'a pas changé
+    if (signatureData[field] === value) {
+      return;
+    }
+    
+    // Éviter les boucles infinies pendant les mises à jour
+    if (isUpdatingRef.current) {
+      return;
+    }
+    
+    isUpdatingRef.current = true;
+    
     const updatedData = {
       ...signatureData,
       [field]: value
@@ -166,9 +185,14 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     
     setSignatureData(updatedData);
     
-    // Notifier le composant parent du changement
+    // Notifier le composant parent du changement avec un léger délai pour éviter les mises à jour en cascade
     if (onSignatureDataChange) {
-      onSignatureDataChange(updatedData);
+      setTimeout(() => {
+        onSignatureDataChange(updatedData);
+        isUpdatingRef.current = false;
+      }, 0);
+    } else {
+      isUpdatingRef.current = false;
     }
   };
   
@@ -260,7 +284,11 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
             <div className="border-t border-gray-200 my-6"></div>
             
             {/* Section Informations de l'entreprise */}
-            <CompanyInfoSection signatureData={signatureData} updateSignatureData={updateSignatureData} />
+            <CompanyInfoSection 
+              signatureData={signatureData} 
+              updateSignatureData={updateSignatureData} 
+              selectedSignature={selectedSignature} 
+            />
           </>
         );
       case 'social':

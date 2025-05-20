@@ -36,8 +36,6 @@ const EmailSignaturesPage: React.FC = () => {
   
   // Fonction pour gérer l'enregistrement de la signature
   const handleSave = async (data: SignatureData) => {
-    console.log('handleSave appelé avec les donnéess:', data);
-    console.log('Signature sélectionnée pour édition:', selectedSignature);
     
     // Si une signature est sélectionnée pour édition, transmettre son ID
     const success = await saveSignature(data, selectedSignature?.id);
@@ -46,8 +44,12 @@ const EmailSignaturesPage: React.FC = () => {
       // Réinitialiser le formulaire et afficher la liste des signatures
       setShowForm(false);
       setSelectedSignature(null); // Réinitialiser la signature sélectionnée
+      
       // Rafraîchir la liste des signatures
       refetch();
+      
+      // Faire défiler la page vers le haut avec une animation fluide
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
   
@@ -55,12 +57,18 @@ const EmailSignaturesPage: React.FC = () => {
   const handleCancel = () => {
     setShowForm(false);
     setSelectedSignature(null);
+    
+    // Faire défiler la page vers le haut avec une animation fluide
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   // Fonction pour retourner à la liste des signatures
   const handleBackToList = () => {
     setShowForm(false);
     setSelectedSignature(null);
+    
+    // Faire défiler la page vers le haut avec une animation fluide
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   // Fonction pour ajouter une nouvelle signature
@@ -318,6 +326,7 @@ const EmailSignaturesPage: React.FC = () => {
                 onSave={handleSave}
                 onCancel={handleCancel}
                 initialData={convertSignatureToFormData(selectedSignature)}
+                selectedSignature={selectedSignature}
               />
             </>
           ) : (

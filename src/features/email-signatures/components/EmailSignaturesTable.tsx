@@ -198,6 +198,11 @@ export const EmailSignaturesTable: React.FC<EmailSignaturesTableProps> = ({
       className: 'w-2/12'
     },
     {
+      header: 'Entreprise',
+      accessor: (signature) => signature.companyName || '-',
+      className: 'w-2/12'
+    },
+    {
       header: 'Fonction',
       accessor: 'jobTitle',
       className: 'w-2/12'
