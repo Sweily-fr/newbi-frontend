@@ -39,7 +39,11 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
             <div key={category} className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
               {/* En-tête de la catégorie (toujours visible) */}
               <button 
-                className={`w-full flex items-center justify-between p-2 bg-white border-l-4 border-[#5b50ff] hover:bg-[#f9f8ff] transition-all duration-200 shadow-sm rounded-t-lg ${expandedCategories[category] ? 'rounded-b-none' : 'rounded-lg'}`}
+                className={`w-full flex items-center justify-between p-2 bg-white border-l-4 hover:bg-[#f9f8ff] transition-all duration-200 shadow-sm rounded-t-lg ${expandedCategories[category] ? 'rounded-b-none' : 'rounded-lg'} ${
+                  results.some(r => r.status === 'problem') ? 'border-red-500' :
+                  results.some(r => r.status === 'improvement') ? 'border-yellow-500' :
+                  'border-[#5b50ff]'
+                }`}
                 onClick={() => setExpandedCategories(prev => ({
                   ...prev,
                   [category]: !prev[category]
