@@ -5,9 +5,9 @@ import {
   PersonalInfoForm,
   CompanyInfoForm,
 } from "../features/profile";
-import { ClientsManager } from "../features/clients";
-import { ProductsManager } from "../features/products";
-import { IntegrationsManager } from "../features/integrations";
+import { ClientsManager } from "../features/clients/components/business/ClientsManager";
+import { ProductsManager } from "../features/products/components/business/ProductsManager";
+import { IntegrationsManager } from "../features/integrations/components/IntegrationsManager";
 import {
   TabNavigation,
   TabItem,

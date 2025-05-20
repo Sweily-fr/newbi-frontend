@@ -2,8 +2,6 @@ import { Modal } from "../../../../components/";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import { ClientForm } from "../forms/";
 import {
-  TrashIcon,
-  PencilIcon,
   UserGroupIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
@@ -176,7 +174,7 @@ export const ClientsManager = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
         title={selectedClient ? "Modifier le client" : "Ajouter un client"}
-        maxWidth="2xl"
+        size="2xl"
         maxHeight="80vh"
         footer={
           <div className="flex justify-end space-x-4">
@@ -219,7 +217,7 @@ export const ClientsManager = () => {
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         title="Confirmation de suppression"
-        maxWidth="sm"
+        size="sm"
       >
         <div className="text-center">
           <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-yellow-500 mb-4" />

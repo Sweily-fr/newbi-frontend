@@ -5,19 +5,28 @@ import {
   ClientFormProps,
   ClientType,
 } from "../../types";
+
+// Interface pour les résultats de recherche d'entreprise
+interface CompanySearchResult {
+  id: string;
+  name: string;
+  siret: string;
+  vatNumber: string;
+  address?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
+}
 import {
   Form,
   TextField,
   FieldGroup,
   FormActions,
-  Select,
   Button,
 } from "../../../../components";
-import useCompanySearch, {
-  CompanySearchResult,
-  CompanyNameResult,
-} from "../../../../hooks/useCompanySearch";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import Radio from "../../../../components/common/Radio";
 import {
   EMAIL_PATTERN,
   SIRET_PATTERN,
@@ -34,6 +43,8 @@ import {
   POSTAL_CODE_ERROR_MESSAGE,
   COUNTRY_ERROR_MESSAGE,
 } from "../../../../constants/formValidations";
+import { Add } from "iconsax-react";
+import Checkbox from "../../../../components/common/Checkbox";
 
 export const ClientForm: React.FC<ClientFormProps> = ({
   initialData,
@@ -51,21 +62,12 @@ export const ClientForm: React.FC<ClientFormProps> = ({
 
   // État pour la recherche d'entreprises
   const [searchTerm, setSearchTerm] = useState("");
-  const [showResults, setShowResults] = useState(false);
   // En mode édition, on affiche directement le formulaire sans la recherche
   const [showManualEntry, setShowManualEntry] = useState(isEditMode);
-  
-  // Hook personnalisé pour la recherche d'entreprises
-  const { 
-    isLoading, 
-    isRetrying,
-    errorMessage,
-    companyData, 
-    companiesList, 
-    searchCompany, 
-    retryLastSearch,
-    resetSearch
-  } = useCompanySearch();
+  // État pour les résultats de recherche
+  const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
+  // État pour indiquer si une recherche est en cours
+  const [isSearching, setIsSearching] = useState(false);
   
   const { register, handleSubmit, watch, setValue, control, formState: { errors, isSubmitting } } = useForm<ClientFormData>({
     defaultValues: {
@@ -75,6 +77,35 @@ export const ClientForm: React.FC<ClientFormProps> = ({
     mode: "onBlur", // Validate on blur for better user experience
   });
   
+  // Fonction de soumission personnalisée pour gérer la validation conditionnelle
+  const onFormSubmit = (data: ClientFormData) => {
+    // Validation spécifique selon le type de client
+    if (data.type === ClientType.INDIVIDUAL) {
+      // Pour un particulier, vérifier que firstName et lastName sont remplis
+      if (!data.firstName || !data.lastName) {
+        // Afficher une erreur ou gérer l'erreur de validation
+        return;
+      }
+      // Le champ name n'est pas pertinent pour un particulier, on peut le remplir avec firstName + lastName
+      data.name = `${data.firstName} ${data.lastName}`;
+      // Les champs spécifiques aux entreprises ne sont pas requis
+      data.siret = data.siret || "";
+      data.vatNumber = data.vatNumber || "";
+    } else {
+      // Pour une entreprise, vérifier que name et siret sont remplis
+      if (!data.name || !data.siret) {
+        // Afficher une erreur ou gérer l'erreur de validation
+        return;
+      }
+      // Les champs spécifiques aux particuliers ne sont pas requis
+      data.firstName = data.firstName || "";
+      data.lastName = data.lastName || "";
+    }
+    
+    // Appeler la fonction onSubmit fournie par le parent
+    onSubmit(data);
+  };
+  
   // Observer les changements du type de client
   const watchedType = watch("type");
   
@@ -82,448 +113,408 @@ export const ClientForm: React.FC<ClientFormProps> = ({
   useEffect(() => {
     if (watchedType) {
       setClientType(watchedType as ClientType);
-    }
-  }, [watchedType]);
-
-  // Fonction pour remplir le formulaire avec les données de l'entreprise trouvée
-  const fillFormWithCompanyData = (company: CompanySearchResult) => {
-    // Initialiser les valeurs avec les données de l'API
-    let streetValue = company.address.street;
-    let postalCodeValue = company.address.postalCode;
-    let cityValue = company.address.city;
-    
-    // Format observé: "229 rue saint-honore 75001 Paris"
-    // Extraire le code postal (5 chiffres) et la ville qui suit
-    const postalCityMatch = streetValue.match(/(.*?)\s+(\d{5})\s+([^,]+)$/);
-    
-    if (postalCityMatch) {
-      // Extraire les composants de l'adresse
-      streetValue = postalCityMatch[1].trim(); // La rue sans le code postal et la ville
-      postalCodeValue = postalCityMatch[2].trim(); // Le code postal (5 chiffres)
-      cityValue = postalCityMatch[3].trim(); // La ville
-    } else {
-      // Si le format principal n'est pas détecté, essayer d'autres formats
-      // Format alternatif: "Rue, Code Postal Ville"
-      const altFormatMatch = streetValue.match(/^(.+),\s*(\d{5})\s+(.+)$/);
       
-      if (altFormatMatch) {
-        streetValue = altFormatMatch[1].trim();
-        postalCodeValue = altFormatMatch[2].trim();
-        cityValue = altFormatMatch[3].trim();
-      } else if (/^\d{5}$/.test(cityValue)) {
-        // Si le champ city contient un code postal, essayer de trouver la ville dans l'adresse
-        postalCodeValue = cityValue; // Utiliser le code postal du champ city
-        
-        // Chercher dans la chaîne d'adresse un format "XXXXX Ville"
-        const cityInAddressMatch = streetValue.match(/\b(\d{5})\s+([^,\d]+)\b/);
-        if (cityInAddressMatch) {
-          cityValue = cityInAddressMatch[2].trim(); // La ville après le code postal
-          // Enlever le code postal et la ville de l'adresse
-          streetValue = streetValue.replace(cityInAddressMatch[0], '').trim();
-        }
+      // Réinitialiser les champs spécifiques au type de client
+      if (watchedType === ClientType.COMPANY) {
+        setValue("firstName", "");
+        setValue("lastName", "");
+      } else if (watchedType === ClientType.INDIVIDUAL) {
+        setValue("siret", "");
+        setValue("vatNumber", "");
       }
     }
-    
-    // Mettre à jour les champs du formulaire avec les valeurs extraites
-    setValue("name", company.name);
-    setValue("siret", company.siret);
-    setValue("vatNumber", company.vatNumber || "");
-    setValue("address.street", streetValue);
-    setValue("address.city", cityValue);
-    setValue("address.postalCode", postalCodeValue);
-    setValue("address.country", company.address.country);
-    
-    // Réinitialiser l'interface utilisateur
-    resetSearch();
-    setSearchTerm("");
-    setShowResults(false);
-    setShowManualEntry(true); // Afficher le formulaire pour compléter les informations
-  };
-
-  // Fonction pour rechercher une entreprise
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      searchCompany(searchTerm.trim());
-      setShowResults(true);
-    }
-  };
+  }, [watchedType, setValue]);
 
   // Fonction pour gérer les changements dans le champ de recherche
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    // Si l'utilisateur efface le champ, on cache les résultats
-    if (!e.target.value.trim()) {
-      setShowResults(false);
-      resetSearch();
+    // Réinitialiser les résultats si le champ est vidé
+    if (e.target.value.trim() === "") {
+      setSearchResults([]);
     }
   };
-
-  // Fonction pour sélectionner une entreprise à partir des résultats de recherche
-  const handleSelectCompany = (company: CompanyNameResult) => {
-    // Rechercher les détails complets de l'entreprise par SIRET
-    searchCompany(company.siret);
-    setShowResults(false);
+  
+  // Fonction pour rechercher une entreprise
+  const handleSearch = () => {
+    if (searchTerm.trim().length < 3) return;
+    
+    setIsSearching(true);
+    setSearchResults([]);
+    
+    // Utilisation de données mockées pour simuler la recherche
+    setTimeout(() => {
+      try {
+        // Création de résultats de recherche basés sur le terme de recherche
+        const mockData = [
+          { 
+            id: "12345678901234", 
+            name: "Newbi SAS", 
+            siret: "12345678901234", 
+            vatNumber: "FR12345678901",
+            address: {
+              street: "1 rue de la Paix",
+              city: "Paris",
+              postalCode: "75001",
+              country: "France"
+            }
+          },
+          { 
+            id: "98765432109876", 
+            name: "Tech Solutions", 
+            siret: "98765432109876", 
+            vatNumber: "FR98765432109",
+            address: {
+              street: "25 avenue des Champs-Élysées",
+              city: "Paris",
+              postalCode: "75008",
+              country: "France"
+            }
+          },
+          { 
+            id: "45678912345678", 
+            name: "Digital Consulting", 
+            siret: "45678912345678", 
+            vatNumber: "FR45678912345",
+            address: {
+              street: "42 boulevard Haussmann",
+              city: "Paris",
+              postalCode: "75009",
+              country: "France"
+            }
+          },
+          { 
+            id: "78912345678912", 
+            name: "Web Factory", 
+            siret: "78912345678912", 
+            vatNumber: "FR78912345678",
+            address: {
+              street: "8 rue de Rivoli",
+              city: "Paris",
+              postalCode: "75004",
+              country: "France"
+            }
+          },
+          { 
+            id: "23456789123456", 
+            name: "Data Intelligence", 
+            siret: "23456789123456", 
+            vatNumber: "FR23456789123",
+            address: {
+              street: "15 rue du Faubourg Saint-Honoré",
+              city: "Paris",
+              postalCode: "75008",
+              country: "France"
+            }
+          },
+          { 
+            id: "56789123456789", 
+            name: "Sweily", 
+            siret: "56789123456789", 
+            vatNumber: "FR56789123456",
+            address: {
+              street: "10 rue de la Victoire",
+              city: "Paris",
+              postalCode: "75009",
+              country: "France"
+            }
+          }
+        ];
+        
+        // Filtrer les résultats en fonction du terme de recherche
+        const results = mockData.filter(company => 
+          company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          company.siret.includes(searchTerm)
+        );
+        
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // Délai pour simuler la recherche
+  };
+  
+  // Fonction pour sélectionner une entreprise des résultats
+  const selectCompany = (company: CompanySearchResult) => {
+    // Si le type de client est une entreprise, on remplit le champ name
+    // Sinon, pour un particulier, on essaie de décomposer le nom en prénom et nom
+    if (clientType === ClientType.COMPANY) {
+      setValue("name", company.name);
+      setValue("siret", company.siret);
+      setValue("vatNumber", company.vatNumber);
+    } else if (clientType === ClientType.INDIVIDUAL) {
+      // Pour un particulier, on essaie de décomposer le nom
+      const nameParts = company.name.split(' ');
+      if (nameParts.length >= 2) {
+        // Prénom = premier mot, Nom = reste
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ');
+        setValue("firstName", firstName);
+        setValue("lastName", lastName);
+      } else {
+        // Si on ne peut pas décomposer, on met tout dans le nom de famille
+        setValue("firstName", "");
+        setValue("lastName", company.name);
+      }
+    }
+    
+    // Remplir les champs d'adresse si disponibles
+    if (company.address) {
+      if (company.address.street) setValue("address.street", company.address.street);
+      if (company.address.city) setValue("address.city", company.address.city);
+      if (company.address.postalCode) setValue("address.postalCode", company.address.postalCode);
+      if (company.address.country) setValue("address.country", company.address.country);
+    }
+    
+    setShowManualEntry(true);
+    setSearchResults([]);
   };
 
   return (
-    <Form
-      id={id}
-      onSubmit={handleSubmit(onSubmit)}
-      spacing="loose"
-      className="px-4"
-    >
+    <Form onSubmit={handleSubmit(onFormSubmit)} id={id} className="space-y-8 mx-auto px-4">
+      {/* Section de sélection du type de client */}
+      <div className="mb-8 p-6 bg-[#f0eeff] rounded-2xl shadow-sm border border-[#e6e1ff]">
+        <h3 className="text-lg font-medium text-gray-900 mb-4 text-left">Type de client</h3>
+        <Controller
+          name="type"
+          control={control}
+          render={({ field }) => (
+            <div className="mt-2 flex space-x-6">
+              <Radio
+                id="company-type"
+                name="type"
+                value={ClientType.COMPANY}
+                label="Entreprise"
+                checked={field.value === ClientType.COMPANY}
+                onChange={() => {
+                  field.onChange(ClientType.COMPANY);
+                  setClientType(ClientType.COMPANY);
+                }}
+                className="text-[#5b50ff] focus:ring-[#4a41e0]"
+              />
+              <Radio
+                id="individual-type"
+                name="type"
+                value={ClientType.INDIVIDUAL}
+                label="Particulier"
+                checked={field.value === ClientType.INDIVIDUAL}
+                onChange={() => {
+                  field.onChange(ClientType.INDIVIDUAL);
+                  setClientType(ClientType.INDIVIDUAL);
+                }}
+                className="text-[#5b50ff] focus:ring-[#4a41e0]"
+              />
+            </div>
+          )}
+        />
+      </div>
+      
       {/* Recherche d'entreprises - Uniquement pour les entreprises et en mode création */}
-      {clientType === ClientType.COMPANY && (
-        <>
-          {!showManualEntry && !isEditMode ? (
-            <FieldGroup spacing="normal">
-              <div className="mb-6 relative">
-                <div className="mb-6">
-                  <div className="flex space-x-2">
-                    <div className="flex-grow">
-                      <TextField
-                        id="companySearch"
-                        name="companySearch"
-                        label="Rechercher une entreprise (SIRET, SIREN ou nom)"
-                        value={searchTerm}
-                        onChange={handleSearchInputChange}
-                        helpText="Entrez un SIRET (14 chiffres), un SIREN (9 chiffres) ou un nom d'entreprise (min. 3 caractères)"
-                        placeholder="Nom de l'entreprise, N°SIREN, N°SIRET..."
-                      />
-                    </div>
-                    <div className="self-end mb-[46px]">
+      {clientType === ClientType.COMPANY && !showManualEntry && (
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center space-x-4">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchInputChange}
+              placeholder="Rechercher une entreprise par nom ou SIRET"
+              className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent"
+            />
+            <Button
+              type="button"
+              variant="primary"
+              disabled={searchTerm.length < 3 || isSearching}
+              onClick={handleSearch}
+              className="whitespace-nowrap bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl px-4 py-2"
+            >
+              {isSearching ? "Recherche..." : "Rechercher"}
+            </Button>
+          </div>
+          
+          {/* Résultats de recherche */}
+          {searchResults.length > 0 && (
+            <div className="mt-4 mb-4 bg-white rounded-lg shadow-sm border border-[#e6e1ff] overflow-hidden">
+              <ul className="divide-y divide-gray-200">
+                {searchResults.map((company) => (
+                  <li key={company.id} className="p-4 hover:bg-[#f0eeff] cursor-pointer" onClick={() => selectCompany(company)}>
+                    <div className="flex items-center justify-between">
+                      <div className="text-left">
+                        <p className="font-medium text-gray-900">{company.name}</p>
+                        <p className="text-sm text-gray-500">SIRET: {company.siret}</p>
+                      </div>
                       <Button
-                        onClick={handleSearch}
-                        disabled={
-                          isLoading ||
-                          !searchTerm.trim() ||
-                          searchTerm.length < 3
-                        }
+                        type="button"
                         variant="secondary"
-                        size="md"
+                        className="text-xs text-[#5b50ff] bg-[#f0eeff] hover:bg-[#e6e1ff] rounded-lg px-3 py-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectCompany(company);
+                        }}
                       >
-                        {isLoading
-                          ? isRetrying
-                            ? "Nouvel essai..."
-                            : "Recherche..."
-                          : "Rechercher"}
+                        Sélectionner
                       </Button>
                     </div>
-                  </div>
-                </div>
-
-                {/* Dropdown des résultats de recherche - positionné en dehors du champ de recherche */}
-                {showResults && companiesList.length > 0 && (
-                  <div className="relative mt-4">
-                    <div className="z-40 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                      <ul className="divide-y divide-gray-200">
-                        {companiesList.map((company, index) => (
-                          <li
-                            key={index}
-                            className="p-2 hover:bg-gray-100 cursor-pointer rounded-md flex justify-between items-center"
-                            onClick={() => handleSelectCompany(company)}
-                          >
-                            <div className="flex-1 mr-2 overflow-hidden">
-                              <p className="font-medium text-sm truncate">
-                                {company.name}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                SIRET: {company.siret} | SIREN: {company.siren}
-                              </p>
-                            </div>
-                            <Button size="sm" variant="secondary">
-                              Sélectionner
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="p-2 border-t border-gray-200">
-                        <Button
-                          onClick={() => setShowResults(false)}
-                          variant="secondary"
-                          size="sm"
-                          className="w-full"
-                        >
-                          Fermer
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Résultat de recherche par SIRET - positionné en dehors du champ de recherche */}
-                {companyData && (
-                  <div className="mt-4 bg-gray-50 p-4 rounded-md border border-gray-200">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-sm font-medium">
-                          {companyData.name}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          SIRET: {companyData.siret}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Adresse: {companyData.address.street},{" "}
-                          {companyData.address.postalCode}{" "}
-                          {companyData.address.city}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          onClick={() => {
-                            fillFormWithCompanyData(companyData);
-                            setShowManualEntry(true);
-                          }}
-                          variant="primary"
-                          size="sm"
-                        >
-                          Utiliser ces données
-                        </Button>
-                        <Button
-                          onClick={resetSearch}
-                          variant="secondary"
-                          size="sm"
-                        >
-                          Annuler
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Espace supplémentaire pour augmenter la hauteur de la modal */}
-                {!showResults && !companyData && (
-                  <div className="py-8 my-6">
-                    <div className="text-center text-gray-400 italic">
-                      <p>
-                        Utilisez la recherche ci-dessus pour trouver une
-                        entreprise
-                      </p>
-                      <p className="text-sm mt-1">
-                        Les informations seront automatiquement remplies
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowManualEntry(true);
-                      resetSearch();
-                    }}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center"
-                  >
-                    <PlusCircleIcon className="h-4 w-4 mr-1" />
-                    Ajouter une entreprise manuellement
-                  </button>
-                </div>
-
-                {/* Affichage des erreurs de connexion */}
-                {errorMessage && (
-                  <div className="mt-4 bg-red-50 p-4 rounded-md border border-red-200">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-5 w-5 text-red-400"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800">
-                          Erreur de connexion
-                        </h3>
-                        <div className="mt-2 text-sm text-red-700">
-                          <p>
-                            Impossible de se connecter au service de recherche
-                            d'entreprises.
-                          </p>
-                        </div>
-                        <div className="mt-3 flex space-x-3">
-                          <Button
-                            onClick={retryLastSearch}
-                            variant="secondary"
-                            size="sm"
-                          >
-                            Réessayer
-                          </Button>
-                          <Button
-                            onClick={() => setShowManualEntry(true)}
-                            variant="primary"
-                            size="sm"
-                          >
-                            Saisie manuelle
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </FieldGroup>
-          ) : (
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">
-                  {isEditMode ? "Informations du client" : "Saisie manuelle des informations"}
-                </h3>
-                {!isEditMode && (
-                  <Button
-                    onClick={() => setShowManualEntry(false)}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    Revenir à la recherche
-                  </Button>
-                )}
-              </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-        </>
+          
+          {searchTerm.length >= 3 && searchResults.length === 0 && !isSearching && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center text-gray-500">
+              Aucune entreprise trouvée. Veuillez essayer avec un autre terme ou créer une nouvelle entreprise.
+            </div>
+          )}
+          
+          <div className="flex justify-center pt-8">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowManualEntry(true)}
+              className="text-sm text-[#5b50ff] bg-[#f0eeff] hover:bg-[#e6e1ff] rounded-2xl px-4 py-2"
+            >
+              <Add size={20} color="#5b50ff" variant="Linear" className="mr-2" />
+              Saisie manuelle
+            </Button>
+          </div>
+        </div>
       )}
 
-      {showManualEntry && (
+      {(showManualEntry || clientType === ClientType.INDIVIDUAL) && (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  id="client-type"
-                  name="type"
-                  label="Type de client"
-                  value={field.value}
-                  onChange={(e) => {
-                    field.onChange(e.target.value);
-                    resetSearch();
-                  }}
-                  options={[
-                    { value: ClientType.COMPANY, label: "Entreprise" },
-                    { value: ClientType.INDIVIDUAL, label: "Particulier" },
-                  ]}
-                  required
-                />
-              )}
-            />
-
-            <TextField
-              id="name"
-              label="Nom"
-              name="name"
-              register={register}
-              error={errors.name}
-              required
-              validation={{
-                required: "Le nom est requis",
-                pattern: {
-                  value: /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-']{2,50}$/,
-                  message:
-                    "Le nom doit contenir entre 2 et 50 caractères et ne peut contenir que des lettres, espaces, tirets ou apostrophes",
-                },
-              }}
-            />
-          </div>
-
-          {clientType === ClientType.INDIVIDUAL && (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
-              <TextField
-                id="firstName"
-                label="Prénom"
-                name="firstName"
-                register={register}
-                error={errors.firstName}
-                validation={{
-                  pattern: {
-                    value: /^[a-zA-ZÀ-ÿ\s-]{1,50}$/,
-                    message: "Prénom invalide",
-                  },
-                }}
-              />
-              <TextField
-                id="lastName"
-                label="Nom de famille"
-                name="lastName"
-                register={register}
-                error={errors.lastName}
-                validation={{
-                  pattern: {
-                    value: /^[a-zA-ZÀ-ÿ\s-]{1,50}$/,
-                    message: "Nom de famille invalide",
-                  },
-                }}
-              />
+          {clientType === ClientType.COMPANY && showManualEntry && (
+            <div className="flex justify-end mb-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowManualEntry(false)}
+                className="text-sm text-[#5b50ff] bg-[#f0eeff] hover:bg-[#e6e1ff] rounded-2xl px-4 py-2"
+              >
+                Retour à la recherche
+              </Button>
             </div>
           )}
+          <FieldGroup title="Informations générales" spacing="normal" className="bg-white p-6 rounded-2xl shadow-sm border border-[#e6e1ff]">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
+              {clientType === ClientType.INDIVIDUAL ? (
+                <>
+                  <TextField
+                    id="firstName"
+                    label="Prénom"
+                    name="firstName"
+                    placeholder="Ex: Jean"
+                    register={register}
+                    error={errors.firstName}
+                    required
+                    validation={{
+                      required: "Le prénom est requis pour un particulier",
+                      pattern: {
+                        value: /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-']{2,50}$/,
+                        message: "Le prénom doit contenir entre 2 et 50 caractères et ne peut contenir que des lettres, espaces, tirets ou apostrophes",
+                      },
+                    }}
+                  />
+                  
+                  <TextField
+                    id="lastName"
+                    label="Nom"
+                    name="lastName"
+                    placeholder="Ex: Dupont"
+                    register={register}
+                    error={errors.lastName}
+                    required
+                    validation={{
+                      required: "Le nom est requis pour un particulier",
+                      pattern: {
+                        value: /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-']{2,50}$/,
+                        message: "Le nom doit contenir entre 2 et 50 caractères et ne peut contenir que des lettres, espaces, tirets ou apostrophes",
+                      },
+                    }}
+                  />
+                </>
+              ) : (
+                <TextField
+                  id="name"
+                  label="Nom de l'entreprise"
+                  name="name"
+                  placeholder="Ex: Newbi SAS"
+                  register={register}
+                  error={errors.name}
+                  required={clientType === ClientType.COMPANY}
+                  validation={{
+                    required: clientType === ClientType.COMPANY ? "Le nom de l'entreprise est requis" : false,
+                  }}
+                  className="sm:col-span-2"
+                />
+              )}
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
-            <TextField
-              id="email"
-              label="Email"
-              name="email"
-              type="email"
-              register={register}
-              error={errors.email}
-              required
-              validation={{
-                required: "L'email est requis",
-                pattern: {
-                  value: EMAIL_PATTERN,
-                  message: EMAIL_ERROR_MESSAGE,
-                },
-              }}
-            />
+              <TextField
+                id="email"
+                label="Email"
+                name="email"
+                placeholder="Ex: contact@exemple.com"
+                register={register}
+                error={errors.email}
+                required
+                validation={{
+                  required: "L'email est requis",
+                  pattern: {
+                    value: EMAIL_PATTERN,
+                    message: EMAIL_ERROR_MESSAGE,
+                  },
+                }}
+                className={clientType === ClientType.INDIVIDUAL ? "" : "sm:col-span-2"}
+              />
+            </div>
 
-            <TextField
-              id="siret"
-              label="SIRET"
-              name="siret"
-              register={register}
-              error={errors.siret}
-              helpText="Format attendu : 14 chiffres"
-              validation={{
-                pattern: {
-                  value: SIRET_PATTERN,
-                  message: SIRET_ERROR_MESSAGE,
-                },
-              }}
-            />
-          </div>
+            {clientType === ClientType.COMPANY && (
+              <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
+                <TextField
+                  id="siret"
+                  label="SIRET"
+                  name="siret"
+                  placeholder="Ex: 12345678901234"
+                  register={register}
+                  error={errors.siret}
+                  required={clientType === ClientType.COMPANY}
+                  validation={{
+                    required: clientType === ClientType.COMPANY ? "Le SIRET est requis pour une entreprise" : false,
+                    pattern: {
+                      value: SIRET_PATTERN,
+                      message: SIRET_ERROR_MESSAGE,
+                    },
+                  }}
+                />
 
-          <div className="mb-4">
-            <TextField
-              id="vatNumber"
-              label="Numéro de TVA"
-              name="vatNumber"
-              register={register}
-              error={errors.vatNumber}
-              helpText="Format attendu : FR suivi de 11 chiffres"
-              validation={{
-                pattern: {
-                  value: VAT_PATTERN,
-                  message: VAT_ERROR_MESSAGE,
-                },
-              }}
-            />
-          </div>
+                <TextField
+                  id="vatNumber"
+                  label="Numéro de TVA"
+                  name="vatNumber"
+                  placeholder="Ex: FR12345678901"
+                  register={register}
+                  error={errors.vatNumber}
+                  validation={{
+                    pattern: {
+                      value: VAT_PATTERN,
+                      message: VAT_ERROR_MESSAGE,
+                    },
+                  }}
+                />
+              </div>
+            )}
 
-          <FieldGroup title="Adresse" spacing="normal">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+            <div className="mb-8">
               <TextField
                 id="street"
                 label="Rue"
                 name="address.street"
+                placeholder="Ex: 1 rue de la Paix"
                 register={register}
                 error={errors.address?.street}
                 required
+                className="w-full"
                 validation={{
                   required: "La rue est requise",
                   pattern: {
@@ -532,11 +523,14 @@ export const ClientForm: React.FC<ClientFormProps> = ({
                   },
                 }}
               />
-
+            </div>
+            
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
               <TextField
                 id="city"
                 label="Ville"
                 name="address.city"
+                placeholder="Ex: Paris"
                 register={register}
                 error={errors.address?.city}
                 required
@@ -550,11 +544,12 @@ export const ClientForm: React.FC<ClientFormProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
               <TextField
                 id="postalCode"
                 label="Code postal"
                 name="address.postalCode"
+                placeholder="Ex: 75001"
                 register={register}
                 error={errors.address?.postalCode}
                 required
@@ -571,6 +566,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({
                 id="country"
                 label="Pays"
                 name="address.country"
+                placeholder="Ex: France"
                 register={register}
                 error={errors.address?.country}
                 required
@@ -585,30 +581,35 @@ export const ClientForm: React.FC<ClientFormProps> = ({
             </div>
           </FieldGroup>
           
-          <div className="mt-6 mb-4">
-            <div className="flex items-center">
-              <input
-                id="hasDifferentShippingAddress"
-                type="checkbox"
-                className="h-4 w-4 text-[#5b50ff] focus:ring-[#4a41e0] border-gray-300 rounded"
-                {...register("hasDifferentShippingAddress")}
-              />
-              <label htmlFor="hasDifferentShippingAddress" className="ml-2 block text-sm text-gray-700">
-                Adresse de livraison différente
-              </label>
-            </div>
+          <div className="mt-8 mb-6">
+            <Controller
+              name="hasDifferentShippingAddress"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  id="hasDifferentShippingAddress"
+                  name="hasDifferentShippingAddress"
+                  label="Adresse de livraison différente"
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  error={errors.hasDifferentShippingAddress}
+                />
+              )}
+            />
           </div>
 
           {watch("hasDifferentShippingAddress") && (
-            <FieldGroup title="Adresse de livraison" spacing="normal" className="mt-4 p-4 bg-[#f0eeff] rounded-md">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+            <FieldGroup title="Adresse de livraison" spacing="normal" className="mt-6 p-6 bg-[#f0eeff] rounded-lg shadow-sm border border-[#e6e1ff]">
+              <div className="mb-8">
                 <TextField
                   id="shipping-street"
                   label="Rue"
                   name="shippingAddress.street"
+                  placeholder="Ex: 1 rue de la Paix"
                   register={register}
                   error={errors.shippingAddress?.street}
                   required
+                  className="w-full"
                   validation={{
                     required: "La rue est requise",
                     pattern: {
@@ -617,11 +618,14 @@ export const ClientForm: React.FC<ClientFormProps> = ({
                     },
                   }}
                 />
-
+              </div>
+              
+              <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
                 <TextField
                   id="shipping-city"
                   label="Ville"
                   name="shippingAddress.city"
+                  placeholder="Ex: Paris"
                   register={register}
                   error={errors.shippingAddress?.city}
                   required
@@ -635,11 +639,12 @@ export const ClientForm: React.FC<ClientFormProps> = ({
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 mb-8">
                 <TextField
                   id="shipping-postalCode"
                   label="Code postal"
                   name="shippingAddress.postalCode"
+                  placeholder="Ex: 75001"
                   register={register}
                   error={errors.shippingAddress?.postalCode}
                   required
@@ -656,6 +661,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({
                   id="shipping-country"
                   label="Pays"
                   name="shippingAddress.country"
+                  placeholder="Ex: France"
                   register={register}
                   error={errors.shippingAddress?.country}
                   required
@@ -674,11 +680,12 @@ export const ClientForm: React.FC<ClientFormProps> = ({
       )}
 
       {showManualEntry && onCancel && (
-        <div className="flex justify-end space-x-4 mt-4">
+        <div className="flex justify-end space-x-6 mt-10">
           <FormActions
             onCancel={onCancel}
             isSubmitting={isSubmitting}
             align="right"
+            className="mt-2"
           />
         </div>
       )}

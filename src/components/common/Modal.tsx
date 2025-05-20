@@ -83,7 +83,7 @@ export const Modal = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-lg bg-white flex flex-col transition-all`}
+                className={`w-full ${sizeClasses[size]} ${className} transform overflow-hidden rounded-2xl bg-white flex flex-col transition-all`}
                 style={{ 
                   boxShadow: "0 4px 20px rgba(91, 80, 255, 0.15)",
                   maxHeight: maxHeight || 'calc(100vh - 2rem)'

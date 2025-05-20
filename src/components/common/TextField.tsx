@@ -41,7 +41,7 @@ export const TextField: React.FC<TextFieldProps> = ({
   return (
     <div className={className}>
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1 text-left">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -70,7 +70,7 @@ export const TextField: React.FC<TextFieldProps> = ({
         <p className="mt-1 text-sm text-gray-500">{helpText}</p>
       )}
       {error && (
-        <p className="mt-1 text-sm text-red-600 font-medium">
+        <p className="mt-1 text-sm text-red-600 font-medium text-left">
           {typeof error === 'string' ? error : error.message}
         </p>
       )}
