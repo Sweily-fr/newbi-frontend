@@ -44,9 +44,45 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
   // Fonction pour vérifier les formats actifs
   const checkActiveFormats = useCallback(() => {
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
+    if (!selection || selection.rangeCount === 0 || !editorRef.current) {
+      // Si pas de sélection ou pas d'éditeur, on désactive tous les formats
+      setActiveFormats({
+        bold: false,
+        italic: false,
+        underline: false,
+        h1: false,
+        h2: false,
+        h3: false,
+        p: false,
+        ul: false,
+        ol: false
+      });
+      setIsLinkSelected(false);
+      return;
+    }
     
-    // Vérifier les formats actifs
+    // Vérifier si la sélection est à l'intérieur de l'éditeur
+    const range = selection.getRangeAt(0);
+    const isSelectionInEditor = editorRef.current.contains(range.commonAncestorContainer);
+    
+    if (!isSelectionInEditor) {
+      // Si la sélection est en dehors de l'éditeur, on désactive tous les formats
+      setActiveFormats({
+        bold: false,
+        italic: false,
+        underline: false,
+        h1: false,
+        h2: false,
+        h3: false,
+        p: false,
+        ul: false,
+        ol: false
+      });
+      setIsLinkSelected(false);
+      return;
+    }
+    
+    // Vérifier les formats actifs uniquement si la sélection est dans l'éditeur
     const isBold = document.queryCommandState('bold');
     const isItalic = document.queryCommandState('italic');
     const isUnderline = document.queryCommandState('underline');
@@ -84,7 +120,7 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
     // Vérifier si un lien est sélectionné
     const linkElement = parentNode?.closest('a');
     setIsLinkSelected(!!linkElement);
-  }, []);
+  }, [editorRef]);
 
   // Nous ne mettons plus de classe visuelle spéciale aux titres contenant le mot-clé
   // Les titres auront uniquement leur style de base (taille et gras)
