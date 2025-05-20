@@ -6,6 +6,13 @@ import { SignatureData } from '../types';
 import { useSignatureValidation } from './useSignatureValidation';
 import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
 
+// Déclaration pour étendre l'interface Window
+declare global {
+  interface Window {
+    isSubmitting?: boolean;
+  }
+}
+
 /**
  * Hook simple pour enregistrer une signature de mail
  */
@@ -53,6 +60,27 @@ export const useSaveSignature = () => {
       instagram: data.socialLinks.instagram ? ensureUrlProtocol(data.socialLinks.instagram) : ''
     };
     
+    // Vérifier explicitement que le nom d'entreprise est présent et valide
+    // Utiliser la valeur exacte du champ companyName sans modification
+    const companyName = data.companyName || '';
+    console.log('Nom d\'entreprise à envoyer:', companyName);
+    
+    // S'assurer que le site web et l'adresse sont correctement formatés
+    const website = data.companyWebsite ? ensureUrlProtocol(data.companyWebsite) : '';
+    const address = data.companyAddress || '';
+    console.log('Site web et adresse à envoyer:', { website, address });
+    
+    // Traiter l'URL du logo de l'entreprise
+    let logoUrl = '';
+    if (data.useNewbiLogo) {
+      // Utiliser le logo Newbi par défaut
+      logoUrl = ''; // Le backend utilisera le logo Newbi par défaut
+    } else if (data.customLogoUrl) {
+      // Utiliser le logo personnalisé
+      logoUrl = data.customLogoUrl;
+    }
+    console.log('Logo URL à envoyer:', logoUrl);
+    
     // Correspondance exacte avec les champs attendus par le backend
     const formattedData = {
       name: data.name,
@@ -62,17 +90,18 @@ export const useSaveSignature = () => {
       // Formater le numéro de téléphone au format international (ex: +33612345678)
       phone: formatPhoneNumber(data.phone || ''),
       mobilePhone: formatPhoneNumber(data.mobilePhone || ''),
-      website: data.companyWebsite ? ensureUrlProtocol(data.companyWebsite) : '',
-      address: data.companyAddress || '',
-      companyName: data.companyName || '',
+      // Utiliser les variables formatées pour les informations de l'entreprise
+      website, // Utiliser la variable website formatée plus haut
+      address, // Utiliser la variable address formatée plus haut
+      companyName, // Utiliser la variable companyName formatée plus haut
+      logoUrl, // URL du logo de l'entreprise
+      showLogo: data.showLogo !== undefined ? data.showLogo : true,
       socialLinks: formattedSocialLinks,
       // Le backend attend une valeur d'énumération spécifique pour template
       // Les valeurs valides sont: 'simple', 'professional', 'modern', 'creative'
       template: mapTemplateIdToName(data.templateId),
       primaryColor: data.primaryColor || '#5b50ff',
       secondaryColor: data.secondaryColor || '#f5f5f5',
-      logoUrl: data.customLogoUrl || '',
-      showLogo: data.showLogo !== undefined ? data.showLogo : true,
       isDefault: data.isDefault !== undefined ? data.isDefault : false,
       profilePhotoUrl: data.profilePhotoUrl || '',
       profilePhotoBase64: data.profilePhotoBase64 || null,
@@ -216,7 +245,7 @@ export const useSaveSignature = () => {
       
       // Convertir en hex
       return `#${lightR.toString(16).padStart(2, '0')}${lightG.toString(16).padStart(2, '0')}${lightB.toString(16).padStart(2, '0')}`;
-    } catch (e) {
+    } catch {
       return '#f0eeff'; // Couleur par défaut en cas d'erreur
     }
   };
@@ -228,6 +257,26 @@ export const useSaveSignature = () => {
     setIsLoading(true);
     resetErrors();
     
+    // Déclencher un événement personnalisé pour s'assurer que les données sont à jour
+    // Utiliser une variable locale pour éviter les boucles infinies
+    const isAlreadySubmitting = window.isSubmitting === true;
+    
+    if (!isAlreadySubmitting) {
+      // Définir le flag pour éviter les appels récursifs
+      window.isSubmitting = true;
+      
+      try {
+        // Déclencher l'événement une seule fois
+        window.dispatchEvent(new CustomEvent('beforesubmit'));
+      } finally {
+        // Réinitialiser le flag après un court délai pour permettre aux gestionnaires d'événements de s'exécuter
+        setTimeout(() => {
+          window.isSubmitting = false;
+        }, 100);
+      }
+    }
+    
+    
     // Valider les données avant l'enregistrement
     const isValid = validateSignature(data);
     
@@ -238,7 +287,32 @@ export const useSaveSignature = () => {
     }
     
     try {
+      // S'assurer que les informations d'entreprise sont présentes avant de préparer les données
+      // Vérification silencieuse du nom d'entreprise
+      if (!data.companyName || data.companyName === '') {
+        // Le nom d'entreprise est vide, mais nous continuons sans avertissement
+      }
+      
+      // Forcer la mise à jour des données d'entreprise si elles existent dans le formulaire mais pas dans data
+      const formCompanyName = document.querySelector('input[placeholder="Nom de votre entreprise"]') as HTMLInputElement;
+      const formCompanyWebsite = document.querySelector('input[placeholder="https://www.exemple.com"]') as HTMLInputElement;
+      const formCompanyAddress = document.querySelector('textarea[placeholder="Ex: 123 Rue Exemple, 75000 Paris, France"]') as HTMLTextAreaElement;
+      
+      if (formCompanyName && formCompanyName.value && !data.companyName) {
+        data.companyName = formCompanyName.value;
+      }
+      
+      if (formCompanyWebsite && formCompanyWebsite.value && !data.companyWebsite) {
+        data.companyWebsite = formCompanyWebsite.value;
+      }
+      
+      if (formCompanyAddress && formCompanyAddress.value && !data.companyAddress) {
+        data.companyAddress = formCompanyAddress.value;
+      }
+      
       const input = prepareSignatureData(data);
+      
+      // Préparation des données terminée, prêt pour l'envoi à l'API
       
       if (id) {
         // Mise à jour d'une signature existante
