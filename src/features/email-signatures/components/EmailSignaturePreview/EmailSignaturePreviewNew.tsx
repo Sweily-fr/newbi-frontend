@@ -101,8 +101,25 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const phone = signature?.phone || propPhone;
   const mobilePhone = signature?.mobilePhone || propMobilePhone;
   const email = signature?.email || propEmail;
-  const website = signature?.website || propWebsite;
-  const address = signature?.address || propAddress;
+  
+  // Pour le site web et l'adresse, utiliser les propriétés du bon type
+  // Vérifier si nous avons un objet de type SignatureData (qui utilise companyWebsite/companyAddress)
+  // ou EmailSignature (qui utilise website/address)
+  // Utiliser une approche sécurisée pour éviter les erreurs TypeScript
+  
+  // Définir une fonction d'aide pour vérifier si une propriété existe dans un objet
+  const hasProperty = <T extends object, K extends string>(obj: T | undefined, prop: K): obj is T & Record<K, unknown> => {
+    return obj !== undefined && prop in obj;
+  };
+  
+  // Utiliser la fonction pour vérifier si les propriétés spécifiques existent
+  const website = signature?.website || 
+    (hasProperty(signature, 'companyWebsite') ? signature.companyWebsite as string : undefined) || 
+    propWebsite;
+    
+  const address = signature?.address || 
+    (hasProperty(signature, 'companyAddress') ? signature.companyAddress as string : undefined) || 
+    propAddress;
   const logoUrl = signature?.logoUrl || propLogoUrl;
   const profilePhotoUrl = signature?.profilePhotoUrl || propProfilePhotoUrl;
   const profilePhotoBase64 = signature?.profilePhotoBase64 || propProfilePhotoBase64;
@@ -110,7 +127,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const layout = signature?.layout || propLayout || 'vertical';
   const horizontalSpacing = signature?.horizontalSpacing || propHorizontalSpacing || 20;
   const verticalSpacing = signature?.verticalSpacing || propVerticalSpacing || 10;
-  const verticalAlignment = signature?.verticalAlignment || 'left';
+  // verticalAlignment n'est pas utilisé dans ce composant, mais pourrait être utilisé dans le futur
+  // const verticalAlignment = signature?.verticalAlignment || 'left';
   const imagesLayout = signature?.imagesLayout || 'stacked';
   const textColor = signature?.textColor || propTextColor || '#333333';
   const primaryColor = signature?.primaryColor || propPrimaryColor || '#5b50ff';
