@@ -26,18 +26,7 @@ interface SocialLinkStyle {
   transition: string;
   padding?: string;
   color: string;
-  iconStyle?: {
-    display: string;
-    alignItems: string;
-    justifyContent: string;
-    padding: string;
-    borderRadius: string;
-    backgroundColor: string;
-    minWidth?: string;
-    minHeight?: string;
-    width?: string;
-    height?: string;
-  };
+  iconStyle?: React.CSSProperties; // Utiliser React.CSSProperties pour éviter les erreurs TypeScript
 }
 
 export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
@@ -49,6 +38,12 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
   backgroundColor: propBackgroundColor,
   verticalSpacing
 }) => {
+  // États pour gérer les effets de survol - déclaré en premier pour éviter l'erreur d'utilisation conditionnelle
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  
+  // Vérifier si des liens sociaux sont activés
+  if (!hasSocialLinksEnabled(socialLinks)) return null;
+  
   // Couleur de fond pour les styles "carré arrondi" et "cercle"
   // Utiliser la couleur de fond fournie ou la couleur primaire par défaut
   const backgroundIconColor = propBackgroundColor || primaryColor;
@@ -73,15 +68,9 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
     }
   }
   
-  
   // Nous n'utilisons plus de style dynamique pour les icônes SVG
   // car nous forçons la couleur blanche (#ffffff) directement dans les balises SVG
   // Cela garantit que les icônes sont toujours blanches dans la prévisualisation
-  
-  if (!hasSocialLinksEnabled(socialLinks)) return null;
-
-  // États pour gérer les effets de survol
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   // Appliquer le style approprié en fonction du mode d'affichage et du style d'icône
   const socialLinksContainerStyle: React.CSSProperties = {
@@ -121,6 +110,20 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
       transition: 'all 0.2s ease-in-out'
     };
     
+    // Définir des dimensions fixes pour garantir la cohérence lors de la copie
+    const iconSize = '28px';
+    const iconPadding = '6px';
+    
+    // Styles communs pour les icônes
+    const commonIconStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: iconPadding,
+      boxSizing: 'border-box',
+      textAlign: 'center'
+    };
+    
     switch (socialLinksIconStyle) {
       case 'rounded':
         return {
@@ -129,14 +132,13 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
           color: iconColor, // Utiliser la couleur d'icône spécifiée ou blanc par défaut
           // La couleur de fond sera appliquée uniquement à l'icône, pas au lien entier
           iconStyle: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '6px',
+            ...commonIconStyle,
             borderRadius: '5px',
             backgroundColor: isHovered ? '#4a41e0' : backgroundIconColor,
-            minWidth: '28px',
-            minHeight: '28px'
+            minWidth: iconSize,
+            minHeight: iconSize,
+            width: iconSize,  // Dimension fixe pour garantir la cohérence
+            height: iconSize // Dimension fixe pour garantir la cohérence
           }
         };
       case 'circle':
@@ -146,14 +148,11 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
           color: iconColor, // Utiliser la couleur d'icône spécifiée ou blanc par défaut
           // La couleur de fond sera appliquée uniquement à l'icône, pas au lien entier
           iconStyle: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '6px',
+            ...commonIconStyle,
             borderRadius: '50%',
             backgroundColor: isHovered ? '#4a41e0' : backgroundIconColor,
-            width: '28px',
-            height: '28px'
+            width: iconSize,
+            height: iconSize
           }
         };
       case 'plain':
@@ -162,16 +161,16 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
           ...baseStyle,
           color: isHovered ? '#4a41e0' : iconColor, // Utiliser la couleur d'icône spécifiée ou blanc par défaut
           iconStyle: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            ...commonIconStyle,
             padding: '0',
             borderRadius: '0',
-            backgroundColor: 'transparent'
+            backgroundColor: 'transparent',
+            width: '14px',  // Dimension fixe pour le style plain
+            height: '14px' // Dimension fixe pour le style plain
           } // Style minimal pour l'icône en mode plain
         };
     }
-  }
+  };
 
   return (
     <div style={socialLinksContainerStyle}>
@@ -185,8 +184,14 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
           onMouseLeave={() => setHoveredLink(null)}
         >
           {displayMode === 'icons' ? (
-            <div style={getLinkStyle('linkedin').iconStyle || {}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" style={{fill: socialLinksIconStyle === 'plain' ? iconColor : (propIconColor || '#ffffff')}}>
+            <div style={getLinkStyle('linkedin').iconStyle}>
+              <svg width="100%" height="100%" viewBox="0 0 24 24" style={{
+                fill: socialLinksIconStyle === 'plain' ? iconColor : (propIconColor || '#ffffff'),
+                display: 'block',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                boxSizing: 'border-box'
+              }}>
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
               </svg>
             </div>
@@ -222,8 +227,15 @@ export const SocialLinksComponent: React.FC<SocialLinksProps> = ({
         >
           {displayMode === 'icons' ? (
             <div style={getLinkStyle('facebook').iconStyle || {}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" style={{fill: socialLinksIconStyle === 'plain' ? iconColor : (propIconColor || '#ffffff')}}>
-                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+              <svg width="100%" height="100%" viewBox="0 0 24 24" style={{
+                fill: socialLinksIconStyle === 'plain' ? iconColor : (propIconColor || '#ffffff'),
+                width: socialLinksIconStyle === 'plain' ? '14px' : '14px',
+                height: socialLinksIconStyle === 'plain' ? '14px' : '14px',
+                minWidth: socialLinksIconStyle === 'plain' ? '14px' : '14px',
+                minHeight: socialLinksIconStyle === 'plain' ? '14px' : '14px',
+                display: 'block'
+              }}>
+                <path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/>
               </svg>
             </div>
           ) : <p style={{ color: propIconColor || '#333333' }}>Facebook</p>}
