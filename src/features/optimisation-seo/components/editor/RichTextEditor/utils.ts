@@ -90,8 +90,8 @@ export const getCategoryTitle = (category: string) => {
       return 'Méta-données';
     case 'links':
       return 'Liens (internes & externes)';
-    case 'images':
-      return 'Images';
+    case 'images':  // La clé reste 'images' pour la rétrocompatibilité
+      return 'Médias (images & vidéos)';
     default:
       return category;
   }

@@ -30,7 +30,7 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
   const groupedResults = groupResultsByCategory(analysisResults);
   const isInitialMount = React.useRef(true);
   
-  // Ouvrir toutes les catégories automatiquement au chargement
+  // Ouvrir uniquement la catégorie 'keywords' par défaut au chargement
   React.useEffect(() => {
     if (isInitialMount.current && analysisResults.length > 0) {
       isInitialMount.current = false;
@@ -38,24 +38,16 @@ const SuggestionsPanel: React.FC<SuggestionsPanelProps> = ({
       // Vérifier si des catégories sont déjà ouvertes
       const hasOpenCategory = Object.values(expandedCategories).some(isOpen => isOpen);
       
-      // Si aucune catégorie n'est ouverte, ouvrir toutes les catégories disponibles
+      // Si aucune catégorie n'est ouverte, ouvrir uniquement 'keywords'
       if (!hasOpenCategory) {
-        const categories = Object.keys(groupedResults).filter(cat => groupedResults[cat].length > 0);
-        
-        if (categories.length > 0) {
-          const newExpandedCategories = { ...expandedCategories };
-          
-          // Définir toutes les catégories comme ouvertes
-          categories.forEach(category => {
-            newExpandedCategories[category] = true;
-          });
-          
-          setExpandedCategories(newExpandedCategories);
-        }
+        setExpandedCategories(prev => ({
+          ...prev,
+          keywords: true
+        }));
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [analysisResults, groupedResults, expandedCategories, setExpandedCategories]);
+  }, [analysisResults, expandedCategories, setExpandedCategories]);
 
   return (
     <div className="w-full bg-white rounded overflow-hidden">

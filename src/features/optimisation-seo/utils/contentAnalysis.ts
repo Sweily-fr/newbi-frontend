@@ -1,5 +1,124 @@
 import { ContentAnalysisResult, ContentStats, KeywordData, MetaTagsData } from '../types';
 
+interface LinkStats {
+  internal: number;
+  external: number;
+  internalLinks: string[];
+  externalLinks: string[];
+}
+
+interface MediaStats {
+  images: number;
+  imagesWithoutAlt: number;
+  videos: number;
+  videosWithoutAlt: number;
+  imageTags: Array<{src: string; alt: string}>;
+  videoTags: Array<{src: string; alt: string}>;
+}
+
+/**
+ * Compte les liens internes et externes dans le contenu
+ */
+const countLinks = (content: string, baseDomain: string = ''): LinkStats => {
+  if (!content) return { internal: 0, external: 0, internalLinks: [], externalLinks: [] };
+  
+  const linkRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/g;
+  const links: string[] = [];
+  let match;
+  
+  // Récupérer tous les liens
+  while ((match = linkRegex.exec(content)) !== null) {
+    const href = match[2];
+    if (href && !href.startsWith('#')) {
+      links.push(href);
+    }
+  }
+  
+  // Séparer les liens internes et externes
+  const result: LinkStats = {
+    internal: 0,
+    external: 0,
+    internalLinks: [],
+    externalLinks: []
+  };
+  
+  links.forEach(link => {
+    try {
+      const url = new URL(link, baseDomain ? `https://${baseDomain}` : undefined);
+      const isInternal = !baseDomain || 
+                        url.hostname === baseDomain || 
+                        url.hostname.endsWith(`.${baseDomain}`);
+      
+      if (isInternal) {
+        result.internal++;
+        if (!result.internalLinks.includes(link)) {
+          result.internalLinks.push(link);
+        }
+      } else {
+        result.external++;
+        if (!result.externalLinks.includes(link)) {
+          result.externalLinks.push(link);
+        }
+      }
+    } catch {
+      // Si l'URL est invalide, on la considère comme interne (lien relatif)
+      result.internal++;
+      if (!result.internalLinks.includes(link)) {
+        result.internalLinks.push(link);
+      }
+    }
+  });
+  
+  return result;
+};
+
+/**
+ * Analyse les images et vidéos dans le contenu
+ */
+const analyzeMedia = (content: string): MediaStats => {
+  if (!content) return { 
+    images: 0, 
+    imagesWithoutAlt: 0, 
+    videos: 0, 
+    videosWithoutAlt: 0, 
+    imageTags: [], 
+    videoTags: [] 
+  };
+
+  // Analyser les images
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*alt=["']?([^"'\s>]*)["']?[^>]*>/gi;
+  const images: Array<{src: string; alt: string}> = [];
+  let imgMatch;
+  
+  while ((imgMatch = imgRegex.exec(content)) !== null) {
+    const src = imgMatch[1];
+    const alt = (imgMatch[2] || '').trim();
+    images.push({ src, alt });
+  }
+
+  // Analyser les vidéos
+  const videoRegex = /<video[^>]+src=["']([^"']+)["'][^>]*>/gi;
+  const videos: Array<{src: string; alt: string}> = [];
+  let videoMatch;
+  
+  while ((videoMatch = videoRegex.exec(content)) !== null) {
+    const src = videoMatch[1];
+    // Extraire l'attribut alt s'il existe
+    const altMatch = videoMatch[0].match(/alt=["']([^"']*)["']/i);
+    const alt = (altMatch ? altMatch[1] : '').trim();
+    videos.push({ src, alt });
+  }
+
+  return {
+    images: images.length,
+    imagesWithoutAlt: images.filter(img => !img.alt).length,
+    videos: videos.length,
+    videosWithoutAlt: videos.filter(video => !video.alt).length,
+    imageTags: images,
+    videoTags: videos
+  };
+};
+
 /**
  * Liste des mots impactants qui améliorent la lisibilité lorsqu'ils sont présents dans le titre H1
  */
@@ -53,10 +172,10 @@ export const analyzeContent = (
   // Vérifier si le contenu est vide ou contient seulement le contenu par défaut
   const isContentEmpty = !content || content === '';
   
-  // Vérifier si les métadonnées sont vides
-  const isMetaTagsEmpty = !metaTags.title && !metaTags.description;
-  
   const results: ContentAnalysisResult[] = [];
+  
+  // Déclaration de hasMainKeyword au début de la fonction
+  const hasMainKeyword = keywords.main && keywords.main.trim() !== '';
   
   // Vérification du contenu vide
   if (isContentEmpty) {
@@ -72,44 +191,108 @@ export const analyzeContent = (
     });
   }
   
-  // Vérification des métadonnées vides
-  if (isMetaTagsEmpty) {
+  // Vérification du titre
+  if (!metaTags.title) {
     results.push({
-      id: 'meta-tags-missing',
-      title: 'Métadonnées manquantes',
-      description: 'Aucune métadonnée (titre ou description) n\'a été définie pour votre contenu.',
+      id: 'meta-title-missing',
+      title: 'Titre manquant',
+      description: 'Aucun titre n\'a été défini pour votre contenu.',
       status: 'problem',
       score: 0,
       priority: 'high',
       category: 'meta',
-      suggestions: ['Ajoutez un titre et une description pour améliorer votre référencement.']
+      suggestions: ['Ajoutez un titre accrocheur pour améliorer votre référencement et attirer les lecteurs.']
     });
   } else {
     // Vérification de la longueur du titre
-    if (metaTags.title.length < 30 || metaTags.title.length > 60) {
+    const titleLength = metaTags.title.length;
+    const isTitleLengthOptimal = titleLength >= 30 && titleLength <= 60;
+    
+    results.push({
+      id: 'title-length',
+      title: 'Longueur du titre',
+      description: `Votre titre fait ${titleLength} caractères.`,
+      status: isTitleLengthOptimal ? 'good' : 'improvement',
+      score: isTitleLengthOptimal ? 10 : 5,
+      priority: 'high',
+      category: 'meta',
+      suggestions: isTitleLengthOptimal 
+        ? ['Parfait ! Votre titre a une longueur optimale pour le référencement.']
+        : [
+            'Un bon titre SEO fait entre 30 et 60 caractères.',
+            titleLength < 30 ? 'Votre titre est trop court. Ajoutez des détails pertinents.' : 'Votre titre est trop long. Essayez de le rendre plus concis.'
+          ]
+    });
+    
+    // Vérification de la présence de mots-clés dans le titre
+    if (hasMainKeyword) {
+      const titleContainsKeyword = metaTags.title.toLowerCase().includes(keywords.main.toLowerCase());
       results.push({
-        id: 'title-length',
-        title: 'Longueur du titre',
-        description: `Votre titre fait ${metaTags.title.length} caractères.`,
-        status: 'improvement',
-        score: 5,
+        id: 'keyword-in-meta-title',
+        title: 'Mot-clé dans le titre',
+        description: titleContainsKeyword 
+          ? `Votre mot-clé principal "${keywords.main}" est présent dans le titre.` 
+          : `Votre mot-clé principal "${keywords.main}" n'est pas présent dans le titre.`,
+        status: titleContainsKeyword ? 'good' : 'problem',
+        score: titleContainsKeyword ? 10 : 3,
         priority: 'high',
         category: 'meta',
-        suggestions: ['Un bon titre SEO fait entre 30 et 60 caractères.']
+        suggestions: titleContainsKeyword 
+          ? ['Parfait ! Votre mot-clé principal est bien présent dans le titre.'] 
+          : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre pour améliorer le référencement.`]
       });
     }
-    
+  }
+  
+  // Vérification de la description
+  if (!metaTags.description) {
+    results.push({
+      id: 'meta-description-missing',
+      title: 'Description manquante',
+      description: 'Aucune méta description n\'a été définie pour votre contenu.',
+      status: 'problem',
+      score: 0,
+      priority: 'high',
+      category: 'meta',
+      suggestions: ['Ajoutez une description attrayante qui incitera les utilisateurs à cliquer sur votre résultat de recherche.']
+    });
+  } else {
     // Vérification de la longueur de la description
-    if (metaTags.description.length < 70 || metaTags.description.length > 160) {
+    const descLength = metaTags.description.length;
+    const isDescLengthOptimal = descLength >= 70 && descLength <= 160;
+    
+    results.push({
+      id: 'description-length',
+      title: 'Longueur de la description',
+      description: `Votre description fait ${descLength} caractères.`,
+      status: isDescLengthOptimal ? 'good' : 'improvement',
+      score: isDescLengthOptimal ? 10 : 5,
+      priority: 'medium',
+      category: 'meta',
+      suggestions: isDescLengthOptimal 
+        ? ['Parfait ! Votre description a une longueur optimale pour le référencement.']
+        : [
+            'Une bonne description SEO fait entre 70 et 160 caractères.',
+            descLength < 70 ? 'Votre description est trop courte. Ajoutez plus de détails pour attirer les lecteurs.' : 'Votre description est trop longue. Elle pourrait être tronquée dans les résultats de recherche.'
+          ]
+    });
+    
+    // Vérification de la présence de mots-clés dans la description
+    if (hasMainKeyword) {
+      const descContainsKeyword = metaTags.description.toLowerCase().includes(keywords.main.toLowerCase());
       results.push({
-        id: 'description-length',
-        title: 'Longueur de la description',
-        description: `Votre description fait ${metaTags.description.length} caractères.`,
-        status: 'improvement',
-        score: 5,
+        id: 'keyword-in-meta-desc',
+        title: 'Mot-clé dans la description',
+        description: descContainsKeyword 
+          ? `Votre mot-clé principal "${keywords.main}" est présent dans la description.` 
+          : `Votre mot-clé principal "${keywords.main}" n'est pas présent dans la description.`,
+        status: descContainsKeyword ? 'good' : 'improvement',
+        score: descContainsKeyword ? 8 : 4,
         priority: 'medium',
         category: 'meta',
-        suggestions: ['Une bonne description SEO fait entre 70 et 160 caractères.']
+        suggestions: descContainsKeyword 
+          ? ['Parfait ! Votre mot-clé principal est bien présent dans la description.'] 
+          : [`Envisagez d'ajouter le mot-clé "${keywords.main}" dans votre description pour améliorer le référencement.`]
       });
     }
   }
@@ -156,28 +339,29 @@ export const analyzeContent = (
     });
   }
   
-  // Analyse du mot-clé principal
-  const hasMainKeyword = keywords.main && keywords.main.trim() !== '';
-  
   // Vérification de la présence du mot-clé principal dans le titre
   const titleContainsKeyword = hasMainKeyword && metaTags.title.toLowerCase().includes(keywords.main.toLowerCase());
   results.push({
     id: 'keyword-in-title',
     title: 'Mot-clé principal dans le titre',
-    description: !hasMainKeyword 
-      ? 'Aucun mot-clé principal défini pour vérification.' 
-      : titleContainsKeyword 
+    description: hasMainKeyword
+      ? titleContainsKeyword 
         ? 'Votre mot-clé principal est présent dans le titre.' 
-        : 'Votre mot-clé principal n\'est pas présent dans le titre.',
-    status: !hasMainKeyword ? 'improvement' : titleContainsKeyword ? 'good' : 'problem',
-    score: !hasMainKeyword ? 5 : titleContainsKeyword ? 10 : 0,
+        : 'Votre mot-clé principal n\'est pas présent dans le titre.'
+      : 'Aucun mot-clé principal défini.',
+    status: hasMainKeyword 
+      ? (titleContainsKeyword ? 'good' : 'problem')
+      : 'improvement',
+    score: hasMainKeyword 
+      ? (titleContainsKeyword ? 10 : 0)
+      : 5,
     priority: 'high',
     category: 'keywords',
-    suggestions: !hasMainKeyword 
-      ? ['Définissez un mot-clé principal pour activer cette vérification.'] 
-      : titleContainsKeyword 
-        ? [] 
-        : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre.`]
+    suggestions: hasMainKeyword
+      ? (titleContainsKeyword 
+          ? ['Parfait ! Votre mot-clé principal est bien présent dans le titre.']
+          : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre.`])
+      : ['Définissez un mot-clé principal pour optimiser votre référencement.']
   });
   
   // Vérification de la présence du mot-clé principal dans la méta description
@@ -185,78 +369,84 @@ export const analyzeContent = (
   results.push({
     id: 'keyword-in-meta',
     title: 'Mot-clé principal dans la méta description',
-    description: !hasMainKeyword
-      ? 'Aucun mot-clé principal défini pour vérification.'
-      : descContainsKeyword 
-        ? 'Votre mot-clé principal est présent dans la méta description.' 
-        : 'Votre mot-clé principal n\'est pas présent dans la méta description.',
-    status: !hasMainKeyword ? 'improvement' : descContainsKeyword ? 'good' : 'problem',
-    score: !hasMainKeyword ? 5 : descContainsKeyword ? 8 : 0,
+    description: hasMainKeyword
+      ? (descContainsKeyword 
+          ? 'Votre mot-clé principal est présent dans la méta description.' 
+          : 'Votre mot-clé principal n\'est pas présent dans la méta description.')
+      : 'Aucun mot-clé principal défini.',
+    status: hasMainKeyword 
+      ? (descContainsKeyword ? 'good' : 'problem')
+      : 'improvement',
+    score: hasMainKeyword 
+      ? (descContainsKeyword ? 8 : 0)
+      : 4,
     priority: 'high',
     category: 'keywords',
-    suggestions: !hasMainKeyword
-      ? ['Définissez un mot-clé principal pour activer cette vérification.']
-      : descContainsKeyword 
-        ? [] 
-        : [`Ajoutez le mot-clé "${keywords.main}" dans votre méta description.`]
+    suggestions: hasMainKeyword
+      ? (descContainsKeyword 
+          ? ['Parfait ! Votre mot-clé principal est bien présent dans la méta description.']
+          : [`Ajoutez le mot-clé "${keywords.main}" dans votre méta description.`])
+      : ['Définissez un mot-clé principal pour optimiser votre référencement.']
   });
   
   // Analyse de la densité du mot-clé principal
   const mainKeywordDensity = stats.keywordDensity.main || 0;
-  let keywordDensityStatus: 'good' | 'improvement' | 'problem' = !hasMainKeyword ? 'improvement' : 'good';
-  let keywordDensityScore = !hasMainKeyword ? 5 : 10;
-  const keywordDensitySuggestions: string[] = [];
-  
-  if (!hasMainKeyword) {
-    keywordDensitySuggestions.push('Définissez un mot-clé principal pour analyser sa densité.');
-  } else if (mainKeywordDensity < 0.5) {
-    keywordDensityStatus = 'problem';
-    keywordDensityScore = 3;
-    keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop faible. Visez entre 0.5% et 2.5%.`);
-  } else if (mainKeywordDensity > 2.5) {
-    keywordDensityStatus = 'improvement';
-    keywordDensityScore = 5;
-    keywordDensitySuggestions.push(`La densité du mot-clé principal (${mainKeywordDensity.toFixed(2)}%) est trop élevée. Visez entre 0.5% et 2.5%.`);
-  } else {
-    keywordDensitySuggestions.push('La densité de votre mot-clé principal est optimale.');
-  }
-  
   results.push({
     id: 'keyword-density',
     title: 'Densité du mot-clé principal',
-    description: !hasMainKeyword 
-      ? 'Aucun mot-clé principal défini pour analyse.' 
-      : `La densité du mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%.`,
-    status: keywordDensityStatus,
-    score: keywordDensityScore,
+    description: hasMainKeyword
+      ? `La densité du mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%.`
+      : 'Aucun mot-clé principal défini.',
+    status: !hasMainKeyword 
+      ? 'improvement' 
+      : mainKeywordDensity >= 0.5 && mainKeywordDensity <= 2.5 
+        ? 'good' 
+        : mainKeywordDensity < 0.5 
+          ? 'problem' 
+          : 'improvement',
+    score: !hasMainKeyword 
+      ? 4 
+      : mainKeywordDensity >= 0.5 && mainKeywordDensity <= 2.5 
+        ? 10 
+        : mainKeywordDensity < 0.5 
+          ? 3 
+          : 5,
     priority: 'medium',
     category: 'keywords',
-    suggestions: keywordDensitySuggestions.length > 0 
-      ? keywordDensitySuggestions 
-      : ['La densité de votre mot-clé principal est bonne.']
+    suggestions: !hasMainKeyword
+      ? ['Définissez un mot-clé principal pour analyser sa densité.']
+      : mainKeywordDensity < 0.5
+        ? [`La densité de votre mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%, ce qui est trop faible. Visez entre 0.5% et 2.5%.`]
+        : mainKeywordDensity > 2.5
+          ? [`La densité de votre mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%, ce qui est trop élevé. Visez entre 0.5% et 2.5%.`]
+          : [`Parfait ! La densité de votre mot-clé principal est de ${mainKeywordDensity.toFixed(2)}%, ce qui est optimal.`]
   });
   
-  // Vérification de la présence du mot-clé dans le premier paragraphe
+  // Vérification de la présence du mot-clé principal dans le premier paragraphe
   const firstParagraph = content.match(/<p[^>]*>(.*?)<\/p>/i)?.[1] || '';
   const keywordInFirstParagraph = hasMainKeyword && firstParagraph.toLowerCase().includes(keywords.main.toLowerCase());
   
   results.push({
     id: 'keyword-in-first-paragraph',
     title: 'Mot-clé dans le premier paragraphe',
-    description: !hasMainKeyword
-      ? 'Aucun mot-clé principal défini pour vérification.'
-      : keywordInFirstParagraph 
-        ? 'Votre mot-clé principal est présent dans le premier paragraphe.' 
-        : 'Votre mot-clé principal n\'est pas présent dans le premier paragraphe.',
-    status: !hasMainKeyword ? 'improvement' : keywordInFirstParagraph ? 'good' : 'improvement',
-    score: !hasMainKeyword ? 5 : keywordInFirstParagraph ? 7 : 3,
+    description: hasMainKeyword
+      ? (keywordInFirstParagraph 
+          ? 'Votre mot-clé principal est présent dans le premier paragraphe.' 
+          : 'Votre mot-clé principal n\'est pas présent dans le premier paragraphe.')
+      : 'Aucun mot-clé principal défini.',
+    status: hasMainKeyword 
+      ? (keywordInFirstParagraph ? 'good' : 'improvement')
+      : 'improvement',
+    score: hasMainKeyword 
+      ? (keywordInFirstParagraph ? 7 : 3)
+      : 4,
     priority: 'medium',
     category: 'keywords',
-    suggestions: !hasMainKeyword
-      ? ['Définissez un mot-clé principal pour activer cette vérification.']
-      : keywordInFirstParagraph 
-        ? [] 
-        : [`Ajoutez le mot-clé "${keywords.main}" dans le premier paragraphe.`]
+    suggestions: hasMainKeyword
+      ? (keywordInFirstParagraph 
+          ? ['Parfait ! Votre mot-clé principal est bien présent dans le premier paragraphe.']
+          : [`Ajoutez le mot-clé "${keywords.main}" dans le premier paragraphe.`])
+      : ['Définissez un mot-clé principal pour optimiser votre référencement.']
   });
   
   // Analyse de la structure du contenu
@@ -296,44 +486,211 @@ export const analyzeContent = (
   
   // Vérification de la présence du mot-clé principal dans le titre H1
   let h1Content = '';
+  const h1Regex = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
+  let h1Match;
+  const allH1Contents = [];
+  
+  // Récupérer tous les H1 du contenu
+  while ((h1Match = h1Regex.exec(content)) !== null) {
+    // Nettoyer le contenu HTML en supprimant toutes les balises
+    const cleanedContent = h1Match[1].replace(/<[^>]*>/g, '');
+    allH1Contents.push(cleanedContent);
+  }
+  
+  // Joindre tous les contenus H1 pour la recherche
+  h1Content = allH1Contents.join(' ');
+  
+  // Vérification du mot-clé dans le H1
+  if (!hasH1) {
+    results.push({
+      id: 'keyword-in-h1',
+      title: 'Mot-clé principal dans le titre H1',
+      description: 'Aucun titre H1 trouvé dans le contenu.',
+      status: 'problem',
+      score: 0,
+      priority: 'high',
+      category: 'keywords',
+      suggestions: ['Ajoutez un titre H1 à votre contenu et incluez-y votre mot-clé principal.']
+    });
+  } else if (!hasMainKeyword) {
+    results.push({
+      id: 'keyword-in-h1',
+      title: 'Mot-clé principal dans le titre H1',
+      description: 'Aucun mot-clé principal défini pour vérification.',
+      status: 'improvement',
+      score: 5,
+      priority: 'high',
+      category: 'keywords',
+      suggestions: ['Définissez un mot-clé principal pour optimiser votre référencement.']
+    });
+  } else {
+    // Vérifier si le mot-clé principal est présent dans le contenu H1
+    const keywordRegex = new RegExp(`\\b${keywords.main.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+    const keywordInH1 = keywordRegex.test(h1Content);
+    
+    results.push({
+      id: 'keyword-in-h1',
+      title: 'Mot-clé principal dans le titre H1',
+      description: keywordInH1 
+        ? `Votre mot-clé principal "${keywords.main}" est présent dans le titre H1.` 
+        : `Votre mot-clé principal "${keywords.main}" n'est pas présent dans le titre H1.`,
+      status: keywordInH1 ? 'good' : 'problem',
+      score: keywordInH1 ? 10 : 3,
+      priority: 'high',
+      category: 'keywords',
+      suggestions: keywordInH1 
+        ? ['Parfait ! Votre mot-clé principal est bien présent dans le titre H1.'] 
+        : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre H1 pour améliorer le référencement.`]
+    });
+  }
+  
+  // Analyse des médias (images et vidéos)
+  const mediaStats = analyzeMedia(content);
+  
+  // Vérification des images
+  results.push({
+    id: 'images-count',
+    title: 'Images dans le contenu',
+    description: mediaStats.images > 0 
+      ? `Votre contenu contient ${mediaStats.images} image(s).`
+      : 'Aucune image trouvée dans votre contenu.',
+    status: mediaStats.images >= 3 ? 'good' : mediaStats.images > 0 ? 'improvement' : 'problem',
+    score: mediaStats.images >= 3 ? 10 : mediaStats.images > 0 ? 5 : 0,
+    priority: 'medium',
+    category: 'images',
+    suggestions: mediaStats.images >= 3 
+      ? ['Parfait ! Votre contenu contient suffisamment d\'images.']
+      : [
+          `Ajoutez au moins ${3 - mediaStats.images} image(s) supplémentaire(s) pour améliorer l'attrait visuel.`,
+          'Les images aident à briser le texte et à rendre le contenu plus engageant.'
+        ]
+  });
+
+  // Vérification des balises alt des images
+  results.push({
+    id: 'images-alt-tags',
+    title: 'Balises alt des images',
+    description: mediaStats.images === 0
+      ? 'Aucune image trouvée pour vérifier les balises alt.'
+      : mediaStats.imagesWithoutAlt === 0
+        ? 'Toutes vos images ont une balise alt.'
+        : `${mediaStats.imagesWithoutAlt} image(s) sur ${mediaStats.images} n'ont pas de balise alt.`,
+    status: mediaStats.images === 0 
+      ? 'improvement' 
+      : mediaStats.imagesWithoutAlt === 0 
+        ? 'good' 
+        : 'problem',
+    score: mediaStats.images === 0 
+      ? 5 
+      : mediaStats.imagesWithoutAlt === 0 
+        ? 10 
+        : 3,
+    priority: 'high',
+    category: 'images',
+    suggestions: mediaStats.images === 0
+      ? ['Ajoutez des images à votre contenu pour améliorer son attrait visuel.']
+      : mediaStats.imagesWithoutAlt === 0
+        ? ['Parfait ! Toutes vos images ont une balise alt descriptive.']
+        : [
+            'Ajoutez des balises alt à toutes vos images pour améliorer l\'accessibilité et le référencement.',
+            'Les balises alt devraient décrire brièvement le contenu de l\'image.'
+          ]
+  });
+
+  // Vérification des vidéos
+  results.push({
+    id: 'videos-count',
+    title: 'Vidéos dans le contenu',
+    description: mediaStats.videos > 0 
+      ? `Votre contenu contient ${mediaStats.videos} vidéo(s).`
+      : 'Aucune vidéo trouvée dans votre contenu.',
+    status: mediaStats.videos >= 1 ? 'good' : 'improvement',
+    score: mediaStats.videos >= 1 ? 10 : 5,
+    priority: 'low',
+    category: 'images',
+    suggestions: mediaStats.videos >= 1 
+      ? ['Parfait ! Votre contenu contient des vidéos.']
+      : [
+          'Envisagez d\'ajouter une vidéo pour améliorer l\'engagement des utilisateurs.',
+          'Les vidéos peuvent aider à expliquer des concepts complexes ou à montrer des démonstrations.'
+        ]
+  });
+
+  // Vérification des balises alt des vidéos
+  results.push({
+    id: 'videos-alt-tags',
+    title: 'Balises alt des vidéos',
+    description: mediaStats.videos === 0
+      ? 'Aucune vidéo trouvée pour vérifier les balises alt.'
+      : mediaStats.videosWithoutAlt === 0
+        ? 'Toutes vos vidéos ont une balise alt.'
+        : `${mediaStats.videosWithoutAlt} vidéo(s) sur ${mediaStats.videos} n'ont pas de balise alt.`,
+    status: mediaStats.videos === 0 
+      ? 'improvement' 
+      : mediaStats.videosWithoutAlt === 0 
+        ? 'good' 
+        : 'problem',
+    score: mediaStats.videos === 0 
+      ? 5 
+      : mediaStats.videosWithoutAlt === 0 
+        ? 10 
+        : 3,
+    priority: 'medium',
+    category: 'images',
+    suggestions: mediaStats.videos === 0
+      ? ['Envisagez d\'ajouter des vidéos pour améliorer l\'engagement des utilisateurs.']
+      : mediaStats.videosWithoutAlt === 0
+        ? ['Parfait ! Toutes vos vidéos ont une balise alt descriptive.']
+        : [
+            'Ajoutez des balises alt à toutes vos vidéos pour améliorer l\'accessibilité.',
+            'Les balises alt pour les vidéos devraient décrire brièvement le contenu de la vidéo.'
+          ]
+  });
+  
+  // Analyse des liens
+  const linkStats = countLinks(content, 'votredomaine.com'); // Remplacez par votre domaine réel
+  
+  // Vérification des liens externes
+  results.push({
+    id: 'external-links',
+    title: 'Liens externes',
+    description: linkStats.external > 0 
+      ? `Votre contenu contient ${linkStats.external} lien(s) externe(s).`
+      : 'Aucun lien externe trouvé dans votre contenu.',
+    status: linkStats.external >= 3 ? 'good' : linkStats.external > 0 ? 'improvement' : 'problem',
+    score: linkStats.external >= 3 ? 10 : linkStats.external > 0 ? 5 : 0,
+    priority: 'medium',
+    category: 'links',
+    suggestions: linkStats.external >= 3 
+      ? ['Parfait ! Votre contenu contient suffisamment de liens externes.']
+      : [
+          `Ajoutez au moins ${3 - linkStats.external} lien(s) externe(s) supplémentaire(s) pour améliorer votre référencement.`,
+          'Les liens externes de qualité vers des sources fiables améliorent la crédibilité de votre contenu.'
+        ]
+  });
+  
+  // Vérification des liens internes
+  results.push({
+    id: 'internal-links',
+    title: 'Liens internes',
+    description: linkStats.internal > 0 
+      ? `Votre contenu contient ${linkStats.internal} lien(s) interne(s).`
+      : 'Aucun lien interne trouvé dans votre contenu.',
+    status: linkStats.internal >= 3 ? 'good' : linkStats.internal > 0 ? 'improvement' : 'problem',
+    score: linkStats.internal >= 3 ? 10 : linkStats.internal > 0 ? 5 : 0,
+    priority: 'medium',
+    category: 'links',
+    suggestions: linkStats.internal >= 3 
+      ? ['Parfait ! Votre contenu contient suffisamment de liens internes.']
+      : [
+          `Ajoutez au moins ${3 - linkStats.internal} lien(s) interne(s) supplémentaire(s) pour améliorer la structure de votre site.`,
+          'Les liens internes aident les moteurs de recherche à comprendre la hiérarchie de votre site.',
+          'Pensez à lier vers des articles connexes ou des pages importantes de votre site.'
+        ]
+  });
+  
+  // Vérification de la présence de mots impactants dans le titre H1 si H1 existe
   if (hasH1) {
-    // Extraire le contenu de tous les H1 (même s'il ne devrait y en avoir qu'un)
-    // Utiliser une expression régulière plus robuste qui capture le contenu HTML complet
-    const h1Regex = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
-    let h1Match;
-    const allH1Contents = [];
-    
-    // Récupérer tous les H1 du contenu
-    while ((h1Match = h1Regex.exec(content)) !== null) {
-      // Nettoyer le contenu HTML en supprimant toutes les balises
-      const cleanedContent = h1Match[1].replace(/<[^>]*>/g, '');
-      allH1Contents.push(cleanedContent);
-    }
-    
-    // Joindre tous les contenus H1 pour la recherche
-    h1Content = allH1Contents.join(' ');
-    
-    if (keywords.main && h1Content) {
-      // Vérifier si le mot-clé principal est présent dans le contenu H1
-      // Utiliser une recherche insensible à la casse
-      const keywordRegex = new RegExp(`\\b${keywords.main.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
-      const keywordInH1 = keywordRegex.test(h1Content);
-      
-      results.push({
-        id: 'keyword-in-h1',
-        title: 'Mot-clé principal dans le titre H1',
-        description: keywordInH1 
-          ? `Votre mot-clé principal "${keywords.main}" est présent dans le titre H1.` 
-          : `Votre mot-clé principal "${keywords.main}" n'est pas présent dans le titre H1.`,
-        status: keywordInH1 ? 'good' : 'problem',
-        score: keywordInH1 ? 10 : 3,
-        priority: 'high',
-        category: 'keywords',
-        suggestions: keywordInH1 ? [] : [`Ajoutez le mot-clé "${keywords.main}" dans votre titre H1 pour améliorer le référencement.`]
-      });
-    }
-    
-    // Vérification de la présence de mots impactants dans le titre H1
     const h1Words = h1Content.toLowerCase().split(/\s+/);
     const impactfulWordsInH1 = h1Words.filter(word => 
       impactfulWords.includes(word.replace(/[.,!?;:'"-]/g, ''))
