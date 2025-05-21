@@ -103,7 +103,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   
   /**
    * Importe les informations de l'entreprise depuis les données de l'API
-   * Cette fonction utilise des états locaux pour éviter les conflits d'état
+   * et force une mise à jour complète de la prévisualisation en une seule opération
    */
   const importCompanyInfo = () => {
     if (!company) {
@@ -144,61 +144,55 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
       : '';
     
     try {
-      // Désactiver temporairement les effets pour éviter les mises à jour multiples
-      const isUpdatingRef = { current: true };
-      
-      // Préparer un objet avec toutes les mises à jour
-      const updatedData = {
-        ...signatureData,
-        companyName,
-        companyWebsite,
-        companyAddress
-      };
-      
-      // Ajouter les informations de logo si disponibles
-      if (logoUrl) {
-        updatedData.customLogoUrl = logoUrl;
-        updatedData.useNewbiLogo = false;
-        updatedData.showLogo = true;
-      }
-      
-      // Mettre à jour les états locaux en une seule fois
+      // 1. Mettre à jour les états locaux pour l'affichage dans le formulaire
       setLocalCompanyName(companyName);
       setLocalCompanyWebsite(companyWebsite);
       setLocalCompanyAddress(companyAddress);
       
-      // Mettre à jour directement l'objet signatureData pour éviter les problèmes de synchronisation
-      Object.assign(signatureData, updatedData);
+      // 2. Créer une copie complète des données actuelles
+      const updatedSignatureData = { ...signatureData };
       
-      // Appliquer toutes les mises à jour en une seule fois via une fonction batch
-      // pour éviter les rendus multiples
-      setTimeout(() => {
-        // Mettre à jour les données de signature en une seule fois
-        if (logoUrl) {
-          updateSignatureData('customLogoUrl', logoUrl);
-        }
-        updateSignatureData('companyName', companyName);
-        updateSignatureData('companyWebsite', companyWebsite);
-        updateSignatureData('companyAddress', companyAddress);
-        
-        if (logoUrl) {
-          updateSignatureData('useNewbiLogo', false);
-          updateSignatureData('showLogo', true);
-        }
-        
-        // Marquer que les informations de l'entreprise ont été importées
-        setCompanyInfoImported(true);
-        
-        isUpdatingRef.current = false;
-      }, 0);
+      // 3. Appliquer toutes les modifications en une seule fois
+      updatedSignatureData.companyName = companyName;
+      updatedSignatureData.companyWebsite = companyWebsite;
+      updatedSignatureData.companyAddress = companyAddress;
       
-      // Afficher une notification de succès
+      // 4. Ajouter les informations de logo si disponibles
+      if (logoUrl) {
+        updatedSignatureData.customLogoUrl = logoUrl;
+        updatedSignatureData.useNewbiLogo = false;
+        updatedSignatureData.showLogo = true;
+      }
+      
+      // 5. SOLUTION: Utiliser une technique spéciale pour forcer une mise à jour complète
+      // Créer un élément temporaire pour stocker les données
+      const tempData = { ...updatedSignatureData };
+      
+      // Mettre à jour toutes les propriétés en une seule fois
+      // en utilisant une approche qui contourne les limitations de React
+      Object.keys(tempData).forEach(key => {
+        const typedKey = key as keyof SignatureData;
+        if (typedKey !== 'companyName') { // Ne pas mettre à jour companyName maintenant
+          signatureData[typedKey] = tempData[typedKey] as any;
+        }
+      });
+      
+      // Déclencher un seul rendu en mettant à jour companyName en dernier
+      // Cela garantit que toutes les autres propriétés sont déjà mises à jour
+      // lorsque le rendu se produit
+      updateSignatureData('companyName', companyName);
+      
+      // 5. Marquer que les informations de l'entreprise ont été importées
+      setCompanyInfoImported(true);
+      
+      // 6. Afficher une notification de succès
       Notification.success('Informations de l\'entreprise importées avec succès', {
         duration: 3000,
         position: 'bottom-left'
       });
       
-    } catch (error) {
+    } catch {
+      // Afficher une notification d'erreur en cas de problème
       Notification.error('Erreur lors de l\'importation des données');
     }
   };
