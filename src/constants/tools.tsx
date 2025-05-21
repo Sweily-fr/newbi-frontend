@@ -1,4 +1,4 @@
-import { Box, Designtools, DocumentText1, Google, I3Dcube, I3DSquare, Send2, ShieldTick, Trello } from "iconsax-react";
+import { Designtools, DocumentText1, Google, Send2, ShieldTick, Trello } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -43,7 +43,7 @@ export const TOOLS: Tool[] = [
     name: "Factures",
     description:
       "Créez et gérez vos factures professionnelles en quelques clics",
-    category: "Factures",
+    category: "Facturation",
     premium: true,
     icon: (
       <DocumentText1 size="24" variant="Bold" color="#5b50ff" />
@@ -55,7 +55,7 @@ export const TOOLS: Tool[] = [
     name: "Devis",
     description:
       "Créez et suivez vos devis clients avec des modèles professionnels",
-    category: "Devis",
+    category: "Facturation",
     premium: true,
     icon: (
       <DocumentText1 size="24" variant="Bold" color="#5b50ff" />
@@ -89,7 +89,7 @@ export const TOOLS: Tool[] = [
     name: "Transfert de fichiers volumineux",
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
-    category: "Productivité",
+    category: "À venir",
     comingSoon: true,
     premium: true,
     icon: (
@@ -102,7 +102,7 @@ export const TOOLS: Tool[] = [
     name: "Gestion des tâches",
     description:
       "Gérez vos tâches et vos projets avec des outils simples et efficaces",
-    category: "Productivité",
+    category: "À venir",
     comingSoon: true,
     premium: true,
     icon: (
@@ -118,7 +118,7 @@ export const HOME_TOOLS = [
     id: "invoices",
     name: "Factures",
     description: "Créez et gérez vos factures en quelques clics",
-    category: "Factures",
+    category: "Facturation",
     icon: (
       <svg
         className="h-6 w-6"
@@ -140,7 +140,7 @@ export const HOME_TOOLS = [
     id: "quotes",
     name: "Devis",
     description: "Créez et suivez vos devis clients",
-    category: "Devis",
+    category: "Facturation",
     icon: (
       <svg
         className="h-6 w-6"
