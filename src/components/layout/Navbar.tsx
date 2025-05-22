@@ -95,23 +95,23 @@ export const Navbar = () => {
       icon: <Card size="20" variant="Linear" color="#5b50ff" />
     });
     
-    // Ajouter l'option Communauté uniquement pour les membres premium
-    if (isPremium) {
-      dropdownItems.push({
-        label: 'Communauté',
-        onClick: () => {
-          window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');
-        },
-        icon: <People size="20" variant="Linear" color="#5b50ff" />
-      });
-    }
+  }
+  // Ajouter l'option Communauté uniquement pour les membres premium
+  if (isPremium) {
+    dropdownItems.push({
+      label: 'Communauté',
+      onClick: () => {
+        window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');
+      },
+      icon: <People size="20" variant="Linear" color="#5b50ff" />
+    });
   }
   
   // Ajouter l'option Aide
   dropdownItems.push({
     label: 'Aide',
     onClick: () => {
-      window.open('https://newbi.fr/faq', '_blank');
+      window.open('https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL', '_blank');
     },
     icon: <InfoCircle size="20" variant="Linear" color="#5b50ff" />
   });
