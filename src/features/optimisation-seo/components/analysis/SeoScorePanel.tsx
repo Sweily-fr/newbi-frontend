@@ -1,5 +1,6 @@
 import React from 'react';
 import { useBlogSeo } from '../../hooks/useBlogSeo';
+import Progress from '../../../../components/ui/Progress'; // Notre composant Progress personnalisé
 
 const SeoScorePanel: React.FC = () => {
   const { state } = useBlogSeo();
@@ -19,6 +20,17 @@ const SeoScorePanel: React.FC = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Fonction pour obtenir le libellé de lisibilité
+  const getReadabilityLabel = (score: number): string => {
+    if (score >= 90) return 'Excellent - Très facile à lire';
+    if (score >= 80) return 'Très bien - Facile à lire';
+    if (score >= 70) return 'Bien - Assez facile à lire';
+    if (score >= 60) return 'Moyen - Un peu difficile';
+    if (score >= 50) return 'Assez difficile';
+    if (score >= 30) return 'Difficile';
+    return 'Très difficile - À améliorer';
   };
 
   // Fonction pour obtenir l'évaluation du nombre de mots
@@ -70,20 +82,30 @@ const SeoScorePanel: React.FC = () => {
             <div className="flex flex-col">
               <p className="text-xs text-gray-500">Nombre de mots</p>
               <div className="flex items-center mt-1">
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getWordCountRating(state.contentStats.wordCount).color}`}>
-                  {getWordCountRating(state.contentStats.wordCount).label}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getWordCountRating(state.contentStats.length.words).color}`}>
+                  {getWordCountRating(state.contentStats.length.words).label}
                 </span>
               </div>
             </div>
-            <p className="text-base font-semibold">{state.contentStats.wordCount}</p>
+            <p className="text-base font-semibold">{state.contentStats.length.words}</p>
           </div>
           <div className="bg-[#f9f8ff] p-3 rounded-lg flex justify-between items-center">
             <p className="text-xs text-gray-500">Temps de lecture</p>
-            <p className="text-base font-semibold">{Math.ceil(state.contentStats.readingTime)} min</p>
+            <p className="text-base font-semibold">{Math.ceil(state.contentStats.length.readingTime)} min</p>
           </div>
-          <div className="bg-[#f9f8ff] p-3 rounded-lg flex justify-between items-center">
-            <p className="text-xs text-gray-500">Score de lisibilité</p>
-            <p className="text-base font-semibold">{state.contentStats.fleschScore.toFixed(1)}</p>
+          <div className="bg-[#f9f8ff] p-3 rounded-lg">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-xs text-gray-500">Score de lisibilité</p>
+              <p className="text-sm font-semibold">{Math.round(state.contentStats.readability.fleschScore)}/100</p>
+            </div>
+            <Progress 
+              value={state.contentStats.readability.fleschScore} 
+              className="h-2 bg-gray-200"
+              indicatorClassName="bg-[#5b50ff]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {getReadabilityLabel(state.contentStats.readability.fleschScore)}
+            </p>
           </div>
           <div className="bg-[#f9f8ff] p-3 rounded-lg flex justify-between items-center">
             <p className="text-xs text-gray-500">Densité du mot-clé</p>

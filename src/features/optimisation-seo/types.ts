@@ -29,30 +29,53 @@ export interface ContentAnalysisResult {
 }
 
 export interface ContentStats {
-  wordCount: number;
-  paragraphCount: number;
-  sentenceCount: number;
-  avgSentenceLength: number;
-  readingTime: number; // En minutes
-  fleschScore: number; // Score de lisibilité Flesch-Kincaid
+  // Statistiques de longueur
+  length: {
+    words: number;           // Nombre total de mots
+    characters: number;       // Nombre total de caractères (espaces inclus)
+    charactersNoSpaces: number; // Nombre de caractères (espaces exclus)
+    paragraphs: number;       // Nombre de paragraphes
+    sentences: number;         // Nombre de phrases
+    readingTime: number;       // Temps de lecture estimé en minutes
+  };
+  
+  // Statistiques de lisibilité
+  readability: {
+    fleschScore: number;      // Score de lisibilité Flesch-Kincaid (0-100)
+    avgSentenceLength: number; // Longueur moyenne des phrases en mots
+    avgWordLength: number;     // Longueur moyenne des mots en caractères
+    complexWords: number;      // Nombre de mots complexes (8+ lettres)
+    complexWordPercentage: number; // Pourcentage de mots complexes
+  };
+  
+  // Densité des mots-clés
   keywordDensity: {
-    main: number;
-    secondary: Record<string, number>;
-    longTail: Record<string, number>;
+    main: number;             // Densité du mot-clé principal (%)
+    secondary: Record<string, number>; // Densité des mots-clés secondaires
+    longTail: Record<string, number>;  // Densité des mots-clés de longue traîne
   };
-  headingCount: {
-    h1: number;
-    h2: number;
-    h3: number;
-    h4: number;
+  
+  // Structure du contenu
+  structure: {
+    // En-têtes
+    headings: {
+      h1: number;
+      h2: number;
+      h3: number;
+      h4: number;
+    };
+    // Liens
+    links: {
+      internal: number;       // Nombre de liens internes
+      external: number;       // Nombre de liens externes
+    };
+    // Images
+    images: {
+      total: number;          // Nombre total d'images
+      withAlt: number;         // Nombre d'images avec attribut alt
+      withKeywordInAlt: number; // Nombre d'images avec mot-clé dans l'alt
+    };
   };
-  linksCount: {
-    internal: number;
-    external: number;
-  };
-  imagesCount: number;
-  imagesWithAlt: number;
-  imagesWithKeywordInAlt: number;
 }
 
 export interface BlogSeoState {

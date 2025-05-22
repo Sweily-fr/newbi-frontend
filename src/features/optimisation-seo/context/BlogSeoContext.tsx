@@ -21,30 +21,43 @@ import { BlogSeoContext } from './BlogSeoContextDefinition';
 
 // État initial
 const initialContentStats: ContentStats = {
-  wordCount: 0,
-  paragraphCount: 0,
-  sentenceCount: 0,
-  avgSentenceLength: 0,
-  readingTime: 0,
-  fleschScore: 0,
+  length: {
+    words: 0,
+    characters: 0,
+    charactersNoSpaces: 0,
+    paragraphs: 0,
+    sentences: 0,
+    readingTime: 0
+  },
+  readability: {
+    fleschScore: 0,
+    avgSentenceLength: 0,
+    avgWordLength: 0,
+    complexWords: 0,
+    complexWordPercentage: 0
+  },
   keywordDensity: {
     main: 0,
     secondary: {},
     longTail: {}
   },
-  headingCount: {
-    h1: 0,
-    h2: 0,
-    h3: 0,
-    h4: 0
-  },
-  linksCount: {
-    internal: 0,
-    external: 0
-  },
-  imagesCount: 0,
-  imagesWithAlt: 0,
-  imagesWithKeywordInAlt: 0
+  structure: {
+    headings: {
+      h1: 0,
+      h2: 0,
+      h3: 0,
+      h4: 0
+    },
+    links: {
+      internal: 0,
+      external: 0
+    },
+    images: {
+      total: 0,
+      withAlt: 0,
+      withKeywordInAlt: 0
+    }
+  }
 };
 
 const initialState: BlogSeoState = {
