@@ -130,25 +130,51 @@ export const calculateContentStats = (content: string, keywords: KeywordData): C
     imagesWithKeywordInAlt = altTexts.filter(alt => alt.includes(mainKeywordLower)).length;
   }
   
+  // Calcul du nombre de caractères (avec et sans espaces)
+  const characters = content.length;
+  const charactersNoSpaces = content.replace(/\s+/g, '').length;
+  
+  // Calcul du pourcentage de mots complexes (8+ lettres)
+  const allWords = textContent.toLowerCase().split(/\s+/);
+  const complexWords = allWords.filter(word => word.length >= 8).length;
+  const complexWordPercentage = allWords.length > 0 ? (complexWords / allWords.length) * 100 : 0;
+  
+  // Calcul de la longueur moyenne des mots
+  const totalWordLength = allWords.reduce((sum, word) => sum + word.length, 0);
+  const avgWordLength = allWords.length > 0 ? totalWordLength / allWords.length : 0;
+  
   return {
-    wordCount,
-    paragraphCount,
-    sentenceCount,
-    avgSentenceLength,
-    readingTime,
-    fleschScore,
+    length: {
+      words: wordCount,
+      characters,
+      charactersNoSpaces,
+      paragraphs: paragraphCount,
+      sentences: sentenceCount,
+      readingTime
+    },
+    readability: {
+      fleschScore,
+      avgSentenceLength,
+      avgWordLength,
+      complexWords,
+      complexWordPercentage
+    },
     keywordDensity: {
       main: mainKeywordDensity,
       secondary: secondaryKeywordDensity,
       longTail: longTailKeywordDensity
     },
-    headingCount,
-    linksCount: {
-      internal: internalLinkCount,
-      external: externalLinkCount
-    },
-    imagesCount,
-    imagesWithAlt,
-    imagesWithKeywordInAlt
+    structure: {
+      headings: headingCount,
+      links: {
+        internal: internalLinkCount,
+        external: externalLinkCount
+      },
+      images: {
+        total: imagesCount,
+        withAlt: imagesWithAlt,
+        withKeywordInAlt: imagesWithKeywordInAlt
+      }
+    }
   };
 };

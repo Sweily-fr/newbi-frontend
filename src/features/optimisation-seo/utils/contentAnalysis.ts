@@ -452,8 +452,8 @@ export const analyzeContent = (
   // Analyse de la structure du contenu
   
   // Vérification de la présence d'un H1
-  const hasH1 = stats.headingCount.h1 > 0;
-  const tooManyH1 = stats.headingCount.h1 > 1;
+  const hasH1 = stats.structure.headings.h1 > 0;
+  const tooManyH1 = stats.structure.headings.h1 > 1;
   
   let h1Status: 'good' | 'improvement' | 'problem' = 'good';
   let h1Score = 10;
@@ -474,7 +474,7 @@ export const analyzeContent = (
     title: 'Titre H1',
     description: hasH1 
       ? tooManyH1 
-        ? `Votre contenu contient ${stats.headingCount.h1} titres H1.` 
+        ? `Votre contenu contient ${stats.structure.headings.h1} titres H1.` 
         : 'Votre contenu contient un titre H1.' 
       : 'Votre contenu ne contient pas de titre H1.',
     status: h1Status,
@@ -713,13 +713,13 @@ export const analyzeContent = (
   }
   
   // Vérification de la présence de sous-titres (H2, H3, H4)
-  const hasSubheadings = stats.headingCount.h2 > 0 || stats.headingCount.h3 > 0 || stats.headingCount.h4 > 0;
+  const hasSubheadings = stats.structure.headings.h2 > 0 || stats.structure.headings.h3 > 0 || stats.structure.headings.h4 > 0;
   
   results.push({
     id: 'subheadings-presence',
     title: 'Sous-titres',
     description: hasSubheadings
-      ? `Votre contenu contient des sous-titres (${stats.headingCount.h2} H2, ${stats.headingCount.h3} H3, ${stats.headingCount.h4} H4).`
+      ? `Votre contenu contient des sous-titres (${stats.structure.headings.h2} H2, ${stats.structure.headings.h3} H3, ${stats.structure.headings.h4} H4).`
       : 'Votre contenu ne contient pas de sous-titres.',
     status: hasSubheadings ? 'good' : 'problem',
     score: hasSubheadings ? 8 : 0,
@@ -730,29 +730,69 @@ export const analyzeContent = (
       : ['Ajoutez des sous-titres (H2, H3, H4) pour structurer votre contenu et améliorer sa lisibilité.']
   });
   
-  // Analyse de la longueur du contenu
+  // Analyse de la lisibilité pour un public jeune (15 ans)
+  const isEasyToRead = stats.readability.fleschScore >= 70; // Score Flesch-Kincaid pour un public de 13-15 ans
+  const isModeratelyDifficult = stats.readability.fleschScore >= 60 && stats.readability.fleschScore < 70;
+  const isDifficult = stats.readability.fleschScore < 60;
+  
+  // Analyse de la longueur des phrases
+  const isSentenceLengthOptimal = stats.readability.avgSentenceLength <= 15; // Moins de 15 mots par phrase en moyenne
+  
+  // Vérification de la simplicité du langage
+  const complexWordPercentage = stats.readability.complexWordPercentage;
+  const isLanguageSimple = complexWordPercentage <= 10; // Moins de 10% de mots complexes
+  
+  // Analyse de la longueur du contenu (adaptée aux jeunes lecteurs)
   let contentLengthStatus: 'good' | 'improvement' | 'problem' = 'good';
   let contentLengthScore = 10;
   const contentLengthSuggestions: string[] = [];
   
-  if (stats.wordCount < 300) {
+  if (stats.length.words < 400) {
     contentLengthStatus = 'problem';
     contentLengthScore = 2;
-    contentLengthSuggestions.push('Votre contenu est trop court. Visez au moins 600 mots pour un bon référencement.');
-  } else if (stats.wordCount < 600) {
+    contentLengthSuggestions.push('Votre contenu est trop court. Visez au moins 400 mots pour maintenir l\'intérêt des jeunes lecteurs.');
+  } else if (stats.length.words < 800) {
     contentLengthStatus = 'improvement';
     contentLengthScore = 5;
-    contentLengthSuggestions.push('Votre contenu pourrait être plus long. Visez au moins 600 mots pour un bon référencement.');
-  } else if (stats.wordCount > 2500) {
-    contentLengthStatus = 'good';
-    contentLengthScore = 10;
-    contentLengthSuggestions.push('Votre contenu est très complet, ce qui est excellent pour le référencement.');
+    contentLengthSuggestions.push('Votre contenu est bien, mais il pourrait être un peu plus long. Visez 800 mots pour un contenu complet.');
+  } else if (stats.length.words > 1500) {
+    contentLengthStatus = 'improvement';
+    contentLengthScore = 8;
+    contentLengthSuggestions.push('Votre contenu est très complet, mais attention à ne pas être trop long pour les jeunes lecteurs. Pensez à le découper en plusieurs parties si nécessaire.');
+  }
+  
+  // Ajout des vérifications de lisibilité
+  if (isDifficult) {
+    contentLengthStatus = 'problem';
+    contentLengthScore = Math.max(2, contentLengthScore - 3);
+    contentLengthSuggestions.push('Votre contenu est trop complexe pour des jeunes de 15 ans. Simplifiez le vocabulaire et les phrases.');
+  } else if (isModeratelyDifficult) {
+    contentLengthStatus = 'improvement';
+    contentLengthScore = Math.max(5, contentLengthScore - 1);
+    contentLengthSuggestions.push('Votre contenu est un peu difficile. Essayez de simplifier certaines phrases ou d\'expliquer les termes complexes.');
+  }
+  
+  if (!isSentenceLengthOptimal) {
+    contentLengthStatus = 'improvement';
+    contentLengthSuggestions.push(`Vos phrases font en moyenne ${stats.readability.avgSentenceLength.toFixed(1)} mots. Essayez de faire des phrases plus courtes (moins de 15 mots en moyenne).`);
+  }
+  
+  if (!isLanguageSimple) {
+    contentLengthStatus = 'improvement';
+    contentLengthSuggestions.push(`Votre contenu contient ${complexWordPercentage.toFixed(1)}% de mots complexes. Pour des jeunes de 15 ans, essayez de rester sous les 10%.`);
   }
   
   results.push({
-    id: 'content-length',
-    title: 'Longueur du contenu',
-    description: `Votre contenu contient ${stats.wordCount} mots.`,
+    id: 'content-readability',
+    title: 'Lisibilité pour les 15 ans et +',
+    description: `
+      • ${stats.length.words} mots (${stats.length.characters} caractères)
+      • ${stats.length.paragraphs} paragraphes, ${stats.length.sentences} phrases
+      • Temps de lecture: ${stats.length.readingTime} min
+      • Score de lisibilité: ${stats.readability.fleschScore.toFixed(1)}/100
+      • Longueur moyenne des phrases: ${stats.readability.avgSentenceLength.toFixed(1)} mots
+      • ${stats.readability.complexWordPercentage.toFixed(1)}% de mots complexes (${stats.readability.complexWords} mots)
+    `,
     status: contentLengthStatus,
     score: contentLengthScore,
     priority: 'high',
