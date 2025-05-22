@@ -5,7 +5,7 @@ import { Button } from "../../../components";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { Link } from "react-router-dom";
-import { ArrowRight2 } from "iconsax-react";
+import { ArrowRight2, Verify } from "iconsax-react";
 
 interface ToolCardProps {
   tool: Tool;
@@ -19,6 +19,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
 
   // Vérifier si l'utilisateur a accès à l'outil
   const hasAccess = !tool.premium || (isAuthenticated && hasActiveSubscription);
+
+  // Tous les tags de catégorie sont en violet (couleur principale de Newbi)
 
   return (
     <Link
@@ -39,18 +41,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
         {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
         <div className="flex items-center gap-4 mb-4 pl-1">
           {/* Icône dans un cercle avec fond et effet de brillance */}
-          <div className={`
-            h-16 w-16 rounded-full
-            flex items-center justify-center
-            border transition-all flex-shrink-0
-            shadow-sm relative overflow-hidden
-            ${tool.premium ? 'bg-gray-50 border-gray-300' : 'bg-white border-gray-200'}
-            group-hover:border-gray-400 group-hover:bg-white
-            before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
-          `}>
-
-            <div className="w-8 h-8 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-110">
-              <div className="text-gray-700">{tool.icon}</div>
+          <div className="flex-shrink-0 relative">
+            {/* L'icône est déjà dans un div avec un fond coloré */}
+            <div className="transition-transform duration-300 group-hover:scale-110">
+              {tool.icon}
             </div>
           </div>
           
@@ -61,9 +55,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
             </h3>
             <div className="flex items-center gap-2 mt-1">
               <div className="flex items-center gap-2">
-                <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 shadow-sm transition-all duration-300 group-hover:shadow group-hover:bg-gray-200">{tool.category}</p>
+                <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#f0eeff] text-[#5b50ff] shadow-sm transition-all duration-300 group-hover:shadow">{tool.category}</p>
                 {tool.premium && (
-                  <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#f0eeff]/50 text-[#5b50ff]/80">Premium</p>
+                  <p className="text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1" style={{ color: '#ffd700' }}>
+                    <Verify size="12" variant="Bold" color="#ffd700" />
+                    <span>Premium</span>
+                  </p>
                 )}
               </div>
             </div>
