@@ -196,11 +196,11 @@ export const Footer = () => {
                   Politique de confidentialité
                 </a>
               </li>
-              {/* <li>
+              <li>
                 <a href="/conditions-generales-de-vente" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
                   CGV
                 </a>
-              </li> */}
+              </li>
               <li>
                 <a
                   href="/contact"

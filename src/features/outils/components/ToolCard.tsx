@@ -25,8 +25,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
   return (
     <Link
       to={tool.href}
-      className={`relative group bg-white rounded-2xl shadow-md border transition-all duration-300 overflow-hidden block
-        hover:shadow-xl hover:border-gray-300 hover:bg-gray-50 hover:transform hover:scale-[1.01]
+      className={`relative group bg-white rounded-2xl border border-gray-200 overflow-hidden block
         ${tool.premium ? 'border-gray-200 bg-gray-50/30' : 'border-gray-100'}
         ${tool.comingSoon ? 'opacity-75 grayscale pointer-events-none' : ''}
         ${!tool.comingSoon && hasAccess ? 'cursor-pointer' : ''}
@@ -43,7 +42,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
           {/* Icône dans un cercle avec fond et effet de brillance */}
           <div className="flex-shrink-0 relative">
             {/* L'icône est déjà dans un div avec un fond coloré */}
-            <div className="transition-transform duration-300 group-hover:scale-110">
+            <div>
               {tool.icon}
             </div>
           </div>
