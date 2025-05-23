@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useBlogSeo } from '../../../hooks/useBlogSeo';
 import { markComplexWords } from './utils/textComplexity';
+import { normalizeContent } from './utils/textComplexity';
 // Importer les utilitaires depuis le bon chemin si nécessaire
 // import { calculateWordCount, cleanupExcessiveSpaces } from '../../utils';
 
@@ -411,7 +412,14 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
     setTimeout(() => {
       if (editorRef.current) {
         // Mettre à jour le contenu
-        const currentContent = editorRef.current.innerHTML;
+        let currentContent = editorRef.current.innerHTML;
+        
+        // Normaliser le contenu pour remplacer les &nbsp; par des espaces normaux
+        // et s'assurer que le texte est dans des balises <p>
+        currentContent = normalizeContent(currentContent);
+        
+        // Mettre à jour l'affichage avec le contenu normalisé
+        editorRef.current.innerHTML = currentContent;
         
         // Vérifier si le contenu a vraiment changé pour éviter les mises à jour inutiles
         if (currentContent !== state.content) {
@@ -522,18 +530,22 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
   };
 
   // Fonction pour marquer les mots complexes dans l'éditeur
-  const markComplexWordsInEditor = useCallback(() => {
+  const markComplexWordsInEditor = useCallback(async () => {
     if (editorRef.current) {
-      markComplexWords(editorRef.current);
+      try {
+        await markComplexWords(editorRef.current);
+      } catch (error) {
+        console.error('Erreur lors du marquage des mots complexes:', error);
+      }
     }
-  }, []);
+  }, [editorRef]);
   
   // Effet pour marquer les mots complexes lorsque l'analyse est terminée
   useEffect(() => {
     if (!isAnalyzing && analysisResults) {
       // Attendre que le DOM soit mis à jour après l'analyse
       const timer = setTimeout(() => {
-        markComplexWordsInEditor();
+        markComplexWordsInEditor().catch(console.error);
       }, 100);
       
       return () => clearTimeout(timer);

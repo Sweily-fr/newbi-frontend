@@ -35,8 +35,59 @@ export const EditorStyles: React.FC = () => {
           color: #ff4d4f;
           font-weight: 500;
           position: relative;
+          white-space: normal; /* Permet le retour à la ligne pour les mots complexes aussi */
         }
         
+        /* Règles CSS pour empêcher la coupure des mots */
+        .rich-text-editor {
+          width: 100% !important;
+        }
+        
+        /* Style pour l'éditeur et tous ses éléments */
+        [contenteditable],
+        [contenteditable] p,
+        [contenteditable] div,
+        [contenteditable] span,
+        [contenteditable] a,
+        [contenteditable] strong,
+        [contenteditable] em,
+        [contenteditable] b,
+        [contenteditable] i,
+        [contenteditable] u {
+          /* Propriétés essentielles pour empêcher la coupure des mots */
+          word-break: keep-all !important; /* Empêche la coupure des mots */
+          overflow-wrap: break-word !important; /* Force le passage à la ligne */
+          word-wrap: break-word !important; /* Pour compatibilité */
+          
+          /* Désactiver toutes les formes de césure */
+          -webkit-hyphens: none !important;
+          -moz-hyphens: none !important;
+          -ms-hyphens: none !important;
+          hyphens: none !important;
+          
+          /* Gestion de l'espace blanc */
+          white-space: normal !important;
+        }
+        
+        /* Style spécifique pour les paragraphes */
+        [contenteditable] p {
+          width: 100% !important;
+          max-width: 100% !important;
+          display: block !important;
+        }
+        
+        /* Style pour le texte en général */
+        [contenteditable] {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+        
+        /* Empêcher les mots de dépasser de leur conteneur */
+        [contenteditable] * {
+          max-width: 100% !important;
+        }
+        
+        /* Style pour les mots complexes au survol */
         .complex-word:hover::after {
           content: 'Mot complexe';
           position: absolute;

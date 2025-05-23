@@ -6,7 +6,8 @@ import EditImagePopup from './components/EditImagePopup';
 import EditorToolbar from './components/EditorToolbar';
 import EditorStyles from './components/EditorStyles';
 import { useEditorHandlers } from './useEditorHandlers';
-import { getWordCountRating, calculateWordCount } from './utils';
+import { getWordCountRating, calculateWordCount } from './utils/wordCount';
+import { normalizeContent } from './utils/textComplexity';
 // Le hook useBlogSeo sera réintégré après la refactorisation complète
 import { Notification } from '../../../../../components/common/Notification';
 
@@ -24,11 +25,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     isEditImagePopupOpen,
     setIsEditImagePopupOpen,
     selectedText,
-    setSelectedText,
+    // setSelectedText est utilisé dans le composant mais pas directement dans ce fichier
     savedRange,
     setSavedRange,
     isLinkSelected,
-    setIsLinkSelected,
+    // setIsLinkSelected est utilisé dans le composant mais pas directement dans ce fichier
     selectedImage,
     setSelectedImage,
     activeFormats,
@@ -43,7 +44,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     handleLinkButtonClick,
     handleImageButtonClick,
     handleAnalyzeContent,
-    analysisResults,
+    // analysisResults est utilisé dans le composant mais pas directement dans ce fichier
     state,
     setContent
   } = useEditorHandlers(editorRef);
@@ -51,11 +52,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Variables temporaires pour éviter les erreurs de rendu
   const isAnalyzing = false;
 
-  // Initialisation de l'éditeur
+  // Initialisation de l'éditeur avec gestion des cas où state.content pourrait être undefined
   useEffect(() => {
-    if (editorRef.current && state.content) {
+    if (editorRef.current) {
+      // Vérifier si state.content existe, sinon utiliser une chaîne vide
+      const content = state.content || '';
+      
+      // Normaliser le contenu pour remplacer les &nbsp; et utiliser des balises <p>
+      const normalizedContent = normalizeContent(content);
+      
       // Mise à jour du contenu de l'éditeur
-      editorRef.current.innerHTML = state.content;
+      editorRef.current.innerHTML = normalizedContent;
       
       // Calcul du nombre de mots
       const wordCount = calculateWordCount(editorRef.current.innerText);
@@ -276,8 +283,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {/* Compteur de mots avec évaluation */}
         <div className="absolute bottom-2 right-2 z-10 bg-white bg-opacity-90 rounded-2xl px-3 py-3 shadow-sm border border-[#e6e1ff] flex items-center space-x-2">
           <span className="text-xs text-gray-500">Mots:</span>
-          <span className="text-sm font-medium">{currentWordCount}</span>
-          <span className={`text-xs font-medium ${getWordCountRating(currentWordCount).color} ml-1 px-1.5 py-0.5 rounded-full text-xs bg-opacity-20 ${getWordCountRating(currentWordCount).color.replace('text-', 'bg-')}`}>({getWordCountRating(currentWordCount).label})</span>
+          <span className="text-sm font-medium">{currentWordCount || 0}</span>
+          {currentWordCount !== undefined && (
+            <span className={`text-xs font-medium ${getWordCountRating(currentWordCount).color} ml-1 px-1.5 py-0.5 rounded-full text-xs bg-opacity-20 ${getWordCountRating(currentWordCount).color.replace('text-', 'bg-')}`}>
+              ({getWordCountRating(currentWordCount).label})
+            </span>
+          )}
         </div>
         
         {/* Barre d'outils */}
