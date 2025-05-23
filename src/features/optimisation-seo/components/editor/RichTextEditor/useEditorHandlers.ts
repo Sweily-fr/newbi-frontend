@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useBlogSeo } from '../../../hooks/useBlogSeo';
+import { markComplexWords } from './utils/textComplexity';
 // Importer les utilitaires depuis le bon chemin si nécessaire
 // import { calculateWordCount, cleanupExcessiveSpaces } from '../../utils';
 
@@ -520,12 +521,41 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
     setIsImagePopupOpen(true);
   };
 
+  // Fonction pour marquer les mots complexes dans l'éditeur
+  const markComplexWordsInEditor = useCallback(() => {
+    if (editorRef.current) {
+      markComplexWords(editorRef.current);
+    }
+  }, []);
+  
+  // Effet pour marquer les mots complexes lorsque l'analyse est terminée
+  useEffect(() => {
+    if (!isAnalyzing && analysisResults) {
+      // Attendre que le DOM soit mis à jour après l'analyse
+      const timer = setTimeout(() => {
+        markComplexWordsInEditor();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAnalyzing, analysisResults, markComplexWordsInEditor]);
+
   // Gestionnaire pour le bouton d'analyse
   const handleAnalyzeContent = () => {
     setIsAnalyzing(true);
     
     // Sauvegarder le contenu actuel de l'éditeur
     if (editorRef.current) {
+      // D'abord, supprimer les marquages de mots complexes existants
+      const markedWords = editorRef.current.querySelectorAll('.complex-word');
+      markedWords.forEach(span => {
+        const parent = span.parentNode;
+        if (parent) {
+          parent.replaceChild(document.createTextNode(span.textContent || ''), span);
+          parent.normalize();
+        }
+      });
+      
       const currentContent = editorRef.current.innerHTML;
       
       // Stocker le contenu actuel pour pouvoir le restaurer après l'analyse
@@ -545,6 +575,9 @@ export const useEditorHandlers = (editorRef: React.RefObject<HTMLDivElement>) =>
             setContent(savedContent);
           }
         }
+        
+        // Marquer les mots complexes après la restauration du contenu
+        markComplexWordsInEditor();
       }, 500); // Délai pour s'assurer que l'analyse est terminée
     } else {
       // Si editorRef.current n'existe pas, appeler quand même analyzeContent

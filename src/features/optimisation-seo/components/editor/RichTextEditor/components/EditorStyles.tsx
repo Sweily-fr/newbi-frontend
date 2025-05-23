@@ -30,6 +30,28 @@ export const EditorStyles: React.FC = () => {
           color: #7a71ff;
         }
         
+        /* Style pour les mots complexes */
+        .complex-word {
+          color: #ff4d4f;
+          font-weight: 500;
+          position: relative;
+        }
+        
+        .complex-word:hover::after {
+          content: 'Mot complexe';
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #ff4d4f;
+          color: white;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 12px;
+          white-space: nowrap;
+          z-index: 1000;
+        }
+        
         /* Styles pour les titres */
         [contenteditable] h1 {
           font-size: 2rem;
