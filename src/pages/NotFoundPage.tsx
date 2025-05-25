@@ -1,17 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../routes/constants';
-import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { PageSEO } from '../components/specific/SEO/PageSEO';
 
 export const NotFoundPage: React.FC = () => {
   return (
     <>
-      <SEOHead
-        title="Page non trouvée | Newbi"
-        description="La page que vous recherchez n'existe pas ou a été déplacée."
-        canonicalUrl="/404"
-        noindex={true}
-      />
+      <PageSEO pageKey="notFound" />
       <div className="flex flex-col items-center justify-center min-h-screen px-4 py-16 bg-white">
         <div className="text-center max-w-md">
           {/* Illustration stylisée aux couleurs de Newbi */}

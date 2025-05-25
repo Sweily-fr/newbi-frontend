@@ -13,6 +13,7 @@ import { GET_QUOTE_STATS } from '../features/devis/graphql/quotes';
 import { QuoteFormModal } from '../features/devis/components/forms/QuoteFormModal';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { SchemaMarkup } from '../components/specific/SEO/SchemaMarkup';
+import { seoConfig } from '../config/seoConfig';
 
 export const QuotesPage = () => {
   const {
@@ -69,10 +70,12 @@ export const QuotesPage = () => {
   return (
     <>
       <SEOHead 
-        title="Gestion des Devis | Newbi"
-        description="Créez et gérez vos devis professionnels avec Newbi. Modèles personnalisables, suivi des conversions et transformation en factures en un clic."
-        keywords="devis, gestion devis, devis professionnels, conversion devis, auto-entrepreneur, freelance, TPE, PME"
-        canonicalUrl="https://newbi.fr/devis"
+        title={seoConfig.quotes.title}
+        description={seoConfig.quotes.description}
+        keywords={seoConfig.quotes.keywords}
+        canonicalUrl={seoConfig.quotes.canonicalUrl}
+        ogImage={seoConfig.quotes.ogImage}
+        schemaType={seoConfig.quotes.schemaType}
         noindex={false}
       />
       

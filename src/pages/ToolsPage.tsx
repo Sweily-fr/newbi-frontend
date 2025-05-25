@@ -8,6 +8,7 @@ import { PremiumModal } from "../components/specific/subscription/PremiumModal";
 import { Add, ArrowDown2, ArrowUp2, Building, Category, InfoCircle, Verify, CloseCircle } from 'iconsax-react';
 import { SEOHead } from "../components/specific/SEO/SEOHead";
 import { useCompany } from "../features/profile/hooks/useCompany";
+import { seoConfig } from "../config/seoConfig";
 
 export const ToolsPage = () => {
   // État pour le tri et la recherche
@@ -44,16 +45,16 @@ export const ToolsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-6">
       <SEOHead
-        title="Outils pour entrepreneurs | Newbi"
-        description="Découvrez tous les outils Newbi pour gérer votre entreprise efficacement - factures, devis, signatures email et plus encore."
-        keywords="outils entreprise, outils entrepreneurs, factures, devis, signature email, gestion entreprise"
-        schemaType="WebApplication"
-        canonicalUrl="https://newbi.fr/outils"
+        title={seoConfig.tools.title}
+        description={seoConfig.tools.description}
+        keywords={seoConfig.tools.keywords}
+        schemaType={seoConfig.tools.schemaType}
+        canonicalUrl={seoConfig.tools.canonicalUrl}
         additionalSchemaData={{
           'applicationCategory': 'BusinessApplication',
           'operatingSystem': 'Web'
         }}
-        schemaPrice="14.99"
+        schemaPrice="0" // Mise à jour pour refléter que l'outil est gratuit
         isPremium={true}
       />
       <div className="max-w-7xl mx-auto">

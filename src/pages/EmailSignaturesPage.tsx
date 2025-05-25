@@ -14,6 +14,7 @@ import { ConfirmationModal } from '../components/common/ConfirmationModal';
 import { Button } from '../components/';
 import { SearchInput } from '../components/';
 import { Footer } from '../components/layout/Footer';
+import { seoConfig } from '../config/seoConfig';
 
 const EmailSignaturesPage: React.FC = () => {
   // État pour contrôler la section active dans la sidebar
@@ -234,15 +235,14 @@ const EmailSignaturesPage: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title="Créateur de Signatures Email Professionnelles | Newbi"
-        description="Créez des signatures email professionnelles et personnalisées pour votre entreprise. Outil facile à utiliser et hautement personnalisable."
-        keywords="signatures email, signature professionnelle, créateur de signature, email marketing, branding, signature d'entreprise"
-        schemaType="WebApplication"
-        schemaName="Créateur de Signatures Email Professionnelles"
-        schemaPrice="14.99"
-        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
-        canonicalUrl="https://newbi.fr/signatures-email"
-        isPremium={true}
+        title={seoConfig.emailSignatures.title}
+        description={seoConfig.emailSignatures.description}
+        keywords={seoConfig.emailSignatures.keywords}
+        schemaType={seoConfig.emailSignatures.schemaType}
+        canonicalUrl={seoConfig.emailSignatures.canonicalUrl}
+        ogImage={seoConfig.emailSignatures.ogImage}
+        schemaPrice="0" // Mise à jour pour refléter que l'outil est gratuit
+        isPremium={false} // Mise à jour pour refléter que l'outil est gratuit
         additionalSchemaData={{
           'applicationCategory': 'BusinessApplication',
           'operatingSystem': 'Web'

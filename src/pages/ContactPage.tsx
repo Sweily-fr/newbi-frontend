@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { seoConfig } from '../config/seoConfig';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -129,10 +130,12 @@ export const ContactPage: React.FC = () => {
   return (
     <div className="bg-[#f0eeff]/30 min-h-screen py-12">
       <SEOHead 
-        title="Contact | Newbi"
-        description="Contactez l'équipe de Newbi pour toute question, suggestion ou besoin d'assistance. Notre équipe est là pour vous aider."
-        keywords="contact, support, aide, assistance, question, message, Newbi"
-        schemaType="ContactPage"
+        title={seoConfig.contact.title}
+        description={seoConfig.contact.description}
+        keywords={seoConfig.contact.keywords}
+        schemaType={seoConfig.contact.schemaType}
+        canonicalUrl={seoConfig.contact.canonicalUrl}
+        ogImage={seoConfig.contact.ogImage}
         additionalSchemaData={{
           'contactPoint': {
             '@type': 'ContactPoint',
@@ -140,8 +143,6 @@ export const ContactPage: React.FC = () => {
             'email': 'contact@newbi.fr'
           }
         }}
-        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
-        canonicalUrl="https://newbi.fr/contact"
       />
       
       <div className="container mx-auto px-4 max-w-6xl">

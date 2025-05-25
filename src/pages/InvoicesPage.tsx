@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
 import { SchemaMarkup } from '../components/specific/SEO/SchemaMarkup';
+import { seoConfig } from '../config/seoConfig';
 
 export const InvoicesPage = () => {
   const { quoteId } = useParams();
@@ -81,11 +82,12 @@ export const InvoicesPage = () => {
   return (
     <>
       <SEOHead 
-        title="Gestion des Factures | Newbi"
-        description="Créez, gérez et suivez vos factures professionnelles avec Newbi. Interface intuitive, modèles personnalisables et suivi des paiements en temps réel."
-        keywords="facturation, factures, gestion factures, suivi paiements, comptabilité, auto-entrepreneur, freelance, TPE, PME"
-        canonicalUrl="https://newbi.fr/factures"
-        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        title={seoConfig.invoices.title}
+        description={seoConfig.invoices.description}
+        keywords={seoConfig.invoices.keywords}
+        canonicalUrl={seoConfig.invoices.canonicalUrl}
+        ogImage={seoConfig.invoices.ogImage}
+        schemaType={seoConfig.invoices.schemaType}
         noindex={false}
       />
       
