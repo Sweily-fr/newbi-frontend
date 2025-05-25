@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Interdire l'accès aux pages sensibles ou privées
+Disallow: /profile
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /resend-verification
+Disallow: /change-password
+
+# Indiquer l'emplacement du sitemap
+Sitemap: https://www.newbi.fr/sitemap.xml
