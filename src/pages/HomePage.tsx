@@ -177,6 +177,22 @@ export const HomePage = () => {
                   permet de vous concentrer sur l'essentiel : votre entreprise.
                 </p>
 
+                {/* Annonce Beta en haut de page */}
+                <div className="bg-gradient-to-r from-purple-100 to-indigo-100 p-4 rounded-xl mt-8 max-w-2xl mx-auto border-2 border-[#5b50ff]/20">
+                  <p className="text-center font-bold text-[#5b50ff]">
+                    🎉 OFFRE SPÉCIALE PÉRIODE BETA 🎉
+                  </p>
+                  <p className="text-center text-gray-800 mt-2">
+                    Tous nos services sont <span className="font-bold">GRATUITS</span> pendant la période Beta ! Profitez de toutes les fonctionnalités Premium sans frais pour une durée limitée.
+                  </p>
+                  <p className="text-center text-[#5b50ff] font-medium mt-1">
+                    <span className="inline-flex items-center">
+                      <TickCircle color="#5b50ff" variant="Bold" size={16} className="mr-1" />
+                      0 carte de crédit nécessaire
+                    </span>
+                  </p>
+                </div>
+
                 <div className="mt-10 max-w-xl mx-auto">
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <ButtonLink
@@ -1094,6 +1110,22 @@ export const HomePage = () => {
                       </span>{" "}
                       et possibilité de résilier à tout moment sans condition.
                     </p>
+
+                    {/* Annonce Beta */}
+                    <div className="bg-gradient-to-r from-purple-100 to-indigo-100 p-4 rounded-xl mb-8 max-w-2xl mx-auto border-2 border-[#5b50ff]/20">
+                      <p className="text-center font-bold text-[#5b50ff]">
+                        🎉 OFFRE SPÉCIALE PÉRIODE BETA 🎉
+                      </p>
+                      <p className="text-center text-gray-800 mt-2">
+                        Tous nos services sont <span className="font-bold">GRATUITS</span> pendant la période Beta ! Profitez de toutes les fonctionnalités Premium sans frais pour une durée limitée.
+                      </p>
+                      <p className="text-center text-[#5b50ff] font-medium mt-1">
+                        <span className="inline-flex items-center justify-center">
+                          <TickCircle color="#5b50ff" variant="Bold" size={16} className="mr-1" />
+                          0 carte de crédit nécessaire
+                        </span>
+                      </p>
+                    </div>
 
                     {/* Sélecteur de période */}
                     <div className="flex justify-center mb-10">
