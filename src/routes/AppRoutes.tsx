@@ -21,6 +21,8 @@ import {
   BlogSeoOptimizerPage,
   EmailSignaturesPage,
   NotFoundPage,
+  BlogPage,
+  BlogArticlePage,
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -113,6 +115,10 @@ export const AppRoutes = () => {
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
+        
+        {/* Routes du blog */}
+        <Route path={ROUTES.BLOG} element={<PublicRoute><BlogPage /></PublicRoute>} />
+        <Route path={ROUTES.BLOG_ARTICLE} element={<PublicRoute><BlogArticlePage /></PublicRoute>} />
         <Route path={ROUTES.PRIVACY_POLICY} element={<PublicRoute><PrivacyPolicyPage /></PublicRoute>} />
         <Route path={ROUTES.TERMS} element={<PublicRoute><TermsPage /></PublicRoute>} />
         <Route path={ROUTES.CONTACT} element={<PublicRoute><ContactPage /></PublicRoute>} />

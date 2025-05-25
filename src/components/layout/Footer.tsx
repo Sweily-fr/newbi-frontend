@@ -101,12 +101,12 @@ export const Footer = () => {
               Ressources
             </h3>
             <ul className="space-y-3">
-              {/* <li>
-                <a href="/blog" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
-                  Blog
-                </a>
-              </li>
               <li>
+                <Link to="/blog" className="text-gray-600 hover:text-[#5b50ff] text-sm transition-colors">
+                  Blog
+                </Link>
+              </li>
+              {/* <li>
                 <a href="/guides" className="text-gray-600 hover:text-indigo-600 text-sm transition-colors">
                   Guides pratiques
                 </a>

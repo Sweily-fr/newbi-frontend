@@ -1,0 +1,11 @@
+// Export des articles de blog
+export { invoiceArticle } from './invoiceArticle';
+export { excelQuoteArticle } from './excelQuoteArticle';
+export { businessManagementArticle } from './businessManagementArticle';
+export { legalNoticeArticle } from './legalNoticeArticle';
+export { emailSignatureArticle } from './emailSignatureArticle';
+export { seoOptimizationArticle } from './seoOptimizationArticle';
+export { invoiceTemplateArticle } from './invoiceTemplateArticle';
+export { quoteCreationArticle } from './quoteCreationArticle';
+export { businessToolsArticle } from './businessToolsArticle';
+export { digitalInvoiceArticle } from './digitalInvoiceArticle';

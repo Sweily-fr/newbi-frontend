@@ -20,3 +20,6 @@ export { default as PrivacyPolicyGeneratorPage } from './PrivacyPolicyGeneratorP
 export { default as BlogSeoOptimizerPage } from './BlogSeoOptimizerPage';
 export { default as EmailSignaturesPage } from './EmailSignaturesPage';
 export { default as NotFoundPage } from './NotFoundPage';
+// Nouvelles pages de blog
+export { default as BlogPage } from './BlogPage';
+export { default as BlogArticlePage } from './BlogArticlePage';

@@ -19,6 +19,8 @@ export const ROUTES = {
   PRIVACY_POLICY: '/politique-de-confidentialite',
   PRIVACY_POLICY_GENERATOR: '/generator-politique-confidentialite',
   BLOG_SEO_OPTIMIZER: '/blog-seo-optimizer',
+  BLOG: '/blog',
+  BLOG_ARTICLE: '/blog/:slug',
   TERMS: '/conditions-generales-de-vente',
   CONTACT: '/contact',
   COOKIE_PREFERENCES: '/preferences-cookies',
