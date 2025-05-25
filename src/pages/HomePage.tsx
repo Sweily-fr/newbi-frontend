@@ -9,8 +9,7 @@ import {
 } from "../components/specific/SEO/SchemaMarkup";
 import {
   StarIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
+  // ChevronDownIcon, ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import {
   ArrowRight2,
@@ -96,31 +95,45 @@ export const HomePage = () => {
 
   return (
     <>
+      {/* SEO spécifique à la page d'accueil - remplace les balises par défaut */}
       <SEOHead
         title="Facturation, Devis & Outils Pros | Newbi"
         description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français. Essai gratuit, sans engagement."
         keywords="facturation, devis, gestion clients, outils professionnels, RGPD, auto-entrepreneur, freelance, TPE, PME"
-        canonicalUrl="https://newbi.fr/"
+        canonicalUrl="https://www.newbi.fr/"
+        ogImage="https://www.newbi.fr/images/logo_newbi/PNG/Logo_Texte_Purple.png"
+        schemaType="Organization"
+        additionalSchemaData={{
+          logo: "https://www.newbi.fr/images/logo_newbi/PNG/Logo_Texte_Purple.png",
+          sameAs: [
+            "https://www.instagram.com/newbi_fr?igsh=MWYwdnNnMDhrZWc3Mw%3D%3D&utm_source=qr"
+          ],
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer service",
+            email: "contact@newbi.fr",
+            telephone: "+33-02-21-85-02-40",
+            areaServed: "FR",
+            availableLanguage: ["French"]
+          }
+        }}
       />
 
-      {/* Données structurées Organization */}
+      {/* Données structurées WebApplication */}
       <SchemaMarkup
-        type="Organization"
-        name="Newbi"
+        type="WebApplication"
+        name="Newbi - Outils de gestion pour entrepreneurs"
         description="Simplifiez votre gestion d'entreprise avec Newbi : facturation en ligne, devis, gestion de clients, outils pros, RGPD, sécurité, support français."
-        url="https://newbi.fr/"
+        url="https://www.newbi.fr/"
         additionalData={{
-          logo: "https://newbi.fr/images/PNG/Logo_Texte_Purple.png",
-          contactPoint: [
-            {
-              "@type": "ContactPoint",
-              telephone: "+33-02-21-85-02-40",
-              contactType: "customer support",
-              areaServed: "FR",
-              availableLanguage: ["French"],
-            },
-          ],
-          sameAs: ["https://www.linkedin.com/company/newbi/"],
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "All",
+          offers: {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+          },
+          featureList: "Facturation, Devis, Signatures Email"
         }}
       />
 
