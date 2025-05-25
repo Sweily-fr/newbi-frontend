@@ -854,36 +854,32 @@ export const HomePage = () => {
                   </div>
                 </div>
 
-                <div className="md:w-3/4 bg-gradient-to-r from-red-400 to-red-500 rounded-2xl overflow-hidden relative">
+                <div className="md:w-3/4 bg-gradient-to-r from-[#5b50ff] to-[#4a41e0] rounded-2xl overflow-hidden relative">
                   <div className="absolute top-4 right-4 bg-white rounded-full p-2">
-                    <ArchiveMinus size={20} color="red" variant="Bulk" />
+                    <Star1 size={20} color="#5b50ff" variant="Bold" />
                   </div>
                   <div className="p-8 text-white">
                     <div className="flex items-center mb-6">
                       <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3">
-                        <span className="text-red-500 font-bold text-xs">
-                          Offre
+                        <span className="text-[#5b50ff] font-bold text-xs">
+                          BETA
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold">TOUT à 1€.</h3>
+                      <h3 className="text-xl font-bold">🎉 TOUT GRATUIT 🎉</h3>
                     </div>
                     <h2 className="text-2xl font-bold mb-4">
-                      Profitez dès maintenant de 6 mois à 1€/mois pour explorer
-                      nos solutions innovantes. Inscrivez-vous avant le 31 Août
-                      2025 pour bénéficier de cette offre exclusive.
+                      Profitez dès maintenant de TOUS nos services PREMIUM GRATUITEMENT pendant toute la période Beta ! Aucune carte de crédit nécessaire.
                     </h2>
                     <p className="text-white/80 mb-6">
-                      Optimisation des factures, des devis et signatures email
-                      professionnelles pour une image de marque cohérente et
-                      bien plus encore.
+                      Accès complet à toutes les fonctionnalités : facturation illimitée, devis personnalisés, signatures email professionnelles et bien plus encore. Aucune restriction !
                     </p>
-                    <a
-                      href="/auth"
-                      className="text-white font-medium hover:underline flex items-center"
+                    <Link
+                      to="/auth"
+                      className="bg-white text-[#5b50ff] font-medium px-4 py-2 rounded-xl hover:bg-opacity-90 transition-all flex items-center inline-flex"
                     >
-                      S'inscrire gratuitement
-                      <ArrowRight size={20} color="#fff" className="ml-2" />
-                    </a>
+                      Commencer gratuitement
+                      <ArrowRight size={20} color="#5b50ff" className="ml-2" />
+                    </Link>
                   </div>
                 </div>
               </div>
