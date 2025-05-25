@@ -186,6 +186,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
             justifyContent: 'center'
           }}>
             <img 
+              key={`logo-${logoUrl}`} 
               src={logoUrl} 
               alt="Logo" 
               style={{ 
