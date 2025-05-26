@@ -250,7 +250,7 @@ const EmailSignaturesPage: React.FC = () => {
       />
       
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto py-6 px-12">
           {/* En-tête unique qui change dynamiquement */}
           <div className="px-4 sm:px-0 mb-6">
             <div className="flex justify-between items-center">
