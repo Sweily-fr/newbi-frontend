@@ -76,8 +76,6 @@ Ce premier modèle se distingue par sa simplicité et sa clarté, idéal pour le
 
 Ce modèle est particulièrement adapté lorsque vous facturez des prestations intellectuelles à l'heure ou à la journée. Utilisez l'espace de description pour détailler précisément la nature de vos services, ce qui réduira les risques de malentendus avec vos clients.
 
-[Télécharger le modèle 1](https://www.newbi.fr/modeles/facture-service-auto-entrepreneur)
-
 ## Modèle 2 : Facture détaillée pour vente de produits
 
 Ce deuxième modèle est optimisé pour les auto-entrepreneurs qui vendent des produits physiques et ont besoin de détailler précisément leurs articles.
@@ -93,8 +91,6 @@ Ce deuxième modèle est optimisé pour les auto-entrepreneurs qui vendent des p
 ### Conseils d'utilisation :
 
 Utilisez les références produits de manière cohérente d'une facture à l'autre pour faciliter le suivi. Si vous proposez une remise, indiquez clairement le prix avant remise, le pourcentage ou montant de la remise, et le prix final pour une transparence totale.
-
-[Télécharger le modèle 2](https://www.newbi.fr/modeles/facture-produits-auto-entrepreneur)
 
 ## Modèle 3 : Facture créative pour métiers artistiques
 
@@ -112,8 +108,6 @@ Ce troisième modèle s'adresse aux auto-entrepreneurs des secteurs créatifs (g
 
 Bien que créatif, ce modèle respecte toutes les obligations légales. Utilisez l'espace dédié pour préciser clairement les droits cédés (ou non) sur vos créations, la durée et l'étendue de ces droits, ce qui évitera des litiges ultérieurs.
 
-[Télécharger le modèle 3](https://www.newbi.fr/modeles/facture-creative-auto-entrepreneur)
-
 ## Modèle 4 : Facture bilingue français-anglais
 
 Ce quatrième modèle est conçu pour les auto-entrepreneurs travaillant avec des clients internationaux, présentant toutes les informations en français et en anglais.
@@ -130,8 +124,6 @@ Ce quatrième modèle est conçu pour les auto-entrepreneurs travaillant avec de
 
 Si vous travaillez avec des clients étrangers, ce modèle vous fera gagner un temps précieux. N'oubliez pas d'indiquer clairement la devise utilisée et, si nécessaire, le taux de change appliqué. Précisez également qui prend en charge les éventuels frais bancaires pour les virements internationaux.
 
-[Télécharger le modèle 4](https://www.newbi.fr/modeles/facture-bilingue-auto-entrepreneur)
-
 ## Modèle 5 : Facture récurrente pour prestations mensuelles
 
 Ce dernier modèle est optimisé pour les auto-entrepreneurs qui facturent régulièrement les mêmes prestations aux mêmes clients (maintenance, abonnements, services récurrents).
@@ -147,8 +139,6 @@ Ce dernier modèle est optimisé pour les auto-entrepreneurs qui facturent régu
 ### Conseils d'utilisation :
 
 Ce modèle est idéal pour les prestations récurrentes comme la maintenance de site web, le coaching régulier, ou tout service par abonnement. Utilisez la section dédiée pour rappeler les conditions de renouvellement et les délais de préavis pour résiliation.
-
-[Télécharger le modèle 5](https://www.newbi.fr/modeles/facture-recurrente-auto-entrepreneur)
 
 ## Comment personnaliser efficacement ces modèles
 
@@ -240,7 +230,7 @@ Une facturation professionnelle et conforme est essentielle pour tout auto-entre
 
 Pour aller plus loin et gagner encore plus de temps, nous vous invitons à découvrir [Newbi](https://www.newbi.fr), notre solution complète de gestion administrative pour auto-entrepreneurs et TPE. Créez des factures professionnelles en quelques clics, suivez vos paiements et simplifiez votre comptabilité.
 
-[Essayer Newbi gratuitement](https://www.newbi.fr/inscription)
+[Essayer Newbi gratuitement](https://www.newbi.fr/auth)
 
 ## FAQ sur les factures pour auto-entrepreneurs
 
