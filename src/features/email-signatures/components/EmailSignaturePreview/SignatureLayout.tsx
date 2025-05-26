@@ -89,11 +89,7 @@ export const SignatureLayout: React.FC<SignatureLayoutProps> = ({
   // Définir une valeur par défaut pour socialLinksDisplayMode
   const effectiveSocialLinksDisplayMode = socialLinksDisplayMode || 'icons' as const;
   
-  // Log pour déboguer la taille effective de la photo
-  console.log('[DEBUG] SignatureLayout - Taille effective:', {
-    profilePhotoSizeOriginal: profilePhotoSize,
-    effectivePhotoSize
-  });
+  // Utiliser la taille effective de la photo sans log de débogage
   
   // Fonction pour obtenir les styles de texte appropriés
   const getTextStyleProps = (style: 'normal' | 'overline' | 'underline' | 'strikethrough'): React.CSSProperties => {

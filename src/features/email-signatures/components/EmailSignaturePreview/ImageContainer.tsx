@@ -29,9 +29,6 @@ export const ImageContainer: React.FC<ImageContainerProps> = ({
   // Utiliser une vérification explicite pour éviter les problèmes avec l'opérateur ||
   const effectiveSize = photoSize !== undefined && photoSize !== null ? photoSize : DEFAULT_PROFILE_PHOTO_SIZE;
   const iconSize = effectiveSize * 0.6; // Taille de l'icône à 60% du conteneur
-  
-  // Log pour déboguer la taille de l'image
-  console.log('[DEBUG] ImageContainer - Taille de l\'image:', photoSize);
 
   // Nous affichons l'icône Profile par défaut si aucune image n'est fournie
   
@@ -83,7 +80,8 @@ export const ImageContainer: React.FC<ImageContainerProps> = ({
         }}>
           {/* Essayer d'afficher l'image si profilePhotoSource est valide */}
           <img 
-            src={getFullProfilePhotoUrl(profilePhotoSource)} 
+            key={`profile-image-${profilePhotoSource ? (typeof profilePhotoSource === 'string' ? profilePhotoSource.substring(0, 20) : 'image') : 'none'}-${Date.now()}`}
+            src={profilePhotoSource && profilePhotoSource.startsWith('data:') ? profilePhotoSource : getFullProfilePhotoUrl(profilePhotoSource)} 
             alt="Profile" 
             style={{ 
               width: '100%', 
@@ -91,7 +89,6 @@ export const ImageContainer: React.FC<ImageContainerProps> = ({
               objectFit: 'cover'
             }} 
             onError={(e) => {
-              console.log('Erreur de chargement de l\'image, affichage de l\'icône par défaut');
               // En cas d'erreur de chargement de l'image, on remplace par l'icône par défaut
               e.currentTarget.style.display = 'none';
               // Nous ne pouvons pas rendre directement l'icône ici, mais nous pouvons masquer l'image

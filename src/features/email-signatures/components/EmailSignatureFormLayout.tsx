@@ -155,28 +155,26 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fonction pour mettre à jour les données de la signature
-  const isUpdatingRef = useRef(false);
-  
+  // Fonction pour mettre à jour les données de signature
   const updateSignatureData = <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => {
-    const updatedData = {
-      ...signatureData,
-      [field]: value,
-      lastUpdated: Date.now() // Ajouter un timestamp pour forcer le rendu
-    };
-    
-    setSignatureData(updatedData);
-    
-    // Éviter les mises à jour en cascade
-    if (!isUpdatingRef.current && onSignatureDataChange) {
-      isUpdatingRef.current = true;
-      // Utiliser setTimeout pour éviter les mises à jour trop fréquentes
-      setTimeout(() => {
-        onSignatureDataChange(updatedData);
-        isUpdatingRef.current = false;
-      }, 100);
-    }
+    // Mettre à jour les données de signature
+    setSignatureData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Forcer la mise à jour pour les champs liés à l'apparence ou à l'image de profil
+      if (['primaryColor', 'secondaryColor', 'layout', 'textAlignment', 'fontSize', 'fontFamily', 'textStyle', 'profilePhotoUrl', 'profilePhotoBase64', 'profilePhotoSize', 'profilePhotoToDelete'].includes(field as string)) {
+        newData.lastUpdated = Date.now();
+      }
+      
+      // Propager les données mises à jour au parent si nécessaire
+      if (onSignatureDataChange) {
+        onSignatureDataChange(newData);
+      }
+      
+      return newData;
+    });
   };
+
   
   // Fonction pour sélectionner un modèle
   const handleSelectTemplate = (templateId: number) => {
@@ -282,6 +280,8 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
       socialLinksPosition: data.socialLinksPosition as any,
       showLogo: data.showLogo,
       profilePhotoUrl: data.profilePhotoUrl,
+      profilePhotoBase64: data.profilePhotoBase64, // Ajouter la propriété profilePhotoBase64
+      profilePhotoToDelete: data.profilePhotoToDelete, // Ajouter la propriété profilePhotoToDelete
       profilePhotoSize: data.profilePhotoSize
     };
   };
@@ -352,7 +352,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
           <div className="flex items-center justify-center">
             {/* Utiliser une clé unique basée sur lastUpdated pour forcer un nouveau rendu */}
             <EmailSignaturePreview 
-              key={`preview-${signatureData?.profilePhotoSize || 'default'}-${signatureData?.lastUpdated || Date.now()}`}
+              key={`preview-${signatureData?.profilePhotoToDelete ? 'deleted' : ''}-${signatureData?.profilePhotoSize || 'default'}-${signatureData?.profilePhotoBase64 ? 'base64-' + Date.now() : ''}-${signatureData?.profilePhotoUrl || 'default'}-${signatureData?.lastUpdated || Date.now()}`}
               signature={convertSignatureDataToEmailSignature(signatureData)} 
               showEmailIcon={Boolean(signatureData?.showEmailIcon)}
               showPhoneIcon={Boolean(signatureData?.showPhoneIcon)}

@@ -151,16 +151,25 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                       const reader = new FileReader();
                       reader.onload = (event) => {
                         const base64 = event.target?.result as string;
-                        // Mettre à jour l'état local ET les données de signature avec l'image en base64
-                        setProfilePhotoPreview(base64);
+                        
+                        // Important: D'abord réinitialiser le flag de suppression
+                        updateSignatureData('profilePhotoToDelete' as any, false);
+                        
+                        // Ensuite mettre à jour l'image en base64
                         updateSignatureData('profilePhotoBase64' as any, base64);
+                        
+                        // Puis mettre à jour l'état local pour la prévisualisation dans le formulaire
+                        setProfilePhotoPreview(base64);
+                        
+                        // Forcer la mise à jour de lastUpdated pour déclencher un nouveau rendu
+                        updateSignatureData('lastUpdated' as any, Date.now());
                       };
                       reader.readAsDataURL(file);
                     }
                   }}
                   onDelete={() => {
-                    // Réinitialiser l'aperçu local
-                    setProfilePhotoPreview(null);
+                    // Marquer comme supprimé en premier pour éviter les conflits
+                    updateSignatureData('profilePhotoToDelete' as any, true);
                     
                     // Effacer les données de l'image
                     updateSignatureData('profilePhotoBase64' as any, null);
@@ -169,10 +178,11 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     // Réinitialiser la taille de la photo à la valeur par défaut
                     updateSignatureData('profilePhotoSize', 80);
                     
-                    // Marquer comme supprimé
-                    updateSignatureData('profilePhotoToDelete' as any, true);
+                    // Réinitialiser l'aperçu local
+                    setProfilePhotoPreview(null);
                     
-                    console.log('[DEBUG] Photo supprimée, profilePhotoSize réinitialisé et profilePhotoToDelete mis à true');
+                    // Forcer la mise à jour de lastUpdated pour déclencher un nouveau rendu
+                    updateSignatureData('lastUpdated' as any, Date.now());
                   }}
                 />
                 
