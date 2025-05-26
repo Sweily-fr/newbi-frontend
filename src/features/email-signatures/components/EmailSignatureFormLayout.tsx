@@ -17,8 +17,6 @@ import { TemplatesSection } from './sections/TemplatesSection';
  * Composant avec une disposition sur deux colonnes pour l'éditeur de signature email
  * Ce composant utilise une approche simplifiée sans dépendre des composants UI externes
  */
-// Fonction pour formater le code couleur (enlever le #)
-const formatColorCode = (color: string) => color.replace('#', '');
 
 interface EmailSignatureFormLayoutProps {
   defaultNewbiLogoUrl: string;
@@ -85,11 +83,11 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   }, [showPrimaryColorPicker, showSecondaryColorPicker]);
   
   // État pour stocker les données de la signature
-  // État pour stocker les données de la signature
-  const [signatureData, setSignatureData] = useState<SignatureData>(initialData || {
+  const [signatureData, setSignatureData] = useState<SignatureData & { lastUpdated?: number }>(initialData || {
     // Propriétés générales
     name: 'Ma signature professionnelle',
     isDefault: true,
+    lastUpdated: Date.now(), // Ajouter un timestamp pour forcer le rendu initial
     
     // Informations personnelles
     fullName: 'Jean Dupont',
@@ -155,43 +153,39 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   const isUpdatingRef = useRef(false);
   
   const updateSignatureData = <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => {
-    // Éviter les mises à jour redondantes si la valeur n'a pas changé
-    if (signatureData[field] === value) {
-      return;
-    }
-    
-    // Éviter les boucles infinies pendant les mises à jour
-    if (isUpdatingRef.current) {
-      return;
-    }
-    
-    isUpdatingRef.current = true;
-    
     const updatedData = {
       ...signatureData,
       [field]: value
     };
     
-    // Si on change le layout en horizontal, forcer l'alignement à gauche
-    if (field === 'layout' && value === 'horizontal') {
-      updatedData.textAlignment = 'left';
+    // Cas spéciaux pour certains champs
+    if (field === 'templateId') {
+      // Si le modèle change, mettre à jour les couleurs en fonction du modèle
+      if (value === 1) { // Modèle Newbi
+        updatedData.primaryColor = '#5b50ff';
+        updatedData.secondaryColor = '#f0eeff';
+      } else if (value === 2) { // Modèle Sombre
+        updatedData.primaryColor = '#333333';
+        updatedData.secondaryColor = '#f5f5f5';
+      } else if (value === 3) { // Modèle Clair
+        updatedData.primaryColor = '#4a90e2';
+        updatedData.secondaryColor = '#e8f4fc';
+      }
     }
     
-    // Si on change l'alignement du texte mais qu'on est en mode horizontal, ignorer
-    if (field === 'textAlignment' && signatureData.layout === 'horizontal') {
-      // Ne pas changer l'alignement en mode horizontal
-      updatedData.textAlignment = 'left';
+    // Forcer un nouveau rendu pour les champs d'image
+    if (field === 'logoUrl' as K || field === 'logoBase64' as K || field === 'logoToDelete' as K || 
+        field === 'profilePhotoUrl' as K || field === 'profilePhotoBase64' as K) {
+      // Ajouter un timestamp pour forcer le rendu
+      updatedData.lastUpdated = Date.now();
     }
     
+    // Mettre à jour l'état local
     setSignatureData(updatedData);
     
-    // Notifier le composant parent du changement avec un léger délai pour éviter les mises à jour en cascade
+    // Notifier le composant parent si nécessaire
     if (onSignatureDataChange) {
-      setTimeout(() => {
-        onSignatureDataChange(updatedData);
-        isUpdatingRef.current = false;
-      }, 0);
-    } else {
+      onSignatureDataChange(updatedData);
       isUpdatingRef.current = false;
     }
   };
@@ -305,13 +299,6 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
             <AppearanceSection 
               signatureData={signatureData} 
               updateSignatureData={updateSignatureData}
-              showPrimaryColorPicker={showPrimaryColorPicker}
-              setShowPrimaryColorPicker={setShowPrimaryColorPicker}
-              primaryColorPickerRef={primaryColorPickerRef}
-              showSecondaryColorPicker={showSecondaryColorPicker}
-              setShowSecondaryColorPicker={setShowSecondaryColorPicker}
-              secondaryColorPickerRef={secondaryColorPickerRef}
-              formatColorCode={formatColorCode}
             />
           </>
         );
@@ -395,9 +382,9 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
         <div className="py-8 pl-8 h-fit sticky top-28">
           <h3 className="text-lg font-semibold text-gray-900 mb-8">Aperçu</h3>
           <div className="flex items-center justify-center">
-            {/* Utiliser une clé unique basée sur profilePhotoSize pour forcer un nouveau rendu */}
+            {/* Utiliser une clé unique basée sur lastUpdated pour forcer un nouveau rendu */}
             <EmailSignaturePreview 
-              key={`preview-${signatureData?.profilePhotoSize || 'default'}-${Date.now()}`}
+              key={`preview-${signatureData?.profilePhotoSize || 'default'}-${signatureData?.lastUpdated || Date.now()}`}
               signature={convertSignatureDataToEmailSignature(signatureData)} 
               showEmailIcon={Boolean(signatureData?.showEmailIcon)}
               showPhoneIcon={Boolean(signatureData?.showPhoneIcon)}
