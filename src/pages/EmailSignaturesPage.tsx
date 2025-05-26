@@ -271,12 +271,12 @@ const EmailSignaturesPage: React.FC = () => {
       />
       
       <div className="min-h-screen bg-gray-50">
-        <div className="mx-auto py-6 px-12">
+        <div className="max-w-7xl mx-auto py-6">
           {/* En-tête unique qui change dynamiquement */}
           <div className="px-4 sm:px-0 mb-6">
             <div className="flex justify-between items-center">
               {showForm ? (
-                <div className="pl-20 md:pl-24 lg:pl-28">
+                <div className="pl-20">
                   <h1 className="text-2xl font-semibold text-gray-900">Gestion des Signatures Email</h1>
                 </div>
               ) : (
@@ -353,7 +353,7 @@ const EmailSignaturesPage: React.FC = () => {
               </div>
               
               {/* Formulaire de signature */}
-              <div className="flex-grow pl-20 md:pl-24 lg:pl-28 pr-4 md:pr-6">
+              <div className="flex-grow pl-20">
                 <EmailSignatureFormLayout 
                   defaultNewbiLogoUrl="/images/logo_newbi/SVG/Logo_Texte_Purple.svg"
                   activeSection={activeSection}
