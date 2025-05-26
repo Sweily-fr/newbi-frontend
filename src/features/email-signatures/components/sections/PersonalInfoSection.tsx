@@ -7,11 +7,18 @@ import { NAME_REGEX, EMAIL_REGEX, PHONE_REGEX } from '../../../../utils/validato
 interface PersonalInfoSectionProps {
   signatureData: SignatureData;
   updateSignatureData: <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => void;
+  validationErrors?: {
+    name?: string;
+    fullName?: string;
+    email?: string;
+    jobTitle?: string;
+  };
 }
 
 export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   signatureData,
   updateSignatureData,
+  validationErrors: externalErrors
 }) => {
   // État local pour la prévisualisation de la photo de profil
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(
@@ -19,13 +26,24 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   );
   
   // États pour gérer les erreurs de validation
-  const [errors, setErrors] = useState({
+  const [localErrors, setLocalErrors] = useState({
     name: '',
     fullName: '',
     email: '',
+    jobTitle: '',
     phone: '',
     mobilePhone: ''
   });
+  
+  // Combiner les erreurs locales et externes
+  const errors = {
+    name: externalErrors?.name || localErrors.name,
+    fullName: externalErrors?.fullName || localErrors.fullName,
+    email: externalErrors?.email || localErrors.email,
+    jobTitle: externalErrors?.jobTitle || localErrors.jobTitle,
+    phone: localErrors.phone,
+    mobilePhone: localErrors.mobilePhone
+  };
   
   // Mettre à jour la prévisualisation lorsque les données de signature changent
   useEffect(() => {
@@ -48,6 +66,12 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     return "";
   };
   
+  const validateJobTitle = (value: string) => {
+    if (!value.trim()) return "Le poste ou la fonction est requis";
+    if (!NAME_REGEX.test(value)) return "Le poste ne doit contenir que des lettres, espaces, tirets ou apostrophes";
+    return "";
+  };
+  
   const validateEmail = (value: string) => {
     if (!value.trim()) return "L'email est requis";
     if (!EMAIL_REGEX.test(value)) return "Format d'email invalide";
@@ -66,7 +90,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom de la signature
+                  Nom de la signature <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -77,15 +101,15 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     const value = e.target.value;
                     updateSignatureData('name', value);
                     const error = validateName(value);
-                    setErrors(prev => ({ ...prev, name: error }));
+                    setLocalErrors(prev => ({ ...prev, name: error }));
                   }}
                   onBlur={(e) => {
                     const error = validateName(e.target.value);
-                    setErrors(prev => ({ ...prev, name: error }));
+                    setLocalErrors(prev => ({ ...prev, name: error }));
                   }}
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.name}</p>
                 )}
               </div>
               
@@ -191,7 +215,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
               {/* Nom complet */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom complet
+                  Nom complet <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -202,36 +226,48 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     const value = e.target.value;
                     updateSignatureData('fullName', value);
                     const error = validateFullName(value);
-                    setErrors(prev => ({ ...prev, fullName: error }));
+                    setLocalErrors(prev => ({ ...prev, fullName: error }));
                   }}
                   onBlur={(e) => {
                     const error = validateFullName(e.target.value);
-                    setErrors(prev => ({ ...prev, fullName: error }));
+                    setLocalErrors(prev => ({ ...prev, fullName: error }));
                   }}
                 />
                 {errors.fullName && (
-                  <p className="mt-1 text-sm text-red-500">{errors.fullName}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.fullName}</p>
                 )}
               </div>
               
               {/* Fonction */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fonction
+                  Poste / Fonction <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
-                  className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm"
-                  placeholder="Développeur Web"
-                  value={signatureData.jobTitle}
-                  onChange={(e) => updateSignatureData('jobTitle', e.target.value)}
+                  className={`w-full h-10 px-3 py-2 border ${errors.jobTitle ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent text-base placeholder:text-sm`}
+                  placeholder="Ex: Fondateur & CEO"
+                  value={signatureData.jobTitle || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    updateSignatureData('jobTitle', value);
+                    const error = validateJobTitle(value);
+                    setLocalErrors(prev => ({ ...prev, jobTitle: error }));
+                  }}
+                  onBlur={(e) => {
+                    const error = validateJobTitle(e.target.value);
+                    setLocalErrors(prev => ({ ...prev, jobTitle: error }));
+                  }}
                 />
+                {errors.jobTitle && (
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.jobTitle}</p>
+                )}
               </div>
               
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="email" 
@@ -242,15 +278,15 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     const value = e.target.value;
                     updateSignatureData('email', value);
                     const error = validateEmail(value);
-                    setErrors(prev => ({ ...prev, email: error }));
+                    setLocalErrors(prev => ({ ...prev, email: error }));
                   }}
                   onBlur={(e) => {
                     const error = validateEmail(e.target.value);
-                    setErrors(prev => ({ ...prev, email: error }));
+                    setLocalErrors(prev => ({ ...prev, email: error }));
                   }}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.email}</p>
                 )}
               </div>
               
@@ -268,15 +304,15 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     const value = e.target.value;
                     updateSignatureData('phone', value);
                     const error = validatePhone(value);
-                    setErrors(prev => ({ ...prev, phone: error }));
+                    setLocalErrors(prev => ({ ...prev, phone: error }));
                   }}
                   onBlur={(e) => {
                     const error = validatePhone(e.target.value);
-                    setErrors(prev => ({ ...prev, phone: error }));
+                    setLocalErrors(prev => ({ ...prev, phone: error }));
                   }}
                 />
                 {errors.phone && (
-                  <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.phone}</p>
                 )}
               </div>
               
@@ -294,21 +330,21 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     const value = e.target.value;
                     updateSignatureData('mobilePhone', value);
                     const error = validatePhone(value);
-                    setErrors(prev => ({ ...prev, mobilePhone: error }));
+                    setLocalErrors(prev => ({ ...prev, mobilePhone: error }));
                   }}
                   onBlur={(e) => {
                     const error = validatePhone(e.target.value);
-                    setErrors(prev => ({ ...prev, mobilePhone: error }));
+                    setLocalErrors(prev => ({ ...prev, mobilePhone: error }));
                   }}
                 />
                 {errors.mobilePhone && (
-                  <p className="mt-1 text-sm text-red-500">{errors.mobilePhone}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.mobilePhone}</p>
                 )}
               </div>
               
               {/* Section pour les options d'affichage des icônes */}
-              <div className="col-span-2 mt-4">
-                <div className="border-t border-gray-200 pt-4">
+              <div className="col-span-2 my-8">
+                <div className="border-t border-gray-200 pt-8">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">Options d'affichage des icônes</h4>
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <div>

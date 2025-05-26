@@ -20,15 +20,21 @@ export const useSaveSignature = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { validateSignature, errors, resetErrors } = useSignatureValidation();
   
+  // État pour suivre s'il y a eu une erreur côté serveur
+  const [serverError, setServerError] = useState<string | null>(null);
+
   // Mutation pour créer une signature
   const [createSignature] = useMutation(CREATE_EMAIL_SIGNATURE, {
     onCompleted: () => {
       Notification.success('Signature créée avec succès');
       setIsLoading(false);
+      setServerError(null);
     },
     onError: (error) => {
-      Notification.error(`Erreur lors de la création de la signature: ${error.message}`);
+      const errorMessage = `Erreur lors de la création de la signature: ${error.message}`;
+      Notification.error(errorMessage);
       setIsLoading(false);
+      setServerError(errorMessage);
     },
     refetchQueries: ['GetEmailSignatures']
   });
@@ -38,10 +44,13 @@ export const useSaveSignature = () => {
     onCompleted: () => {
       Notification.success('Signature mise à jour avec succès');
       setIsLoading(false);
+      setServerError(null);
     },
     onError: (error) => {
-      Notification.error(`Erreur lors de la mise à jour de la signature: ${error.message}`);
+      const errorMessage = `Erreur lors de la mise à jour de la signature: ${error.message}`;
+      Notification.error(errorMessage);
       setIsLoading(false);
+      setServerError(errorMessage);
     },
     refetchQueries: ['GetEmailSignatures']
   });
@@ -256,6 +265,8 @@ export const useSaveSignature = () => {
   const saveSignature = async (data: SignatureData, id?: string) => {
     setIsLoading(true);
     resetErrors();
+    // Réinitialiser les erreurs côté serveur
+    setServerError(null);
     
     // Déclencher un événement personnalisé pour s'assurer que les données sont à jour
     // Utiliser une variable locale pour éviter les boucles infinies
@@ -275,7 +286,6 @@ export const useSaveSignature = () => {
         }, 100);
       }
     }
-    
     
     // Valider les données avant l'enregistrement
     const isValid = validateSignature(data);
@@ -314,25 +324,67 @@ export const useSaveSignature = () => {
       
       // Préparation des données terminée, prêt pour l'envoi à l'API
       
-      if (id) {
-        // Mise à jour d'une signature existante
-        await updateSignature({
-          variables: {
-            id,
-            input
+      // Utiliser une promesse pour capturer les erreurs côté serveur
+      return new Promise<boolean>((resolve) => {
+        // Créer une variable pour suivre si une erreur a été détectée
+        let hasError = false;
+        
+        // Fonction pour vérifier les erreurs après un délai
+        const checkForErrors = () => {
+          setTimeout(() => {
+            // Vérifier si une erreur côté serveur a été détectée
+            if (serverError) {
+              console.log('Erreur côté serveur détectée:', serverError);
+              hasError = true;
+              resolve(false);
+            } else if (!hasError) {
+              // Aucune erreur, la sauvegarde a réussi
+              resolve(true);
+            }
+          }, 200); // Attendre un peu plus longtemps pour s'assurer que les callbacks onError ont eu le temps de s'exécuter
+        };
+        
+        try {
+          // Exécuter la mutation appropriée
+          if (id) {
+            // Mise à jour d'une signature existante
+            updateSignature({
+              variables: {
+                id,
+                input
+              }
+            })
+            .then(() => checkForErrors())
+            .catch((error) => {
+              console.error('Erreur lors de la mise à jour de la signature:', error);
+              hasError = true;
+              resolve(false);
+            });
+          } else {
+            // Création d'une nouvelle signature
+            createSignature({
+              variables: {
+                input
+              }
+            })
+            .then(() => checkForErrors())
+            .catch((error) => {
+              console.error('Erreur lors de la création de la signature:', error);
+              hasError = true;
+              resolve(false);
+            });
           }
-        });
-      } else {
-        // Création d'une nouvelle signature
-        await createSignature({
-          variables: {
-            input
-          }
-        });
-      }
-      
-      return true;
+        } catch (error) {
+          // Erreur lors de l'exécution de la mutation
+          console.error('Erreur lors de l\'enregistrement de la signature:', error);
+          Notification.error(`Erreur lors de l'enregistrement de la signature: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+          setIsLoading(false);
+          hasError = true;
+          resolve(false);
+        }
+      });
     } catch (error) {
+      // Erreur générale (hors mutation)
       console.error('Erreur lors de l\'enregistrement de la signature:', error);
       Notification.error(`Erreur lors de l'enregistrement de la signature: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
       setIsLoading(false);

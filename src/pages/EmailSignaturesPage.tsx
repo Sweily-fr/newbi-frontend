@@ -5,6 +5,7 @@ import { Personalcard, Instagram, Paintbucket, Grid5, AddCircle, Sms, ArrowLeft 
 import { NavigationSidebar } from '../components/common/NavigationSidebar/NavigationSidebar';
 import { useSignatureProgress } from '../features/email-signatures/hooks/useSignatureProgress';
 import { useSaveSignature } from '../features/email-signatures/hooks';
+import { useSignatureValidation } from '../features/email-signatures/hooks/useSignatureValidation';
 import { SignatureData } from '../features/email-signatures/types';
 import { useMutation, useQuery } from '@apollo/client';
 import { DELETE_EMAIL_SIGNATURE, SET_DEFAULT_EMAIL_SIGNATURE, GET_EMAIL_SIGNATURES } from '../graphql/emailSignatures';
@@ -32,17 +33,35 @@ const EmailSignaturesPage: React.FC = () => {
   // État pour stocker la signature sélectionnée pour édition
   const [selectedSignature, setSelectedSignature] = useState<EmailSignature | null>(null);
   
-  // Hook pour sauvegarder la signature
-  const { saveSignature, isLoading: saveLoading, validationErrors } = useSaveSignature();
+  // Hooks pour la validation et la sauvegarde des signatures
+  const { saveSignature } = useSaveSignature();
+  const { validateSignature, errors } = useSignatureValidation();
   
   // Fonction pour gérer l'enregistrement de la signature
   const handleSave = async (data: SignatureData) => {
+    // Récupérer les signatures existantes pour vérifier les doublons
+    const existingSignatures = signaturesData?.emailSignatures?.signatures || [];
     
+    // Effectuer une validation préalable avant d'exécuter saveSignature
+    // Passer les signatures existantes et l'ID de la signature en cours d'édition
+    const isValid = validateSignature(data, existingSignatures, selectedSignature?.id);
+    
+    // Si la validation échoue, afficher une notification et rester sur le formulaire
+    if (!isValid) {
+      Notification.error('Veuillez corriger les erreurs dans le formulaire');
+      console.log('Erreurs de validation:', errors);
+      return;
+    }
+    
+    
+    // Si success est false, cela signifie qu'il y a eu une erreur lors de la sauvegarde
+    // Si la validation réussit, procéder à la sauvegarde
     // Si une signature est sélectionnée pour édition, transmettre son ID
     const success = await saveSignature(data, selectedSignature?.id);
-    
+
+    // Si success est true, nous pouvons changer de composant
     if (success) {
-      // Réinitialiser le formulaire et afficher la liste des signatures
+      // Réinitialiser le formulaire et afficher la liste des signatures seulement si la sauvegarde a réussi
       setShowForm(false);
       setSelectedSignature(null); // Réinitialiser la signature sélectionnée
       
@@ -50,8 +69,10 @@ const EmailSignaturesPage: React.FC = () => {
       refetch();
       
       // Faire défiler la page vers le haut avec une animation fluide
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0 });
     }
+    // Si success est false, nous ne changeons pas de composant et restons sur le formulaire
+    // Les erreurs de validation sont déjà affichées par le hook useSaveSignature
   };
   
   // Fonction pour annuler l'édition
