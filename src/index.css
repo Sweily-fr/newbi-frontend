@@ -115,6 +115,20 @@
     animation: pulse-width 2s ease-in-out infinite;
   }
   
+  /* Animation pour l'icône de maintenance */
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 4s linear infinite;
+  }
+  
   /* Classe pour limiter le nombre de lignes de texte */
   .line-clamp-2 {
     display: -webkit-box;

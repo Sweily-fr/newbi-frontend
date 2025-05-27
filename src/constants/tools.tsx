@@ -11,6 +11,7 @@ export interface Tool {
   href: string;
   premium?: boolean;
   comingSoon?: boolean;
+  maintenance?: boolean;
 }
 
 // Liste des outils disponibles dans l'application
@@ -34,6 +35,7 @@ export const TOOLS: Tool[] = [
     name: "Signature Email",
     description: "Créez des signatures email professionnelles personnalisées",
     category: "Communication",
+    maintenance: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
