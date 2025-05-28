@@ -272,28 +272,84 @@ export const isComplexWord = async (word: string): Promise<boolean> => {
   return false;
 };
 
+// Liste des balises à conserver (mise en forme, titres, listes, etc.)
+const ALLOWED_TAGS = ['b', 'strong', 'i', 'em', 'u', 's', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote'];
+
 /**
- * Normalise le contenu HTML en remplaçant les &nbsp; par des espaces normaux
- * et en s'assurant que le texte est correctement structuré avec des balises <p>
+ * Normalise le contenu HTML en structurant le texte en paragraphes
+ * et en ne conservant que les balises de mise en forme essentielles
  * @param content Le contenu HTML à normaliser
- * @returns Le contenu HTML normalisé
+ * @returns Le contenu HTML normalisé avec des paragraphes
  */
 export const normalizeContent = (content: string): string => {
-  // Remplacer tous les &nbsp; par des espaces normaux
-  let normalizedContent = content.replace(/&nbsp;/g, ' ');
-  
-  // Vérifier si le contenu est déjà enveloppé dans des balises <p>
-  if (!normalizedContent.trim().startsWith('<p>')) {
-    // Si le contenu est dans une div, remplacer div par p
-    if (normalizedContent.trim().startsWith('<div>') && normalizedContent.trim().endsWith('</div>')) {
-      normalizedContent = normalizedContent.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
-    } else {
-      // Sinon, envelopper tout le contenu dans des balises <p>
-      normalizedContent = `<p>${normalizedContent}</p>`;
-    }
+  if (!content || typeof content !== 'string') {
+    return '';
   }
-  
-  return normalizedContent;
+
+  // 1. Créer un élément DOM temporaire pour parser le HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = content;
+
+  // 2. Fonction récursive pour traverser et nettoyer les nœuds
+  const processNode = (node: Node): string => {
+    // Si c'est un nœud texte, retourner son contenu
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent || '';
+    }
+
+    // Si ce n'est pas un élément, ignorer
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return '';
+    }
+
+    const element = node as HTMLElement;
+    const tagName = element.tagName.toLowerCase();
+    
+    // 3. Si c'est une balise autorisée, la conserver
+    if (ALLOWED_TAGS.includes(tagName)) {
+      // Traiter les enfants récursivement
+      const children = Array.from(element.childNodes).map(processNode).join('');
+      return `<${tagName}${element.id ? ` id="${element.id}"` : ''}${element.className ? ` class="${element.className}"` : ''}>${children}</${tagName}>`;
+    }
+    
+    // 4. Si c'est un div ou p, traiter les enfants sans ajouter de balise supplémentaire
+    if (tagName === 'div' || tagName === 'p') {
+      return Array.from(element.childNodes).map(processNode).join('');
+    }
+    
+    // 5. Pour les autres balises non autorisées, ne conserver que le contenu
+    return Array.from(element.childNodes).map(processNode).join('');
+  };
+
+  // 6. Traiter chaque nœud enfant de l'élément racine
+  const processedContent = Array.from(tempDiv.childNodes)
+    .map(processNode)
+    .join('')
+    .trim();
+
+  // 7. Si le contenu est vide, retourner une chaîne vide
+  if (!processedContent) {
+    return '';
+  }
+
+  // 8. Diviser le contenu en paragraphes basés sur les sauts de ligne
+  const paragraphs = processedContent
+    .split(/\n{2,}/) // Diviser sur deux sauts de ligne ou plus
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+
+  // 9. Si pas de paragraphes, retourner une chaîne vide
+  if (paragraphs.length === 0) {
+    return '';
+  }
+
+  // 10. Si un seul paragraphe, le retourner directement
+  if (paragraphs.length === 1) {
+    return paragraphs[0];
+  }
+
+  // 11. Sinon, envelopper chaque paragraphe dans des balises <p>
+  return paragraphs.map(p => `<p>${p}</p>`).join('');
 };
 
 /**
