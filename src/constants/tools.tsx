@@ -35,7 +35,7 @@ export const TOOLS: Tool[] = [
     name: "Signature Email",
     description: "Créez des signatures email professionnelles personnalisées",
     category: "Marketing & Communication",
-    maintenance: true,
+    // maintenance: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
@@ -183,58 +183,6 @@ export const TOOLS: Tool[] = [
       </div>
     ),
     href: "/gestion-tresorerie",
-  },
-];
-
-// Outils pour la page d'accueil (format moderne avec le nouveau design)
-export const HOME_TOOLS = [
-  {
-    id: "invoices",
-    name: "Factures",
-    description: "Créez et gérez vos factures en quelques clics",
-    category: "Finances",
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <svg
-          className="h-7 w-7"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="#5b50ff"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      </div>
-    ),
-    href: "/factures",
-  },
-  {
-    id: "quotes",
-    name: "Devis",
-    description: "Créez et suivez vos devis clients",
-    category: "Finances",
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <svg
-          className="h-7 w-7"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="#5b50ff"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-          />
-        </svg>
-      </div>
-    ),
-    href: "/devis",
   },
 ];
 
