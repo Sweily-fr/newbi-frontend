@@ -1,4 +1,4 @@
-import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools } from "iconsax-react";
+import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools, MoneySend, Document, MoneyChange, Receipt2 } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -21,7 +21,7 @@ export const TOOLS: Tool[] = [
     name: "Articles SEO",
     description:
       "Analysez et améliorez le référencement de vos articles de blog",
-    category: "Marketing",
+    category: "Marketing & Communication",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
@@ -34,7 +34,7 @@ export const TOOLS: Tool[] = [
     id: "email-signature",
     name: "Signature Email",
     description: "Créez des signatures email professionnelles personnalisées",
-    category: "Communication",
+    category: "Marketing & Communication",
     maintenance: true,
     premium: true,
     icon: (
@@ -49,7 +49,7 @@ export const TOOLS: Tool[] = [
     name: "Factures",
     description:
       "Créez et gérez vos factures professionnelles en quelques clics",
-    category: "Facturation",
+    category: "Finances",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
@@ -63,7 +63,7 @@ export const TOOLS: Tool[] = [
     name: "Devis",
     description:
       "Créez et suivez vos devis clients avec des modèles professionnels",
-    category: "Facturation",
+    category: "Finances",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
@@ -103,7 +103,7 @@ export const TOOLS: Tool[] = [
     name: "Transfert de fichiers volumineux",
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
-    category: "À venir",
+    category: "Productivité",
     comingSoon: true,
     premium: true,
     icon: (
@@ -118,7 +118,7 @@ export const TOOLS: Tool[] = [
     name: "Gestion des tâches",
     description:
       "Gérez vos tâches et vos projets avec des outils simples et efficaces",
-    category: "À venir",
+    category: "Productivité",
     comingSoon: true,
     premium: true,
     icon: (
@@ -128,6 +128,62 @@ export const TOOLS: Tool[] = [
     ),
     href: "/gestion-taches",
   },
+  {
+    id: "depenses",
+    name: "Dépenses",
+    description: "Suivez et gérez vos dépenses professionnelles facilement",
+    category: "Finances",
+    comingSoon: true,
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
+        <MoneySend size="28" variant="Bold" color="#5b50ff" />
+      </div>
+    ),
+    href: "/depenses",
+  },
+  {
+    id: "signature-electronique",
+    name: "Signature électronique",
+    description: "Signez et faites signer vos documents en ligne de manière sécurisée",
+    category: "Finances",
+    comingSoon: true,
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
+        <Document size="28" variant="Bold" color="#5b50ff" />
+      </div>
+    ),
+    href: "/signature-electronique",
+  },
+  {
+    id: "bon-de-commande",
+    name: "Bon de commande",
+    description: "Créez et gérez vos bons de commande professionnels",
+    category: "Finances",
+    comingSoon: true,
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
+        <Receipt2 size="28" variant="Bold" color="#5b50ff" />
+      </div>
+    ),
+    href: "/bon-de-commande",
+  },
+  {
+    id: "gestion-tresorerie",
+    name: "Gestion de trésorerie",
+    description: "Suivez et anticipez vos flux de trésorerie pour une meilleure gestion financière",
+    category: "Finances",
+    comingSoon: true,
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
+        <MoneyChange size="28" variant="Bold" color="#5b50ff" />
+      </div>
+    ),
+    href: "/gestion-tresorerie",
+  },
 ];
 
 // Outils pour la page d'accueil (format moderne avec le nouveau design)
@@ -136,7 +192,7 @@ export const HOME_TOOLS = [
     id: "invoices",
     name: "Factures",
     description: "Créez et gérez vos factures en quelques clics",
-    category: "Facturation",
+    category: "Finances",
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
         <svg
@@ -160,7 +216,7 @@ export const HOME_TOOLS = [
     id: "quotes",
     name: "Devis",
     description: "Créez et suivez vos devis clients",
-    category: "Facturation",
+    category: "Finances",
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
         <svg

@@ -31,6 +31,7 @@ import {
   ShoppingBag,
   User,
   Verify,
+  Link21,
 } from "iconsax-react";
 
 export const ProfilePage = () => {
@@ -181,6 +182,28 @@ export const ProfilePage = () => {
         </div>
       ),
     });
+    
+    // Ajouter l'onglet Intégrations pour les utilisateurs premium
+    tabs.push({
+      id: "integrations",
+      label: "Intégrations",
+      icon: (
+        <div className="flex items-center justify-between w-full">
+          <Link21
+            size="20"
+            variant="Linear"
+            color={getIconColor("integrations")}
+            className="w-5 h-5"
+          />
+          <Verify
+            size="20"
+            variant="Bold"
+            color="#FFD700"
+            className="w-5 h-5 ml-4 absolute right-8"
+          />
+        </div>
+      ),
+    });
   } else {
     // Pour les utilisateurs non premium, ajouter un onglet désactivé
     tabs.push({
@@ -242,6 +265,28 @@ export const ProfilePage = () => {
             size="20"
             variant="Linear"
             color={getIconColor("clients_locked")}
+            className="w-4 h-4 text-gray-400 ml-4"
+          />
+        </div>
+      ),
+    });
+    
+    // Ajouter l'onglet Intégrations désactivé pour les utilisateurs non premium
+    tabs.push({
+      id: "integrations_locked",
+      label: "Intégrations",
+      icon: (
+        <div className="flex items-center justify-between w-full">
+          <Link21
+            size="20"
+            variant="Linear"
+            color={getIconColor("integrations_locked")}
+            className="w-5 h-5"
+          />
+          <Lock1
+            size="20"
+            variant="Linear"
+            color={getIconColor("integrations_locked")}
             className="w-4 h-4 text-gray-400 ml-4"
           />
         </div>
@@ -508,7 +553,8 @@ export const ProfilePage = () => {
 
             {(activeTab === "company_locked" ||
               activeTab === "products_locked" ||
-              activeTab === "clients_locked") && (
+              activeTab === "clients_locked" ||
+              activeTab === "integrations_locked") && (
               <div className="bg-white shadow-sm rounded-2xl">
                 <div className="px-4 py-5 sm:p-6 flex flex-col items-center justify-center text-center">
                   <CheckBadgeIcon className="w-12 h-12 text-yellow-500 mb-4" />
@@ -520,7 +566,9 @@ export const ProfilePage = () => {
                       ? "La gestion des informations de votre entreprise est disponible uniquement pour les comptes Premium."
                       : activeTab === "products_locked"
                       ? "La gestion du catalogue de produits et services est disponible uniquement pour les comptes Premium."
-                      : "La gestion des clients est disponible uniquement pour les comptes Premium."}
+                      : activeTab === "clients_locked"
+                      ? "La gestion des clients est disponible uniquement pour les comptes Premium."
+                      : "La gestion des intégrations avec d'autres services est disponible uniquement pour les comptes Premium."}
                   </p>
                   <Button
                     onClick={() => setIsPremiumModalOpen(true)}
