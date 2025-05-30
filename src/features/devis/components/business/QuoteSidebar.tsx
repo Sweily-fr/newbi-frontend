@@ -61,8 +61,15 @@ type SidebarQuote = Omit<Quote, "status"> & {
   issueDate: string;
   totalHT: number;
   totalTTC: number;
+  totalVAT: number;
   finalTotalHT: number;
   finalTotalTTC: number;
+  discountAmount?: number;
+  vatRates?: Array<{
+    rate: number;
+    amount: number;
+    baseAmount: number;
+  }>;
   client: {
     name: string;
     email?: string;
@@ -168,6 +175,23 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
 
   // Fonction pour calculer les totaux et les détails des TVA
   const calculateTotals = () => {
+    // Utiliser directement les totaux du devis s'ils existent
+    if (quote?.finalTotalHT !== undefined && quote?.finalTotalTTC !== undefined && quote?.totalVAT !== undefined) {
+      // S'assurer que le TTC est toujours supérieur au HT
+      const finalTotalTTC = Math.max(quote.finalTotalTTC, quote.finalTotalHT + (quote.totalVAT || 0));
+      
+      return {
+        subtotal: quote.totalHT || 0,
+        totalVAT: quote.totalVAT || 0,
+        totalWithoutVAT: quote.finalTotalHT || 0,
+        totalWithVAT: finalTotalTTC,
+        totalDiscount: quote.discountAmount || 0,
+        finalTotalHT: quote.finalTotalHT || 0,
+        finalTotalTTC: finalTotalTTC,
+        vatRates: quote.vatRates || [],
+      };
+    }
+    
     // Calculer les détails des différentes TVA à partir des items
     const vatDetails: Record<
       number,
@@ -202,11 +226,14 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         subtotal = quote.totalHT || 0;
         totalVAT = quote.totalVAT || 0;
         totalWithoutVAT = quote.finalTotalHT || quote.totalHT || 0;
-        totalWithVAT = quote.finalTotalTTC || quote.totalTTC || 0;
+        totalWithVAT = Math.max(
+          quote.finalTotalTTC || quote.totalTTC || 0,
+          totalWithoutVAT + totalVAT
+        );
         totalDiscount = quote.discountAmount || 0;
       }
     } else {
-      // Parcourir les items pour calculer les montants par taux de TVA
+      // Parcourir les items pour calculer le sous-total
       quote.items.forEach((item: QuoteItem) => {
         const itemHT = item.quantity * item.unitPrice;
         subtotal += itemHT;
@@ -225,10 +252,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
           totalDiscount += itemDiscountAmount;
         }
 
-        const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
-        totalVAT += itemVAT;
-
-        // Ajouter les détails de TVA pour ce taux
+        // Initialiser les détails de TVA pour ce taux
         if (!vatDetails[item.vatRate]) {
           vatDetails[item.vatRate] = {
             rate: item.vatRate,
@@ -236,23 +260,47 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             baseAmount: 0,
           };
         }
-        vatDetails[item.vatRate].amount += itemVAT;
         vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
       });
 
       // Appliquer la remise globale si elle existe
+      const baseAfterItemDiscounts = subtotal - totalDiscount;
       let globalDiscountAmount = 0;
+      
       if (quote.discount && quote.discount > 0) {
         if (quote.discountType === "PERCENTAGE") {
-          globalDiscountAmount = (subtotal - totalDiscount) * (quote.discount / 100);
+          globalDiscountAmount = baseAfterItemDiscounts * (quote.discount / 100);
         } else {
-          globalDiscountAmount = Math.min(subtotal - totalDiscount, quote.discount);
+          globalDiscountAmount = Math.min(baseAfterItemDiscounts, quote.discount);
         }
         totalDiscount += globalDiscountAmount;
       }
-
-      // Calculer les totaux finaux
+      
+      // Calculer la base imposable finale après toutes les remises
       totalWithoutVAT = subtotal - totalDiscount;
+      
+      // Appliquer la remise globale proportionnellement à chaque base de TVA
+      if (globalDiscountAmount > 0 && baseAfterItemDiscounts > 0) {
+        const discountRatio = globalDiscountAmount / baseAfterItemDiscounts;
+        
+        // Ajuster les bases de TVA en fonction de la remise globale
+        Object.keys(vatDetails).forEach((rateKey) => {
+          const rate = Number(rateKey);
+          const detail = vatDetails[rate];
+          detail.baseAmount = detail.baseAmount * (1 - discountRatio);
+        });
+      }
+      
+      // Calculer la TVA sur les bases ajustées
+      totalVAT = 0;
+      Object.keys(vatDetails).forEach((rateKey) => {
+        const rate = Number(rateKey);
+        const detail = vatDetails[rate];
+        detail.amount = detail.baseAmount * (rate / 100);
+        totalVAT += detail.amount;
+      });
+      
+      // Calculer le total TTC en s'assurant qu'il est supérieur au HT
       totalWithVAT = totalWithoutVAT + totalVAT;
     }
 
@@ -490,20 +538,6 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                         );
                       });
                     })()}
-
-                  {/* Si pas de factures liées, afficher les boutons normaux avec le nouveau style */}
-                  {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) &&
-                    statusActions.map((action, index) => {
-                      // Déterminer la couleur et l'icône en fonction de l'action
-                      let buttonClass = "";
-                      let icon = null;
-                      
-                      if (action.color === "primary") {
-                        buttonClass = "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                        icon = <Money size={20} color="#fff" className="mr-2" variant="Linear" />;
-                      } else if (action.color === "green") {
-                        buttonClass = "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                        icon = <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />;
                       } else {
                         buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
                         icon = <ArrowRight size={20} color="#5b50ff" className="mr-2" variant="Linear" />;

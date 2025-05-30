@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { CompanyInfo } from "../../../../types";
 import { Quote } from "../../../devis/types/quote";
 import { Client } from "../../../clients/types/client";
@@ -7,6 +7,7 @@ import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
 import { getTransactionCategoryDisplayText } from "../../../../utils/transactionCategoryUtils";
 import { formatIban } from "../../../../utils/ibanFormatter";
 import { PDFGenerator, Loader } from "../../../../components/";
+import { useCalculateTotals } from "../../hooks/useCalculateTotals";
 
 interface QuotePreviewProps {
   quote: Partial<Quote>;
@@ -44,8 +45,21 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
   useBankDetails,
   showActionButtons = true,
 }) => {
-  // Calculer les totaux si la fonction est fournie
-  const totals = calculateTotals ? calculateTotals() : null;
+  // Utiliser notre hook personnalisé pour calculer les totaux avec précision
+  const { calculateTotals: calculateExactTotals } = useCalculateTotals();
+  
+  // Calculer les totaux avec notre fonction précise ou utiliser celle fournie en prop
+  const totals = useMemo(() => {
+    // Si une fonction de calcul est fournie en prop, l'utiliser
+    if (calculateTotals) {
+      return calculateTotals();
+    }
+    // Sinon, utiliser notre fonction de calcul précise
+    if (quote.items && quote.items.length > 0) {
+      return calculateExactTotals(quote.items, quote.discount || 0, quote.discountType || 'PERCENTAGE');
+    }
+    return null;
+  }, [calculateTotals, calculateExactTotals, quote.items, quote.discount, quote.discountType]);
   // Fonction pour formater les dates
   const formatDate = (dateInput?: string | null) => {
     if (!dateInput) return "";
@@ -474,7 +488,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
                     data-pdf-total-item="true"
                   >
                     <span>TVA</span>
-                    <span>{formatAmount(quote.totalVAT || 0)}</span>
+                    <span>{formatAmount(totals ? totals.totalVAT : (quote.totalVAT || 0))}</span>
                   </div>
                 );
               }
