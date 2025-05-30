@@ -373,7 +373,7 @@ export const ProfilePage = () => {
         title="Mon Espace | Newbi"
         description="Gérez vos informations personnelles et professionnelles"
         keywords="mon espace, espace personnel, espace professionnel, gestion espace, espace Newbi"
-        canonicalUrl="https://newbi.fr/profile"
+        canonicalUrl="https://www.newbi.fr/profile"
       />
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8 flex justify-between items-start">
