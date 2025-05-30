@@ -750,24 +750,19 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
               <Clock size={18} className="mr-2 text-[#5b50ff]" color="#5b50ff" variant="Bold" />
               À encaisser
             </button>
-            <dl className="space-y-4">
-              <div className="flex">
-                <dt className="text-gray-500 w-48 flex-shrink-0 text-left">Date d'émission :</dt>
+            <div className="border-b mt-6"></div>
+            <dl className="space-y-8">
+              <div className="flex mt-8">
+                <dt className="text-gray-500 w-52 flex-shrink-0 text-left">Date d'émission :</dt>
                 <dd className="text-gray-900">{formatDate(quote.issueDate)}</dd>
               </div>
               
               {quote.validUntil && (
                 <div className="flex">
-                  <dt className="text-gray-500 w-48 flex-shrink-0 text-left">Date d'échéance :</dt>
+                  <dt className="text-gray-500 w-52 flex-shrink-0 text-left">Date d'échéance :</dt>
                   <dd className="text-gray-900">{formatDate(quote.validUntil)}</dd>
                 </div>
               )}
-            </dl>
-          </div>
-
-          {/* Informations client */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <dl className="space-y-4">
               <div className="flex">
                 <dt className="text-gray-500 w-52 flex-shrink-0 text-left">Client :</dt>
                 <dd className="text-gray-900 font-medium">{quote.client.name}</dd>
