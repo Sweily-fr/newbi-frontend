@@ -85,11 +85,12 @@ export const Navbar = () => {
 
   // Créer un tableau d'éléments pour le dropdown
   const dropdownItems = [
-    // Tableau de bord
+    // Tableau de bord (désactivé)
     {
       label: "Tableau de bord",
-      onClick: () => navigate("/"),
-      icon: <HomeTrendUp size="20" variant="Linear" color="#5b50ff" />,
+      onClick: () => {}, // Fonction vide pour désactiver la navigation
+      icon: <HomeTrendUp size="20" variant="Linear" color="#c7c7c7" />,
+      disabled: true, // Marquer comme désactivé
     },
     // Profil utilisateur
     {
@@ -190,13 +191,13 @@ export const Navbar = () => {
               <div className="hidden md:flex md:items-center space-x-5">
                 {isAuthenticated && (
                   <>
-                    <Link
-                      to="/"
-                      className="text-sm font-medium text-[#5b50ff] hover:text-[#5b50ff] flex items-center space-x-2"
+                    <span
+                      className="text-sm font-medium text-gray-400 cursor-not-allowed flex items-center space-x-2"
+                      title="Fonctionnalité à venir"
                     >
-                      <HomeTrendUp size={20} color="#5b50ff" variant="Bold" className="mr-2" />
+                      <HomeTrendUp size={20} color="#c7c7c7" variant="Bold" className="mr-2" />
                       Tableau de bord
-                    </Link>
+                    </span>
                     <Button
                       variant="outline"
                       size="md"
