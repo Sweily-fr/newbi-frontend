@@ -443,7 +443,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
       {/* Prévisualisation de la facture */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[999] border-r border-gray-100 transition-all duration-500 ${
+          className={`fixed top-0 left-0 h-full w-[55%] 2xl:w-[65%] bg-gray-50 z-[999] border-r border-gray-100 transition-all duration-500 ${
             isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
           }`}
           style={{
@@ -480,7 +480,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         title={`Facture ${invoice.prefix}${invoice.number}`}
-        width="w-1/2"
+        width="w-[45%] 2xl:w-[35%]"
         position="right"
         actions={actions}
         className="custom-scrollbar bg-white shadow-xl"

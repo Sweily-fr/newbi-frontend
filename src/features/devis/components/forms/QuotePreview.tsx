@@ -160,7 +160,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
       <div
         className="p-6 max-w-full"
         style={{
-          minHeight: "calc(100vh - 120px)",
+          minHeight: "calc(80vh - 120px)",
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
@@ -171,7 +171,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
       >
         {/* En-tête avec logo et infos entreprise */}
         <div className="flex justify-between mb-8" data-pdf-no-break="true">
-          <div className="w-24 h-24 flex justify-center items-center">
+          <div className="w-24 h-24 flex justify-start items-center">
             {companyInfo?.logo && (
               <img
                 src={
@@ -742,7 +742,7 @@ export const QuotePreview: React.FC<QuotePreviewProps> = ({
           </div>
         )}
         <div
-          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl pb-20"
+          className="mx-auto w-full sm:max-w-2xl p-5"
           style={{ height: "auto" }}
         >
           {documentContent}

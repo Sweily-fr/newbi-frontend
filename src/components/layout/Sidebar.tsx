@@ -113,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 ${positionClass} ${width} bg-white shadow-xl transform transition-all duration-400 ease-out z-[1000] ${transformClass} ${className}`}
+        className={`fixed inset-y-0 ${positionClass} ${width} bg-white border-l border-gray-100 transform transition-all duration-400 ease-out z-[1000] ${transformClass} ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="sidebar-title"

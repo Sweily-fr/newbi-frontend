@@ -409,7 +409,7 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
       {/* Prévisualisation du devis */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[999] transition-opacity duration-300 ${
+          className={`fixed top-0 left-0 h-full w-[55%] 2xl:w-[65%] bg-gray-50 z-[999] transition-opacity duration-300 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{ display: isOpen ? "block" : "none" }}
@@ -470,9 +470,9 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         title={`Devis ${quote.prefix}${quote.number}`}
-        width="w-1/2"
+        width="w-[45%] 2xl:w-[35%]"
         position="right"
-        className="custom-scrollbar bg-white shadow-xl"
+        className="custom-scrollbar bg-white"
         actions={
           <>
             {/* Contenu détaillé - affiché uniquement si showStatusDetails est true */}

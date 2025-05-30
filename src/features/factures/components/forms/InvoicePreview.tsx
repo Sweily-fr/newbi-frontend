@@ -196,7 +196,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       <div
         className="p-6 pb-0 max-w-full"
         style={{
-          minHeight: "calc(100vh - 120px)",
+          minHeight: "calc(80vh - 120px)",
           display: "flex",
           flexDirection: "column",
           pageBreakInside: "avoid",
@@ -207,7 +207,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       >
         {/* En-tête avec logo et infos entreprise */}
         <div className="flex justify-between mb-8">
-          <div className="w-24 h-24 flex justify-center items-center">
+          <div className="w-24 h-24 flex justify-start items-center">
             {companyInfo?.logo && (
               <img
                 src={`${import.meta.env.VITE_API_URL}/${companyInfo.logo}`}
@@ -760,7 +760,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
         )}
         <div
-          className="w-full sm:w-full md:w-full lg:w-full xl:w-full 2xl:w-full mx-auto max-w-4xl sm:max-w-5xl relative lg:max-w-6xl pb-20"
+          className="mx-auto w-full sm:max-w-2xl p-5"
           style={{ height: "auto" }}
         >
           {documentContent}
