@@ -9,10 +9,12 @@ import {
   invoiceTemplateArticle,
   quoteCreationArticle,
   businessToolsArticle,
-  digitalInvoiceArticle
+  digitalInvoiceArticle,
+  quoteVsOrderArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  quoteVsOrderArticle,
   invoiceArticle,
   excelQuoteArticle,
   businessManagementArticle,

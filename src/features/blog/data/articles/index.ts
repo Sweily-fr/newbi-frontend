@@ -9,3 +9,4 @@ export { invoiceTemplateArticle } from './invoiceTemplateArticle';
 export { quoteCreationArticle } from './quoteCreationArticle';
 export { businessToolsArticle } from './businessToolsArticle';
 export { digitalInvoiceArticle } from './digitalInvoiceArticle';
+export { quoteVsOrderArticle } from './quoteVsOrderArticle';
