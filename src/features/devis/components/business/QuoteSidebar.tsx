@@ -538,9 +538,23 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                         );
                       });
                     })()}
+                  
+                  {/* Afficher les boutons d'action normaux si pas de factures liées */}
+                  {(!quote.linkedInvoices || quote.linkedInvoices.length === 0) &&
+                    statusActions.map((action, index) => {
+                      // Déterminer la couleur et l'icône en fonction de l'action
+                      let buttonClass = "";
+                      let icon = null;
+                      
+                      if (action.color === "primary") {
+                        buttonClass = "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                        icon = <Money size={20} color="#fff" className="mr-2" variant="Linear" />;
+                      } else if (action.color === "green") {
+                        buttonClass = "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
+                        icon = <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />;
                       } else {
                         buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
-                        icon = <ArrowRight size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
+                        icon = <AddCircle size={20} color="#5b50ff" className="mr-2" variant="Linear" />;
                       }
                       
                       return (
@@ -558,7 +572,8 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                             <ArrowRight size={18} className="ml-2" variant="Bold" />}
                         </Button>
                       );
-                    })}
+                    })
+                  }
                 </div>
               </div>
             )}
