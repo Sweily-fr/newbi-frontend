@@ -6,6 +6,7 @@ import {
   ToolsPage,
   InvoicesPage,
   QuotesPage,
+  ExpensesPage,
   ForgotPasswordPage,
   ResetPasswordPage,
   VerifyEmail,
@@ -80,6 +81,14 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <QuotesPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.EXPENSES} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <ExpensesPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />

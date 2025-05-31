@@ -5,6 +5,7 @@ export { ProfilePage } from './ProfilePage';
 export { ToolsPage } from './ToolsPage';
 export { InvoicesPage } from './InvoicesPage';
 export { QuotesPage } from './QuotesPage';
+export { default as ExpensesPage } from './ExpensesPage';
 export { ForgotPasswordPage } from './ForgotPasswordPage';
 export { ResetPasswordPage } from './ResetPasswordPage';
 export { default as VerifyEmail } from './VerifyEmail';

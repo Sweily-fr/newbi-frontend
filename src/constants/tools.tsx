@@ -1,4 +1,4 @@
-import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools, MoneySend, Document, MoneyChange, Receipt2 } from "iconsax-react";
+import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools, Document, MoneyChange, Receipt2 } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -131,13 +131,12 @@ export const TOOLS: Tool[] = [
   {
     id: "depenses",
     name: "Dépenses",
-    description: "Suivez et gérez vos dépenses professionnelles facilement",
+    description: "Suivez et gérez vos dépenses professionnelles avec OCR",
     category: "Finances",
-    comingSoon: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <MoneySend size="28" variant="Bold" color="#5b50ff" />
+        <Receipt2 size="28" variant="Bold" color="#5b50ff" />
       </div>
     ),
     href: "/depenses",
