@@ -10,3 +10,4 @@ export { quoteCreationArticle } from './quoteCreationArticle';
 export { businessToolsArticle } from './businessToolsArticle';
 export { digitalInvoiceArticle } from './digitalInvoiceArticle';
 export { quoteVsOrderArticle } from './quoteVsOrderArticle';
+export { editInvoiceArticle } from './editInvoiceArticle';
