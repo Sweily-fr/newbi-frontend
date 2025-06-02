@@ -39,7 +39,7 @@ interface EmailSignaturePreviewProps {
   socialLinksIconStyle?: string;
   socialLinksIconColor?: string;
   socialLinks?: any;
-  textStyle?: string;
+  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
   iconTextSpacing?: number;
   // Props spécifiques à l'affichage
   showEmailIcon?: boolean;
@@ -145,7 +145,10 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const showLogo = signature?.showLogo !== undefined ? signature.showLogo : (propShowLogo !== undefined ? propShowLogo : true);
   // Déterminer si le logo doit être affiché
   const fontSize = signature?.fontSize || propFontSize || 14;
-  const textStyle = signature?.textStyle || propTextStyle || 'normal';
+  const textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough' = 
+    (signature?.textStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
+    (propTextStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
+    'normal';
   const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
   const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
 

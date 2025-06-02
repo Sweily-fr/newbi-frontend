@@ -156,18 +156,17 @@ export const TOOLS: Tool[] = [
     href: "/signature-electronique",
   },
   {
-    id: "bon-de-commande",
-    name: "Bon de commande",
+    id: "bons-de-commande",
+    name: "Bons de commande",
     description: "Créez et gérez vos bons de commande professionnels",
     category: "Finances",
-    comingSoon: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
         <Receipt2 size="28" variant="Bold" color="#5b50ff" />
       </div>
     ),
-    href: "/bon-de-commande",
+    href: "/bons-de-commande",
   },
   {
     id: "gestion-tresorerie",
