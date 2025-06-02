@@ -22,6 +22,7 @@ import {
   PrivacyPolicyGeneratorPage,
   BlogSeoOptimizerPage,
   EmailSignaturesPage,
+  FileTransferPage,
   NotFoundPage,
   BlogPage,
   BlogArticlePage,
@@ -110,6 +111,14 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         } />
 
+        <Route path={ROUTES.FILE_TRANSFER} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <FileTransferPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
         {/* Pages légales */}
         <Route path={ROUTES.LEGAL_NOTICE} element={<PublicRoute><LegalNoticePage /></PublicRoute>} />
         <Route path={ROUTES.LEGAL_NOTICE_GENERATOR} element={
@@ -133,6 +142,9 @@ export const AppRoutes = () => {
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
+        
+        {/* Route publique pour le téléchargement des fichiers partagés */}
+        <Route path={ROUTES.FILE_TRANSFER_DOWNLOAD} element={<PublicRoute><FileTransferPage /></PublicRoute>} />
         
         {/* Routes du blog */}
         <Route path={ROUTES.BLOG} element={<PublicRoute><BlogPage /></PublicRoute>} />

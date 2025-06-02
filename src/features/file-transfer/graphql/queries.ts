@@ -1,0 +1,85 @@
+import { gql } from '@apollo/client';
+
+export const MY_FILE_TRANSFERS = gql`
+  query MyFileTransfers {
+    myFileTransfers {
+      id
+      shareLink
+      accessKey
+      expiryDate
+      status
+      isPaymentRequired
+      paymentAmount
+      paymentCurrency
+      isPaid
+      downloadCount
+      createdAt
+      totalSize
+      files {
+        id
+        fileName
+        originalName
+        mimeType
+        size
+        filePath
+      }
+    }
+  }
+`;
+
+export const FILE_TRANSFER_BY_ID = gql`
+  query FileTransferById($id: ID!) {
+    fileTransferById(id: $id) {
+      id
+      shareLink
+      accessKey
+      expiryDate
+      status
+      isPaymentRequired
+      paymentAmount
+      paymentCurrency
+      isPaid
+      downloadCount
+      createdAt
+      totalSize
+      files {
+        id
+        fileName
+        originalName
+        mimeType
+        size
+        filePath
+      }
+    }
+  }
+`;
+
+export const GET_FILE_TRANSFER_BY_LINK = gql`
+  query GetFileTransferByLink($shareLink: String!, $accessKey: String!) {
+    getFileTransferByLink(shareLink: $shareLink, accessKey: $accessKey) {
+      success
+      message
+      fileTransfer {
+        id
+        files {
+          id
+          fileName
+          originalName
+          mimeType
+          size
+          filePath
+        }
+        totalSize
+        expiryDate
+        paymentInfo {
+          isPaymentRequired
+          paymentAmount
+          paymentCurrency
+          isPaid
+          checkoutUrl
+        }
+        isAccessible
+      }
+    }
+  }
+`;

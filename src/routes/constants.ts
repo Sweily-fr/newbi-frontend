@@ -21,6 +21,8 @@ export const ROUTES = {
   PRIVACY_POLICY: '/politique-de-confidentialite',
   PRIVACY_POLICY_GENERATOR: '/generator-politique-confidentialite',
   BLOG_SEO_OPTIMIZER: '/blog-seo-optimizer',
+  FILE_TRANSFER: '/file-transfer',
+  FILE_TRANSFER_DOWNLOAD: '/file-transfer/download',
   BLOG: '/blog',
   BLOG_ARTICLE: '/blog/:slug',
   TERMS: '/conditions-generales-de-vente',

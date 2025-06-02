@@ -104,14 +104,13 @@ export const TOOLS: Tool[] = [
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
     category: "Productivité",
-    comingSoon: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
         <Send2 size="28" variant="Bold" color="#5b50ff" />
       </div>
     ),
-    href: "/transfert-fichiers-volumineux",
+    href: "/file-transfer",
   },
   {
     id: "gestion-taches",
