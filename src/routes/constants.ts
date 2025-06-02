@@ -23,6 +23,8 @@ export const ROUTES = {
   BLOG_SEO_OPTIMIZER: '/blog-seo-optimizer',
   FILE_TRANSFER: '/file-transfer',
   FILE_TRANSFER_DOWNLOAD: '/file-transfer/download',
+  KANBAN: '/kanban',
+  KANBAN_BOARD: '/kanban/:boardId',
   BLOG: '/blog',
   BLOG_ARTICLE: '/blog/:slug',
   TERMS: '/conditions-generales-de-vente',

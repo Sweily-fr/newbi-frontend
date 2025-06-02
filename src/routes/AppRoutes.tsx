@@ -26,6 +26,7 @@ import {
   NotFoundPage,
   BlogPage,
   BlogArticlePage,
+  KanbanPage,
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -115,6 +116,22 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <FileTransferPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.KANBAN} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <KanbanPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.KANBAN_BOARD} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <KanbanPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />

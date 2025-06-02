@@ -26,3 +26,5 @@ export { default as NotFoundPage } from './NotFoundPage';
 // Nouvelles pages de blog
 export { default as BlogPage } from './BlogPage';
 export { default as BlogArticlePage } from './BlogArticlePage';
+// Page Kanban
+export { default as KanbanPage } from './KanbanPage';

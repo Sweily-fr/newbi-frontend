@@ -46,7 +46,7 @@ export * from './common/Card';
 export * from './common/Spinner';
 export * from './common/Notification';
 
-// export * from './common/Input';
+export * from './common/Input';
 
 // Export des composants de mise en page
 // export * from './layout/Header';

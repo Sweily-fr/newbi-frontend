@@ -114,18 +114,17 @@ export const TOOLS: Tool[] = [
   },
   {
     id: "gestion-taches",
-    name: "Gestion des tâches",
+    name: "Gestion des tâches Kanban",
     description:
-      "Gérez vos tâches et vos projets avec des outils simples et efficaces",
+      "Gérez vos tâches et vos projets avec un tableau Kanban intuitif et efficace",
     category: "Productivité",
-    comingSoon: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
         <Trello size="28" variant="Bold" color="#5b50ff" />
       </div>
     ),
-    href: "/gestion-taches",
+    href: "/kanban",
   },
   {
     id: "depenses",
