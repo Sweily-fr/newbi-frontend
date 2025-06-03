@@ -4,6 +4,7 @@ export { excelQuoteArticle } from './excelQuoteArticle';
 export { businessManagementArticle } from './businessManagementArticle';
 export { legalNoticeArticle } from './legalNoticeArticle';
 export { emailSignatureArticle } from './emailSignatureArticle';
+export { emailSignatureImportanceArticle } from './emailSignatureImportanceArticle';
 export { seoOptimizationArticle } from './seoOptimizationArticle';
 export { invoiceTemplateArticle } from './invoiceTemplateArticle';
 export { quoteCreationArticle } from './quoteCreationArticle';
