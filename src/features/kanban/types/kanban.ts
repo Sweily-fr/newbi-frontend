@@ -2,68 +2,76 @@
  * Types pour la fonctionnalité Kanban
  */
 
+/**
+ * Types aligned with backend schema
+ */
+
+// Renamed from KanbanUser to match backend schema
 export interface KanbanUser {
-  _id: string;
-  name: string;
+  id: string; // Changed from _id to id
+  // name field removed as it doesn't exist in the backend schema
   email: string;
-  avatar?: string;
+  // avatar field removed as it doesn't exist in the backend schema
 }
 
+// Renamed from KanbanComment to match backend schema
 export interface KanbanComment {
-  _id: string;
+  id: string; // Changed from _id to id
   content: string;
-  creator: KanbanUser;
+  // creator field removed as it doesn't exist in the backend schema
   createdAt: string;
-  updatedAt: string;
+  // updatedAt field removed as it doesn't exist in the backend schema
 }
 
+// Updated to match backend Attachment type
 export interface KanbanAttachment {
-  _id: string;
-  filename: string;
+  id: string;
+  name: string;
   url: string;
-  mimetype: string;
-  size: number;
-  creator: KanbanUser;
-  createdAt: string;
+  type: string;
 }
 
+// No changes needed
 export interface KanbanLabel {
   name: string;
   color: string;
 }
 
+// Updated to match backend Task type
 export interface KanbanTask {
-  _id: string;
+  id: string; // Changed from _id to id
   title: string;
   description?: string;
   status: string;
   order: number;
   dueDate?: string;
-  labels: KanbanLabel[];
+  labels: string[]; // Changed from KanbanLabel[] to string[] to match backend schema
   assignedTo?: KanbanUser;
   comments: KanbanComment[];
   attachments: KanbanAttachment[];
-  creator: KanbanUser;
+  // creator field removed as it doesn't exist in the backend schema
   createdAt: string;
-  updatedAt: string;
+  // updatedAt field removed as it doesn't exist in the backend schema
 }
 
+// Updated to match backend Column type
 export interface KanbanColumn {
-  _id: string;
+  id: string; // Changed from _id to id
   title: string;
   order: number;
   tasks: KanbanTask[];
 }
 
+// Updated to match backend Board type
 export interface KanbanBoard {
-  _id: string;
+  id: string; // Changed from _id to id
   title: string;
   description?: string;
   columns: KanbanColumn[];
   members: KanbanUser[];
-  creator: KanbanUser;
+  // creator field removed as it doesn't exist in the backend schema
   createdAt: string;
-  updatedAt: string;
+  // updatedAt field removed as it doesn't exist in the backend schema
 }
 
 // Types pour les inputs de mutation

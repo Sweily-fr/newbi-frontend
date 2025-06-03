@@ -3,56 +3,40 @@ import { gql } from '@apollo/client';
 // Fragment pour les données de base d'un utilisateur
 export const USER_FRAGMENT = gql`
   fragment UserFragment on User {
-    _id
-    name
+    id
     email
-    avatar
   }
 `;
 
 // Fragment pour les commentaires
 export const COMMENT_FRAGMENT = gql`
-  fragment CommentFragment on KanbanComment {
-    _id
+  fragment CommentFragment on Comment {
+    id
     content
-    creator {
-      ...UserFragment
-    }
     createdAt
-    updatedAt
   }
-  ${USER_FRAGMENT}
 `;
 
 // Fragment pour les pièces jointes
 export const ATTACHMENT_FRAGMENT = gql`
-  fragment AttachmentFragment on KanbanAttachment {
-    _id
-    filename
+  fragment AttachmentFragment on Attachment {
+    id
+    name
     url
-    mimetype
-    size
-    creator {
-      ...UserFragment
-    }
-    createdAt
+    type
   }
-  ${USER_FRAGMENT}
 `;
 
 // Fragment pour les tâches
 export const TASK_FRAGMENT = gql`
-  fragment TaskFragment on KanbanTask {
-    _id
+  fragment TaskFragment on Task {
+    id
     title
     description
     status
     order
     dueDate
-    labels {
-      name
-      color
-    }
+    labels
     assignedTo {
       ...UserFragment
     }
@@ -62,11 +46,7 @@ export const TASK_FRAGMENT = gql`
     attachments {
       ...AttachmentFragment
     }
-    creator {
-      ...UserFragment
-    }
     createdAt
-    updatedAt
   }
   ${USER_FRAGMENT}
   ${COMMENT_FRAGMENT}
@@ -75,8 +55,8 @@ export const TASK_FRAGMENT = gql`
 
 // Fragment pour les colonnes
 export const COLUMN_FRAGMENT = gql`
-  fragment ColumnFragment on KanbanColumn {
-    _id
+  fragment ColumnFragment on Column {
+    id
     title
     order
     tasks {
@@ -89,7 +69,7 @@ export const COLUMN_FRAGMENT = gql`
 // Fragment pour les tableaux Kanban
 export const BOARD_FRAGMENT = gql`
   fragment BoardFragment on KanbanBoard {
-    _id
+    id
     title
     description
     columns {
@@ -98,11 +78,7 @@ export const BOARD_FRAGMENT = gql`
     members {
       ...UserFragment
     }
-    creator {
-      ...UserFragment
-    }
     createdAt
-    updatedAt
   }
   ${COLUMN_FRAGMENT}
   ${USER_FRAGMENT}
@@ -111,7 +87,7 @@ export const BOARD_FRAGMENT = gql`
 // Requête pour récupérer un tableau Kanban spécifique
 export const GET_BOARD = gql`
   query GetBoard($id: ID!) {
-    board(id: $id) {
+    kanbanBoard(id: $id) {
       ...BoardFragment
     }
   }
@@ -121,12 +97,12 @@ export const GET_BOARD = gql`
 // Requête pour récupérer tous les tableaux Kanban avec pagination
 export const GET_BOARDS = gql`
   query GetBoards($page: Int, $limit: Int) {
-    boards(page: $page, limit: $limit) {
-      items {
+    kanbanBoards(page: $page, limit: $limit) {
+      boards {
         ...BoardFragment
       }
       totalCount
-      hasMore
+      hasNextPage
     }
   }
   ${BOARD_FRAGMENT}
