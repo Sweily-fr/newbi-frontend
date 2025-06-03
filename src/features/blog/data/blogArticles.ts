@@ -5,6 +5,7 @@ import {
   businessManagementArticle,
   legalNoticeArticle,
   emailSignatureArticle,
+  emailSignatureImportanceArticle,
   seoOptimizationArticle,
   invoiceTemplateArticle,
   quoteCreationArticle,
@@ -15,6 +16,7 @@ import {
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  emailSignatureImportanceArticle,
   editInvoiceArticle,
   quoteVsOrderArticle,
   invoiceArticle,
