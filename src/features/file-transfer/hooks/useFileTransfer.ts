@@ -36,7 +36,7 @@ export const useMyFileTransfers = () => {
 
   // Transformer les données pour s'assurer que les statuts sont correctement mappés
   const fileTransfers = data?.myFileTransfers 
-    ? data.myFileTransfers.map((transfer: any) => ({
+    ? data.myFileTransfers.map((transfer: { status: string; [key: string]: any }) => ({
         ...transfer,
         status: mapStatusToEnum(transfer.status)
       }))
@@ -84,7 +84,6 @@ export const useCreateFileTransfer = () => {
   
   const upload = async (
     files: File[], 
-    expiryDays?: number, 
     isPaymentRequired?: boolean,
     paymentAmount?: number,
     paymentCurrency?: string
@@ -103,7 +102,6 @@ export const useCreateFileTransfer = () => {
       const result = await createFileTransfer({
         variables: {
           files,
-          expiryDays,
           isPaymentRequired,
           paymentAmount,
           paymentCurrency

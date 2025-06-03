@@ -5,10 +5,10 @@ import FilePreview from './FilePreview';
 import { logger } from '../../../utils/logger';
 import UploadProgress from './UploadProgress';
 import { ArrowRight, Copy, Link1, TickCircle } from 'iconsax-react';
+import Checkbox from '../../../components/common/Checkbox';
 
 const FileTransferForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [expiryDays, setExpiryDays] = useState<number>(7);
   const [isPaymentRequired, setIsPaymentRequired] = useState<boolean>(false);
   const [paymentAmount, setPaymentAmount] = useState<number>(5);
   const [paymentCurrency, setPaymentCurrency] = useState<string>('EUR');
@@ -36,7 +36,6 @@ const FileTransferForm: React.FC = () => {
     try {
       const result = await upload(
         files,
-        expiryDays,
         isPaymentRequired,
         isPaymentRequired ? paymentAmount : undefined,
         isPaymentRequired ? paymentCurrency : undefined
@@ -85,37 +84,26 @@ const FileTransferForm: React.FC = () => {
               className="mb-6" 
             />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Durée de validité
                 </label>
-                <select
-                  value={expiryDays}
-                  onChange={(e) => setExpiryDays(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-[#5b50ff]"
-                >
-                  <option value={1}>1 jour</option>
-                  <option value={3}>3 jours</option>
-                  <option value={7}>7 jours</option>
-                  <option value={14}>14 jours</option>
-                  <option value={30}>30 jours</option>
-                </select>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+                  48 heures
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Les fichiers sont automatiquement supprimés après 48 heures</p>
               </div>
               
-              <div>
-                <div className="flex items-center mb-1">
-                  <input
-                    type="checkbox"
-                    id="isPaymentRequired"
-                    checked={isPaymentRequired}
-                    onChange={(e) => setIsPaymentRequired(e.target.checked)}
-                    className="h-4 w-4 text-[#5b50ff] focus:ring-[#5b50ff] border-gray-300 rounded"
-                  />
-                  <label htmlFor="isPaymentRequired" className="ml-2 block text-sm font-medium text-gray-700">
-                    Exiger un paiement pour le téléchargement
-                  </label>
-                </div>
+              <div className="mt-4 border-t pt-4">
+                <Checkbox
+                  id="isPaymentRequired"
+                  name="isPaymentRequired"
+                  label="Exiger un paiement pour le téléchargement"
+                  checked={isPaymentRequired}
+                  onChange={(e) => setIsPaymentRequired(e.target.checked)}
+                  className="mb-1"
+                />
                 
                 {isPaymentRequired && (
                   <div className="flex mt-2">
