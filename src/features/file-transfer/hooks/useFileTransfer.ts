@@ -14,7 +14,8 @@ import {
   FileTransfer, 
   FileTransferResponse, 
   FileTransferPaymentResponse,
-  FileUploadProgress
+  FileUploadProgress,
+  FileTransferStatus
 } from '../types';
 
 // Utilitaire de logging personnalisé
@@ -23,10 +24,28 @@ import { logger } from '../../../utils/logger';
 export const useMyFileTransfers = () => {
   const { loading, error, data, refetch } = useQuery(MY_FILE_TRANSFERS);
   
+  // Mapper les statuts du backend (minuscules) vers le frontend (majuscules)
+  const mapStatusToEnum = (status: string): FileTransferStatus => {
+    switch(status.toLowerCase()) {
+      case 'active': return FileTransferStatus.ACTIVE;
+      case 'expired': return FileTransferStatus.EXPIRED;
+      case 'deleted': return FileTransferStatus.DELETED;
+      default: return FileTransferStatus.ACTIVE;
+    }
+  };
+
+  // Transformer les données pour s'assurer que les statuts sont correctement mappés
+  const fileTransfers = data?.myFileTransfers 
+    ? data.myFileTransfers.map((transfer: any) => ({
+        ...transfer,
+        status: mapStatusToEnum(transfer.status)
+      }))
+    : [];
+  
   return {
     loading,
     error,
-    fileTransfers: data?.myFileTransfers as FileTransfer[] || [],
+    fileTransfers: fileTransfers as FileTransfer[],
     refetch
   };
 };

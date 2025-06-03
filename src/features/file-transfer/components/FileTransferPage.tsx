@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMyFileTransfers, useDeleteFileTransfer } from '../hooks/useFileTransfer';
 import { formatFileSize, formatExpiryDate } from '../utils/fileUtils';
 import { FileTransfer } from '../types';
 import FileTransferForm from './FileTransferForm';
-import { ArrowRight, DocumentText, Link1, Trash, TickCircle } from 'iconsax-react';
+import { ArrowRight, DocumentText, Link1, Trash, TickCircle, RefreshCircle } from 'iconsax-react';
 import { logger } from '../../../utils/logger';
 
 const FileTransferPage: React.FC = () => {
@@ -11,6 +11,31 @@ const FileTransferPage: React.FC = () => {
   const { deleteTransfer, loading: deleteLoading } = useDeleteFileTransfer();
   const [showForm, setShowForm] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  
+  // Rafraîchir automatiquement les données au chargement du composant
+  useEffect(() => {
+    handleRefresh();
+    // Rafraîchir les données toutes les 5 minutes
+    const interval = setInterval(() => {
+      handleRefresh();
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  // Fonction pour rafraîchir les données
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } catch (err) {
+      logger.error('Erreur lors du rafraîchissement des données:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce transfert de fichiers ?')) {
@@ -39,21 +64,42 @@ const FileTransferPage: React.FC = () => {
             Partagez des fichiers volumineux jusqu'à 100GB avec vos clients ou collaborateurs
           </p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
-        >
-          {showForm ? 'Voir mes transferts' : 'Nouveau transfert'}
-          <ArrowRight size="16" className="ml-2" />
-        </button>
+        <div className="flex space-x-2">
+          {!showForm && (
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+              title="Rafraîchir"
+            >
+              <RefreshCircle 
+                size="16" 
+                className={`${isRefreshing ? 'animate-spin text-[#5b50ff]' : 'text-gray-500'}`} 
+              />
+              <span className="ml-1">Rafraîchir</span>
+            </button>
+          )}
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
+          >
+            {showForm ? 'Voir mes transferts' : 'Nouveau transfert'}
+            <ArrowRight size="16" className="ml-2" />
+          </button>
+        </div>
       </div>
 
       {showForm ? (
         <FileTransferForm />
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 bg-[#f0eeff]">
+          <div className="p-6 border-b border-gray-200 bg-[#f0eeff] flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">Mes transferts de fichiers</h2>
+            <div className="text-sm text-gray-500">
+              {fileTransfers.length > 0 && (
+                <span>Dernière mise à jour: {new Date().toLocaleTimeString('fr-FR')}</span>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -85,48 +131,27 @@ const FileTransferPage: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-[#f0eeff]">
                   <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Fichiers
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Taille
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Date de création
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Expiration
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Statut
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Téléchargements
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
