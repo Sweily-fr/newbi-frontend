@@ -204,10 +204,12 @@ const FileDownloadPage: React.FC = () => {
                     </p>
                   </div>
                   <a
-                    href={file.filePath}
+                    href={`${window.location.origin}${file.filePath}`}
                     download={file.originalName}
                     className="flex-shrink-0 ml-2 p-2 rounded-full bg-[#f0eeff] hover:bg-[#e6e1ff] transition-colors"
                     aria-label={`Télécharger ${file.originalName}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <ArrowDown2 size="18" color="#5b50ff" />
                   </a>

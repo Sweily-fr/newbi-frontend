@@ -82,8 +82,18 @@ export const useFileTransferByLink = (shareLink: string, accessKey: string) => {
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file); // Utilise readAsDataURL pour inclure l'en-tête MIME
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Vérifier que le résultat contient bien l'en-tête MIME
+      if (!result.includes(';base64,')) {
+        // Si l'en-tête est absent, l'ajouter manuellement
+        const mimeHeader = `data:${file.type || 'application/octet-stream'};base64,`;
+        resolve(mimeHeader + result);
+      } else {
+        resolve(result);
+      }
+    };
     reader.onerror = error => reject(error);
   });
 };

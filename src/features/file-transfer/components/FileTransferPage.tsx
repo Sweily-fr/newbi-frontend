@@ -211,13 +211,19 @@ const FileTransferPage: React.FC = () => {
                         <div className="flex justify-end space-x-2">
                           <button
                             onClick={() => copyToClipboard(transfer.shareLink, transfer.accessKey, transfer.id)}
-                            className="text-gray-600 hover:text-[#5b50ff] p-1 rounded-full hover:bg-[#f0eeff]"
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md text-[#5b50ff] bg-[#f0eeff] hover:bg-[#e6e1ff] border border-[#e6e1ff]"
                             title="Copier le lien"
                           >
                             {copiedId === transfer.id ? (
-                              <TickCircle size="18" color="#10B981" variant="Bulk" />
+                              <>
+                                <TickCircle size="16" color="#10B981" variant="Bulk" className="mr-1" />
+                                <span className="text-green-600">Copié</span>
+                              </>
                             ) : (
-                              <Link1 size="18" />
+                              <>
+                                <Link1 size="16" className="mr-1" />
+                                <span>Copier</span>
+                              </>
                             )}
                           </button>
                           <button
