@@ -70,10 +70,11 @@ export interface FileTransferAccessResponse {
 }
 
 export interface CreateFileTransferInput {
-  files: File[];
+  expiryDays?: number;
   isPaymentRequired?: boolean;
   paymentAmount?: number;
   paymentCurrency?: string;
+  recipientEmail?: string;
 }
 
 export interface FileUploadProgress {

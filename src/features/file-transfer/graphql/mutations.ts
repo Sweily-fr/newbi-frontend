@@ -3,17 +3,45 @@ import { gql } from '@apollo/client';
 export const CREATE_FILE_TRANSFER = gql`
   mutation CreateFileTransfer(
     $files: [Upload!]!
-    $expiryDays: Int
-    $isPaymentRequired: Boolean
-    $paymentAmount: Float
-    $paymentCurrency: String
+    $input: FileTransferInput
   ) {
     createFileTransfer(
       files: $files
-      expiryDays: $expiryDays
-      isPaymentRequired: $isPaymentRequired
-      paymentAmount: $paymentAmount
-      paymentCurrency: $paymentCurrency
+      input: $input
+    ) {
+      fileTransfer {
+        id
+        shareLink
+        accessKey
+        expiryDate
+        status
+        isPaymentRequired
+        paymentAmount
+        paymentCurrency
+        isPaid
+        totalSize
+        files {
+          id
+          fileName
+          originalName
+          mimeType
+          size
+        }
+      }
+      shareLink
+      accessKey
+    }
+  }
+`;
+
+export const CREATE_FILE_TRANSFER_BASE64 = gql`
+  mutation CreateFileTransferBase64(
+    $files: [Base64FileInput!]!
+    $input: FileTransferInput
+  ) {
+    createFileTransferBase64(
+      files: $files
+      input: $input
     ) {
       fileTransfer {
         id

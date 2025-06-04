@@ -6,7 +6,7 @@ import {
   GET_FILE_TRANSFER_BY_LINK 
 } from '../graphql/queries';
 import { 
-  CREATE_FILE_TRANSFER, 
+  CREATE_FILE_TRANSFER_BASE64,
   DELETE_FILE_TRANSFER, 
   GENERATE_FILE_TRANSFER_PAYMENT_LINK 
 } from '../graphql/mutations';
@@ -36,7 +36,7 @@ export const useMyFileTransfers = () => {
 
   // Transformer les données pour s'assurer que les statuts sont correctement mappés
   const fileTransfers = data?.myFileTransfers 
-    ? data.myFileTransfers.map((transfer: { status: string; [key: string]: any }) => ({
+    ? data.myFileTransfers.map((transfer: { status: string; id: string; userId: string; files: File[]; totalSize: number; shareLink: string; accessKey: string; expiryDate: string; isPaymentRequired: boolean; paymentAmount?: number; paymentCurrency?: string; isPaid: boolean; downloadCount: number; createdAt: string; updatedAt: string }) => ({
         ...transfer,
         status: mapStatusToEnum(transfer.status)
       }))
@@ -78,15 +78,28 @@ export const useFileTransferByLink = (shareLink: string, accessKey: string) => {
   };
 };
 
+// Fonction utilitaire pour convertir un fichier en base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
 export const useCreateFileTransfer = () => {
   const [uploadProgress, setUploadProgress] = useState<FileUploadProgress[]>([]);
-  const [createFileTransfer, { loading, error, data }] = useMutation(CREATE_FILE_TRANSFER);
+  
+  const [createFileTransferBase64, { loading, error, data }] = useMutation(CREATE_FILE_TRANSFER_BASE64);
   
   const upload = async (
     files: File[], 
+    expiryDays?: number,
     isPaymentRequired?: boolean,
     paymentAmount?: number,
-    paymentCurrency?: string
+    paymentCurrency?: string,
+    recipientEmail?: string
   ) => {
     // Initialiser le suivi de progression pour chaque fichier
     setUploadProgress(
@@ -98,27 +111,58 @@ export const useCreateFileTransfer = () => {
     );
     
     try {
-      // Créer un tableau de promesses pour suivre la progression de chaque fichier
-      const result = await createFileTransfer({
+      // Convertir les fichiers en base64
+      const base64Files = [];
+      let currentFileIndex = 0;
+      
+      for (const file of files) {
+        try {
+          // Mettre à jour la progression pour montrer que le fichier est en cours de traitement
+          setUploadProgress(prev => 
+            prev.map((item, index) => 
+              index === currentFileIndex 
+                ? { ...item, progress: 10, status: 'uploading' } 
+                : item
+            )
+          );
+          
+          // Convertir le fichier en base64
+          const base64 = await fileToBase64(file);
+          
+          // Ajouter le fichier converti à la liste
+          base64Files.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            base64
+          });
+          
+          // Mettre à jour la progression pour montrer que le fichier est prêt à être envoyé
+          setUploadProgress(prev => 
+            prev.map((item, index) => 
+              index === currentFileIndex 
+                ? { ...item, progress: 50, status: 'uploading' } 
+                : item
+            )
+          );
+          
+          currentFileIndex++;
+        } catch (error) {
+          logger.error(`Erreur lors de la conversion du fichier ${file.name} en base64:`, error);
+          throw error;
+        }
+      }
+      
+      // Envoyer les fichiers en base64 au serveur
+      const result = await createFileTransferBase64({
         variables: {
-          files,
-          isPaymentRequired,
-          paymentAmount,
-          paymentCurrency
-        },
-        context: {
-          fetchOptions: {
-            useUpload: true,
-            onProgress: (progress: number, fileName: string) => {
-              // Mettre à jour la progression du fichier spécifique
-              setUploadProgress(prev => 
-                prev.map(item => 
-                  item.fileName === fileName 
-                    ? { ...item, progress, status: 'uploading' } 
-                    : item
-                )
-              );
-            }
+          files: base64Files,
+          input: {
+            expiryDays,
+            isPaymentRequired,
+            paymentAmount,
+            paymentCurrency,
+            recipientEmail
           }
         }
       });
@@ -128,7 +172,7 @@ export const useCreateFileTransfer = () => {
         prev.map(item => ({ ...item, progress: 100, status: 'success' }))
       );
       
-      return result.data?.createFileTransfer as FileTransferResponse;
+      return result.data?.createFileTransferBase64 as FileTransferResponse;
     } catch (err) {
       // Marquer les fichiers comme ayant échoué
       setUploadProgress(prev => 

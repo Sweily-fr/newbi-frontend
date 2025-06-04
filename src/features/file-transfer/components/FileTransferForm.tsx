@@ -34,11 +34,22 @@ const FileTransferForm: React.FC = () => {
     if (files.length === 0) return;
     
     try {
+      // S'assurer que nous avons des objets File natifs
+      const nativeFiles = files.filter(file => file instanceof File);
+      
+      if (nativeFiles.length !== files.length) {
+        logger.error('Certains fichiers ne sont pas des objets File valides');
+        return;
+      }
+      
+      // Utiliser la nouvelle structure avec l'objet input
       const result = await upload(
-        files,
+        nativeFiles,
+        48, // expiryDays: 48 heures par défaut
         isPaymentRequired,
         isPaymentRequired ? paymentAmount : undefined,
-        isPaymentRequired ? paymentCurrency : undefined
+        isPaymentRequired ? paymentCurrency : undefined,
+        undefined // recipientEmail (optionnel)
       );
       
       if (result) {
