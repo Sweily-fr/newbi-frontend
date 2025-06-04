@@ -6,30 +6,45 @@ import { BlogArticle } from '../types/blog';
 import { ROUTES } from '../routes/constants';
 
 const BlogPage: React.FC = () => {
+  // État pour la catégorie sélectionnée
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filteredArticles, setFilteredArticles] = useState<BlogArticle[]>(blogArticles);
+  // État pour le nombre d'articles à afficher
+  const [displayCount, setDisplayCount] = useState<number>(9);
+  // État pour l'article à la une
   const [featuredArticle, setFeaturedArticle] = useState<BlogArticle | null>(null);
-  const [displayCount, setDisplayCount] = useState<number>(9); // Nombre d'articles à afficher par défaut
-
-  // Extraire toutes les catégories uniques des articles
+  
+  // Extraction des catégories uniques
   const allCategories = Array.from(
     new Set(blogArticles.flatMap(article => article.categories))
   ).sort();
-
+  
+  // Fonction pour garantir l'unicité des articles par ID
+  const getUniqueArticles = (articles: BlogArticle[]): BlogArticle[] => {
+    const uniqueMap = new Map<string, BlogArticle>();
+    articles.forEach(article => {
+      if (!uniqueMap.has(article.id)) {
+        uniqueMap.set(article.id, article);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  };
+  
+  // Obtenir la liste complète des articles sans doublons
+  const uniqueAllArticles = getUniqueArticles(blogArticles);
+  
+  // Calcul des articles filtrés à partir de la catégorie sélectionnée
+  // Cette approche garantit qu'il n'y a jamais de duplication
+  const filteredArticles = selectedCategory
+    ? getUniqueArticles(uniqueAllArticles.filter(article => article.categories.includes(selectedCategory)))
+    : uniqueAllArticles;
+  
+  // Initialisation de l'article à la une au chargement du composant
   useEffect(() => {
-    // Sélectionner l'article le plus récent comme article à la une
     setFeaturedArticle(getRecentArticles(1)[0]);
-    
-    // Filtrer les articles par catégorie si une catégorie est sélectionnée
-    if (selectedCategory) {
-      setFilteredArticles(
-        blogArticles.filter(article => article.categories.includes(selectedCategory))
-      );
-    } else {
-      setFilteredArticles(blogArticles);
-    }
-    
-    // Réinitialiser le nombre d'articles affichés lorsque la catégorie change
+  }, []);
+  
+  // Réinitialiser le compteur d'affichage lorsque la catégorie change
+  useEffect(() => {
     setDisplayCount(9);
   }, [selectedCategory]);
 
