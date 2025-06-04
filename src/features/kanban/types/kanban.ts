@@ -75,27 +75,27 @@ export interface KanbanBoard {
 }
 
 // Types pour les inputs de mutation
-export interface CreateBoardInput {
+export interface KanbanBoardInput {
   title: string;
   description?: string;
   members?: string[];
 }
 
-export interface UpdateBoardInput {
+export interface KanbanBoardUpdateInput {
   title?: string;
   description?: string;
   members?: string[];
 }
 
-export interface CreateColumnInput {
-  boardId: string;
+export interface ColumnInput {
   title: string;
+  order?: number;
+  tasks?: TaskInput[];
 }
 
-export interface UpdateColumnInput {
-  boardId: string;
-  columnId: string;
-  title: string;
+export interface ColumnUpdateInput {
+  title?: string;
+  order?: number;
 }
 
 export interface ReorderColumnsInput {
@@ -103,49 +103,50 @@ export interface ReorderColumnsInput {
   columnIds: string[];
 }
 
-export interface CreateTaskInput {
-  boardId: string;
-  columnId: string;
+export interface TaskInput {
   title: string;
   description?: string;
+  status?: string;
+  order?: number;
   dueDate?: string;
-  labels?: { name: string; color: string }[];
+  labels?: string[];
   assignedTo?: string;
+  attachments?: AttachmentInput[];
 }
 
-export interface UpdateTaskInput {
-  boardId: string;
-  columnId: string;
-  taskId: string;
+export interface TaskUpdateInput {
   title?: string;
   description?: string;
+  status?: string;
+  order?: number;
   dueDate?: string;
-  labels?: { name: string; color: string }[];
+  labels?: string[];
   assignedTo?: string;
 }
 
 export interface MoveTaskInput {
-  boardId: string;
+  taskId: string;
   sourceColumnId: string;
   destinationColumnId: string;
-  taskId: string;
   newOrder: number;
 }
 
-export interface AddCommentInput {
-  boardId: string;
-  columnId: string;
-  taskId: string;
+// Ajout d'une interface pour les pièces jointes
+export interface AttachmentInput {
+  name: string;
+  url: string;
+  type: string;
+}
+
+export interface CommentInput {
   content: string;
 }
 
 // Types pour les réponses de queries et mutations
 export interface BoardsResponse {
-  boards: {
-    items: KanbanBoard[];
-    totalCount: number;
-    hasMore: boolean;
-  };
+  boards: KanbanBoard[];
+  totalCount: number;
+  hasNextPage: boolean;
 }
 
 export interface BoardResponse {

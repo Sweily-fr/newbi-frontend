@@ -6,8 +6,8 @@ import {
   ADD_COMMENT, DELETE_COMMENT
 } from '../graphql/mutations';
 import { 
-  KanbanBoard, CreateColumnInput, UpdateColumnInput, ReorderColumnsInput,
-  CreateTaskInput, UpdateTaskInput, MoveTaskInput, AddCommentInput
+  KanbanBoard, ColumnInput, ColumnUpdateInput, ReorderColumnsInput,
+  TaskInput, TaskUpdateInput, MoveTaskInput, CommentInput
 } from '../types/kanban';
 
 export const useKanbanBoard = (boardId: string) => {
@@ -17,7 +17,7 @@ export const useKanbanBoard = (boardId: string) => {
     loading: boardLoading, 
     error: boardError,
     refetch: refetchBoard 
-  } = useQuery<{ board: KanbanBoard }>(GET_BOARD, {
+  } = useQuery<{ kanbanBoard: KanbanBoard }>(GET_BOARD, {
     variables: { id: boardId },
     fetchPolicy: 'cache-and-network',
     skip: !boardId,
@@ -40,26 +40,27 @@ export const useKanbanBoard = (boardId: string) => {
   const [deleteCommentMutation, { loading: deleteCommentLoading }] = useMutation(DELETE_COMMENT);
 
   // Fonctions pour les colonnes
-  const createColumn = async (input: CreateColumnInput) => {
+  const createColumn = async (input: ColumnInput) => {
     try {
       const { data } = await createColumnMutation({
-        variables: { input },
+        variables: { input: { ...input, boardId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.createColumn;
+      return data.createKanbanColumn;
     } catch (error) {
       console.error("Erreur lors de la création de la colonne:", error);
       throw error;
     }
   };
 
-  const updateColumn = async (input: UpdateColumnInput) => {
+  const updateColumn = async (input: ColumnUpdateInput & { columnId: string }) => {
     try {
+      const { columnId, ...updateData } = input;
       const { data } = await updateColumnMutation({
-        variables: { input },
+        variables: { id: columnId, input: { ...updateData, boardId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.updateColumn;
+      return data.updateKanbanColumn;
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la colonne:", error);
       throw error;
@@ -69,10 +70,10 @@ export const useKanbanBoard = (boardId: string) => {
   const deleteColumn = async (columnId: string) => {
     try {
       const { data } = await deleteColumnMutation({
-        variables: { boardId, columnId },
+        variables: { id: columnId },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.deleteColumn;
+      return data.deleteKanbanColumn;
     } catch (error) {
       console.error("Erreur lors de la suppression de la colonne:", error);
       throw error;
@@ -85,7 +86,7 @@ export const useKanbanBoard = (boardId: string) => {
         variables: { input },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.reorderColumns;
+      return data.reorderKanbanColumns;
     } catch (error) {
       console.error("Erreur lors de la réorganisation des colonnes:", error);
       throw error;
@@ -93,39 +94,41 @@ export const useKanbanBoard = (boardId: string) => {
   };
 
   // Fonctions pour les tâches
-  const createTask = async (input: CreateTaskInput) => {
+  const createTask = async (input: TaskInput & { columnId: string }) => {
     try {
+      const { columnId, ...taskData } = input;
       const { data } = await createTaskMutation({
-        variables: { input },
+        variables: { input: { ...taskData, boardId, columnId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.createTask;
+      return data.createKanbanTask;
     } catch (error) {
       console.error("Erreur lors de la création de la tâche:", error);
       throw error;
     }
   };
 
-  const updateTask = async (input: UpdateTaskInput) => {
+  const updateTask = async (input: TaskUpdateInput & { taskId: string }) => {
     try {
+      const { taskId, ...updateData } = input;
       const { data } = await updateTaskMutation({
-        variables: { input },
+        variables: { id: taskId, input: { ...updateData, boardId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.updateTask;
+      return data.updateKanbanTask;
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la tâche:", error);
       throw error;
     }
   };
 
-  const deleteTask = async (columnId: string, taskId: string) => {
+  const deleteTask = async (taskId: string) => {
     try {
       const { data } = await deleteTaskMutation({
-        variables: { boardId, columnId, taskId },
+        variables: { id: taskId },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.deleteTask;
+      return data.deleteKanbanTask;
     } catch (error) {
       console.error("Erreur lors de la suppression de la tâche:", error);
       throw error;
@@ -135,10 +138,10 @@ export const useKanbanBoard = (boardId: string) => {
   const moveTask = async (input: MoveTaskInput) => {
     try {
       const { data } = await moveTaskMutation({
-        variables: { input },
+        variables: { input: { ...input, boardId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.moveTask;
+      return data.moveKanbanTask;
     } catch (error) {
       console.error("Erreur lors du déplacement de la tâche:", error);
       throw error;
@@ -146,26 +149,27 @@ export const useKanbanBoard = (boardId: string) => {
   };
 
   // Fonctions pour les commentaires
-  const addComment = async (input: AddCommentInput) => {
+  const addComment = async (input: CommentInput & { taskId: string }) => {
     try {
+      const { taskId, ...commentData } = input;
       const { data } = await addCommentMutation({
-        variables: { input },
+        variables: { input: { ...commentData, boardId, taskId } },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.addComment;
+      return data.addKanbanComment;
     } catch (error) {
       console.error("Erreur lors de l'ajout du commentaire:", error);
       throw error;
     }
   };
 
-  const deleteComment = async (columnId: string, taskId: string, commentId: string) => {
+  const deleteComment = async (commentId: string) => {
     try {
       const { data } = await deleteCommentMutation({
-        variables: { boardId, columnId, taskId, commentId },
+        variables: { id: commentId },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.deleteComment;
+      return data.deleteKanbanComment;
     } catch (error) {
       console.error("Erreur lors de la suppression du commentaire:", error);
       throw error;
@@ -173,7 +177,7 @@ export const useKanbanBoard = (boardId: string) => {
   };
 
   return {
-    board: boardData?.board,
+    board: boardData?.kanbanBoard,
     boardLoading,
     boardError,
     refetchBoard,

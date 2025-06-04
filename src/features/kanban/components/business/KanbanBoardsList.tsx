@@ -100,8 +100,8 @@ export const KanbanBoardsList: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {boards.map((board: KanbanBoard) => (
               <Link
-                key={board._id}
-                to={`/kanban/${board._id}`}
+                key={board.id}
+                to={`/kanban/${board.id}`}
                 className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow group"
               >
                 <h2 className="text-lg font-medium text-gray-800 mb-2 group-hover:text-[#5b50ff] transition-colors">
@@ -125,21 +125,14 @@ export const KanbanBoardsList: React.FC = () => {
                       <div className="flex -space-x-2 mr-2">
                         {board.members.slice(0, 3).map((member: KanbanUser) => (
                           <div
-                            key={member._id}
+                            key={member.id}
                             className="w-7 h-7 rounded-full border-2 border-white overflow-hidden bg-[#f0eeff]"
-                            title={member.name}
+                            title={member.email}
                           >
-                            {member.avatar ? (
-                              <img
-                                src={member.avatar}
-                                alt={member.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <User size="14" variant="Bold" color="#5b50ff" />
-                              </div>
-                            )}
+                            {/* Utiliser un avatar générique car le backend ne fournit pas d'avatar */}
+                            <div className="w-full h-full flex items-center justify-center">
+                              <User size="14" variant="Bold" color="#5b50ff" />
+                            </div>
                           </div>
                         ))}
                         {board.members.length > 3 && (

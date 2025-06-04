@@ -110,8 +110,8 @@ export const GET_BOARDS = gql`
 
 // Requête pour récupérer une tâche spécifique
 export const GET_TASK = gql`
-  query GetTask($boardId: ID!, $columnId: ID!, $taskId: ID!) {
-    task(boardId: $boardId, columnId: $columnId, taskId: $taskId) {
+  query GetTask($boardId: ID!, $taskId: ID!) {
+    kanbanTask(boardId: $boardId, taskId: $taskId) {
       ...TaskFragment
     }
   }

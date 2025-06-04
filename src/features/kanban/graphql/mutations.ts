@@ -1,10 +1,10 @@
 import { gql } from '@apollo/client';
-import { BOARD_FRAGMENT, COLUMN_FRAGMENT, TASK_FRAGMENT, COMMENT_FRAGMENT } from './queries';
+import { BOARD_FRAGMENT, TASK_FRAGMENT } from './queries';
 
 // Mutation pour créer un tableau Kanban
 export const CREATE_BOARD = gql`
-  mutation CreateBoard($input: CreateBoardInput!) {
-    createBoard(input: $input) {
+  mutation CreateBoard($input: KanbanBoardInput!) {
+    createKanbanBoard(input: $input) {
       ...BoardFragment
     }
   }
@@ -13,8 +13,8 @@ export const CREATE_BOARD = gql`
 
 // Mutation pour mettre à jour un tableau Kanban
 export const UPDATE_BOARD = gql`
-  mutation UpdateBoard($id: ID!, $input: UpdateBoardInput!) {
-    updateBoard(id: $id, input: $input) {
+  mutation UpdateBoard($id: ID!, $input: KanbanBoardUpdateInput!) {
+    updateKanbanBoard(id: $id, input: $input) {
       ...BoardFragment
     }
   }
@@ -24,47 +24,44 @@ export const UPDATE_BOARD = gql`
 // Mutation pour supprimer un tableau Kanban
 export const DELETE_BOARD = gql`
   mutation DeleteBoard($id: ID!) {
-    deleteBoard(id: $id) {
-      _id
-      success
-    }
+    deleteKanbanBoard(id: $id)
   }
 `;
 
 // Mutation pour créer une colonne
 export const CREATE_COLUMN = gql`
-  mutation CreateColumn($input: CreateColumnInput!) {
-    createColumn(input: $input) {
-      ...ColumnFragment
+  mutation CreateColumn($boardId: ID!, $input: ColumnInput!) {
+    addKanbanColumn(boardId: $boardId, input: $input) {
+      ...BoardFragment
     }
   }
-  ${COLUMN_FRAGMENT}
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour mettre à jour une colonne
 export const UPDATE_COLUMN = gql`
-  mutation UpdateColumn($input: UpdateColumnInput!) {
-    updateColumn(input: $input) {
-      ...ColumnFragment
+  mutation UpdateColumn($boardId: ID!, $columnId: ID!, $input: ColumnUpdateInput!) {
+    updateKanbanColumn(boardId: $boardId, columnId: $columnId, input: $input) {
+      ...BoardFragment
     }
   }
-  ${COLUMN_FRAGMENT}
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour supprimer une colonne
 export const DELETE_COLUMN = gql`
   mutation DeleteColumn($boardId: ID!, $columnId: ID!) {
-    deleteColumn(boardId: $boardId, columnId: $columnId) {
-      _id
-      success
+    deleteKanbanColumn(boardId: $boardId, columnId: $columnId) {
+      ...BoardFragment
     }
   }
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour réordonner les colonnes
 export const REORDER_COLUMNS = gql`
-  mutation ReorderColumns($input: ReorderColumnsInput!) {
-    reorderColumns(input: $input) {
+  mutation ReorderColumns($boardId: ID!, $columnIds: [ID!]!) {
+    reorderKanbanColumns(boardId: $boardId, columnIds: $columnIds) {
       ...BoardFragment
     }
   }
@@ -73,38 +70,38 @@ export const REORDER_COLUMNS = gql`
 
 // Mutation pour créer une tâche
 export const CREATE_TASK = gql`
-  mutation CreateTask($input: CreateTaskInput!) {
-    createTask(input: $input) {
-      ...TaskFragment
+  mutation CreateTask($boardId: ID!, $columnId: ID!, $input: TaskInput!) {
+    addKanbanTask(boardId: $boardId, columnId: $columnId, input: $input) {
+      ...BoardFragment
     }
   }
-  ${TASK_FRAGMENT}
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour mettre à jour une tâche
 export const UPDATE_TASK = gql`
-  mutation UpdateTask($input: UpdateTaskInput!) {
-    updateTask(input: $input) {
-      ...TaskFragment
+  mutation UpdateTask($boardId: ID!, $taskId: ID!, $input: TaskUpdateInput!) {
+    updateKanbanTask(boardId: $boardId, taskId: $taskId, input: $input) {
+      ...BoardFragment
     }
   }
-  ${TASK_FRAGMENT}
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour supprimer une tâche
 export const DELETE_TASK = gql`
-  mutation DeleteTask($boardId: ID!, $columnId: ID!, $taskId: ID!) {
-    deleteTask(boardId: $boardId, columnId: $columnId, taskId: $taskId) {
-      _id
-      success
+  mutation DeleteTask($boardId: ID!, $taskId: ID!) {
+    deleteKanbanTask(boardId: $boardId, taskId: $taskId) {
+      ...BoardFragment
     }
   }
+  ${BOARD_FRAGMENT}
 `;
 
 // Mutation pour déplacer une tâche
 export const MOVE_TASK = gql`
-  mutation MoveTask($input: MoveTaskInput!) {
-    moveTask(input: $input) {
+  mutation MoveTask($boardId: ID!, $taskId: ID!, $sourceColumnId: ID!, $targetColumnId: ID!, $order: Int!) {
+    moveKanbanTask(boardId: $boardId, taskId: $taskId, sourceColumnId: $sourceColumnId, targetColumnId: $targetColumnId, order: $order) {
       ...BoardFragment
     }
   }
@@ -113,20 +110,20 @@ export const MOVE_TASK = gql`
 
 // Mutation pour ajouter un commentaire à une tâche
 export const ADD_COMMENT = gql`
-  mutation AddComment($input: AddCommentInput!) {
-    addComment(input: $input) {
-      ...CommentFragment
+  mutation AddComment($boardId: ID!, $taskId: ID!, $input: CommentInput!) {
+    addKanbanTaskComment(boardId: $boardId, taskId: $taskId, input: $input) {
+      ...TaskFragment
     }
   }
-  ${COMMENT_FRAGMENT}
+  ${TASK_FRAGMENT}
 `;
 
 // Mutation pour supprimer un commentaire
 export const DELETE_COMMENT = gql`
-  mutation DeleteComment($boardId: ID!, $columnId: ID!, $taskId: ID!, $commentId: ID!) {
-    deleteComment(boardId: $boardId, columnId: $columnId, taskId: $taskId, commentId: $commentId) {
-      _id
-      success
+  mutation DeleteComment($boardId: ID!, $taskId: ID!, $commentId: ID!) {
+    deleteKanbanTaskComment(boardId: $boardId, taskId: $taskId, commentId: $commentId) {
+      ...TaskFragment
     }
   }
+  ${TASK_FRAGMENT}
 `;

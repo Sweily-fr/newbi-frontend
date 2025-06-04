@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_BOARDS, GET_BOARD } from '../graphql/queries';
 import { CREATE_BOARD, UPDATE_BOARD, DELETE_BOARD } from '../graphql/mutations';
-import { BoardsResponse, BoardResponse, CreateBoardInput, UpdateBoardInput } from '../types/kanban';
+import { BoardsResponse, KanbanBoardInput, KanbanBoardUpdateInput, KanbanBoard } from '../types/kanban';
 import { useState } from 'react';
 
 export const useKanbanBoards = () => {
@@ -15,38 +15,40 @@ export const useKanbanBoards = () => {
     error: boardsError,
     refetch: refetchBoards,
     fetchMore: fetchMoreBoards
-  } = useQuery<{ boards: BoardsResponse }>(GET_BOARDS, {
+  } = useQuery<{ kanbanBoards: BoardsResponse }>(GET_BOARDS, {
     variables: { page, limit },
     fetchPolicy: 'cache-and-network',
   });
 
-  // Récupérer un tableau Kanban spécifique
-  const getBoard = (id: string) => {
-    return useQuery<{ board: BoardResponse }>(GET_BOARD, {
+  // Fonction pour obtenir la requête d'un tableau Kanban spécifique
+  // Cette fonction ne doit pas être appelée directement dans le composant
+  const getBoardQuery = (id: string) => {
+    return {
+      query: GET_BOARD,
       variables: { id },
-      fetchPolicy: 'cache-and-network',
-    });
+      fetchPolicy: 'cache-and-network' as const,
+    };
   };
 
   // Créer un nouveau tableau Kanban
   const [createBoardMutation, { loading: createBoardLoading }] = useMutation(CREATE_BOARD, {
-    update(cache, { data: { createBoard } }) {
+    update(cache, { data: { createKanbanBoard } }) {
       try {
         // Mettre à jour le cache pour la requête GET_BOARDS
-        const existingBoards = cache.readQuery<{ boards: BoardsResponse }>({
+        const existingData = cache.readQuery<{ kanbanBoards: BoardsResponse }>({
           query: GET_BOARDS,
           variables: { page: 1, limit },
         });
 
-        if (existingBoards) {
+        if (existingData) {
           cache.writeQuery({
             query: GET_BOARDS,
             variables: { page: 1, limit },
             data: {
-              boards: {
-                ...existingBoards.boards,
-                items: [createBoard, ...existingBoards.boards.items],
-                totalCount: existingBoards.boards.totalCount + 1,
+              kanbanBoards: {
+                boards: [createKanbanBoard, ...existingData.kanbanBoards.boards],
+                totalCount: existingData.kanbanBoards.totalCount + 1,
+                hasNextPage: existingData.kanbanBoards.hasNextPage,
               },
             },
           });
@@ -57,12 +59,12 @@ export const useKanbanBoards = () => {
     },
   });
 
-  const createBoard = async (input: CreateBoardInput) => {
+  const createBoard = async (input: KanbanBoardInput) => {
     try {
       const { data } = await createBoardMutation({
         variables: { input },
       });
-      return data.createBoard;
+      return data.createKanbanBoard;
     } catch (error) {
       console.error("Erreur lors de la création du tableau:", error);
       throw error;
@@ -72,12 +74,12 @@ export const useKanbanBoards = () => {
   // Mettre à jour un tableau Kanban
   const [updateBoardMutation, { loading: updateBoardLoading }] = useMutation(UPDATE_BOARD);
 
-  const updateBoard = async (id: string, input: UpdateBoardInput) => {
+  const updateBoard = async (id: string, input: KanbanBoardUpdateInput) => {
     try {
       const { data } = await updateBoardMutation({
         variables: { id, input },
       });
-      return data.updateBoard;
+      return data.updateKanbanBoard;
     } catch (error) {
       console.error("Erreur lors de la mise à jour du tableau:", error);
       throw error;
@@ -86,23 +88,23 @@ export const useKanbanBoards = () => {
 
   // Supprimer un tableau Kanban
   const [deleteBoardMutation, { loading: deleteBoardLoading }] = useMutation(DELETE_BOARD, {
-    update(cache, { data: { deleteBoard } }) {
+    update(cache, { data: { deleteKanbanBoard } }) {
       try {
         // Mettre à jour le cache pour la requête GET_BOARDS
-        const existingBoards = cache.readQuery<{ boards: BoardsResponse }>({
+        const existingData = cache.readQuery<{ kanbanBoards: BoardsResponse }>({
           query: GET_BOARDS,
           variables: { page, limit },
         });
 
-        if (existingBoards) {
+        if (existingData) {
           cache.writeQuery({
             query: GET_BOARDS,
             variables: { page, limit },
             data: {
-              boards: {
-                ...existingBoards.boards,
-                items: existingBoards.boards.items.filter((board) => board._id !== deleteBoard._id),
-                totalCount: existingBoards.boards.totalCount - 1,
+              kanbanBoards: {
+                boards: existingData.kanbanBoards.boards.filter((board: KanbanBoard) => board.id !== deleteKanbanBoard),
+                totalCount: existingData.kanbanBoards.totalCount - 1,
+                hasNextPage: existingData.kanbanBoards.hasNextPage,
               },
             },
           });
@@ -127,7 +129,7 @@ export const useKanbanBoards = () => {
 
   // Charger plus de tableaux (pagination)
   const loadMoreBoards = () => {
-    if (boardsData?.boards?.hasMore) {
+    if (boardsData?.kanbanBoards?.hasNextPage) {
       fetchMoreBoards({
         variables: {
           page: page + 1,
@@ -139,12 +141,13 @@ export const useKanbanBoards = () => {
           setPage(page + 1);
           
           return {
-            boards: {
-              ...fetchMoreResult.boards,
-              items: [
-                ...prev.boards.items,
-                ...fetchMoreResult.boards.items,
+            kanbanBoards: {
+              boards: [
+                ...prev.kanbanBoards.boards,
+                ...fetchMoreResult.kanbanBoards.boards,
               ],
+              totalCount: fetchMoreResult.kanbanBoards.totalCount,
+              hasNextPage: fetchMoreResult.kanbanBoards.hasNextPage,
             },
           };
         },
@@ -153,12 +156,12 @@ export const useKanbanBoards = () => {
   };
 
   return {
-    boards: boardsData?.boards?.items || [],
-    totalCount: boardsData?.boards?.totalCount || 0,
-    hasMore: boardsData?.boards?.hasMore || false,
+    boards: boardsData?.kanbanBoards?.boards || [],
+    totalCount: boardsData?.kanbanBoards?.totalCount || 0,
+    hasMore: boardsData?.kanbanBoards?.hasNextPage || false,
     boardsLoading,
     boardsError,
-    getBoard,
+    getBoardQuery,
     createBoard,
     updateBoard,
     deleteBoard,
