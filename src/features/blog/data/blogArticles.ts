@@ -12,10 +12,12 @@ import {
   businessToolsArticle,
   digitalInvoiceArticle,
   quoteVsOrderArticle,
-  editInvoiceArticle
+  editInvoiceArticle,
+  seoSoloOptimizationArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  seoSoloOptimizationArticle,
   emailSignatureImportanceArticle,
   editInvoiceArticle,
   quoteVsOrderArticle,
