@@ -1,4 +1,3 @@
-import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools, Document, MoneyChange, Receipt2 } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -24,8 +23,8 @@ export const TOOLS: Tool[] = [
     category: "Marketing & Communication",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Google size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/ArticlesSeo.svg" alt="Articles SEO" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/blog-seo-optimizer",
@@ -38,8 +37,8 @@ export const TOOLS: Tool[] = [
     // maintenance: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Designtools size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/SignatureEmail.svg" alt="Signature Email" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/signatures-email",
@@ -52,8 +51,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Facture.svg" alt="Factures" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/factures",
@@ -66,8 +65,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Devis.svg" alt="Devis" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/devis",
@@ -79,8 +78,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Politiquedeconfidentialité.svg" alt="Politique de confidentialité" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-politique-confidentialite",
@@ -92,8 +91,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Mentionslegales.svg" alt="Mentions légales" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-mentions-legales",
@@ -106,8 +105,8 @@ export const TOOLS: Tool[] = [
     category: "Productivité",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Send2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Transfertdefichiers.svg" alt="Transfert de fichiers" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/file-transfer",
@@ -120,8 +119,8 @@ export const TOOLS: Tool[] = [
     category: "Productivité",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Trello size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondestaches.svg" alt="Gestion des tâches" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/kanban",
@@ -133,8 +132,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Receipt2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Depenses.svg" alt="Dépenses" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/depenses",
@@ -147,8 +146,8 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Document size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Signatureelectronique.svg" alt="Signature électronique" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/signature-electronique",
@@ -160,8 +159,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Receipt2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Bondecommande.svg" alt="Bon de commande" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/bons-de-commande",
@@ -174,8 +173,8 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <MoneyChange size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondetresorerie.svg" alt="Gestion de trésorerie" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/gestion-tresorerie",
