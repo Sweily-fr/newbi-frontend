@@ -10,6 +10,14 @@ import {
   TaskInput, TaskUpdateInput, MoveTaskInput, CommentInput
 } from '../types/kanban';
 
+// Colonnes par défaut pour les tableaux Kanban
+const DEFAULT_COLUMNS = [
+  { title: 'À faire', order: 0 },
+  { title: 'En cours', order: 1 },
+  { title: 'En attente', order: 2 },
+  { title: 'Terminée', order: 3 }
+];
+
 export const useKanbanBoard = (boardId: string) => {
   // Récupérer les données du tableau
   const { 
@@ -20,6 +28,8 @@ export const useKanbanBoard = (boardId: string) => {
   } = useQuery<{ kanbanBoard: KanbanBoard }>(GET_BOARD, {
     variables: { id: boardId },
     fetchPolicy: 'cache-and-network',
+    // Activer le polling pour les mises à jour en temps réel
+    pollInterval: 5000, // Rafraîchir toutes les 5 secondes
     skip: !boardId,
   });
 
@@ -42,11 +52,50 @@ export const useKanbanBoard = (boardId: string) => {
   // Fonctions pour les colonnes
   const createColumn = async (input: ColumnInput) => {
     try {
+      console.log(`Création de colonne avec titre "${input.title}" pour le tableau ${boardId}`);
+      
+      // Exécuter la mutation avec mise à jour optimiste du cache
       const { data } = await createColumnMutation({
-        variables: { input: { ...input, boardId } },
+        variables: { boardId, input },
+        update: (cache, { data: mutationData }) => {
+          try {
+            // Récupérer les données actuelles du cache
+            const existingData = cache.readQuery({
+              query: GET_BOARD,
+              variables: { id: boardId }
+            });
+            
+            if (existingData && mutationData?.addKanbanColumn) {
+              // Mettre à jour le cache avec les nouvelles données
+              cache.writeQuery({
+                query: GET_BOARD,
+                variables: { id: boardId },
+                data: { kanbanBoard: mutationData.addKanbanColumn }
+              });
+              console.log("Cache mis à jour avec la nouvelle colonne");
+            }
+          } catch (cacheError) {
+            console.error("Erreur lors de la mise à jour du cache:", cacheError);
+          }
+        },
+        // Refetch pour s'assurer que les données sont à jour
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
+        // Force le refetch pour garantir des données fraîches
+        awaitRefetchQueries: true
       });
-      return data.createKanbanColumn;
+      
+      console.log("Résultat de la mutation addKanbanColumn:", data);
+      
+      if (!data || !data.addKanbanColumn) {
+        throw new Error("La mutation addKanbanColumn n'a pas retourné de données");
+      }
+      
+      // Forcer un rafraîchissement manuel pour garantir la mise à jour
+      setTimeout(() => {
+        refetchBoard();
+      }, 100);
+      
+      return data.addKanbanColumn;
     } catch (error) {
       console.error("Erreur lors de la création de la colonne:", error);
       throw error;
@@ -176,6 +225,41 @@ export const useKanbanBoard = (boardId: string) => {
     }
   };
 
+  // Fonction pour initialiser les colonnes par défaut si le tableau est vide
+  const initializeDefaultColumns = async () => {
+    if (!boardData?.kanbanBoard) {
+      console.log("Impossible d'initialiser les colonnes : tableau non disponible");
+      return;
+    }
+    
+    const board = boardData.kanbanBoard;
+    
+    // Vérifier si le tableau a déjà des colonnes
+    if (board.columns.length > 0) {
+      console.log("Le tableau possède déjà des colonnes, initialisation ignorée");
+      return;
+    }
+    
+    try {
+      console.log(`Création des colonnes par défaut pour le tableau ${board.id}`);
+      
+      // Créer les colonnes par défaut en séquence
+      for (const column of DEFAULT_COLUMNS) {
+        console.log(`Création de la colonne par défaut: ${column.title}`);
+        await createColumn(column);
+        // Ajouter un petit délai entre chaque création pour éviter les conflits
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      // Rafraîchir une dernière fois pour s'assurer que toutes les colonnes sont chargées
+      await refetchBoard();
+      console.log("Colonnes par défaut créées avec succès");
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation des colonnes par défaut:", error);
+      throw error;
+    }
+  };
+
   return {
     board: boardData?.kanbanBoard,
     boardLoading,
@@ -191,6 +275,7 @@ export const useKanbanBoard = (boardId: string) => {
     updateColumnLoading,
     deleteColumnLoading,
     reorderColumnsLoading,
+    initializeDefaultColumns,
     
     // Opérations sur les tâches
     createTask,

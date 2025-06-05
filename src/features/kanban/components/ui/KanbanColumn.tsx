@@ -42,7 +42,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
     
     setIsLoading(true);
     try {
-      await onAddTask(column._id, newTaskTitle, newTaskDescription);
+      await onAddTask(column.id, newTaskTitle, newTaskDescription);
       setNewTaskTitle('');
       setNewTaskDescription('');
       setIsAddTaskModalOpen(false);
@@ -62,7 +62,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
     
     setIsLoading(true);
     try {
-      await onEditColumn(column._id, columnTitle);
+      await onEditColumn(column.id, columnTitle);
       setIsEditColumnModalOpen(false);
     } catch (error) {
       console.error("Erreur lors de la modification de la colonne:", error);
@@ -75,7 +75,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
   const handleDeleteColumn = async () => {
     setIsLoading(true);
     try {
-      await onDeleteColumn(column._id);
+      await onDeleteColumn(column.id);
       setIsDeleteColumnModalOpen(false);
     } catch (error) {
       console.error("Erreur lors de la suppression de la colonne:", error);
@@ -85,7 +85,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
   };
   
   return (
-    <Draggable draggableId={column._id} index={index}>
+    <Draggable draggableId={column.id} index={index}>
       {(provided: DraggableProvided) => (
         <div
           ref={provided.innerRef}
@@ -106,7 +106,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
           </div>
           
           {/* Zone de drop pour les tâches */}
-          <Droppable droppableId={column._id} type="task">
+          <Droppable droppableId={column.id} type="task">
             {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
               <div
                 ref={provided.innerRef}
@@ -118,7 +118,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
               >
                 {column.tasks.map((task, taskIndex) => (
                   <TaskCard
-                    key={task._id}
+                    key={task.id}
                     task={task}
                     index={taskIndex}
                     onClick={onTaskClick}
