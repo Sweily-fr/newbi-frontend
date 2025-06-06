@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
-import { KanbanBoard, KanbanColumn, KanbanTask } from '../types/kanban';
+import { KanbanBoard } from '../types/kanban';
 
 interface UseDragAndDropProps {
   board: KanbanBoard;
@@ -10,18 +10,18 @@ interface UseDragAndDropProps {
     destinationColumnId: string;
     taskId: string;
     newOrder: number;
-  }) => Promise<any>;
+  }) => Promise<void>;
   reorderColumns: (input: {
     boardId: string;
     columnIds: string[];
-  }) => Promise<any>;
+  }) => Promise<void>;
 }
 
 export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDropProps) => {
   const [localBoard, setLocalBoard] = useState<KanbanBoard | null>(null);
   
   // Mettre à jour l'état local lorsque le board change
-  if (board && (!localBoard || board._id !== localBoard._id)) {
+  if (board && (!localBoard || board.id !== localBoard?.id)) {
     setLocalBoard(board);
   }
 
@@ -55,8 +55,8 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
       // Envoyer la mise à jour au serveur
       try {
         await reorderColumns({
-          boardId: board._id,
-          columnIds: newColumns.map(col => col._id)
+          boardId: board.id,
+          columnIds: newColumns.map(col => col.id)
         });
       } catch (error) {
         console.error("Erreur lors de la réorganisation des colonnes:", error);
@@ -73,8 +73,8 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
       const destinationColumnId = destination.droppableId;
       
       // Trouver les colonnes source et destination
-      const sourceColumn = localBoard.columns.find(col => col._id === sourceColumnId);
-      const destinationColumn = localBoard.columns.find(col => col._id === destinationColumnId);
+      const sourceColumn = localBoard.columns.find(col => col.id === sourceColumnId);
+      const destinationColumn = localBoard.columns.find(col => col.id === destinationColumnId);
       
       if (!sourceColumn || !destinationColumn) return;
       
@@ -93,7 +93,7 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
         
         // Mettre à jour l'ordre local immédiatement
         const newColumns = localBoard.columns.map(col => {
-          if (col._id === sourceColumnId) {
+          if (col.id === sourceColumnId) {
             return {
               ...col,
               tasks: destinationTasks.map((task, index) => ({
@@ -119,7 +119,7 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
         
         // Mettre à jour l'ordre local immédiatement
         const newColumns = localBoard.columns.map(col => {
-          if (col._id === sourceColumnId) {
+          if (col.id === sourceColumnId) {
             return {
               ...col,
               tasks: sourceTasks.map((task, index) => ({
@@ -128,7 +128,7 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
               }))
             };
           }
-          if (col._id === destinationColumnId) {
+          if (col.id === destinationColumnId) {
             return {
               ...col,
               tasks: destinationTasks.map((task, index) => ({
@@ -150,10 +150,10 @@ export const useDragAndDrop = ({ board, moveTask, reorderColumns }: UseDragAndDr
       // Envoyer la mise à jour au serveur
       try {
         await moveTask({
-          boardId: board._id,
+          boardId: board.id,
           sourceColumnId,
           destinationColumnId,
-          taskId: movedTask._id,
+          taskId: movedTask.id,
           newOrder: destination.index
         });
       } catch (error) {
