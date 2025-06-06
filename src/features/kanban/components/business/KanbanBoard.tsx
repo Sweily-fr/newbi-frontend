@@ -253,89 +253,6 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
     setIsTaskDetailModalOpen(true);
   }, [setSelectedTask, setIsTaskDetailModalOpen]);
 
-// Fonction pour initialiser les colonnes si nécessaire
-const initializeColumns = useCallback(async () => {
-  if (!board || board.columns.length > 0) {
-    return;
-  }
-
-  try {
-    // Créer les colonnes par défaut
-    await addColumn({ title: 'À faire' });
-    await addColumn({ title: 'En cours' });
-    await addColumn({ title: 'Terminé' });
-  } catch (error) {
-    console.error('Erreur lors de l\'initialisation des colonnes:', error);
-  }
-}, [board, addColumn]);
-
-// Initialiser les colonnes au chargement initial
-useEffect(() => {
-  if (board && !loading) {
-    initializeColumns();
-  }
-}, [board, loading, initializeColumns]);
-
-// Fonction pour ajouter une colonne (utilisée dans l'UI)
-const handleAddColumn = useCallback(async () => {
-  if (!newColumnTitle.trim()) {
-    return;
-  }
-
-  try {
-    await addColumn({ title: newColumnTitle });
-    setNewColumnTitle('');
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout de la colonne:', error);
-  }
-}, [newColumnTitle, addColumn]);
-
-// Fonction pour ajouter une tâche
-const handleAddTask = useCallback(async (columnId: string, title: string) => {
-  if (!title.trim() || !columnId) {
-    return;
-  }
-
-  try {
-    await addTask({
-      title,
-      description: '',
-      columnId,
-    });
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout de la tâche:', error);
-  }
-}, [addTask]);
-
-// Gérer la modification d'une colonne
-const handleUpdateColumn = useCallback(async (columnId: string, title: string) => {
-  if (!title.trim()) return;
-
-  try {
-    await updateColumn({
-      columnId,
-      title,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour de la colonne:", error);
-  }
-}, [updateColumn]);
-
-// Gérer la suppression d'une colonne
-const handleDeleteColumn = useCallback(async (columnId: string) => {
-  try {
-    await deleteColumn(columnId);
-  } catch (error) {
-    console.error("Erreur lors de la suppression de la colonne:", error);
-  }
-}, [deleteColumn]);
-
-// Fonction pour voir les détails d'une tâche
-const handleViewTask = useCallback((task: KanbanTask) => {
-  setSelectedTask(task);
-  setIsTaskDetailModalOpen(true);
-}, [setSelectedTask, setIsTaskDetailModalOpen]);
-
 // Gérer la mise à jour d'une tâche
 const handleUpdateTask = useCallback(async (taskId: string, updates: Record<string, unknown>) => {
   try {
@@ -498,35 +415,7 @@ return (
           <div className="mb-4">
             <h3 className="text-lg font-medium text-gray-800 mb-2">Description</h3>
             <p className="text-gray-700">{selectedTask.description || "Aucune description"}</p>
-                ))
-            ) : (
-              <div className="flex items-center justify-center w-full">
-                <div className="bg-[#f0eeff] border border-[#5b50ff]/20 rounded-lg p-4 text-gray-700">
-                  <p className="flex items-center">
-                    <MessageSquare size={20} color="#5b50ff" className="mr-2" />
-                    Aucune colonne n'a été créée pour ce tableau.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
-        </div>
-      </DndContext>
-      
-      {/* Modal de détail de tâche */}
-      {selectedTask && isTaskDetailModalOpen && (
-        <Modal
-          isOpen={isTaskDetailModalOpen}
-          onClose={() => setIsTaskDetailModalOpen(false)}
-          title={selectedTask.title}
-          size="lg"
-        >
-          <div className="p-4">
-            {/* Contenu de la tâche */}
-            <div className="mb-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Description</h3>
-              <p className="text-gray-700">{selectedTask.description || "Aucune description"}</p>
-            </div>
             
             {/* Membres assignés */}
             <div className="mb-4">
