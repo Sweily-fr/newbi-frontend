@@ -1,14 +1,17 @@
 import React from 'react';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { seoConfig } from '../config/seoConfig';
 
 export const TermsPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <SEOHead
-        title="Conditions Générales de Vente | Newbi"
-        description="Conditions générales de vente de Newbi - Modalités d'utilisation de nos services et de souscription à nos offres."
+        title={seoConfig.terms.title}
+        description={seoConfig.terms.description}
+        keywords={seoConfig.terms.keywords}
         schemaType="Organization"
-        canonicalUrl="https://www.newbi.fr/conditions-generales-de-vente"
+        canonicalUrl={seoConfig.terms.canonicalUrl}
+        ogImage={seoConfig.terms.ogImage}
       />
       
       <div className="bg-white border border-gray-200 rounded-2xl p-8">

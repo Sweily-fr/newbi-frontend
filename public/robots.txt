@@ -7,6 +7,9 @@ Disallow: /reset-password
 Disallow: /verify-email
 Disallow: /resend-verification
 Disallow: /change-password
+Disallow: /auth
+Disallow: /forgot-password
+Disallow: /preferences-cookies
 
 # Autoriser explicitement l'accès au blog et à ses articles
 Allow: /blog

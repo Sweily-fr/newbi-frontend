@@ -1,14 +1,17 @@
 import React from 'react';
 import { SEOHead } from '../components/specific/SEO/SEOHead';
+import { seoConfig } from '../config/seoConfig';
 
 export const PrivacyPolicyPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <SEOHead
-        title="Politique de Confidentialité | Newbi"
-        description="Politique de confidentialité de Newbi - Comment nous collectons, utilisons et protégeons vos données personnelles."
+        title={seoConfig.privacyPolicy.title}
+        description={seoConfig.privacyPolicy.description}
+        keywords={seoConfig.privacyPolicy.keywords}
         schemaType="Organization"
-        canonicalUrl="https://www.newbi.fr/politique-de-confidentialite"
+        canonicalUrl={seoConfig.privacyPolicy.canonicalUrl}
+        ogImage={seoConfig.privacyPolicy.ogImage}
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">
