@@ -13,3 +13,6 @@ export { digitalInvoiceArticle } from './digitalInvoiceArticle';
 export { quoteVsOrderArticle } from './quoteVsOrderArticle';
 export { editInvoiceArticle } from './editInvoiceArticle';
 export { seoSoloOptimizationArticle } from './seoSoloOptimizationArticle';
+export { gestionIndependantArticle } from './gestionIndependantArticle';
+export { erpArticle } from './erpArticle';
+
