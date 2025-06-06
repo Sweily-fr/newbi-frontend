@@ -13,7 +13,9 @@ import {
   digitalInvoiceArticle,
   quoteVsOrderArticle,
   editInvoiceArticle,
-  seoSoloOptimizationArticle
+  seoSoloOptimizationArticle,
+  erpArticle,
+  gestionIndependantArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
@@ -30,8 +32,10 @@ export const blogArticles: BlogArticle[] = [
   invoiceTemplateArticle,
   quoteCreationArticle,
   businessToolsArticle,
-  digitalInvoiceArticle
-];
+  digitalInvoiceArticle,
+  gestionIndependantArticle,
+  erpArticle,
+].sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
 // Fonction utilitaire pour trouver un article par son slug
 export const getArticleBySlug = (slug: string): BlogArticle | undefined => {

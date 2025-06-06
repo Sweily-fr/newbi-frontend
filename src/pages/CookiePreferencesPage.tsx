@@ -107,6 +107,7 @@ export const CookiePreferencesPage: React.FC = () => {
         description="Gérez vos préférences de cookies sur Newbi - Contrôlez quels cookies sont utilisés lors de votre navigation sur notre site et personnalisez votre expérience."
         keywords="cookies, préférences cookies, RGPD, confidentialité, paramètres, vie privée"
         schemaType="WebPage"
+        noindex={true}
         additionalSchemaData={{
           'specialty': 'Privacy Settings'
         }}
