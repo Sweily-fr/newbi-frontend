@@ -106,7 +106,11 @@ export const useKanbanBoard = (boardId: string) => {
     try {
       const { columnId, ...updateData } = input;
       const { data } = await updateColumnMutation({
-        variables: { id: columnId, input: { ...updateData, boardId } },
+        variables: {
+          boardId,
+          columnId,
+          input: updateData
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.updateKanbanColumn;
@@ -119,7 +123,10 @@ export const useKanbanBoard = (boardId: string) => {
   const deleteColumn = async (columnId: string) => {
     try {
       const { data } = await deleteColumnMutation({
-        variables: { id: columnId },
+        variables: {
+          boardId,
+          columnId
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.deleteKanbanColumn;
@@ -268,6 +275,7 @@ export const useKanbanBoard = (boardId: string) => {
     
     // Opérations sur les colonnes
     createColumn,
+    addColumn: createColumn, // Alias pour maintenir la compatibilité avec le composant KanbanBoard
     updateColumn,
     deleteColumn,
     reorderColumns,
@@ -279,6 +287,7 @@ export const useKanbanBoard = (boardId: string) => {
     
     // Opérations sur les tâches
     createTask,
+    addTask: createTask, // Alias pour maintenir la compatibilité avec le composant KanbanBoard
     updateTask,
     deleteTask,
     moveTask,

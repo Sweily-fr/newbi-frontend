@@ -2,21 +2,19 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { KanbanColumn as KanbanColumnType, KanbanTask } from '../../types/kanban';
-import { Plus, MoreVertical, Edit2, Trash2 } from 'react-feather';
+import { MoreVertical, Plus, Edit, Trash } from 'react-feather';
 import { KanbanTaskDndKit } from './KanbanTaskDndKit';
 
 interface KanbanColumnProps {
   column: KanbanColumnType;
-  index: number;
-  onTaskClick: (taskId: string) => void;
-  onAddTask: (columnId: string) => void;
-  onEditColumn: (columnId: string, title: string) => void;
+  onTaskClick: (task: KanbanTask) => void;
+  onAddTask: (columnId: string, title?: string) => void;
+  onEditColumn: (columnId: string, title?: string) => void;
   onDeleteColumn?: (columnId: string) => void;
 }
 
 export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
   column,
-  index,
   onTaskClick,
   onAddTask,
   onEditColumn,
@@ -60,7 +58,12 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
   };
 
   const handleTitleSubmit = () => {
-    onEditColumn(column.id, title);
+    if (title.trim() && title !== column.title) {
+      onEditColumn(column.id, title);
+    } else {
+      // Réinitialiser le titre si vide ou inchangé
+      setTitle(column.title);
+    }
     setIsEditing(false);
   };
 
@@ -94,6 +97,8 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
             onKeyDown={handleKeyDown}
             className="flex-1 px-2 py-1 border border-[#5b50ff] rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#5b50ff]/30"
             autoFocus
+            placeholder="Nom de la colonne"
+            aria-label="Modifier le nom de la colonne"
           />
         ) : (
           <h3 className="font-medium text-gray-800">{column.title}</h3>
@@ -113,7 +118,7 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
                 onClick={handleEditClick}
                 className="flex items-center w-full px-4 py-2 text-sm text-left hover:bg-[#f0eeff] transition-colors"
               >
-                <Edit2 size={14} className="mr-2 text-gray-600" />
+                <Edit size={14} className="mr-2 text-gray-600" />
                 Modifier
               </button>
               {onDeleteColumn && (
@@ -121,7 +126,7 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
                   onClick={handleDeleteClick}
                   className="flex items-center w-full px-4 py-2 text-sm text-left hover:bg-red-50 text-red-600 transition-colors"
                 >
-                  <Trash2 size={14} className="mr-2" />
+                  <Trash size={14} className="mr-2" />
                   Supprimer
                 </button>
               )}
@@ -140,7 +145,7 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
               <KanbanTaskDndKit
                 key={task.id}
                 task={task}
-                onClick={() => onTaskClick(task.id)}
+                onClick={() => onTaskClick(task)}
                 columnId={column.id}
               />
             ))
