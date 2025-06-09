@@ -82,17 +82,11 @@ export const useFileTransferByLink = (shareLink: string, accessKey: string) => {
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file); // Utilise readAsDataURL pour inclure l'en-tête MIME
+    reader.readAsDataURL(file); // Utilise readAsDataURL qui inclut déjà l'en-tête MIME
     reader.onload = () => {
       const result = reader.result as string;
-      // Vérifier que le résultat contient bien l'en-tête MIME
-      if (!result.includes(';base64,')) {
-        // Si l'en-tête est absent, l'ajouter manuellement
-        const mimeHeader = `data:${file.type || 'application/octet-stream'};base64,`;
-        resolve(mimeHeader + result);
-      } else {
-        resolve(result);
-      }
+      // readAsDataURL retourne déjà le format "data:mime/type;base64,content"
+      resolve(result);
     };
     reader.onerror = error => reject(error);
   });
@@ -127,6 +121,9 @@ export const useCreateFileTransfer = () => {
       
       for (const file of files) {
         try {
+          // Debug: Afficher les informations du fichier original
+          logger.info('Fichier original:', file.name, file.size, file.type);
+          
           // Mettre à jour la progression pour montrer que le fichier est en cours de traitement
           setUploadProgress(prev => 
             prev.map((item, index) => 
@@ -138,6 +135,10 @@ export const useCreateFileTransfer = () => {
           
           // Convertir le fichier en base64
           const base64 = await fileToBase64(file);
+          
+          // Debug: Vérifier la longueur du base64 et son début
+          logger.info(`Base64 length: ${base64.length}`);
+          logger.info(`Base64 start: ${base64.substring(0, 100)}...`);
           
           // Ajouter le fichier converti à la liste
           base64Files.push({
@@ -163,6 +164,9 @@ export const useCreateFileTransfer = () => {
         }
       }
       
+      // Debug: Afficher le nombre de fichiers à envoyer
+      logger.info(`Envoi de ${base64Files.length} fichiers au serveur`);
+      
       // Envoyer les fichiers en base64 au serveur
       const result = await createFileTransferBase64({
         variables: {
@@ -176,6 +180,9 @@ export const useCreateFileTransfer = () => {
           }
         }
       });
+      
+      // Debug: Vérifier la réponse du serveur
+      logger.info('Réponse du serveur:', result.data?.createFileTransferBase64);
       
       // Marquer tous les fichiers comme téléchargés avec succès
       setUploadProgress(prev => 

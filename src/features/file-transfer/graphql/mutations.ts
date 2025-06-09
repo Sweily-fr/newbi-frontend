@@ -43,6 +43,8 @@ export const CREATE_FILE_TRANSFER_BASE64 = gql`
       files: $files
       input: $input
     ) {
+      success
+      message
       fileTransfer {
         id
         shareLink
