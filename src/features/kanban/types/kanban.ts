@@ -127,8 +127,10 @@ export interface TaskUpdateInput {
 export interface MoveTaskInput {
   taskId: string;
   sourceColumnId: string;
-  destinationColumnId: string;
-  newOrder: number;
+  destinationColumnId: string; // Utilisé côté frontend
+  newOrder: number; // Utilisé côté frontend
+  // Note: Ces champs sont renommés dans la fonction moveTask pour correspondre à la mutation GraphQL
+  // qui attend targetColumnId et order
 }
 
 // Ajout d'une interface pour les pièces jointes

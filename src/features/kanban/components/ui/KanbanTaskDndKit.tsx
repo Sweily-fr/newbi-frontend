@@ -2,7 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { KanbanTask } from '../../types/kanban';
-import { Calendar, MessageSquare, Paperclip, User } from 'react-feather';
+import { Calendar, MessageSquare, Paperclip } from 'react-feather';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -32,9 +32,15 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 1
+    opacity: isDragging ? 0.85 : 1,
+    zIndex: isDragging ? 1000 : 1,
+    boxShadow: isDragging ? '0 8px 20px rgba(91, 80, 255, 0.4)' : 'none',
+    scale: isDragging ? '1.03' : '1',
+    rotate: isDragging ? '1deg' : '0deg',
   };
+  
+  // Classe CSS pour l'élément en cours de déplacement
+  const dragClass = isDragging ? 'ring-2 ring-[#5b50ff] bg-[#f0eeff]/80 border-[#5b50ff]/30' : '';
 
   // Formater la date d'échéance si elle existe
   const formattedDueDate = task.dueDate
@@ -55,12 +61,15 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
     }
   };
 
-  // Extraire la priorité des étiquettes si elle existe
-  const priorityLabel = task.labels?.find(label => 
-    ['high', 'medium', 'low'].includes(label.toLowerCase())
-  );
-  
-  const priorityClass = getPriorityColor(priorityLabel);
+  // Pas besoin de vérifier les étiquettes de priorité ici car nous le faisons directement dans le rendu
+
+  // Fonction pour gérer le clic sur la tâche sans interférer avec le drag-and-drop
+  const handleClick = () => {
+    // Si nous ne sommes pas en train de faire un drag, alors on traite le clic
+    if (!isDragging) {
+      onClick();
+    }
+  };
 
   return (
     <div
@@ -68,9 +77,16 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
       style={style}
       {...attributes}
       {...listeners}
-      onClick={onClick}
-      className="bg-white p-3 rounded-md shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+      className={`bg-white p-3 rounded-md shadow-sm border border-gray-200 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} hover:shadow-md transition-all ${dragClass}`}
     >
+      {/* Bouton transparent qui gère uniquement les clics */}
+      <button 
+        onClick={handleClick}
+        className="absolute inset-0 z-10 bg-transparent border-0 w-full h-full cursor-pointer"
+        type="button"
+        aria-label="Ouvrir les détails de la tâche"
+      ></button>
+
       {/* Titre de la tâche */}
       <h4 className="font-medium text-gray-800 mb-2">{task.title}</h4>
       
@@ -82,18 +98,24 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
       {/* Étiquettes */}
       {task.labels && task.labels.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
-          {task.labels.map((label, index) => (
-            <span
-              key={index}
-              className={`text-xs px-2 py-0.5 rounded-full ${
-                ['high', 'medium', 'low'].includes(label.toLowerCase())
-                  ? getPriorityColor(label.toLowerCase())
-                  : 'bg-[#f0eeff] text-[#5b50ff]'
-              }`}
-            >
-              {label}
-            </span>
-          ))}
+          {task.labels.map((label, index) => {
+            const isPriority = ['high', 'medium', 'low'].includes(label.toLowerCase());
+            return (
+              <span
+                key={index}
+                className={`text-xs px-2 py-0.5 rounded-full ${
+                  isPriority
+                    ? getPriorityColor(label.toLowerCase())
+                    : 'bg-[#f0eeff] text-[#5b50ff]'
+                }`}
+              >
+                {label === 'high' ? 'Haute' : 
+                 label === 'medium' ? 'Moyenne' : 
+                 label === 'low' ? 'Basse' : 
+                 label}
+              </span>
+            );
+          })}
         </div>
       )}
       

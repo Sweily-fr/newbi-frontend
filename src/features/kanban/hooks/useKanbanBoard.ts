@@ -9,6 +9,7 @@ import {
   KanbanBoard, ColumnInput, ColumnUpdateInput, ReorderColumnsInput,
   TaskInput, TaskUpdateInput, MoveTaskInput, CommentInput
 } from '../types/kanban';
+import { logger } from '../../../utils/logger';
 
 // Colonnes par défaut pour les tableaux Kanban
 const DEFAULT_COLUMNS = [
@@ -52,7 +53,7 @@ export const useKanbanBoard = (boardId: string) => {
   // Fonctions pour les colonnes
   const createColumn = async (input: ColumnInput) => {
     try {
-      console.log(`Création de colonne avec titre "${input.title}" pour le tableau ${boardId}`);
+      logger.log(`Création de colonne avec titre "${input.title}" pour le tableau ${boardId}`);
       
       // Exécuter la mutation avec mise à jour optimiste du cache
       const { data } = await createColumnMutation({
@@ -72,10 +73,10 @@ export const useKanbanBoard = (boardId: string) => {
                 variables: { id: boardId },
                 data: { kanbanBoard: mutationData.addKanbanColumn }
               });
-              console.log("Cache mis à jour avec la nouvelle colonne");
+              logger.log("Cache mis à jour avec la nouvelle colonne");
             }
           } catch (cacheError) {
-            console.error("Erreur lors de la mise à jour du cache:", cacheError);
+            logger.error("Erreur lors de la mise à jour du cache:", cacheError);
           }
         },
         // Refetch pour s'assurer que les données sont à jour
@@ -84,7 +85,7 @@ export const useKanbanBoard = (boardId: string) => {
         awaitRefetchQueries: true
       });
       
-      console.log("Résultat de la mutation addKanbanColumn:", data);
+      logger.log("Résultat de la mutation addKanbanColumn:", data);
       
       if (!data || !data.addKanbanColumn) {
         throw new Error("La mutation addKanbanColumn n'a pas retourné de données");
@@ -97,7 +98,7 @@ export const useKanbanBoard = (boardId: string) => {
       
       return data.addKanbanColumn;
     } catch (error) {
-      console.error("Erreur lors de la création de la colonne:", error);
+      logger.error("Erreur lors de la création de la colonne:", error);
       throw error;
     }
   };
@@ -115,7 +116,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.updateKanbanColumn;
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la colonne:", error);
+      logger.error("Erreur lors de la mise à jour de la colonne:", error);
       throw error;
     }
   };
@@ -131,7 +132,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.deleteKanbanColumn;
     } catch (error) {
-      console.error("Erreur lors de la suppression de la colonne:", error);
+      logger.error("Erreur lors de la suppression de la colonne:", error);
       throw error;
     }
   };
@@ -144,7 +145,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.reorderKanbanColumns;
     } catch (error) {
-      console.error("Erreur lors de la réorganisation des colonnes:", error);
+      logger.error("Erreur lors de la réorganisation des colonnes:", error);
       throw error;
     }
   };
@@ -153,13 +154,23 @@ export const useKanbanBoard = (boardId: string) => {
   const createTask = async (input: TaskInput & { columnId: string }) => {
     try {
       const { columnId, ...taskData } = input;
+      // Ajouter le status par défaut si non fourni
+      const taskInput = {
+        ...taskData,
+        status: taskData.status || 'todo' // Valeur par défaut pour le status requis
+      };
+      
       const { data } = await createTaskMutation({
-        variables: { input: { ...taskData, boardId, columnId } },
+        variables: { 
+          boardId, 
+          columnId, 
+          input: taskInput 
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
-      return data.createKanbanTask;
+      return data.addKanbanTask;
     } catch (error) {
-      console.error("Erreur lors de la création de la tâche:", error);
+      logger.error("Erreur lors de la création de la tâche:", error);
       throw error;
     }
   };
@@ -173,7 +184,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.updateKanbanTask;
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la tâche:", error);
+      logger.error("Erreur lors de la mise à jour de la tâche:", error);
       throw error;
     }
   };
@@ -186,20 +197,28 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.deleteKanbanTask;
     } catch (error) {
-      console.error("Erreur lors de la suppression de la tâche:", error);
+      logger.error("Erreur lors de la suppression de la tâche:", error);
       throw error;
     }
   };
 
   const moveTask = async (input: MoveTaskInput) => {
     try {
+      const { taskId, sourceColumnId, destinationColumnId, newOrder } = input;
+      
       const { data } = await moveTaskMutation({
-        variables: { input: { ...input, boardId } },
+        variables: { 
+          boardId, 
+          taskId, 
+          sourceColumnId, 
+          targetColumnId: destinationColumnId, // Renommer destinationColumnId en targetColumnId
+          order: newOrder || 0 // Utiliser newOrder ou 0 par défaut
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.moveKanbanTask;
     } catch (error) {
-      console.error("Erreur lors du déplacement de la tâche:", error);
+      logger.error("Erreur lors du déplacement de la tâche:", error);
       throw error;
     }
   };
@@ -214,7 +233,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.addKanbanComment;
     } catch (error) {
-      console.error("Erreur lors de l'ajout du commentaire:", error);
+      logger.error("Erreur lors de l'ajout du commentaire:", error);
       throw error;
     }
   };
@@ -227,7 +246,7 @@ export const useKanbanBoard = (boardId: string) => {
       });
       return data.deleteKanbanComment;
     } catch (error) {
-      console.error("Erreur lors de la suppression du commentaire:", error);
+      logger.error("Erreur lors de la suppression du commentaire:", error);
       throw error;
     }
   };
@@ -235,7 +254,7 @@ export const useKanbanBoard = (boardId: string) => {
   // Fonction pour initialiser les colonnes par défaut si le tableau est vide
   const initializeDefaultColumns = async () => {
     if (!boardData?.kanbanBoard) {
-      console.log("Impossible d'initialiser les colonnes : tableau non disponible");
+      logger.log("Impossible d'initialiser les colonnes : tableau non disponible");
       return;
     }
     
@@ -243,16 +262,16 @@ export const useKanbanBoard = (boardId: string) => {
     
     // Vérifier si le tableau a déjà des colonnes
     if (board.columns.length > 0) {
-      console.log("Le tableau possède déjà des colonnes, initialisation ignorée");
+      logger.log("Le tableau possède déjà des colonnes, initialisation ignorée");
       return;
     }
     
     try {
-      console.log(`Création des colonnes par défaut pour le tableau ${board.id}`);
+      logger.log(`Création des colonnes par défaut pour le tableau ${board.id}`);
       
       // Créer les colonnes par défaut en séquence
       for (const column of DEFAULT_COLUMNS) {
-        console.log(`Création de la colonne par défaut: ${column.title}`);
+        logger.log(`Création de la colonne par défaut: ${column.title}`);
         await createColumn(column);
         // Ajouter un petit délai entre chaque création pour éviter les conflits
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -260,9 +279,9 @@ export const useKanbanBoard = (boardId: string) => {
       
       // Rafraîchir une dernière fois pour s'assurer que toutes les colonnes sont chargées
       await refetchBoard();
-      console.log("Colonnes par défaut créées avec succès");
+      logger.log("Colonnes par défaut créées avec succès");
     } catch (error) {
-      console.error("Erreur lors de l'initialisation des colonnes par défaut:", error);
+      logger.error("Erreur lors de l'initialisation des colonnes par défaut:", error);
       throw error;
     }
   };
