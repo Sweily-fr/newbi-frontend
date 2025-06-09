@@ -4,7 +4,7 @@ import { useFileTransferByLink } from '../hooks/useFileTransfer';
 import { formatFileSize, formatExpiryDate, isImage } from '../utils/fileUtils';
 import { ArrowDown2, Calendar, CloseCircle, DocumentText, Image as ImageIcon, Lock1, MoneyRecive } from 'iconsax-react';
 import { logger } from '../../../utils/logger';
-import { File as FileType, FileTransfer } from '../types';
+import { File as FileType, FileTransfer, FileTransferPaymentInfo } from '../types';
 
 // Type pour la réponse du hook useFileTransferByLink
 interface FileTransferAccessResponse {
@@ -37,71 +37,70 @@ const FileDownloadPage: React.FC = () => {
       // Mettre à jour l'état de téléchargement pour ce fichier
       setDownloadingFiles(prev => ({ ...prev, [file.id]: true }));
       
-      // Appeler l'API de téléchargement
+      // Appeler l'API de téléchargement avec responseType blob pour éviter les problèmes d'encodage
       const response = await fetch(`/api/file-transfer/download/${shareLink}/${accessKey}/${file.id}`, {
         method: 'GET',
         credentials: 'include',
+        headers: {
+          'Accept': '*/*',  // Accepter tous les types de contenu
+        }
       });
       
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
       
-      // Vérifier si la réponse contient des données
-      if (!response.body) {
-        throw new Error('Aucune donnée reçue du serveur');
-      }
-      
-      // Créer un lecteur de flux pour gérer la réponse en streaming
-      const reader = response.body.getReader();
+      // Vérifier le type de contenu
+      const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
+      const contentDisposition = response.headers.get('Content-Disposition') || '';
       const contentLength = Number(response.headers.get('Content-Length')) || 0;
-      let receivedLength = 0;
-      const chunks: Uint8Array[] = [];
       
-      // Lire les données en streaming
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) break;
-        
-        chunks.push(value);
-        receivedLength += value.length;
-        
-        // Mettre à jour la progression si nécessaire
-        if (contentLength > 0) {
-          const percentComplete = Math.round((receivedLength / contentLength) * 100);
-          // Vous pouvez ajouter ici une logique pour afficher la progression
-          console.log(`Téléchargement: ${percentComplete}%`);
-        }
+      // Extraire le nom de fichier du header Content-Disposition si disponible
+      let fileName = file.originalName || 'fichier';
+      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(contentDisposition);
+      if (matches && matches[1]) {
+        fileName = matches[1].replace(/['"]*/g, '');
       }
       
-      // Fusionner tous les morceaux
-      const chunksAll = new Uint8Array(receivedLength);
-      let position = 0;
-      for (const chunk of chunks) {
-        chunksAll.set(chunk, position);
-        position += chunk.length;
+      logger.info(`Téléchargement de ${fileName} (${contentType}, ${contentLength} octets)`);
+      
+      // Obtenir le blob directement de la réponse
+      const blob = await response.blob();
+      
+      // Vérifier que le blob a la bonne taille
+      if (contentLength > 0 && blob.size !== contentLength) {
+        logger.warn(`Taille du fichier téléchargé (${blob.size}) différente de la taille attendue (${contentLength})`);
       }
       
-      // Créer le blob et le lien de téléchargement
-      const blob = new Blob([chunksAll], { type: response.headers.get('Content-Type') || 'application/octet-stream' });
+      // Créer un objet URL pour le blob
       const url = window.URL.createObjectURL(blob);
       
       // Créer un élément de lien pour déclencher le téléchargement
       const a = document.createElement('a');
       a.href = url;
-      a.download = file.originalName || 'fichier';
+      a.download = fileName;
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
       
-      // Nettoyer
-      window.URL.revokeObjectURL(url);
-      a.remove();
+      // Nettoyer après un court délai pour s'assurer que le téléchargement a commencé
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        // Réinitialiser l'état de téléchargement après un délai
+        setTimeout(() => {
+          setDownloadingFiles(prev => ({ ...prev, [file.id]: false }));
+        }, 1000);
+      }, 100);
       
-      logger.info(`Fichier téléchargé avec succès: ${file.originalName}`);
+      logger.info(`Fichier téléchargé avec succès: ${fileName}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       logger.error('Erreur lors du téléchargement du fichier:', errorMessage);
+      
+      // Réinitialiser l'état de téléchargement
+      setDownloadingFiles(prev => ({ ...prev, [file.id]: false }));
       
       // Afficher une notification d'erreur à l'utilisateur
       alert(`Erreur lors du téléchargement: ${errorMessage}. Veuillez réessayer.`);

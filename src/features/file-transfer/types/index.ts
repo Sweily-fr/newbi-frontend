@@ -13,6 +13,15 @@ export interface File {
   filePath: string;
 }
 
+export interface FileTransferPaymentInfo {
+  isPaymentRequired: boolean;
+  isPaid: boolean;
+  paymentAmount?: number;
+  paymentCurrency?: string;
+  paymentLink?: string;
+  stripeSessionId?: string;
+}
+
 export interface FileTransfer {
   id: string;
   userId: string;
@@ -23,11 +32,11 @@ export interface FileTransfer {
   expiryDate: string;
   status: FileTransferStatus;
   isPaymentRequired: boolean;
+  isPaid: boolean;
   paymentAmount?: number;
   paymentCurrency?: string;
-  isPaid: boolean;
-  paymentSessionId?: string;
-  paymentSessionUrl?: string;
+  paymentLink?: string;
+  recipientEmail?: string;
   downloadCount: number;
   createdAt: string;
   updatedAt: string;
