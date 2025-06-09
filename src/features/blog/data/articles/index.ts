@@ -15,4 +15,7 @@ export { editInvoiceArticle } from './editInvoiceArticle';
 export { seoSoloOptimizationArticle } from './seoSoloOptimizationArticle';
 export { gestionIndependantArticle } from './gestionIndependantArticle';
 export { erpArticle } from './erpArticle';
+export { compteBancaireFreelanceArticle } from './compte-bancaire-freelance';
+export { calendrierImpots2025Article } from './calendrier-impots-2025';
+export { modifierCodeApeArticle } from './modifier-code-ape';
 
