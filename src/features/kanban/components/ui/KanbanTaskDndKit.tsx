@@ -8,11 +8,12 @@ import { fr } from 'date-fns/locale';
 
 interface KanbanTaskProps {
   task: KanbanTask;
-  onClick: () => void;
+  onClick?: () => void;
   columnId: string;
+  isDragging?: boolean;
 }
 
-export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, columnId }) => {
+export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, columnId, isDragging: externalIsDragging }) => {
   const {
     attributes,
     listeners,
@@ -29,18 +30,21 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
     }
   });
 
+  // Utiliser isDragging externe s'il est fourni, sinon utiliser celui de useSortable
+  const isTaskDragging = externalIsDragging !== undefined ? externalIsDragging : isDragging;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.85 : 1,
-    zIndex: isDragging ? 1000 : 1,
-    boxShadow: isDragging ? '0 8px 20px rgba(91, 80, 255, 0.4)' : 'none',
-    scale: isDragging ? '1.03' : '1',
-    rotate: isDragging ? '1deg' : '0deg',
+    opacity: isTaskDragging ? 0.85 : 1,
+    zIndex: isTaskDragging ? 1000 : 1,
+    boxShadow: isTaskDragging ? '0 8px 20px rgba(91, 80, 255, 0.4)' : 'none',
+    scale: isTaskDragging ? '1.03' : '1',
+    rotate: isTaskDragging ? '1deg' : '0deg',
   };
   
   // Classe CSS pour l'élément en cours de déplacement
-  const dragClass = isDragging ? 'ring-2 ring-[#5b50ff] bg-[#f0eeff]/80 border-[#5b50ff]/30' : '';
+  const dragClass = isTaskDragging ? 'ring-2 ring-[#5b50ff] bg-[#f0eeff]/80 border-[#5b50ff]/30' : '';
 
   // Formater la date d'échéance si elle existe
   const formattedDueDate = task.dueDate
@@ -65,8 +69,8 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
 
   // Fonction pour gérer le clic sur la tâche sans interférer avec le drag-and-drop
   const handleClick = () => {
-    // Si nous ne sommes pas en train de faire un drag, alors on traite le clic
-    if (!isDragging) {
+    // Si nous ne sommes pas en train de faire un drag et onClick est défini, alors on traite le clic
+    if (!isTaskDragging && onClick) {
       onClick();
     }
   };
@@ -77,7 +81,7 @@ export const KanbanTaskDndKit: React.FC<KanbanTaskProps> = ({ task, onClick, col
       style={style}
       {...attributes}
       {...listeners}
-      className={`bg-white p-3 rounded-md shadow-sm border border-gray-200 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} hover:shadow-md transition-all ${dragClass}`}
+      className={`bg-white p-3 rounded-md shadow-sm border border-gray-200 ${isTaskDragging ? 'cursor-grabbing' : 'cursor-grab'} hover:shadow-md transition-all ${dragClass}`}
     >
       {/* Bouton transparent qui gère uniquement les clics */}
       <button 

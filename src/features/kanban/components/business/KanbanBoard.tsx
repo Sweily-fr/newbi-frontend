@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, closestCenter, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
-import { KanbanTask } from '../../types/kanban';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { KanbanTask, KanbanColumn } from '../../types/kanban';
 import { useKanbanBoard } from '../../hooks/useKanbanBoard';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -23,6 +24,7 @@ interface DragItem {
   id: string;
   type: 'column' | 'task';
   columnId?: string;
+  column?: KanbanColumn;
 }
 
 export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
@@ -45,6 +47,7 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
   // activeTaskId n'est pas directement utilisé dans le rendu mais est nécessaire pour le suivi interne
   const [, setActiveTaskId] = useState<string | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [activeColumn, setActiveColumn] = useState<KanbanColumn | null>(null);
 
   // Configurer les capteurs pour le drag and drop
   const mouseSensor = useSensor(MouseSensor, {
@@ -77,6 +80,7 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
     deleteTask,
     updateColumn,
     deleteColumn,
+    reorderColumns,
   } = useKanbanBoard(boardId);
 
   // Normaliser les données du board pour s'assurer que toutes les propriétés sont correctement nommées
@@ -101,6 +105,8 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
 
     if (!over) {
       setActiveItem(null);
+      setActiveTask(null);
+      setActiveColumn(null);
       return;
     }
 
@@ -138,9 +144,40 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
         }
       }
     }
+    // Vérifier si c'est une colonne
+    else if (active.data.current?.type === 'column') {
+      const activeColumnId = active.id as string;
+      const overColumnId = over.id as string;
+      
+      if (activeColumnId !== overColumnId) {
+        // Récupérer l'ordre actuel des colonnes
+        const oldColumnOrder = normalizedBoard.columns.map(column => column.id);
+        
+        // Trouver les indices des colonnes source et destination
+        const activeColumnIndex = oldColumnOrder.indexOf(activeColumnId);
+        const overColumnIndex = oldColumnOrder.indexOf(overColumnId);
+        
+        if (activeColumnIndex !== -1 && overColumnIndex !== -1) {
+          // Créer un nouvel ordre en déplaçant la colonne
+          const newColumnOrder = [...oldColumnOrder];
+          newColumnOrder.splice(activeColumnIndex, 1);
+          newColumnOrder.splice(overColumnIndex, 0, activeColumnId);
+          
+          logger.log(`Reordering columns: ${newColumnOrder.join(', ')}`);
+          
+          // Appeler la mutation pour réordonner les colonnes
+          reorderColumns({
+            boardId: normalizedBoard.id,
+            columnIds: newColumnOrder
+          });
+        }
+      }
+    }
 
     setActiveItem(null);
-  }, [moveTask, setActiveItem]);
+    setActiveTask(null);
+    setActiveColumn(null);
+  }, [moveTask, reorderColumns, normalizedBoard]);
 
   // Fonction pour gérer le début du drag-and-drop
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -167,8 +204,24 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
           }
         }
       }
+    } else if (active.data.current?.type === 'column') {
+      const columnId = active.id as string;
+      
+      // Trouver la colonne correspondante pour l'overlay
+      if (board && board.columns) {
+        const column = board.columns.find(col => col.id === columnId);
+        if (column) {
+          setActiveItem({
+            id: columnId,
+            type: 'column',
+            column: column
+          });
+          setActiveColumn(column);
+          setActiveColumnId(columnId);
+        }
+      }
     }
-  }, [board, setActiveItem, setActiveTask, setActiveTaskId, setActiveColumnId]);
+  }, [board, setActiveItem, setActiveTask, setActiveTaskId, setActiveColumnId, setActiveColumn]);
 
   // Fonction pour initialiser les colonnes si nécessaire
   const initializeColumns = useCallback(async () => {
@@ -329,12 +382,72 @@ if (boardError) {
 // Si le tableau n'existe pas
 if (!board) {
   return (
-    <div className="flex items-center justify-center h-64">
-      <div className="bg-[#f0eeff] border border-[#5b50ff]/20 rounded-lg p-4 text-gray-700">
-        <p className="flex items-center">
-          <MessageCircle size={20} variant="Bold" color="#5b50ff" className="mr-2" />
-          Ce tableau n'existe pas ou vous n'avez pas les permissions nécessaires.
-        </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* En-tête du tableau avec titre et boutons */}
+      <div className="flex justify-between items-center mb-4 px-4 py-2 bg-white rounded-md shadow-sm">
+        <h1 className="text-2xl font-semibold text-gray-800">{normalizedBoard.title || 'Tableau Kanban'}</h1>
+        <div className="flex space-x-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => setIsAddColumnModalOpen(true)}
+            className="flex items-center"
+          >
+            <Add size="18" className="mr-1" />
+            Ajouter une colonne
+          </Button>
+        </div>
+      </div>
+      
+      {/* Conteneur des colonnes avec défilement horizontal */}
+      <div className="flex-1 overflow-x-auto pb-4">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex h-full gap-4 p-2">
+            <SortableContext 
+              items={normalizedBoard.columns.map(column => column.id)} 
+              strategy={horizontalListSortingStrategy}
+            >
+              {normalizedBoard.columns.map((column) => (
+                <KanbanColumnDndKit
+                  key={column.id}
+                  column={column}
+                  onAddTask={handleAddTask}
+                  onEditColumn={handleColumnEdit}
+                  onDeleteColumn={handleDeleteColumn}
+                />
+              ))}
+            </SortableContext>
+          </div>
+          
+          {/* Overlay pour afficher l'élément en cours de déplacement */}
+          <DragOverlay>
+            {activeTask && (
+              <div className="w-64 opacity-80"> {/* Largeur fixe pour l'overlay */}
+                <KanbanTaskDndKit
+                  task={activeTask}
+                  columnId={activeColumnId || ''}
+                  onClick={() => {}}
+                  isDragging={true}
+                />
+              </div>
+            )}
+            {activeColumn && (
+              <div className="opacity-80">
+                <KanbanColumnDndKit
+                  column={activeColumn}
+                  onAddTask={handleAddTask}
+                  onEditColumn={handleColumnEdit}
+                  onDeleteColumn={handleDeleteColumn}
+                  isDragging={true}
+                />
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   );

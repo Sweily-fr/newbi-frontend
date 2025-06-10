@@ -140,7 +140,10 @@ export const useKanbanBoard = (boardId: string) => {
   const reorderColumns = async (input: ReorderColumnsInput) => {
     try {
       const { data } = await reorderColumnsMutation({
-        variables: { input },
+        variables: {
+          boardId: input.boardId,
+          columnIds: input.columnIds
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.reorderKanbanColumns;

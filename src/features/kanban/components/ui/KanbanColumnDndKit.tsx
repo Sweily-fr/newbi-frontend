@@ -9,10 +9,11 @@ import { Button } from '../../../../components/common/Button';
 
 interface KanbanColumnProps {
   column: KanbanColumnType;
-  onTaskClick: (task: KanbanTask) => void;
+  onTaskClick?: (task: KanbanTask) => void;
   onAddTask: (columnId: string, title: string, description?: string, dueDate?: string, priority?: string) => void;
   onEditColumn: (columnId: string, title?: string) => void;
   onDeleteColumn?: (columnId: string) => void;
+  isDragging?: boolean; // Propriété pour indiquer si la colonne est en cours de glissement
 }
 
 export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
@@ -20,7 +21,8 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
   onTaskClick,
   onAddTask,
   onEditColumn,
-  onDeleteColumn
+  onDeleteColumn,
+  isDragging: externalIsDragging
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
@@ -37,7 +39,7 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging: dndIsDragging,
     isOver
   } = useSortable({
     id: column.id,
@@ -46,6 +48,9 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
       column
     }
   });
+
+  // Utiliser isDragging externe s'il est fourni, sinon utiliser celui de useSortable
+  const isDragging = externalIsDragging !== undefined ? externalIsDragging : dndIsDragging;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -183,7 +188,7 @@ export const KanbanColumnDndKit: React.FC<KanbanColumnProps> = ({
               <KanbanTaskDndKit
                 key={task.id}
                 task={task}
-                onClick={() => onTaskClick(task)}
+                onClick={() => onTaskClick && onTaskClick(task)}
                 columnId={column.id}
               />
             ))
