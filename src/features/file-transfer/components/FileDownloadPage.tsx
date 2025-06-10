@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useFileTransferByLink } from '../hooks/useFileTransfer';
 import { formatFileSize, formatExpiryDate, isImage } from '../utils/fileUtils';
-import { ArrowDown2, Calendar, CloseCircle, DocumentText, Image as ImageIcon, Lock1, MoneyRecive } from 'iconsax-react';
+import { ArrowDown2, Calendar, CloseCircle, DocumentText, Image as ImageIcon, Lock1, MoneyRecive, DocumentDownload, InfoCircle as InfoIcon } from 'iconsax-react';
 import { logger } from '../../../utils/logger';
 import { File as FileType, FileTransfer, FileTransferPaymentInfo } from '../types';
 
@@ -25,7 +25,78 @@ const FileDownloadPage: React.FC = () => {
   const [accessKey, setAccessKey] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [downloadingFiles, setDownloadingFiles] = useState<{[key: string]: boolean}>({});
+  const [downloadingAll, setDownloadingAll] = useState<boolean>(false);
   
+  // Gérer le téléchargement de tous les fichiers en ZIP
+  const handleDownloadAll = useCallback(async () => {
+    if (!shareLink || !accessKey) {
+      logger.error('Lien de partage ou clé d\'accès manquant pour le téléchargement groupé');
+      return;
+    }
+
+    try {
+      // Indiquer que le téléchargement groupé est en cours
+      setDownloadingAll(true);
+      
+      // Appeler l'API de téléchargement groupé
+      const response = await fetch(`/api/file-transfer/download-all/${shareLink}/${accessKey}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': '*/*',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      // Vérifier le type de contenu
+      const contentType = response.headers.get('Content-Type') || 'application/zip';
+      const contentDisposition = response.headers.get('Content-Disposition') || '';
+      
+      // Extraire le nom de fichier du header Content-Disposition si disponible
+      let fileName = 'newbi-files.zip';
+      const filenameRegex = /filename[^;=\n]*=((['"]).+?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(contentDisposition);
+      if (matches && matches[1]) {
+        fileName = matches[1].replace(/['"]*/g, '');
+      }
+      
+      logger.info(`Téléchargement groupé: ${fileName} (${contentType})`);
+      
+      // Obtenir le blob directement de la réponse
+      const blob = await response.blob();
+      
+      // Créer un objet URL pour le blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Créer un élément de lien pour déclencher le téléchargement
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      
+      // Nettoyer après un court délai pour s'assurer que le téléchargement a commencé
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        // Réinitialiser l'état de téléchargement après un délai
+        setTimeout(() => {
+          setDownloadingAll(false);
+        }, 1000);
+      }, 100);
+      
+      logger.info(`Archive ZIP téléchargée avec succès: ${fileName}`);
+    } catch (error) {
+      logger.error('Erreur lors du téléchargement groupé:', error);
+      setDownloadingAll(false);
+      alert('Une erreur est survenue lors du téléchargement groupé. Veuillez réessayer.');
+    }
+  }, [shareLink, accessKey]);
+
   // Gérer le téléchargement d'un fichier
   const handleDownload = useCallback(async (file: FileType) => {
     if (!file?.id) {
@@ -264,6 +335,31 @@ const FileDownloadPage: React.FC = () => {
         
         <div className="p-6">
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="flex justify-between items-center mb-4 px-4 py-2 bg-[#f0eeff] rounded-lg">
+              <div className="text-sm font-medium text-gray-700">
+                {fileTransfer.files.length} fichier{fileTransfer.files.length > 1 ? 's' : ''} disponible{fileTransfer.files.length > 1 ? 's' : ''}
+              </div>
+              <button
+                onClick={handleDownloadAll}
+                disabled={downloadingAll}
+                className={`flex items-center px-4 py-2 rounded-md ${downloadingAll ? 'bg-gray-200 text-gray-500' : 'bg-[#5b50ff] text-white hover:bg-[#4a41e0]'} transition-colors`}
+                aria-label="Télécharger tous les fichiers"
+              >
+                {downloadingAll ? (
+                  <>
+                    <div className="animate-spin mr-2">
+                      <DocumentDownload size="18" />
+                    </div>
+                    <span>Préparation...</span>
+                  </>
+                ) : (
+                  <>
+                    <DocumentDownload size="18" className="mr-2" />
+                    <span>Télécharger tout</span>
+                  </>
+                )}
+              </button>
+            </div>
             <div className="max-h-[500px] overflow-y-auto" data-testid="file-list">
               {fileTransfer.files.map((file: FileType) => (
                 <div key={file.id} className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
@@ -301,6 +397,14 @@ const FileDownloadPage: React.FC = () => {
                 </div>
               ))}
             </div>
+            {fileTransfer.files.length > 1 && (
+              <div className="mt-4 px-4 py-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                <p className="flex items-center">
+                  <InfoIcon size="16" className="mr-2 text-[#5b50ff]" />
+                  Utilisez le bouton "Télécharger tout" pour obtenir tous les fichiers dans une archive ZIP.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
