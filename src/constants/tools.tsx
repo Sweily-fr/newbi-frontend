@@ -34,7 +34,7 @@ export const TOOLS: Tool[] = [
     name: "Signature Email",
     description: "Créez des signatures email professionnelles personnalisées",
     category: "Marketing & Communication",
-    // maintenance: true,
+    maintenance: true,
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
