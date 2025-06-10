@@ -29,8 +29,15 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
   // États pour les modales
   const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
   const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
+  
+  // États pour l'édition de tâche
+  const [editTaskTitle, setEditTaskTitle] = useState('');
+  const [editTaskDescription, setEditTaskDescription] = useState('');
+  const [editTaskStatus, setEditTaskStatus] = useState('');
+  const [editTaskDueDate, setEditTaskDueDate] = useState('');
   // États pour suivre l'élément actif dans le drag and drop
   // activeItem est utilisé pour stocker les informations de l'élément en cours de déplacement
   const [, setActiveItem] = useState<DragItem | null>(null);
@@ -66,7 +73,7 @@ export const KanbanBoard: React.FC<{ boardId: string }> = ({ boardId }) => {
     moveTask,
     addColumn,
     addTask,
-    // updateTask, // Commenté car non utilisé actuellement
+    updateTask,
     deleteTask,
     updateColumn,
     deleteColumn,
@@ -574,7 +581,15 @@ return (
             <Button
               variant="secondary"
               onClick={() => {
-                // Implémenter l'édition de la tâche
+                if (selectedTask) {
+                  // Initialiser les valeurs du formulaire d'édition
+                  setEditTaskTitle(selectedTask.title);
+                  setEditTaskDescription(selectedTask.description || '');
+                  setEditTaskStatus(selectedTask.status || '');
+                  setEditTaskDueDate(selectedTask.dueDate || '');
+                  setIsEditTaskModalOpen(true);
+                  setIsTaskDetailModalOpen(false);
+                }
               }}
             >
               <Edit2 size={16} variant="Bold" className="mr-1" />
@@ -588,6 +603,150 @@ return (
             >
               <Trash size={16} variant="Bold" className="mr-1" />
               Supprimer
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    )}
+
+    {/* Modale d'édition de tâche */}
+    {isEditTaskModalOpen && selectedTask && (
+      <Modal
+        isOpen={isEditTaskModalOpen}
+        onClose={() => {
+          setIsEditTaskModalOpen(false);
+          setIsTaskDetailModalOpen(true); // Revenir à la modale de détail
+        }}
+        title="Modifier la tâche"
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="taskTitle" className="block text-sm font-medium text-gray-700 mb-1">
+              Titre
+            </label>
+            <input
+              type="text"
+              id="taskTitle"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent"
+              value={editTaskTitle}
+              onChange={(e) => setEditTaskTitle(e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="taskDescription" className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              id="taskDescription"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent min-h-[100px]"
+              value={editTaskDescription}
+              onChange={(e) => setEditTaskDescription(e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="taskStatus" className="block text-sm font-medium text-gray-700 mb-1">
+              Statut
+            </label>
+            <select
+              id="taskStatus"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent"
+              value={editTaskStatus}
+              onChange={(e) => setEditTaskStatus(e.target.value)}
+            >
+              <option value="">Sélectionner un statut</option>
+              <option value="À faire">À faire</option>
+              <option value="En cours">En cours</option>
+              <option value="En attente">En attente</option>
+              <option value="Terminée">Terminée</option>
+            </select>
+          </div>
+          
+          <div>
+            <label htmlFor="taskDueDate" className="block text-sm font-medium text-gray-700 mb-1">
+              Date d'échéance
+            </label>
+            <input
+              type="date"
+              id="taskDueDate"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5b50ff] focus:border-transparent"
+              value={editTaskDueDate ? new Date(editTaskDueDate).toISOString().split('T')[0] : ''}
+              onChange={(e) => setEditTaskDueDate(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsEditTaskModalOpen(false);
+                setIsTaskDetailModalOpen(true); // Revenir à la modale de détail
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              onClick={async () => {
+                if (selectedTask && editTaskTitle.trim()) {
+                  try {
+                    // Récupérer l'ancien statut et la colonne actuelle de la tâche
+                    const oldStatus = selectedTask.status;
+                    const newStatus = editTaskStatus;
+                    
+                    // Mettre à jour la tâche
+                    await updateTask({
+                      taskId: selectedTask.id,
+                      title: editTaskTitle,
+                      description: editTaskDescription,
+                      status: editTaskStatus,
+                      dueDate: editTaskDueDate ? new Date(editTaskDueDate).toISOString() : undefined,
+                    });
+                    
+                    // Si le statut a changé, déplacer la tâche vers la colonne correspondante
+                    if (newStatus && oldStatus !== newStatus && normalizedBoard.columns.length > 0) {
+                      // Trouver la colonne source (où se trouve actuellement la tâche)
+                      let sourceColumn = null;
+                      for (const column of normalizedBoard.columns) {
+                        if (column.tasks.some(task => task.id === selectedTask.id)) {
+                          sourceColumn = column;
+                          break;
+                        }
+                      }
+                      
+                      // Trouver la colonne de destination basée sur le nouveau statut
+                      const destinationColumn = normalizedBoard.columns.find(column => column.title === newStatus);
+                      
+                      if (sourceColumn && destinationColumn && sourceColumn.id !== destinationColumn.id) {
+                        logger.log(`Déplacement de la tâche de la colonne "${sourceColumn.title}" vers "${destinationColumn.title}"`);
+                        
+                        // Déplacer la tâche vers la nouvelle colonne
+                        await moveTask({
+                          taskId: selectedTask.id,
+                          sourceColumnId: sourceColumn.id,
+                          destinationColumnId: destinationColumn.id,
+                          newOrder: 0 // Placer la tâche en haut de la colonne
+                        });
+                      }
+                    }
+                    
+                    // Fermer la modale d'édition
+                    setIsEditTaskModalOpen(false);
+                    // Fermer également la modale de détail pour montrer les changements
+                    setIsTaskDetailModalOpen(false);
+                    setSelectedTask(null);
+                    
+                    // Afficher un message de succès (à implémenter si nécessaire)
+                    logger.log('Tâche mise à jour avec succès');
+                  } catch (error) {
+                    logger.error('Erreur lors de la mise à jour de la tâche:', error);
+                    // Afficher un message d'erreur (à implémenter si nécessaire)
+                  }
+                }
+              }}
+            >
+              Enregistrer
             </Button>
           </div>
         </div>

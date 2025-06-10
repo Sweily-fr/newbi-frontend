@@ -178,8 +178,13 @@ export const useKanbanBoard = (boardId: string) => {
   const updateTask = async (input: TaskUpdateInput & { taskId: string }) => {
     try {
       const { taskId, ...updateData } = input;
+      // Corriger les paramètres pour correspondre à la mutation GraphQL
       const { data } = await updateTaskMutation({
-        variables: { id: taskId, input: { ...updateData, boardId } },
+        variables: { 
+          boardId, // Utiliser boardId directement comme paramètre
+          taskId,  // Utiliser taskId directement comme paramètre
+          input: updateData // Ne pas inclure boardId dans l'input
+        },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.updateKanbanTask;
