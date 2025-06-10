@@ -192,7 +192,7 @@ export const useKanbanBoard = (boardId: string) => {
   const deleteTask = async (taskId: string) => {
     try {
       const { data } = await deleteTaskMutation({
-        variables: { id: taskId },
+        variables: { boardId, taskId },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.deleteKanbanTask;
@@ -238,10 +238,10 @@ export const useKanbanBoard = (boardId: string) => {
     }
   };
 
-  const deleteComment = async (commentId: string) => {
+  const deleteComment = async (commentId: string, taskId: string) => {
     try {
       const { data } = await deleteCommentMutation({
-        variables: { id: commentId },
+        variables: { boardId, taskId, commentId },
         refetchQueries: [{ query: GET_BOARD, variables: { id: boardId } }],
       });
       return data.deleteKanbanComment;
