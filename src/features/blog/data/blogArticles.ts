@@ -18,7 +18,8 @@ import {
   gestionIndependantArticle,
   calendrierImpots2025Article,
   modifierCodeApeArticle,
-  compteBancaireFreelanceArticle
+  compteBancaireFreelanceArticle,
+  freelanceToolsArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
@@ -40,7 +41,8 @@ export const blogArticles: BlogArticle[] = [
   erpArticle,
   calendrierImpots2025Article,
   modifierCodeApeArticle,
-  compteBancaireFreelanceArticle
+  compteBancaireFreelanceArticle,
+  freelanceToolsArticle
 ].sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
 // Fonction utilitaire pour trouver un article par son slug
