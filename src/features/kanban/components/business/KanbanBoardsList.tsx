@@ -1,8 +1,9 @@
 import React, { useState, ChangeEvent } from 'react';
 import { useKanbanBoards } from '../../hooks/useKanbanBoards';
 import { Link } from 'react-router-dom';
-import { Add, ArrowRight2, Calendar, Note1, User } from 'iconsax-react';
+import { Add, ArrowRight2, Calendar, Note1, User, Edit2, Trash } from 'iconsax-react';
 import { Button, Modal, TextField, TextArea } from '../../../../components';
+import { logger } from '../../../../utils/logger';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { KanbanBoard, KanbanUser } from '../../types/kanban';
@@ -10,8 +11,13 @@ import { KanbanBoard, KanbanUser } from '../../types/kanban';
 export const KanbanBoardsList: React.FC = () => {
   // États pour les modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [newBoardDescription, setNewBoardDescription] = useState('');
+  const [editBoardTitle, setEditBoardTitle] = useState('');
+  const [editBoardDescription, setEditBoardDescription] = useState('');
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
   // Note: Nous n'utilisons pas l'utilisateur connecté pour l'instant, mais il sera nécessaire plus tard pour les permissions
@@ -23,7 +29,10 @@ export const KanbanBoardsList: React.FC = () => {
     boardsLoading,
     boardsError,
     createBoard,
-    loadMoreBoards
+    updateBoard,
+    deleteBoard,
+    loadMoreBoards,
+    refetchBoards
   } = useKanbanBoards();
   
   // Gérer la création d'un nouveau tableau
@@ -40,7 +49,58 @@ export const KanbanBoardsList: React.FC = () => {
       setNewBoardDescription('');
       setIsCreateModalOpen(false);
     } catch (error) {
-      console.error("Erreur lors de la création du tableau:", error);
+      logger.error("Erreur lors de la création du tableau:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Ouvrir la modal d'édition
+  const openEditModal = (board: KanbanBoard) => {
+    setSelectedBoardId(board.id);
+    setEditBoardTitle(board.title);
+    setEditBoardDescription(board.description || '');
+    setIsEditModalOpen(true);
+  };
+
+  // Ouvrir la modal de suppression
+  const openDeleteModal = (boardId: string) => {
+    setSelectedBoardId(boardId);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Gérer la modification d'un tableau
+  const handleUpdateBoard = async () => {
+    if (!selectedBoardId || !editBoardTitle.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      await updateBoard(selectedBoardId, {
+        title: editBoardTitle,
+        description: editBoardDescription.trim() ? editBoardDescription : undefined
+      });
+      setIsEditModalOpen(false);
+      // Actualiser la liste des tableaux pour voir les modifications en temps réel
+      await refetchBoards();
+    } catch (error) {
+      logger.error("Erreur lors de la modification du tableau:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Gérer la suppression d'un tableau
+  const handleDeleteBoard = async () => {
+    if (!selectedBoardId) return;
+    
+    setIsLoading(true);
+    try {
+      await deleteBoard(selectedBoardId);
+      setIsDeleteModalOpen(false);
+      // Actualiser la liste des tableaux pour voir les suppressions en temps réel
+      await refetchBoards();
+    } catch (error) {
+      logger.error("Erreur lors de la suppression du tableau:", error);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +121,7 @@ export const KanbanBoardsList: React.FC = () => {
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-xl"
         >
-          <Add size="20" className="mr-2" />
+          <Add size="20" className="mr-2" color="#ffffff" />
           Nouveau tableau
         </Button>
       </div>
@@ -91,7 +151,7 @@ export const KanbanBoardsList: React.FC = () => {
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-xl"
           >
-            <Add size="20" className="mr-2" />
+            <Add size="20" className="mr-2" color="#ffffff" />
             Créer un tableau
           </Button>
         </div>
@@ -99,11 +159,39 @@ export const KanbanBoardsList: React.FC = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {boards.map((board: KanbanBoard) => (
-              <Link
+              <div 
                 key={board.id}
-                to={`/kanban/${board.id}`}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow group"
+                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow group relative"
               >
+                {/* Menu d'actions */}
+                <div className="absolute top-4 right-4 flex space-x-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openEditModal(board);
+                    }}
+                    className="p-1.5 rounded-full hover:bg-[#f0eeff] text-gray-500 hover:text-[#5b50ff] transition-colors"
+                    title="Modifier"
+                  >
+                    <Edit2 size="16" color="currentColor" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openDeleteModal(board.id);
+                    }}
+                    className="p-1.5 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors"
+                    title="Supprimer"
+                  >
+                    <Trash size="16" color="currentColor" />
+                  </button>
+                </div>
+                
+                <Link
+                  to={`/kanban/${board.id}`}
+                  className="block">
                 <h2 className="text-lg font-medium text-gray-800 mb-2 group-hover:text-[#5b50ff] transition-colors">
                   {board.title}
                 </h2>
@@ -114,7 +202,7 @@ export const KanbanBoardsList: React.FC = () => {
                 
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center text-sm text-gray-500">
-                    <Calendar size="16" variant="Linear" className="mr-1" />
+                    <Calendar size="16" variant="Linear" className="mr-1" color="#6b7280" />
                     <span>
                       {format(new Date(board.createdAt), 'dd MMM yyyy', { locale: fr })}
                     </span>
@@ -151,7 +239,8 @@ export const KanbanBoardsList: React.FC = () => {
                     />
                   </div>
                 </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
           
@@ -215,6 +304,86 @@ export const KanbanBoardsList: React.FC = () => {
               className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white"
             >
               Créer
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      
+      {/* Modal de modification de tableau */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Modifier le tableau Kanban"
+      >
+        <div className="p-4">
+          <TextField
+            id="edit-board-title"
+            name="edit-board-title"
+            label="Titre"
+            value={editBoardTitle}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setEditBoardTitle(e.target.value)}
+            placeholder="Titre du tableau"
+            required
+            className="mb-4"
+          />
+          
+          <TextArea
+            id="edit-board-description"
+            name="edit-board-description"
+            label="Description (optionnelle)"
+            value={editBoardDescription}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setEditBoardDescription(e.target.value)}
+            placeholder="Description du tableau"
+            className="mb-6"
+            rows={4}
+          />
+          
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleUpdateBoard}
+              disabled={!editBoardTitle.trim() || isLoading}
+              isLoading={isLoading}
+              className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white"
+            >
+              Enregistrer
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      
+      {/* Modal de confirmation de suppression */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Supprimer le tableau Kanban"
+      >
+        <div className="p-4">
+          <div className="mb-6">
+            <p className="text-gray-700 mb-2">Êtes-vous sûr de vouloir supprimer ce tableau Kanban ?</p>
+            <p className="text-red-600 text-sm">Cette action est irréversible et supprimera toutes les colonnes et tâches associées.</p>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteBoard}
+              isLoading={isLoading}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Supprimer
             </Button>
           </div>
         </div>
