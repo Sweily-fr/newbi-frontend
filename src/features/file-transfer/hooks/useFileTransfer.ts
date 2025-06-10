@@ -21,8 +21,11 @@ import {
 // Utilitaire de logging personnalisé
 import { logger } from '../../../utils/logger';
 
-export const useMyFileTransfers = () => {
-  const { loading, error, data, refetch } = useQuery(MY_FILE_TRANSFERS);
+export const useMyFileTransfers = (page: number = 1, limit: number = 10) => {
+  const { loading, error, data, refetch } = useQuery(MY_FILE_TRANSFERS, {
+    variables: { page, limit },
+    fetchPolicy: 'cache-and-network'
+  });
   
   // Mapper les statuts du backend (minuscules) vers le frontend (majuscules)
   const mapStatusToEnum = (status: string): FileTransferStatus => {
@@ -35,18 +38,36 @@ export const useMyFileTransfers = () => {
   };
 
   // Transformer les données pour s'assurer que les statuts sont correctement mappés
-  const fileTransfers = data?.myFileTransfers 
-    ? data.myFileTransfers.map((transfer: { status: string; id: string; userId: string; files: File[]; totalSize: number; shareLink: string; accessKey: string; expiryDate: string; isPaymentRequired: boolean; paymentAmount?: number; paymentCurrency?: string; isPaid: boolean; downloadCount: number; createdAt: string; updatedAt: string }) => ({
+  const fileTransfers = data?.myFileTransfers?.items 
+    ? data.myFileTransfers.items.map((transfer: { status: string; id: string; userId: string; files: File[]; totalSize: number; shareLink: string; accessKey: string; expiryDate: string; isPaymentRequired: boolean; paymentAmount?: number; paymentCurrency?: string; isPaid: boolean; downloadCount: number; createdAt: string; updatedAt: string }) => ({
         ...transfer,
         status: mapStatusToEnum(transfer.status)
       }))
     : [];
   
+  // Extraire les informations de pagination
+  const pagination = data?.myFileTransfers ? {
+    totalItems: data.myFileTransfers.totalItems || 0,
+    currentPage: data.myFileTransfers.currentPage || page,
+    totalPages: data.myFileTransfers.totalPages || 1,
+    hasNextPage: data.myFileTransfers.hasNextPage || false
+  } : {
+    totalItems: 0,
+    currentPage: page,
+    totalPages: 1,
+    hasNextPage: false
+  };
+  
+  const refetchWithPagination = (newPage: number, newLimit: number = limit) => {
+    return refetch({ page: newPage, limit: newLimit });
+  };
+  
   return {
     loading,
     error,
     fileTransfers: fileTransfers as FileTransfer[],
-    refetch
+    pagination,
+    refetch: refetchWithPagination
   };
 };
 

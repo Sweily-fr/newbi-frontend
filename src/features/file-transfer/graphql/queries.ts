@@ -1,28 +1,34 @@
 import { gql } from '@apollo/client';
 
 export const MY_FILE_TRANSFERS = gql`
-  query MyFileTransfers {
-    myFileTransfers {
-      id
-      shareLink
-      accessKey
-      expiryDate
-      status
-      isPaymentRequired
-      paymentAmount
-      paymentCurrency
-      isPaid
-      downloadCount
-      createdAt
-      totalSize
-      files {
+  query MyFileTransfers($page: Int, $limit: Int) {
+    myFileTransfers(page: $page, limit: $limit) {
+      items {
         id
-        fileName
-        originalName
-        mimeType
-        size
-        filePath
+        shareLink
+        accessKey
+        expiryDate
+        status
+        isPaymentRequired
+        paymentAmount
+        paymentCurrency
+        isPaid
+        downloadCount
+        createdAt
+        totalSize
+        files {
+          id
+          fileName
+          originalName
+          mimeType
+          size
+          filePath
+        }
       }
+      totalItems
+      currentPage
+      totalPages
+      hasNextPage
     }
   }
 `;
