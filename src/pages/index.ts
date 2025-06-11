@@ -21,6 +21,7 @@ export { default as LegalNoticeGeneratorPage } from './LegalNoticeGeneratorPage'
 export { default as PrivacyPolicyGeneratorPage } from './PrivacyPolicyGeneratorPage';
 export { default as BlogSeoOptimizerPage } from './BlogSeoOptimizerPage';
 export { default as FileTransferPage } from './FileTransferPage';
+export { FileTransferDownloadPage } from '../features/file-transfer/pages/FileTransferDownloadPage';
 export { default as EmailSignaturesPage } from './EmailSignaturesPage';
 export { default as NotFoundPage } from './NotFoundPage';
 // Nouvelles pages de blog
