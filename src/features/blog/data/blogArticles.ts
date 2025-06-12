@@ -19,10 +19,14 @@ import {
   calendrierImpots2025Article,
   modifierCodeApeArticle,
   compteBancaireFreelanceArticle,
-  freelanceToolsArticle
+  freelanceToolsArticle,
+  odooVsNewbiArticle,
+  interiorDesignerManagementArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  odooVsNewbiArticle,
+  interiorDesignerManagementArticle,
   seoSoloOptimizationArticle,
   emailSignatureImportanceArticle,
   editInvoiceArticle,

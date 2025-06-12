@@ -19,4 +19,6 @@ export { compteBancaireFreelanceArticle } from './compte-bancaire-freelance';
 export { calendrierImpots2025Article } from './calendrier-impots-2025';
 export { modifierCodeApeArticle } from './modifier-code-ape';
 export { freelanceToolsArticle } from './freelanceToolsArticle';
+export { odooVsNewbiArticle } from './odooVsNewbiArticle';
+export { interiorDesignerManagementArticle } from './interiorDesignerManagement';
 
