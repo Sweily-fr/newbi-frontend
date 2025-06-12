@@ -5,7 +5,6 @@ export const businessToolsArticle: BlogArticle = {
   title: 'Les 8 meilleurs outils gratuits pour gérer votre entreprise efficacement en 2025',
   slug: 'meilleurs-outils-gratuits-gestion-entreprise',
   excerpt: 'Découvrez notre sélection des 8 meilleurs outils gratuits pour gérer votre entreprise en 2025. De la facturation à la gestion de projet, ces solutions vous aideront à optimiser votre productivité sans grever votre budget.',
-  featuredImage: '/images/blog/meilleurs_outils.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-04-28T09:00:00Z',
   categories: ['Gestion d\'entreprise', 'Outils'],

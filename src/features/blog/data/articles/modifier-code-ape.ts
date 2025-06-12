@@ -5,7 +5,6 @@ export const modifierCodeApeArticle: BlogArticle = {
   title: 'TUTO : Comment modifier son code APE en tant qu\'indépendant',
   slug: 'modifier-code-ape-independant',
   excerpt: 'Découvrez comment modifier facilement votre code APE (ou code NAF) en tant qu\'indépendant. Guide étape par étape avec les pièces justificatives nécessaires et les démarches à suivre.',
-  featuredImage: '/images/blog/modifier-code-ape.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-09T10:00:00+02:00',
   updatedDate: '2025-06-09T10:00:00+02:00',

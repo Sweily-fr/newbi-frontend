@@ -5,7 +5,6 @@ export const businessManagementArticle: BlogArticle = {
   title: '7 outils essentiels pour optimiser la gestion de votre entreprise en 2025',
   slug: 'outils-essentiels-gestion-entreprise',
   excerpt: 'Découvrez les 7 outils indispensables qui transformeront la gestion de votre entreprise en 2025. De la facturation à la gestion de projet, ces solutions vous feront gagner du temps et de l\'efficacité.',
-  featuredImage: '/images/blog/gestion_entreprise.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-15T14:00:00Z',
   categories: ['Gestion d\'entreprise', 'Productivité'],

@@ -5,7 +5,6 @@ export const seoSoloOptimizationArticle: BlogArticle = {
   title: 'Comment optimiser son SEO tout seul ? Guide pratique 2025',
   slug: 'comment-optimiser-seo-tout-seul-guide',
   excerpt: 'Découvrez comment optimiser efficacement votre référencement naturel sans faire appel à une agence spécialisée. Un guide complet avec des actions concrètes pour améliorer votre visibilité en ligne par vous-même.',
-  featuredImage: '/images/blog/seo-solo-optimization.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-04T09:30:00Z',
   categories: ['SEO', 'Marketing digital', 'Entrepreneuriat'],

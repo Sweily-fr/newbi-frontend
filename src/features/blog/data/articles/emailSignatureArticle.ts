@@ -5,7 +5,6 @@ export const emailSignatureArticle: BlogArticle = {
   title: 'Comment créer une signature de mail professionnelle qui convertit',
   slug: 'signature-mail-professionnelle-conversion',
   excerpt: 'Découvrez comment créer une signature de mail professionnelle qui renforce votre image de marque et génère des opportunités commerciales. Guide complet avec exemples et bonnes pratiques.',
-  featuredImage: '/images/blog/signature_de_mail.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-10T09:00:00Z',
   categories: ['Marketing', 'Communication'],

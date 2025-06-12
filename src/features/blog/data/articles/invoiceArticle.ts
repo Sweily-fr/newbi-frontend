@@ -5,7 +5,6 @@ export const invoiceArticle: BlogArticle = {
   title: 'Comment créer des factures professionnelles en ligne en 5 minutes',
   slug: 'creer-factures-professionnelles-en-ligne',
   excerpt: 'Découvrez comment créer des factures professionnelles rapidement et facilement avec Newbi. Notre guide complet vous montre comment gagner du temps et projeter une image professionnelle.',
-  featuredImage: '/images/blog/factures_blog.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-20T10:00:00Z',
   updatedDate: '2025-05-25T08:30:00Z',

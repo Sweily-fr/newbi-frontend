@@ -5,7 +5,6 @@ export const quoteCreationArticle: BlogArticle = {
   title: 'Comment créer un devis professionnel qui augmente votre taux de conversion',
   slug: 'creer-devis-professionnel-conversion',
   excerpt: 'Découvrez comment créer des devis professionnels qui convertissent mieux. Nos conseils d\'experts et techniques éprouvées pour transformer vos prospects en clients grâce à des devis optimisés.',
-  featuredImage: '/images/blog/devis_conversion.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-03T11:15:00Z',
   categories: ['Devis', 'Vente'],

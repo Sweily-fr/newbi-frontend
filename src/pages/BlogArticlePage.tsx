@@ -121,11 +121,11 @@ const BlogArticlePage: React.FC = () => {
             <span>{article.readTime} min de lecture</span>
           </div>
           
-          <img 
-            src={article.featuredImage} 
-            alt={article.title} 
-            className="w-full max-w-4xl mx-auto rounded-xl shadow-lg object-cover h-96"
-          />
+          <div className="w-full max-w-4xl mx-auto rounded-xl shadow-lg h-96 flex items-center justify-start bg-gradient-to-r from-[#5b50ff] to-[#6a60ff] p-8 text-left">
+            <h2 className="text-5xl w-4/5 font-bold text-white">
+              Passez à la vitesse supérieure avec Newbi, réinventez votre activité
+            </h2>
+          </div>
         </div>
         
         {/* Contenu de l'article */}
@@ -243,11 +243,11 @@ const BlogArticlePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {relatedArticles.map(relatedArticle => (
                 <div key={relatedArticle.id} className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-                  <img 
-                    className="h-48 w-full object-cover" 
-                    src={relatedArticle.featuredImage} 
-                    alt={relatedArticle.title} 
-                  />
+                  <div className="h-48 w-full bg-gradient-to-r from-[#5b50ff] to-[#6a60ff] flex items-center p-6">
+                    <h3 className="text-xl font-bold text-white line-clamp-3">
+                      {relatedArticle.title}
+                    </h3>
+                  </div>
                   <div className="p-6 flex-grow">
                     <div className="flex flex-wrap gap-2 mb-3">
                       {relatedArticle.categories.slice(0, 2).map(category => (

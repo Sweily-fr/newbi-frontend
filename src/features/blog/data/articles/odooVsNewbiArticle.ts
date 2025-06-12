@@ -5,7 +5,6 @@ export const odooVsNewbiArticle: BlogArticle = {
   title: 'Odoo vs Newbi : Quelle solution choisir pour gérer votre entreprise en 2025 ?',
   slug: 'odoo-vs-newbi-comparatif',
   excerpt: 'Découvrez les forces et faiblesses d\'Odoo et Newbi pour trouver la solution de gestion d\'entreprise la plus adaptée à vos besoins en 2025.',
-  featuredImage: '/images/blog/odoo-vs-newbi.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-12T14:00:00Z',
   categories: ['Gestion d\'entreprise', 'Comparatif'],

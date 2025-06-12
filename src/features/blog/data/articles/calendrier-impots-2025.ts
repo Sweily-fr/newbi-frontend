@@ -5,7 +5,6 @@ export const calendrierImpots2025Article: BlogArticle = {
   title: 'Le calendrier des impôts 2025 pour les indépendants',
   slug: 'calendrier-impots-2025-independants',
   excerpt: 'Retrouvez toutes les échéances fiscales à ne pas manquer en 2025 pour les indépendants et auto-entrepreneurs. Un guide complet pour bien gérer vos obligations fiscales tout au long de l\'année.',
-  featuredImage: '/images/blog/calendrier-impots-2025.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-08T10:00:00+02:00',
   updatedDate: '2025-06-08T10:00:00+02:00',

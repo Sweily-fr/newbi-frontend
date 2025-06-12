@@ -5,7 +5,6 @@ export const digitalInvoiceArticle: BlogArticle = {
   title: 'Facture numérique 2025 : tout ce que vous devez savoir sur la facturation électronique obligatoire',
   slug: 'facture-numerique-facturation-electronique-obligatoire',
   excerpt: 'La facturation électronique devient obligatoire en France en 2025. Découvrez tout ce que vous devez savoir pour vous conformer à cette nouvelle réglementation et transformer cette obligation en opportunité pour votre entreprise.',
-  featuredImage: '/images/blog/facture_electronique.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-04-25T08:00:00Z',
   categories: ['Facturation', 'Réglementation'],
