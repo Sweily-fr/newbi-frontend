@@ -1,5 +1,34 @@
 import { gql } from '@apollo/client';
 
+export const GET_FILE_TRANSFER_BY_DOWNLOAD_LINK = gql`
+  query GetFileTransferByDownloadLink($downloadLink: String!, $accessKey: String!) {
+    getFileTransferByLink(shareLink: $downloadLink, accessKey: $accessKey) {
+      success
+      message
+      fileTransfer {
+        id
+        files {
+          id
+          fileName
+          originalName
+          size
+          filePath
+        }
+        totalSize
+        expiryDate
+        paymentInfo {
+          isPaymentRequired
+          paymentAmount
+          paymentCurrency
+          isPaid
+          checkoutUrl
+        }
+        isAccessible
+      }
+    }
+  }
+`;
+
 export const MY_FILE_TRANSFERS = gql`
   query MyFileTransfers($page: Int, $limit: Int) {
     myFileTransfers(page: $page, limit: $limit) {

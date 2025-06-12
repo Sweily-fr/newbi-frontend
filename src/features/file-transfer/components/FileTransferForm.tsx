@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCreateFileTransfer } from '../hooks/useFileTransfer';
 import FileDropzone from './FileDropzone';
 import FilePreview from './FilePreview';
 import { logger } from '../../../utils/logger';
 import UploadProgress from './UploadProgress';
-import { ArrowRight, Copy, Link1, TickCircle } from 'iconsax-react';
+import { ArrowRight, Copy, Link1, TickCircle, InfoCircle } from 'iconsax-react';
 import Checkbox from '../../../components/common/Checkbox';
 import Modal from '../../../components/common/Modal';
+import StripeConnectOnboarding from './StripeConnectOnboarding';
+import { useMutation } from '@apollo/client';
+import { CHECK_STRIPE_CONNECT_ACCOUNT_STATUS } from '../graphql/stripe-connect-mutations';
 
 const FileTransferForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -17,8 +20,33 @@ const FileTransferForm: React.FC = () => {
   const [accessKey, setAccessKey] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isStripeConnectModalOpen, setIsStripeConnectModalOpen] = useState<boolean>(false);
+  const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
+  const [stripeAccountStatus, setStripeAccountStatus] = useState<{
+    isOnboarded: boolean;
+    payoutsEnabled: boolean;
+    chargesEnabled: boolean;
+  } | null>(null);
   
   const { upload, uploadProgress, loading, error, data } = useCreateFileTransfer();
+  
+  // Mutation pour vérifier le statut du compte Stripe Connect
+  const [checkStripeConnectStatus] = useMutation(CHECK_STRIPE_CONNECT_ACCOUNT_STATUS, {
+    onCompleted: (data) => {
+      if (data.checkStripeConnectAccountStatus.success) {
+        setStripeAccountStatus({
+          isOnboarded: data.checkStripeConnectAccountStatus.isOnboarded,
+          payoutsEnabled: data.checkStripeConnectAccountStatus.payoutsEnabled,
+          chargesEnabled: data.checkStripeConnectAccountStatus.chargesEnabled
+        });
+      } else {
+        logger.error('Erreur lors de la vérification du statut du compte Stripe:', data.checkStripeConnectAccountStatus.message);
+      }
+    },
+    onError: (error) => {
+      logger.error('Erreur lors de la vérification du statut du compte Stripe:', error);
+    }
+  });
   
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles([...files, ...selectedFiles]);
@@ -30,10 +58,46 @@ const FileTransferForm: React.FC = () => {
     setFiles(newFiles);
   };
   
+  // Vérifier si l'utilisateur a un compte Stripe Connect configuré lorsqu'il active l'option de paiement
+  useEffect(() => {
+    if (isPaymentRequired && stripeAccountId) {
+      checkStripeConnectStatus({
+        variables: {
+          accountId: stripeAccountId
+        }
+      });
+    }
+  }, [isPaymentRequired, stripeAccountId, checkStripeConnectStatus]);
+
+  const handlePaymentRequiredChange = (checked: boolean) => {
+    setIsPaymentRequired(checked);
+    
+    // Si l'utilisateur active l'option de paiement et n'a pas de compte Stripe Connect configuré
+    if (checked && !stripeAccountId) {
+      setIsStripeConnectModalOpen(true);
+    }
+  };
+  
+  const handleStripeAccountCreated = (accountId: string) => {
+    setStripeAccountId(accountId);
+    // Vérifier immédiatement le statut du compte
+    checkStripeConnectStatus({
+      variables: {
+        accountId
+      }
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (files.length === 0) return;
+    
+    // Vérifier si l'utilisateur a besoin de configurer son compte Stripe pour les paiements
+    if (isPaymentRequired && (!stripeAccountStatus?.isOnboarded || !stripeAccountStatus?.chargesEnabled)) {
+      setIsStripeConnectModalOpen(true);
+      return;
+    }
     
     try {
       // S'assurer que nous avons des objets File natifs
@@ -52,6 +116,7 @@ const FileTransferForm: React.FC = () => {
         isPaymentRequired ? paymentAmount : undefined,
         isPaymentRequired ? paymentCurrency : undefined,
         undefined // recipientEmail (optionnel)
+        // Note: stripeAccountId sera ajouté côté backend via le contexte utilisateur
       );
       
       if (result) {
@@ -180,13 +245,34 @@ const FileTransferForm: React.FC = () => {
               
               <div className="mt-4 border-t pt-4">
                 <Checkbox
-                  id="isPaymentRequired"
-                  name="isPaymentRequired"
-                  label="Exiger un paiement pour le téléchargement"
+                  id="payment-required"
+                  name="payment-required"
                   checked={isPaymentRequired}
-                  onChange={(e) => setIsPaymentRequired(e.target.checked)}
-                  className="mb-1"
+                  onChange={(e) => handlePaymentRequiredChange(e.target.checked)}
+                  label="Demander un paiement pour accéder aux fichiers"
                 />
+              
+              {isPaymentRequired && stripeAccountStatus && (
+                <div className="mt-2 ml-6">
+                  {stripeAccountStatus.isOnboarded && stripeAccountStatus.chargesEnabled ? (
+                    <div className="flex items-center text-sm text-green-700">
+                      <TickCircle size="16" color="#10B981" variant="Bulk" className="mr-1" />
+                      Compte Stripe Connect configuré
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-sm text-amber-700">
+                      <InfoCircle size="16" color="#F59E0B" variant="Bulk" className="mr-1" />
+                      <button 
+                        type="button" 
+                        className="text-[#5b50ff] underline"
+                        onClick={() => setIsStripeConnectModalOpen(true)}
+                      >
+                        Terminer la configuration de votre compte Stripe
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
                 
                 {isPaymentRequired && (
                   <div className="flex mt-2">
@@ -321,6 +407,12 @@ const FileTransferForm: React.FC = () => {
           </div>
         )}
       </div>
+      {/* Modal d'onboarding Stripe Connect */}
+      <StripeConnectOnboarding
+        isOpen={isStripeConnectModalOpen}
+        onClose={() => setIsStripeConnectModalOpen(false)}
+        onAccountCreated={handleStripeAccountCreated}
+      />
     </div>
   );
 };

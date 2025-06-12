@@ -23,6 +23,7 @@ import {
   BlogSeoOptimizerPage,
   EmailSignaturesPage,
   FileTransferPage,
+  FileTransferDownloadPage,
   NotFoundPage,
   BlogPage,
   BlogArticlePage,
@@ -161,7 +162,7 @@ export const AppRoutes = () => {
         } />
         
         {/* Route publique pour le téléchargement des fichiers partagés */}
-        <Route path={ROUTES.FILE_TRANSFER_DOWNLOAD} element={<PublicRoute><FileTransferPage /></PublicRoute>} />
+        <Route path={ROUTES.FILE_TRANSFER_DOWNLOAD} element={<PublicRoute><FileTransferDownloadPage /></PublicRoute>} />
         
         {/* Routes du blog */}
         <Route path={ROUTES.BLOG} element={<PublicRoute><BlogPage /></PublicRoute>} />

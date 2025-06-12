@@ -107,6 +107,19 @@ const fileToBase64 = (file: File): Promise<string> => {
     reader.onload = () => {
       const result = reader.result as string;
       // readAsDataURL retourne déjà le format "data:mime/type;base64,content"
+      // Vérifier que le résultat est bien au format attendu
+      if (!result || typeof result !== 'string') {
+        reject(new Error('Échec de la conversion en base64'));
+        return;
+      }
+      
+      // S'assurer que le format est correct
+      if (!result.includes(';base64,')) {
+        logger.error('Format base64 incorrect:', result.substring(0, 50));
+        reject(new Error('Format base64 incorrect'));
+        return;
+      }
+      
       resolve(result);
     };
     reader.onerror = error => reject(error);
@@ -160,6 +173,12 @@ export const useCreateFileTransfer = () => {
           // Debug: Vérifier la longueur du base64 et son début
           logger.info(`Base64 length: ${base64.length}`);
           logger.info(`Base64 start: ${base64.substring(0, 100)}...`);
+          
+          // Vérifier que le format est correct
+          if (!base64.includes(';base64,')) {
+            logger.error(`Format base64 incorrect pour le fichier ${file.name}`);
+            throw new Error(`Format base64 incorrect pour le fichier ${file.name}`);
+          }
           
           // Ajouter le fichier converti à la liste
           base64Files.push({
