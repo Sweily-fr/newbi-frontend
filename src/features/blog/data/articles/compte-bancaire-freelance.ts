@@ -5,7 +5,6 @@ export const compteBancaireFreelanceArticle: BlogArticle = {
   title: 'Compte bancaire particulier ou professionnel pour les freelances ?',
   slug: 'compte-bancaire-particulier-ou-professionnel-freelance',
   excerpt: 'Découvrez comment choisir entre un compte bancaire particulier et professionnel en tant que freelance. Avantages, inconvénients et critères de choix expliqués.',
-  featuredImage: '/images/blog/compte-bancaire-freelance.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-07T10:00:00+02:00',
   updatedDate: '2025-06-07T10:00:00+02:00',

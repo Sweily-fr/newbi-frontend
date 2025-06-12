@@ -5,7 +5,6 @@ export const erpArticle: BlogArticle = {
   title: 'C\'est quoi un ERP ? Décryptage et avantages pour votre entreprise',
   slug: 'cest-quoi-un-erp',
   excerpt: 'Découvrez ce qu\'est un ERP, comment il peut transformer la gestion de votre entreprise et pourquoi cet outil est devenu incontournable pour les TPE/PME en 2025.',
-  featuredImage: '/images/blog/erp-entreprise.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-06T10:00:00+02:00',
   updatedDate: '2025-06-06T10:00:00+02:00',

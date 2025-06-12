@@ -5,7 +5,6 @@ export const excelQuoteArticle: BlogArticle = {
   title: 'Devis sur Excel : Limites et alternatives plus efficaces en 2025',
   slug: 'devis-excel-limites-alternatives',
   excerpt: 'Découvrez pourquoi créer des devis sur Excel peut limiter votre entreprise et explorez des alternatives plus efficaces comme Newbi pour professionnaliser votre processus commercial.',
-  featuredImage: '/images/blog/Devis_sur_Excel.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-18T09:30:00Z',
   categories: ['Devis', 'Gestion d\'entreprise'],

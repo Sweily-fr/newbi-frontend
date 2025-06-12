@@ -5,7 +5,6 @@ export const quoteVsOrderArticle: BlogArticle = {
   title: 'Quelle différence entre un devis et un bon de commande : Guide complet',
   slug: 'difference-devis-bon-commande',
   excerpt: 'Découvrez les différences essentielles entre un devis et un bon de commande, leur rôle respectif dans le processus commercial et comment les utiliser efficacement pour sécuriser vos transactions.',
-  featuredImage: '/images/blog/devis-vs-bon-commande.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-30T10:00:00Z',
   categories: ['Devis', 'Gestion commerciale'],

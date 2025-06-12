@@ -5,7 +5,6 @@ export const editInvoiceArticle: BlogArticle = {
   title: 'Comment modifier une facture ? Guide complet et conseils pratiques',
   slug: 'comment-modifier-facture-guide-conseils',
   excerpt: 'Découvrez comment modifier correctement une facture avec Newbi. Notre guide détaillé explique les bonnes pratiques, les aspects légaux et les étapes à suivre pour modifier vos factures en toute conformité.',
-  featuredImage: '/images/blog/modifier_facture.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-02T10:00:00Z',
   updatedDate: '2025-06-02T10:00:00Z',

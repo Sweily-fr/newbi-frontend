@@ -5,7 +5,6 @@ export const emailSignatureImportanceArticle: BlogArticle = {
   title: 'L\'importance d\'une signature de mail professionnelle : impact et bonnes pratiques',
   slug: 'importance-signature-mail-professionnelle',
   excerpt: 'Découvrez pourquoi une signature de mail professionnelle est essentielle pour votre image de marque et comment en créer une efficace qui respecte les bonnes pratiques du marketing digital.',
-  featuredImage: '/images/blog/signature_mail_importance.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-03T09:00:00Z',
   categories: ['Marketing', 'Communication', 'Branding'],

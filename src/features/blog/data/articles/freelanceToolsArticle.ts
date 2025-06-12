@@ -5,7 +5,6 @@ export const freelanceToolsArticle: BlogArticle = {
   title: 'Les meilleurs outils pour freelance en 2025',
   slug: 'meilleurs-outils-freelance-2025',
   excerpt: 'Découvrez notre sélection des outils indispensables pour les freelances en 2025. De la facturation à la gestion de projet, ces solutions vous aideront à optimiser votre activité et à vous concentrer sur votre cœur de métier.',
-  featuredImage: '/images/blog/freelance_tools.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-10T09:00:00Z',
   categories: ['Freelance', 'Productivité'],

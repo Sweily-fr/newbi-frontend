@@ -5,7 +5,6 @@ export const legalNoticeArticle: BlogArticle = {
   title: 'Générateur de mentions légales : pourquoi c\'est indispensable pour votre site web',
   slug: 'generateur-mentions-legales-site-web',
   excerpt: 'Découvrez pourquoi les mentions légales sont obligatoires pour votre site web et comment un générateur automatique peut vous aider à les créer facilement tout en respectant la législation française.',
-  featuredImage: '/images/blog/generator_mentions_legales.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-12T11:00:00Z',
   categories: ['Juridique', 'Création de site web'],

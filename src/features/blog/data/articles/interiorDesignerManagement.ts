@@ -5,7 +5,6 @@ export const interiorDesignerManagementArticle: BlogArticle = {
   title: 'Gérez votre activité d\'architecte d\'intérieur comme un pro en 2025',
   slug: 'gestion-agence-architecture-interieur',
   excerpt: 'Découvrez les meilleures pratiques et outils pour gérer efficacement votre activité d\'architecte d\'intérieur. Optimisez votre temps, améliorez votre productivité et développez votre entreprise avec ces conseils d\'expert.',
-  featuredImage: '/images/blog/architecture_interieure.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-11T10:00:00Z',
   categories: ['Architecture d\'intérieur', 'Gestion d\'entreprise'],

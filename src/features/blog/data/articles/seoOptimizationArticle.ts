@@ -5,7 +5,6 @@ export const seoOptimizationArticle: BlogArticle = {
   title: '10 techniques essentielles pour optimiser le SEO de votre blog en 2025',
   slug: 'optimiser-seo-blog-techniques',
   excerpt: 'Découvrez les 10 techniques les plus efficaces pour optimiser le référencement de votre blog en 2025. Des stratégies concrètes pour améliorer votre visibilité sur Google et attirer plus de visiteurs qualifiés.',
-  featuredImage: '/images/blog/seo-optimizer.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-08T10:30:00Z',
   categories: ['SEO', 'Marketing digital'],

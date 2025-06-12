@@ -5,7 +5,6 @@ export const gestionIndependantArticle: BlogArticle = {
   title: 'Comment mieux gérer son activité d\'indépendant ?',
   slug: 'gestion-activite-independant',
   excerpt: 'Découvrez nos conseils pratiques pour optimiser la gestion de votre activité d\'indépendant et gagner en efficacité au quotidien.',
-  featuredImage: '/images/blog/gestion-independant.jpg',
   author: 'Équipe Newbi',
   publishDate: '2025-06-05T10:00:00+02:00',
   updatedDate: '2025-06-05T10:00:00+02:00',

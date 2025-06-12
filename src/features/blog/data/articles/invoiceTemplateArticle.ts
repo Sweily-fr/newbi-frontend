@@ -5,7 +5,6 @@ export const invoiceTemplateArticle: BlogArticle = {
   title: '5 modèles de factures professionnelles pour auto-entrepreneurs en 2025',
   slug: 'modeles-factures-professionnelles-auto-entrepreneurs',
   excerpt: 'Découvrez 5 modèles de factures professionnelles spécialement conçus pour les auto-entrepreneurs. Des templates conformes à la législation française qui vous feront gagner du temps et renforceront votre image professionnelle.',
-  featuredImage: '/images/blog/modeles_factures.jpeg',
   author: 'Équipe Newbi',
   publishDate: '2025-05-05T08:45:00Z',
   categories: ['Facturation', 'Auto-entrepreneur'],
