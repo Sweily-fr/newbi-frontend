@@ -50,33 +50,73 @@ export const FileTransferDownloadPage: React.FC = () => {
     setIsDownloading(true);
     
     try {
+      logger.info('Début du téléchargement des fichiers');
+      
       // Appel à l'API pour télécharger les fichiers en utilisant des query params
-      const response = await fetch(`/file-transfer/download-all?link=${downloadLink}&key=${accessKey}`, {
+      const response = await fetch(`/api/file-transfer/download-all?link=${downloadLink}&key=${accessKey}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/octet-stream',
         },
       });
       
       if (!response.ok) {
-        throw new Error('Erreur lors du téléchargement des fichiers');
+        const errorText = await response.text();
+        logger.error(`Erreur HTTP ${response.status}: ${errorText}`);
+        throw new Error(`Erreur lors du téléchargement des fichiers (${response.status})`);
       }
       
+      // Vérifier le type de contenu de la réponse
+      const contentType = response.headers.get('content-type');
+      logger.info(`Type de contenu reçu: ${contentType}`);
+      
+      // Récupérer le blob
       const blob = await response.blob();
+      logger.info(`Taille du blob reçu: ${blob.size} octets`);
+      
+      // Vérifier si le blob est vide ou trop petit
+      if (blob.size === 0) {
+        throw new Error('Le fichier téléchargé est vide');
+      }
+      
+      // Créer l'URL du blob et le lien de téléchargement
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      // Utiliser le nom du premier fichier ou un nom par défaut
-      const fileName = fileTransfer.files && fileTransfer.files.length > 0 
-        ? fileTransfer.files[0].originalName 
-        : 'fichiers.zip';
+      
+      // Déterminer le nom du fichier
+      let fileName = 'fichiers.zip'; // Nom par défaut
+      
+      // Essayer de récupérer le nom du fichier depuis l'en-tête Content-Disposition
+      const contentDisposition = response.headers.get('content-disposition');
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"|filename=([^;]+)/i);
+        if (filenameMatch) {
+          fileName = filenameMatch[1] || filenameMatch[2];
+        }
+      } else if (fileTransfer.files && fileTransfer.files.length > 0) {
+        // Utiliser le nom du premier fichier si disponible
+        fileName = fileTransfer.files.length > 1 
+          ? 'fichiers.zip' 
+          : fileTransfer.files[0].originalName;
+      }
+      
+      logger.info(`Téléchargement du fichier: ${fileName}`);
       a.download = fileName;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
+      
+      // Nettoyer
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+      
+      logger.info('Téléchargement terminé avec succès');
     } catch (err) {
       logger.error('Erreur lors du téléchargement des fichiers:', err);
+      // Afficher une alerte à l'utilisateur
+      alert(`Erreur lors du téléchargement: ${err instanceof Error ? err.message : 'Une erreur est survenue'}`);
     } finally {
       setIsDownloading(false);
     }
