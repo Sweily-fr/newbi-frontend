@@ -29,8 +29,9 @@ const BlogPage: React.FC = () => {
     return Array.from(uniqueMap.values());
   };
   
-  // Obtenir la liste complète des articles sans doublons
-  const uniqueAllArticles = getUniqueArticles(blogArticles);
+  // Obtenir la liste complète des articles sans doublons et triés par date
+  const uniqueAllArticles = getUniqueArticles(blogArticles)
+    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
   
   // Calcul des articles filtrés à partir de la catégorie sélectionnée
   // Cette approche garantit qu'il n'y a jamais de duplication
@@ -101,13 +102,11 @@ const BlogPage: React.FC = () => {
         {/* Article à la une */}
         {featuredArticle && !selectedCategory && (
           <div className="featured-article mb-16">
-            <div className="bg-white rounded-xl shadow-md overflow-hidden md:flex">
-              <div className="md:flex-shrink-0 md:w-1/2">
-                <img 
-                  className="h-64 w-full object-cover md:h-full" 
-                  src={featuredArticle.featuredImage} 
-                  alt={featuredArticle.title} 
-                />
+            <div className="bg-white rounded-2xl shadow-md overflow-hidden md:flex">
+              <div className="md:flex-shrink-0 md:w-1/2 bg-gradient-to-br from-[#5b50ff] to-[#4a41e0] flex items-center p-8 group-hover:from-[#4a41e0] group-hover:to-[#3a32b0] transition-all duration-300">
+                <h2 className="text-2xl font-bold text-white drop-shadow-sm">
+                  {featuredArticle.title}
+                </h2>
               </div>
               <div className="p-8 md:w-1/2">
                 <div className="uppercase tracking-wide text-sm text-[#5b50ff] font-semibold mb-1">
@@ -142,18 +141,18 @@ const BlogPage: React.FC = () => {
         {/* Liste des articles */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredArticles.slice(0, displayCount).map(article => (
-            <div key={article.id} className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-              <img 
-                className="h-48 w-full object-cover" 
-                src={article.featuredImage} 
-                alt={article.title} 
-              />
+            <div key={article.id} className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+              <div className="h-48 w-full bg-gradient-to-r from-[#5b50ff] to-[#6a60ff] flex items-center p-6 group-hover:from-[#4a41e0] group-hover:to-[#5b50ff] transition-all duration-300">
+                <h3 className="text-xl font-bold text-white drop-shadow-sm">
+                  {article.title}
+                </h3>
+              </div>
               <div className="p-6 flex-grow">
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {article.categories.map(category => (
                     <span 
                       key={category} 
-                      className="inline-block bg-[#f0eeff] text-[#5b50ff] text-xs px-2 py-1 rounded-full"
+                      className="inline-block bg-[#f0eeff] text-[#5b50ff] text-xs px-3 py-1.5 rounded-2xl hover:bg-[#e6e1ff] transition-colors duration-200"
                       onClick={() => setSelectedCategory(category)}
                       style={{ cursor: 'pointer' }}
                     >
@@ -161,12 +160,7 @@ const BlogPage: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                <Link 
-                  to={`${ROUTES.BLOG}/${article.slug}`} 
-                  className="block mt-1 text-xl leading-tight font-bold text-gray-900 hover:text-[#4a41e0] transition-colors"
-                >
-                  {article.title}
-                </Link>
+                <div className="h-6"></div>
                 <p className="mt-2 text-gray-500">
                   {formatDate(article.publishDate)} • {article.readTime} min de lecture
                 </p>

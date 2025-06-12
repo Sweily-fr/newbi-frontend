@@ -1,7 +1,7 @@
 import { BlogArticle } from '../../../../types/blog';
 
 export const freelanceToolsArticle: BlogArticle = {
-  id: '4',
+  id: '26',
   title: 'Les meilleurs outils pour freelance en 2025',
   slug: 'meilleurs-outils-freelance-2025',
   excerpt: 'Découvrez notre sélection des outils indispensables pour les freelances en 2025. De la facturation à la gestion de projet, ces solutions vous aideront à optimiser votre activité et à vous concentrer sur votre cœur de métier.',
