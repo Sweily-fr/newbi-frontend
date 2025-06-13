@@ -39,7 +39,7 @@ interface EmailSignaturePreviewProps {
   socialLinksIconStyle?: string;
   socialLinksIconColor?: string;
   socialLinks?: any;
-  textStyle?: string;
+  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
   iconTextSpacing?: number;
   // Props spécifiques à l'affichage
   showEmailIcon?: boolean;
@@ -145,7 +145,10 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   const showLogo = signature?.showLogo !== undefined ? signature.showLogo : (propShowLogo !== undefined ? propShowLogo : true);
   // Déterminer si le logo doit être affiché
   const fontSize = signature?.fontSize || propFontSize || 14;
-  const textStyle = signature?.textStyle || propTextStyle || 'normal';
+  const textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough' = 
+    (signature?.textStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
+    (propTextStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
+    'normal';
   const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
   const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
 
@@ -176,16 +179,22 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   
   // IMPORTANT: Forcer profilePhotoSource à null si l'image a été supprimée
   if (photoDeleted) {
-    console.log('[DEBUG] EmailSignaturePreviewNew - Photo supprimée, profilePhotoSource forcé à null');
     profilePhotoSource = null;
   } else {
-    // Vérifier d'abord s'il y a une image en base64
-    if (profilePhotoBase64) {
+    // Vérifier d'abord s'il y a une image en base64 dans l'objet signature
+    if (signature?.profilePhotoBase64) {
+      profilePhotoSource = signature.profilePhotoBase64;
+    }
+    // Sinon, vérifier s'il y a une image en base64 dans les props
+    else if (profilePhotoBase64) {
       profilePhotoSource = profilePhotoBase64;
     } 
     // Sinon, vérifier s'il y a une URL valide
     else if (profilePhotoUrl && profilePhotoUrl !== '' && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') {
       profilePhotoSource = profilePhotoUrl;
+    }
+    else if (signature?.profilePhotoUrl && signature.profilePhotoUrl !== '' && signature.profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') {
+      profilePhotoSource = signature.profilePhotoUrl;
     }
   }
   
@@ -334,6 +343,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
             {/* Signature */}
             <div ref={signatureRef} style={signatureStyle} className="pt-1">
               <SignatureLayout
+                key={`signature-layout-${photoDeleted ? 'deleted' : ''}-${photoSize}-${profilePhotoSource ? 'has-image' : 'no-image'}-${Date.now()}`}
                 signatureLayout={signatureLayout}
                 fullName={fullName}
                 jobTitle={jobTitle}
@@ -344,7 +354,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
                 website={website}
                 address={address}
                 logoUrl={effectiveLogoUrl}
-                profilePhotoSource={profilePhotoSource ? getFullProfilePhotoUrl(profilePhotoSource) : null}
+                profilePhotoSource={profilePhotoSource ? (profilePhotoSource.startsWith('data:') ? profilePhotoSource : getFullProfilePhotoUrl(profilePhotoSource)) : null}
                 profilePhotoSize={photoSize}
                 imagesLayout={imagesLayout as 'stacked' | 'side-by-side'}
                 profilePhotoToDelete={photoDeleted}

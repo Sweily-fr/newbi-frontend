@@ -72,7 +72,7 @@ const MobileRedirectPage: React.FC = () => {
         
         <div className="mt-8 space-y-4">
           <a 
-            href="https://newbi.fr" 
+            href="https://www.newbi.fr" 
             className="block w-full py-3 px-4 bg-[#5b50ff] hover:bg-[#4a41e0] text-white font-medium rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1"
           >
             Accéder au site sur ordinateur

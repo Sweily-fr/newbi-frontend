@@ -1,4 +1,3 @@
-import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -11,6 +10,7 @@ export interface Tool {
   href: string;
   premium?: boolean;
   comingSoon?: boolean;
+  maintenance?: boolean;
 }
 
 // Liste des outils disponibles dans l'application
@@ -20,11 +20,11 @@ export const TOOLS: Tool[] = [
     name: "Articles SEO",
     description:
       "Analysez et améliorez le référencement de vos articles de blog",
-    category: "Marketing",
+    category: "Marketing & Communication",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Google size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/ArticlesSeo.svg" alt="Articles SEO" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/blog-seo-optimizer",
@@ -33,11 +33,12 @@ export const TOOLS: Tool[] = [
     id: "email-signature",
     name: "Signature Email",
     description: "Créez des signatures email professionnelles personnalisées",
-    category: "Communication",
+    category: "Marketing & Communication",
+    maintenance: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Designtools size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/SignatureEmail.svg" alt="Signature Email" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/signatures-email",
@@ -47,11 +48,11 @@ export const TOOLS: Tool[] = [
     name: "Factures",
     description:
       "Créez et gérez vos factures professionnelles en quelques clics",
-    category: "Facturation",
+    category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Facture.svg" alt="Factures" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/factures",
@@ -61,11 +62,11 @@ export const TOOLS: Tool[] = [
     name: "Devis",
     description:
       "Créez et suivez vos devis clients avec des modèles professionnels",
-    category: "Facturation",
+    category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Devis.svg" alt="Devis" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/devis",
@@ -77,8 +78,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Politiquedeconfidentialité.svg" alt="Politique de confidentialité" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-politique-confidentialite",
@@ -90,8 +91,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Mentionslegales.svg" alt="Mentions légales" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-mentions-legales",
@@ -101,82 +102,82 @@ export const TOOLS: Tool[] = [
     name: "Transfert de fichiers volumineux",
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
-    category: "À venir",
-    comingSoon: true,
+    category: "Productivité",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Send2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Transfertdefichiers.svg" alt="Transfert de fichiers" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/transfert-fichiers-volumineux",
+    href: "/file-transfer",
   },
   {
     id: "gestion-taches",
-    name: "Gestion des tâches",
+    name: "Gestion des tâches Kanban",
     description:
-      "Gérez vos tâches et vos projets avec des outils simples et efficaces",
-    category: "À venir",
+      "Gérez vos tâches et vos projets avec un tableau Kanban intuitif et efficace",
+    category: "Productivité",
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondestaches.svg" alt="Gestion des tâches" className="w-full h-full object-cover" />
+      </div>
+    ),
+    href: "/kanban",
+  },
+  {
+    id: "depenses",
+    name: "Dépenses",
+    description: "Suivez et gérez vos dépenses professionnelles avec OCR",
+    category: "Finances",
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Depenses.svg" alt="Dépenses" className="w-full h-full object-cover" />
+      </div>
+    ),
+    href: "/depenses",
+  },
+  {
+    id: "signature-electronique",
+    name: "Signature électronique",
+    description: "Signez et faites signer vos documents en ligne de manière sécurisée",
+    category: "Finances",
     comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Trello size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Signatureelectronique.svg" alt="Signature électronique" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/gestion-taches",
-  },
-];
-
-// Outils pour la page d'accueil (format moderne avec le nouveau design)
-export const HOME_TOOLS = [
-  {
-    id: "invoices",
-    name: "Factures",
-    description: "Créez et gérez vos factures en quelques clics",
-    category: "Facturation",
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <svg
-          className="h-7 w-7"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="#5b50ff"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      </div>
-    ),
-    href: "/factures",
+    href: "/signature-electronique",
   },
   {
-    id: "quotes",
-    name: "Devis",
-    description: "Créez et suivez vos devis clients",
-    category: "Facturation",
+    id: "bons-de-commande",
+    name: "Bons de commande",
+    description: "Créez et gérez vos bons de commande professionnels",
+    category: "Finances",
+    premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <svg
-          className="h-7 w-7"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="#5b50ff"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-          />
-        </svg>
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Bondecommande.svg" alt="Bon de commande" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/devis",
+    href: "/bons-de-commande",
+  },
+  {
+    id: "gestion-tresorerie",
+    name: "Gestion de trésorerie",
+    description: "Suivez et anticipez vos flux de trésorerie pour une meilleure gestion financière",
+    category: "Finances",
+    comingSoon: true,
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondetresorerie.svg" alt="Gestion de trésorerie" className="w-full h-full object-cover" />
+      </div>
+    ),
+    href: "/gestion-tresorerie",
   },
 ];
 

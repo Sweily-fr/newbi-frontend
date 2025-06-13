@@ -293,11 +293,11 @@ export const ToolsPage = () => {
                 </div>
               ) : (
                 // Affichage par catégorie
-                <div className="space-y-10">
+                <div className="space-y-16">
                   {categories.map((category) => (
                     <div key={category} className="mb-8">
                       {/* Titre de la catégorie */}
-                      <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-2">
                         {category}
                       </h2>
                       {/* Grille d'outils pour cette catégorie */}

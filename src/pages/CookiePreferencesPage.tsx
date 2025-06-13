@@ -107,11 +107,12 @@ export const CookiePreferencesPage: React.FC = () => {
         description="Gérez vos préférences de cookies sur Newbi - Contrôlez quels cookies sont utilisés lors de votre navigation sur notre site et personnalisez votre expérience."
         keywords="cookies, préférences cookies, RGPD, confidentialité, paramètres, vie privée"
         schemaType="WebPage"
+        noindex={true}
         additionalSchemaData={{
           'specialty': 'Privacy Settings'
         }}
-        ogImage="https://newbi.fr/images/PNG/Logo_Texte_Purple.png"
-        canonicalUrl="https://newbi.fr/preferences-cookies"
+        ogImage="https://www.newbi.fr/images/PNG/Logo_Texte_Purple.png"
+        canonicalUrl="https://www.newbi.fr/preferences-cookies"
       />
       
       <div className="bg-white shadow-md rounded-lg p-8">

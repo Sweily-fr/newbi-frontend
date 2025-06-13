@@ -5,22 +5,14 @@ import { Sidebar } from "../../../../components/layout/Sidebar";
 import { Button } from "../../../../components/";
 import { InvoicePreview } from "../forms/InvoicePreview";
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
-import { 
-  InfoCircle, 
-  Profile2User, 
-  DocumentText, 
-  TickCircle, 
-  CloseCircle, 
-  Edit2, 
-  Trash, 
-  ArrowRight, 
-  Money, 
-  Calendar, 
-  Clock, 
-  Receipt21, 
-  Wallet, 
-  ReceiptItem, 
-  Sms
+import {
+  TickCircle,
+  CloseCircle,
+  Edit2,
+  Trash,
+  ArrowRight,
+  Money,
+  Clock,
 } from "iconsax-react";
 
 // Type pour le statut de la facture
@@ -139,18 +131,20 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
     DRAFT: "bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]",
     PENDING: "bg-[#fff8e6] text-[#e6a700] border border-[#ffe7a0]",
     COMPLETED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
-    CANCELED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]"
+    CANCELED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]",
   };
-  
+
   // Texte des statuts en français
   const statusText = {
     DRAFT: "Brouillon",
     PENDING: "À encaisser",
     COMPLETED: "Payée",
-    CANCELED: "Annulée"
+    CANCELED: "Annulée",
   };
 
-  const getNextStatus = (currentStatus: InvoiceStatus): InvoiceStatus | null => {
+  const getNextStatus = (
+    currentStatus: InvoiceStatus
+  ): InvoiceStatus | null => {
     switch (currentStatus) {
       case "DRAFT":
         return "PENDING";
@@ -160,7 +154,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         return null;
     }
   };
-  
+
   // Fonction pour annuler une facture
   const cancelInvoice = () => {
     if (invoice.status === "PENDING") {
@@ -173,305 +167,170 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
   // Fonction pour calculer les totaux (nécessaire pour InvoicePreview)
   const calculateTotals = () => {
     // Calculer les détails des différentes TVA à partir des items
-    const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
-    
+    const vatDetails: Record<
+      number,
+      { rate: number; amount: number; baseAmount: number }
+    > = {};
+
     // Parcourir les items pour calculer les montants par taux de TVA
-    invoice.items.forEach(item => {
+    invoice.items.forEach((item) => {
       const itemHT = item.quantity * item.unitPrice;
-      
+
       // Appliquer la remise au niveau de l'item si elle existe
       let itemHTAfterDiscount = itemHT;
       if (item.discount && item.discount > 0) {
-        if (item.discountType === 'PERCENTAGE') {
-          itemHTAfterDiscount = itemHT * (1 - (item.discount / 100));
+        if (item.discountType === "PERCENTAGE") {
+          itemHTAfterDiscount = itemHT * (1 - item.discount / 100);
         } else {
           itemHTAfterDiscount = Math.max(0, itemHT - item.discount);
         }
       }
-      
+
       const itemVAT = itemHTAfterDiscount * (item.vatRate / 100);
-      
+
       // Ajouter les détails de TVA pour ce taux
       if (!vatDetails[item.vatRate]) {
-        vatDetails[item.vatRate] = { rate: item.vatRate, amount: 0, baseAmount: 0 };
+        vatDetails[item.vatRate] = {
+          rate: item.vatRate,
+          amount: 0,
+          baseAmount: 0,
+        };
       }
       vatDetails[item.vatRate].amount += itemVAT;
       vatDetails[item.vatRate].baseAmount += itemHTAfterDiscount;
     });
-    
+
     // Convertir l'objet vatDetails en tableau trié par taux
     const vatRates = Object.values(vatDetails).sort((a, b) => a.rate - b.rate);
-    
+
     return {
       totalHT: invoice.totalHT,
       totalVAT: invoice.totalVAT,
       finalTotalHT: invoice.finalTotalHT,
       finalTotalTTC: invoice.finalTotalTTC,
       discountAmount: invoice.discountAmount,
-      vatRates: vatRates // Ajouter les détails des différentes TVA
+      vatRates: vatRates, // Ajouter les détails des différentes TVA
     };
   };
 
   // Contenu de la sidebar
   const content = (
-    <div className="space-y-8">
-      {/* Statut de la facture */}
-      <div className="mb-8 animate-fadeIn">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-600 flex items-center">
-            <div className="w-7 h-7 rounded-full bg-[#f0eeff] flex items-center justify-center mr-2">
-              <TickCircle size={18} color="#5b50ff" variant="Bold" />
-            </div>
-            Statut
-          </span>
-          <span className={`px-4 py-1.5 rounded-full text-xs font-semibold ${statusColors[invoice.status as keyof typeof statusColors]} shadow-sm transition-all duration-300 hover:shadow-md badge-transition flex items-center`}>
-            <span className="w-2 h-2 rounded-full bg-current mr-2 animate-pulse"></span>
-            {statusText[invoice.status as keyof typeof statusText]}
-          </span>
+    <div className="space-y-6 px-1">
+      {/* Montant principal en haut */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 text-center shadow-sm">
+        <div className="text-3xl font-bold mb-4">
+          {invoice.finalTotalTTC?.toFixed(2) || "0.00"} €
         </div>
-        <div className="mt-4 h-4 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
-          <div 
-            className={`h-full ${invoice.status === 'DRAFT' ? 'w-1/3' : 
-              invoice.status === 'PENDING' ? 'w-2/3' : 
-              invoice.status === 'COMPLETED' ? 'w-full' : 
-              'w-0'} bg-[#5b50ff]`}
-            style={{ transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-          />
-        </div>
-        <div className="flex justify-between mt-2 text-xs font-medium text-gray-600">
-          <span className="flex flex-col items-center">
-            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
-            Création
-          </span>
-          <span className="flex flex-col items-center">
-            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
-            En attente
-          </span>
-          <span className="flex flex-col items-center">
-            <span className="w-2 h-2 rounded-full bg-[#5b50ff] mb-1"></span>
-            Finalisée
-          </span>
-        </div>
-      </div>
-      {/* Informations générales */}
-      <div className="rounded-xl">
-        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
-          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
-            <InfoCircle size={18} color="#5b50ff" variant="Bold" />
+        {invoice.status === "DRAFT" && (
+          <button
+            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
+            onClick={() => onStatusChange("PENDING")}
+          >
+            <Clock
+              size={18}
+              className="mr-2 text-[#5b50ff]"
+              color="#5b50ff"
+              variant="Bold"
+            />
+            À encaisser
+          </button>
+        )}
+        {invoice.status === "PENDING" && (
+          <button
+            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
+            onClick={() => onStatusChange("COMPLETED")}
+          >
+            <TickCircle
+              size={18}
+              className="mr-2 text-[#5b50ff]"
+              color="#5b50ff"
+              variant="Bold"
+            />
+            Marquer comme payée
+          </button>
+        )}
+        <div className="border-b mt-6"></div>
+        <dl className="space-y-4 mt-6">
+          <div className="flex">
+            <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+              Date d'émission :
+            </dt>
+            <dd className="text-gray-900">{formatDate(invoice.issueDate)}</dd>
           </div>
-          Informations générales
-        </h3>
-        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
-          <dl>
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Calendar size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'émission</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
-                {formatDate(invoice.issueDate)}
-              </dd>
-            </div>
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Clock size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'échéance</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {formatDate(invoice.dueDate)}
-              </dd>
-            </div>
-            {invoice.executionDate && (
-              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                <dt className="text-sm font-medium text-gray-600 flex items-center"><Calendar size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Date d'exécution</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {formatDate(invoice.executionDate)}
-                </dd>
-              </div>
-            )}
-            {invoice.purchaseOrderNumber && (
-              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                <dt className="text-sm font-medium text-gray-600 flex items-center"><Receipt21 size={16} color="#5b50ff" className="mr-4" variant="Linear" /> N° de commande</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {invoice.purchaseOrderNumber}
-                </dd>
-              </div>
-            )}
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Wallet size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant HT</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
-                {invoice.totalHT?.toFixed(2) || '0.00'} €
-              </dd>
-            </div>
-            {/* Affichage détaillé des TVA si plusieurs taux sont utilisés */}
-            {(() => {
-              // Calculer les détails des TVA
-              const vatDetails = calculateTotals().vatRates;
-              
-              if (vatDetails && vatDetails.length > 1) {
-                return (
-                  <>
-                    {vatDetails.map((vatDetail, index) => (
-                      <div key={index} className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                        <dt className="text-sm font-medium text-gray-600 flex items-center">
-                          <ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA {vatDetail.rate}%
-                        </dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                          {vatDetail.amount.toFixed(2)} € ({vatDetail.rate}% de {vatDetail.baseAmount.toFixed(2)} €)
-                        </dd>
-                      </div>
-                    ))}
-                    <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                      <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Total TVA</dt>
-                      <dd className="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">
-                        {invoice.totalVAT?.toFixed(2) || '0.00'} €
-                      </dd>
-                    </div>
-                  </>
-                );
-              } else {
-                // Afficher seulement le total de TVA si un seul taux est utilisé
-                return (
-                  <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                    <dt className="text-sm font-medium text-gray-600 flex items-center"><ReceiptItem size={16} color="#5b50ff" className="mr-4" variant="Linear" /> TVA</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {invoice.totalVAT?.toFixed(2) || '0.00'} €
-                    </dd>
-                  </div>
-                );
-              }
-            })()}
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Money size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Montant TTC</dt>
-              <dd className="mt-1 text-sm font-bold text-[#5b50ff] sm:mt-0 sm:col-span-2 transition-transform duration-300 rounded-lg inline-block">
-                {invoice.finalTotalTTC?.toFixed(2) || '0.00'} €
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </div>
 
-      {/* Client */}
-      <div className="rounded-xl">
-        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
-          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
-            <Profile2User size={18} color="#5b50ff" variant="Bold" />
+          <div className="flex">
+            <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+              Date d'échéance :
+            </dt>
+            <dd className="text-gray-900">{formatDate(invoice.dueDate)}</dd>
           </div>
-          Client
-        </h3>
-        <div className="bg-white shadow-sm overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
-          <dl>
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Profile2User size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Nom</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-medium hover:text-[#5b50ff] transition-colors duration-300">
-                {invoice.client.name}
+
+          {invoice.executionDate && (
+            <div className="flex">
+              <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+                Date d'exécution :
+              </dt>
+              <dd className="text-gray-900">
+                {formatDate(invoice.executionDate)}
               </dd>
             </div>
-            <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-              <dt className="text-sm font-medium text-gray-600 flex items-center"><Sms size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Email</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {invoice.client.email}
+          )}
+          <div className="flex">
+            <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+              Client :
+            </dt>
+            <dd className="text-gray-900 font-medium">{invoice.client.name}</dd>
+          </div>
+
+          {invoice.client.siret && (
+            <div className="flex">
+              <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+                SIREN/SIRET:
+              </dt>
+              <dd className="text-gray-900">{invoice.client.siret}</dd>
+            </div>
+          )}
+
+          {invoice.client.vatNumber && (
+            <div className="flex">
+              <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+                Numéro de TVA :
+              </dt>
+              <dd className="text-gray-900">{invoice.client.vatNumber}</dd>
+            </div>
+          )}
+
+          {invoice.client.email && (
+            <div className="flex">
+              <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+                E-mail :
+              </dt>
+              <dd className="text-gray-900">{invoice.client.email}</dd>
+            </div>
+          )}
+
+          {invoice.client.address && (
+            <div className="flex">
+              <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+                Adresse de facturation :
+              </dt>
+              <dd className="text-gray-900">
+                {invoice.client.address.street}
+                <br />
+                {invoice.client.address.postalCode}{" "}
+                {invoice.client.address.city}, {invoice.client.address.country}
               </dd>
             </div>
-            {invoice.client.siret && (
-              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                <dt className="text-sm font-medium text-gray-600 flex items-center"><DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" /> SIRET</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {invoice.client.siret}
-                </dd>
-              </div>
-            )}
-            {invoice.client.vatNumber && (
-              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                <dt className="text-sm font-medium text-gray-600 flex items-center"><Receipt21 size={16} color="#5b50ff" className="mr-4" variant="Linear" /> N° TVA</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {invoice.client.vatNumber}
-                </dd>
-              </div>
-            )}
-            {invoice.client.address && (
-              <div className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-200">
-                <dt className="text-sm font-medium text-gray-600 flex items-center"><InfoCircle size={16} color="#5b50ff" className="mr-4" variant="Linear" /> Adresse</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {invoice.client.address.street}<br />
-                  {invoice.client.address.postalCode} {invoice.client.address.city}<br />
-                  {invoice.client.address.country}
-                </dd>
-              </div>
-            )}
-          </dl>
-        </div>
-      </div>
+          )}
 
-      {/* Éléments de la facture */}
-      <div className="rounded-xl">
-        <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
-          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center mr-2">
-            <DocumentText size={18} color="#5b50ff" variant="Bold" />
+          <div className="flex">
+            <dt className="text-gray-500 w-52 flex-shrink-0 text-left">
+              Langue du document :
+            </dt>
+            <dd className="text-gray-900">Français</dd>
           </div>
-          Éléments de la facture
-        </h3>
-        <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
-          <ul className="divide-y divide-gray-200">
-            {invoice.items && invoice.items.map((item, index) => (
-              <li key={index} className={`px-4 py-4 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-all duration-300 hover:bg-gray-100`}>
-                <div className="flex justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 flex items-center">
-                      <DocumentText size={16} color="#5b50ff" className="mr-4" variant="Linear" />
-                      {item.description}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700 mr-2">
-                        {item.quantity} {getUnitAbbreviation(item.unit) || 'u'}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-gray-700">
-                        {item.unitPrice.toFixed(2)} €
-                      </span>
-                    </p>
-                  </div>
-                  <div className="text-sm font-medium text-gray-800 px-3 py-1 rounded-lg">
-                    {((item.quantity * item.unitPrice) * (1 - (item.discountType === 'PERCENTAGE' && item.discount ? item.discount / 100 : 0))).toFixed(2)} €
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        </dl>
       </div>
-
-      {/* Notes */}
-      {(invoice.headerNotes || invoice.footerNotes || invoice.termsAndConditions) && (
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Notes</h3>
-          <div className="bg-white overflow-hidden rounded-xl border border-gray-100 transition-all duration-300 hover:border-[#e6e1ff]">
-            <div className="divide-y divide-gray-200">
-            {invoice.headerNotes && (
-              <div className="px-4 py-4 border-b border-gray-200">
-                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">En-tête</h4>
-                <p className="text-sm text-gray-900">{invoice.headerNotes}</p>
-              </div>
-            )}
-            {invoice.footerNotes && (
-              <div className="px-4 py-4 border-b border-gray-200">
-                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Pied de page</h4>
-                <p className="text-sm text-gray-900">{invoice.footerNotes}</p>
-              </div>
-            )}
-            {invoice.termsAndConditions && (
-              <div className="px-4 py-4 border-b border-gray-200">
-                <h4 className="text-xs font-medium text-gray-500 uppercase mb-1">Conditions générales</h4>
-                <p className="text-sm text-gray-900">{invoice.termsAndConditions}</p>
-                {invoice.termsAndConditionsLink && (
-                  <a 
-                    href={invoice.termsAndConditionsLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center"
-                  >
-                    {invoice.termsAndConditionsLinkTitle || 'Voir les conditions générales'} <ArrowRight size={14} className="ml-1" variant="Bold" />
-                  </a>
-                )}
-              </div>
-            )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -480,7 +339,7 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
     <>
       <div className="space-y-4">
         <div className="flex flex-col space-y-3">
-          {invoice.status === 'DRAFT' && nextStatus && (
+          {invoice.status === "DRAFT" && nextStatus && (
             <Button
               variant="primary"
               fullWidth
@@ -492,19 +351,24 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               <ArrowRight size={18} className="ml-2" variant="Bold" />
             </Button>
           )}
-          {invoice.status === 'PENDING' && nextStatus && (
+          {invoice.status === "PENDING" && nextStatus && (
             <Button
               variant="primary"
               fullWidth
               className="bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
               onClick={() => onStatusChange(nextStatus)}
             >
-              <TickCircle size={20} color="#fff" className="mr-2" variant="Bold" />
+              <TickCircle
+                size={20}
+                color="#fff"
+                className="mr-2"
+                variant="Bold"
+              />
               Indiquer comme payée
               <ArrowRight size={18} className="ml-2" variant="Bold" />
             </Button>
           )}
-          {invoice.status === 'PENDING' && (
+          {invoice.status === "PENDING" && (
             <Button
               variant="outline"
               color="red"
@@ -512,13 +376,18 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
               className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
               onClick={cancelInvoice}
             >
-              <CloseCircle size={20} color="#f44336" className="mr-2" variant="Bold" />
+              <CloseCircle
+                size={20}
+                color="#f44336"
+                className="mr-2"
+                variant="Bold"
+              />
               Annuler la facture
             </Button>
           )}
         </div>
       </div>
-      {invoice.status === 'DRAFT' && (
+      {invoice.status === "DRAFT" && (
         <div className="grid grid-cols-2 gap-3 mt-2">
           <Button
             variant="outline"
@@ -526,7 +395,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
             fullWidth
             className="border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md"
           >
-            <Edit2 size={20} color="#5b50ff" className="mr-2" variant="Linear" />
+            <Edit2
+              size={20}
+              color="#5b50ff"
+              className="mr-2"
+              variant="Linear"
+            />
             Modifier
           </Button>
           <Button
@@ -536,7 +410,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
             fullWidth
             className="border border-[#f44336] text-[#f44336] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
           >
-            <Trash size={20} color="#f44336" className="mr-2" variant="Linear" />
+            <Trash
+              size={20}
+              color="#f44336"
+              className="mr-2"
+              variant="Linear"
+            />
             Supprimer
           </Button>
         </div>
@@ -560,14 +439,17 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         cancelButtonText="Non, conserver la facture"
         confirmButtonVariant="danger"
       />
-      
+
       {/* Prévisualisation de la facture */}
       {showPreview && (
         <div
-          className={`fixed top-0 left-0 h-full w-1/2 bg-gray-50 z-[999] border-r border-gray-100 transition-all duration-500 ${
+          className={`fixed top-0 left-0 h-full w-[55%] 2xl:w-[65%] bg-gray-50 z-[999] border-r border-gray-100 transition-all duration-500 ${
             isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
           }`}
-          style={{ display: isOpen ? "block" : "none", boxShadow: "5px 0 15px rgba(0,0,0,0.1)" }}
+          style={{
+            display: isOpen ? "block" : "none",
+            boxShadow: "5px 0 15px rgba(0,0,0,0.1)",
+          }}
         >
           <div className="h-full overflow-auto custom-scrollbar animate-slideInLeft">
             <InvoicePreview
@@ -598,14 +480,12 @@ export const InvoiceSidebar: React.FC<InvoiceSidebarProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         title={`Facture ${invoice.prefix}${invoice.number}`}
-        width="w-1/2"
+        width="w-[45%] 2xl:w-[35%]"
         position="right"
         actions={actions}
         className="custom-scrollbar bg-white shadow-xl"
       >
-        <div className="animate-fadeIn space-y-6 px-1">
-          {content}
-        </div>
+        <div className="animate-fadeIn space-y-6 px-1">{content}</div>
       </Sidebar>
     </>
   );

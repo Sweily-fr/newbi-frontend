@@ -437,7 +437,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         )}
 
         {/* Formulaire à gauche */}
-        <div className="w-3/6 bg-gray-50 overflow-y-auto border-r border-gray-200 flex flex-col h-full custom-scrollbar">
+        <div className="w-[52%] bg-gray-50 overflow-y-auto border-r border-gray-200 flex flex-col h-full custom-scrollbar">
           <Form onSubmit={(e) => e.preventDefault()} className="flex flex-col flex-grow">
             {showSettings ? (
               <div className="p-6">
@@ -754,7 +754,7 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
         </div>
 
         {/* Aperçu à droite */}
-        <div className="w-3/6 overflow-hidden z-[900]">
+        <div className="w-[48%] overflow-hidden z-[900]">
           {/* Calculer les totaux pour l'aperçu */}
           <QuotePreview
             quote={{

@@ -297,7 +297,7 @@ export const useQuoteForm = ({
       setQuoteNumber(nextQuoteNumberData.nextQuoteNumber);
     }
   }, [nextQuoteNumberData, quote]);
-
+  
   // Fonction pour calculer les totaux
   const calculateTotals = () => {
     let subtotal = 0;
@@ -305,6 +305,7 @@ export const useQuoteForm = ({
     let totalWithoutVAT = 0;
     let totalWithVAT = 0;
     let totalDiscount = 0;
+    
     // Objet pour suivre les montants par taux de TVA
     const vatDetails: Record<number, { rate: number; amount: number; baseAmount: number }> = {};
 
@@ -314,17 +315,17 @@ export const useQuoteForm = ({
       const unitPrice = item.unitPrice || 0;
       const vatRate = item.vatRate || 0;
       const itemDiscount = item.discount || 0;
-      const discountType = item.discountType || "PERCENTAGE";
+      const itemDiscountType = item.discountType || "PERCENTAGE";
 
       // Calculer le montant avant remise
       let itemTotal = quantity * unitPrice;
 
       // Appliquer la remise sur l'élément
       let itemDiscountAmount = 0;
-      if (discountType === "PERCENTAGE") {
+      if (itemDiscountType === "PERCENTAGE") {
         itemDiscountAmount = (itemTotal * itemDiscount) / 100;
       } else {
-        itemDiscountAmount = itemDiscount;
+        itemDiscountAmount = Math.min(itemDiscount, itemTotal); // Éviter les remises négatives
       }
       itemTotal -= itemDiscountAmount;
       totalDiscount += itemDiscountAmount;
@@ -332,27 +333,51 @@ export const useQuoteForm = ({
       // Ajouter au sous-total
       subtotal += itemTotal;
 
-      // Calculer la TVA
-      const itemVAT = (itemTotal * vatRate) / 100;
-      totalVAT += itemVAT;
-      
-      // Ajouter les détails de TVA pour ce taux
+      // Initialiser les détails de TVA pour ce taux
       if (!vatDetails[vatRate]) {
         vatDetails[vatRate] = { rate: vatRate, amount: 0, baseAmount: 0 };
       }
-      vatDetails[vatRate].amount += itemVAT;
       vatDetails[vatRate].baseAmount += itemTotal;
     });
 
     // Appliquer la remise globale
     let globalDiscountAmount = 0;
-    if (discountType === "PERCENTAGE") {
-      globalDiscountAmount = (subtotal * discount) / 100;
-    } else {
-      globalDiscountAmount = discount;
+    if (discount > 0) {
+      if (discountType === "PERCENTAGE") {
+        globalDiscountAmount = (subtotal * discount) / 100;
+      } else {
+        globalDiscountAmount = Math.min(discount, subtotal); // Éviter les remises négatives
+      }
+      
+      // Appliquer la remise globale proportionnellement à chaque base de TVA
+      if (globalDiscountAmount > 0 && subtotal > 0) {
+        const discountRatio = globalDiscountAmount / subtotal;
+        
+        // Ajuster les bases de TVA en fonction de la remise globale
+        Object.keys(vatDetails).forEach((rateKey) => {
+          const rate = Number(rateKey);
+          const detail = vatDetails[rate];
+          const rateDiscount = detail.baseAmount * discountRatio;
+          
+          // Réduire la base imposable pour ce taux de TVA
+          detail.baseAmount -= rateDiscount;
+        });
+        
+        subtotal -= globalDiscountAmount;
+        totalDiscount += globalDiscountAmount;
+      }
     }
-    subtotal -= globalDiscountAmount;
-    totalDiscount += globalDiscountAmount;
+    
+    // Recalculer la TVA après application de toutes les remises
+    totalVAT = 0;
+    Object.keys(vatDetails).forEach((rateKey) => {
+      const rate = Number(rateKey);
+      const detail = vatDetails[rate];
+      
+      // Calculer le montant de TVA sur la base ajustée
+      detail.amount = (detail.baseAmount * rate) / 100;
+      totalVAT += detail.amount;
+    });
 
     // Calculer les totaux finaux
     totalWithoutVAT = subtotal;
@@ -370,10 +395,9 @@ export const useQuoteForm = ({
       vatRates: vatRates // Ajouter les détails des différents taux de TVA
     };
   };
-
+  
   // Calculer les totaux à chaque changement des éléments ou de la remise
   const totals = calculateTotals();
-
   // Fonction pour gérer le changement de mode client (existant ou nouveau)
   const handleClientModeChange = (isNew: boolean) => {
     setIsNewClient(isNew);

@@ -84,12 +84,12 @@ export const QuotesPage = () => {
         type="Service"
         name="Gestion des Devis Newbi"
         description="Solution complète de création et gestion de devis pour professionnels, auto-entrepreneurs et PME"
-        url="https://newbi.fr/devis"
+        url="https://www.newbi.fr/devis"
         additionalData={{
           "provider": {
             "@type": "Organization",
             "name": "Newbi",
-            "url": "https://newbi.fr/"
+            "url": "https://www.newbi.fr/"
           },
           "serviceType": "Gestion de devis en ligne",
           "offers": {

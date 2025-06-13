@@ -1,0 +1,24 @@
+// Export des articles de blog
+export { invoiceArticle } from './invoiceArticle';
+export { excelQuoteArticle } from './excelQuoteArticle';
+export { businessManagementArticle } from './businessManagementArticle';
+export { legalNoticeArticle } from './legalNoticeArticle';
+export { emailSignatureArticle } from './emailSignatureArticle';
+export { emailSignatureImportanceArticle } from './emailSignatureImportanceArticle';
+export { seoOptimizationArticle } from './seoOptimizationArticle';
+export { invoiceTemplateArticle } from './invoiceTemplateArticle';
+export { quoteCreationArticle } from './quoteCreationArticle';
+export { businessToolsArticle } from './businessToolsArticle';
+export { digitalInvoiceArticle } from './digitalInvoiceArticle';
+export { quoteVsOrderArticle } from './quoteVsOrderArticle';
+export { editInvoiceArticle } from './editInvoiceArticle';
+export { seoSoloOptimizationArticle } from './seoSoloOptimizationArticle';
+export { gestionIndependantArticle } from './gestionIndependantArticle';
+export { erpArticle } from './erpArticle';
+export { compteBancaireFreelanceArticle } from './compte-bancaire-freelance';
+export { calendrierImpots2025Article } from './calendrier-impots-2025';
+export { modifierCodeApeArticle } from './modifier-code-ape';
+export { freelanceToolsArticle } from './freelanceToolsArticle';
+export { odooVsNewbiArticle } from './odooVsNewbiArticle';
+export { interiorDesignerManagementArticle } from './interiorDesignerManagement';
+

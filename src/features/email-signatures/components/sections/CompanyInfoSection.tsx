@@ -10,6 +10,9 @@ interface CompanyInfoSectionProps {
   signatureData: SignatureData;
   updateSignatureData: <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => void;
   selectedSignature?: EmailSignature; // Pour savoir si on est en mode édition
+  validationErrors?: {
+    companyName?: string;
+  };
 }
 
 /**
@@ -19,6 +22,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   signatureData,
   updateSignatureData,
   selectedSignature,
+  validationErrors: externalErrors
 }) => {
   // Récupérer les informations de l'entreprise de l'utilisateur
   const { company, loading } = useCompany();
@@ -32,16 +36,29 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   const [showLogo, setShowLogo] = useState(signatureData.showLogo !== false);
   
   // États pour gérer les erreurs de validation
-  const [errors, setErrors] = useState({
+  const [localErrors, setLocalErrors] = useState({
     companyName: '',
     companyWebsite: '',
     companyAddress: ''
   });
   
+  // Combiner les erreurs locales et externes
+  const errors = {
+    companyName: externalErrors?.companyName || localErrors.companyName,
+    companyWebsite: localErrors.companyWebsite,
+    companyAddress: localErrors.companyAddress
+  };
+  
   // Fonctions de validation
   const validateCompanyName = (value: string) => {
-    if (value.trim() && !NAME_REGEX.test(value)) {
+    if (!value.trim()) {
+      return "Le nom de l'entreprise est requis";
+    }
+    if (!NAME_REGEX.test(value)) {
       return "Le nom de l'entreprise ne doit contenir que des lettres, espaces, tirets ou apostrophes";
+    }
+    if (value.length > 50) {
+      return "Le nom de l'entreprise ne doit pas dépasser 50 caractères";
     }
     return "";
   };
@@ -232,6 +249,9 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
   return (
     <>
       <div>
+            {/* Trait de séparation */}
+            <div className="border-t border-gray-200 pt-6 mt-2 mb-6"></div>
+            
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-semibold text-gray-900">Informations de l'entreprise</h3>
               <div className="flex space-x-2">
@@ -321,7 +341,7 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
               {/* Nom de l'entreprise */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom de l'entreprise
+                  Nom de l'entreprise <span className="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -332,15 +352,15 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                     const value = e.target.value;
                     setLocalCompanyName(value);
                     const error = validateCompanyName(value);
-                    setErrors(prev => ({ ...prev, companyName: error }));
+                    setLocalErrors(prev => ({ ...prev, companyName: error }));
                   }}
                   onBlur={(e) => {
                     const error = validateCompanyName(e.target.value);
-                    setErrors(prev => ({ ...prev, companyName: error }));
+                    setLocalErrors(prev => ({ ...prev, companyName: error }));
                   }}
                 />
                 {errors.companyName && (
-                  <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.companyName}</p>
                 )}
               </div>
               
@@ -358,15 +378,15 @@ export const CompanyInfoSection: React.FC<CompanyInfoSectionProps> = ({
                     const value = e.target.value;
                     setLocalCompanyWebsite(value);
                     const error = validateWebsite(value);
-                    setErrors(prev => ({ ...prev, companyWebsite: error }));
+                    setLocalErrors(prev => ({ ...prev, companyWebsite: error }));
                   }}
                   onBlur={(e) => {
                     const error = validateWebsite(e.target.value);
-                    setErrors(prev => ({ ...prev, companyWebsite: error }));
+                    setLocalErrors(prev => ({ ...prev, companyWebsite: error }));
                   }}
                 />
                 {errors.companyWebsite && (
-                  <p className="mt-1 text-sm text-red-500">{errors.companyWebsite}</p>
+                  <p className="mt-1 text-sm text-red-500" role="alert" aria-live="polite">{errors.companyWebsite}</p>
                 )}
               </div>
               

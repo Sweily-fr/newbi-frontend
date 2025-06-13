@@ -5,7 +5,7 @@ import { Button } from "../../../components";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { Link } from "react-router-dom";
-import { ArrowRight2, Verify } from "iconsax-react";
+import { ArrowRight2, Verify, Setting4 } from "iconsax-react";
 
 interface ToolCardProps {
   tool: Tool;
@@ -28,17 +28,27 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
       className={`relative group bg-white rounded-2xl border border-gray-200 overflow-hidden block
         ${tool.premium ? 'border-gray-200 bg-gray-50/30' : 'border-gray-100'}
         ${tool.comingSoon ? 'opacity-75 grayscale pointer-events-none' : ''}
-        ${!tool.comingSoon && hasAccess ? 'cursor-pointer' : ''}
+        ${tool.maintenance ? 'opacity-90 pointer-events-none' : ''}
+        ${!tool.comingSoon && !tool.maintenance && hasAccess ? 'cursor-pointer' : ''}
         ${className}
       `}
       onClick={onClick}
-      aria-label={`Accéder à l'outil ${tool.name}${tool.premium ? ' (Premium)' : ''}`}
+      aria-label={`Accéder à l'outil ${tool.name}${tool.premium ? ' (Premium)' : ''}${tool.maintenance ? ' (En maintenance)' : ''}`}
     >
-      {/* Aucun indicateur premium en haut à droite */}
+      {/* Indicateur de maintenance en haut à droite */}
+      {tool.maintenance && (
+        <div className="absolute top-0 right-0 w-full h-full overflow-hidden">
+          <div className="absolute top-3 right-3 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full flex items-center gap-1 z-10 shadow-sm">
+            <Setting4 size="16" variant="Bold" className="animate-spin-slow" />
+            <span className="text-xs font-medium">Maintenance</span>
+          </div>
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-yellow-50/80 rotate-45 z-0"></div>
+        </div>
+      )}
       
       <div className="p-5 flex flex-col h-full justify-between">
         {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
-        <div className="flex items-center gap-4 mb-4 pl-1">
+        <div className="flex items-center gap-4 pl-1">
           {/* Icône dans un cercle avec fond et effet de brillance */}
           <div className="flex-shrink-0 relative">
             {/* L'icône est déjà dans un div avec un fond coloré */}
@@ -52,7 +62,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
             <h3 className="text-lg font-semibold tracking-wide text-gray-800 group-hover:text-gray-900 transition-colors duration-300">
               {tool.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            {/* <div className="flex items-center gap-2 mt-1">
               <div className="flex items-center gap-2">
                 <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#f0eeff] text-[#5b50ff] shadow-sm transition-all duration-300 group-hover:shadow">{tool.category}</p>
                 {tool.premium && (
@@ -62,52 +72,48 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
                   </p>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-sm mb-4 min-h-[42px]">
+            </div> */}
+        <div className="text-sm">
           {tool.comingSoon ? (
             <div className="flex items-center gap-2">
               <span className="italic text-gray-600 font-medium">{tool.name} bientôt disponible</span>
             </div>
+          ) : tool.maintenance ? (
+            <div className="space-y-2">
+              <p className="text-gray-700 line-clamp-2">{tool.description}</p>
+              <div className="flex items-center gap-1 mt-2 text-yellow-700 text-xs">
+                <Setting4 size="14" variant="Bold" className="inline-block" />
+                <span>Temporairement indisponible pour maintenance</span>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2">
               <p className="text-gray-700 line-clamp-2">{tool.description}</p>
-              {/* Informations pertinentes supplémentaires */}
-              <div className="flex items-center gap-3 text-xs text-gray-500">
-                <div className="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Utilisation rapide</span>
-                </div>
-                {tool.premium && (
-                  <div className="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Modèles personnalisables</span>
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>
+          </div>
+        </div>
+
 
         {/* Bouton avec transition secondary -> primary au survol */}
-        <div className="mt-auto pt-3">
+        {/* <div className="mt-auto pt-3">
           <Button
             variant="secondary"
             size="md"
             fullWidth
             className={`font-medium transition-all duration-300 rounded-2xl relative overflow-hidden
-              group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md
+              ${!tool.maintenance && !tool.comingSoon ? 'group-hover:bg-[#5b50ff] group-hover:text-white group-hover:border-transparent group-hover:shadow-md' : ''}
             `}
-            disabled={tool.comingSoon}
+            disabled={tool.comingSoon || tool.maintenance}
           >
             {tool.comingSoon ? (
               "Vous serez notifié au lancement"
+            ) : tool.maintenance ? (
+              <div className="flex items-center justify-center gap-2">
+                <Setting4 size="16" variant="Bold" className="animate-spin-slow" />
+                <span>En maintenance</span>
+              </div>
             ) : (
               <div className="flex items-center justify-center gap-2">
                 {tool.premium && isAuthenticated && !hasActiveSubscription ? (
@@ -129,7 +135,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
               </div>
             )}
           </Button>
-        </div>
+        </div> */}
       </div>
     </Link>
   );

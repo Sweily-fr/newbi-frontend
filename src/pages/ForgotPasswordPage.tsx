@@ -2,10 +2,17 @@ import { Link } from 'react-router-dom';
 import { ForgotPasswordForm } from '../features/auth/components/';
 import { Logo } from '../assets/logo';
 import { ROUTES } from '../routes/constants';
+import { SEOHead } from '../components/specific/SEO/SEOHead';
 
 export const ForgotPasswordPage = () => {
   return (
     <div className="min-h-screen pt-10 bg-gray-50">
+      <SEOHead 
+        title="Réinitialisation du mot de passe | Newbi"
+        description="Réinitialisez votre mot de passe pour accéder à votre compte Newbi et à tous nos outils pour entrepreneurs."
+        noindex={true}
+        canonicalUrl="https://www.newbi.fr/forgot-password"
+      />
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="absolute top-8 left-8">
           <Link 

@@ -96,12 +96,12 @@ export const InvoicesPage = () => {
         type="Service"
         name="Gestion des Factures Newbi"
         description="Solution complète de facturation pour professionnels, auto-entrepreneurs et PME"
-        url="https://newbi.fr/factures"
+        url="https://www.newbi.fr/factures"
         additionalData={{
           "provider": {
             "@type": "Organization",
             "name": "Newbi",
-            "url": "https://newbi.fr/"
+            "url": "https://www.newbi.fr/"
           },
           "serviceType": "Facturation en ligne",
           "offers": {

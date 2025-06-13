@@ -6,6 +6,8 @@ import {
   ToolsPage,
   InvoicesPage,
   QuotesPage,
+  PurchaseOrdersPage,
+  ExpensesPage,
   ForgotPasswordPage,
   ResetPasswordPage,
   VerifyEmail,
@@ -20,7 +22,12 @@ import {
   PrivacyPolicyGeneratorPage,
   BlogSeoOptimizerPage,
   EmailSignaturesPage,
+  FileTransferPage,
+  FileTransferDownloadPage,
   NotFoundPage,
+  BlogPage,
+  BlogArticlePage,
+  KanbanPage,
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
@@ -82,10 +89,50 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         } />
 
+        <Route path={ROUTES.PURCHASE_ORDERS} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <PurchaseOrdersPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.EXPENSES} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <ExpensesPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
         <Route path={ROUTES.EMAIL_SIGNATURES} element={
           <ProtectedRoute>
             <SubscriptionRoute>
               <EmailSignaturesPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.FILE_TRANSFER} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <FileTransferPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.KANBAN} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <KanbanPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+
+        <Route path={ROUTES.KANBAN_BOARD} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <KanbanPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
@@ -113,6 +160,13 @@ export const AppRoutes = () => {
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
+        
+        {/* Route publique pour le téléchargement des fichiers partagés */}
+        <Route path={ROUTES.FILE_TRANSFER_DOWNLOAD} element={<PublicRoute><FileTransferDownloadPage /></PublicRoute>} />
+        
+        {/* Routes du blog */}
+        <Route path={ROUTES.BLOG} element={<PublicRoute><BlogPage /></PublicRoute>} />
+        <Route path={ROUTES.BLOG_ARTICLE} element={<PublicRoute><BlogArticlePage /></PublicRoute>} />
         <Route path={ROUTES.PRIVACY_POLICY} element={<PublicRoute><PrivacyPolicyPage /></PublicRoute>} />
         <Route path={ROUTES.TERMS} element={<PublicRoute><TermsPage /></PublicRoute>} />
         <Route path={ROUTES.CONTACT} element={<PublicRoute><ContactPage /></PublicRoute>} />
