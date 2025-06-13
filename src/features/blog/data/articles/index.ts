@@ -21,4 +21,5 @@ export { modifierCodeApeArticle } from './modifier-code-ape';
 export { freelanceToolsArticle } from './freelanceToolsArticle';
 export { odooVsNewbiArticle } from './odooVsNewbiArticle';
 export { interiorDesignerManagementArticle } from './interiorDesignerManagement';
+export { fileTransferForDesignersArticle } from './fileTransferForDesignersArticle';
 

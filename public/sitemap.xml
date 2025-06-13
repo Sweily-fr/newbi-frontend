@@ -12,6 +12,14 @@
     <priority>0.8</priority>
   </url>
   
+  <!-- Articles de blog -->
+  <url>
+    <loc>https://www.newbi.fr/blog/transferer-fichiers-graphistes-2025</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-06-13</lastmod>
+  </url>
+
   <!-- Pages légales -->
   <url>
     <loc>https://www.newbi.fr/mentions-legales</loc>
