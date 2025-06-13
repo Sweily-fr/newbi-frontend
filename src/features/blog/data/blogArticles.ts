@@ -21,10 +21,12 @@ import {
   compteBancaireFreelanceArticle,
   freelanceToolsArticle,
   odooVsNewbiArticle,
-  interiorDesignerManagementArticle
+  interiorDesignerManagementArticle,
+  fileTransferForDesignersArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  fileTransferForDesignersArticle,
   odooVsNewbiArticle,
   interiorDesignerManagementArticle,
   seoSoloOptimizationArticle,

@@ -4,7 +4,6 @@ export interface BlogArticle {
   slug: string;
   excerpt: string;
   content: string;
-  featuredImage: string;
   author: string;
   publishDate: string;
   updatedDate?: string;
