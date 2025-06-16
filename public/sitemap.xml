@@ -5,6 +5,7 @@
     <loc>https://www.newbi.fr/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <lastmod>2025-06-16</lastmod>
   </url>
   <url>
     <loc>https://www.newbi.fr/contact</loc>
@@ -13,6 +14,12 @@
   </url>
   
   <!-- Articles de blog -->
+  <url>
+    <loc>https://www.newbi.fr/blog/apparaitre-premier-google-articles-optimises</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-06-16</lastmod>
+  </url>
   <url>
     <loc>https://www.newbi.fr/blog/guide-freelance-2025</loc>
     <changefreq>monthly</changefreq>
