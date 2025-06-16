@@ -22,10 +22,16 @@ import {
   freelanceToolsArticle,
   odooVsNewbiArticle,
   interiorDesignerManagementArticle,
-  fileTransferForDesignersArticle
+  fileTransferForDesignersArticle,
+  filePaymentArticle,
+  freelance2025Article,
+  seoRankingArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  seoRankingArticle,
+  freelance2025Article,
+  filePaymentArticle,
   fileTransferForDesignersArticle,
   odooVsNewbiArticle,
   interiorDesignerManagementArticle,

@@ -22,4 +22,7 @@ export { freelanceToolsArticle } from './freelanceToolsArticle';
 export { odooVsNewbiArticle } from './odooVsNewbiArticle';
 export { interiorDesignerManagementArticle } from './interiorDesignerManagement';
 export { fileTransferForDesignersArticle } from './fileTransferForDesignersArticle';
+export { filePaymentArticle } from './filePaymentArticle';
+export { freelance2025Article } from './freelance2025Article';
+export { seoRankingArticle } from './seoRankingArticle';
 
