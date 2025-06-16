@@ -48,7 +48,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
       
       <div className="p-5 flex flex-col h-full justify-between">
         {/* En-tête avec logo, titre et catégorie alignés horizontalement */}
-        <div className="flex items-center gap-4 mb-4 pl-1">
+        <div className="flex items-center gap-4 pl-1">
           {/* Icône dans un cercle avec fond et effet de brillance */}
           <div className="flex-shrink-0 relative">
             {/* L'icône est déjà dans un div avec un fond coloré */}
@@ -62,7 +62,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
             <h3 className="text-lg font-semibold tracking-wide text-gray-800 group-hover:text-gray-900 transition-colors duration-300">
               {tool.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            {/* <div className="flex items-center gap-2 mt-1">
               <div className="flex items-center gap-2">
                 <p className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#f0eeff] text-[#5b50ff] shadow-sm transition-all duration-300 group-hover:shadow">{tool.category}</p>
                 {tool.premium && (
@@ -72,11 +72,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
                   </p>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-sm mb-4 min-h-[42px]">
+            </div> */}
+        <div className="text-sm">
           {tool.comingSoon ? (
             <div className="flex items-center gap-2">
               <span className="italic text-gray-600 font-medium">{tool.name} bientôt disponible</span>
@@ -92,29 +89,15 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
           ) : (
             <div className="space-y-2">
               <p className="text-gray-700 line-clamp-2">{tool.description}</p>
-              {/* Informations pertinentes supplémentaires */}
-              <div className="flex items-center gap-3 text-xs text-gray-500">
-                <div className="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Utilisation rapide</span>
-                </div>
-                {tool.premium && (
-                  <div className="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Modèles personnalisables</span>
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>
+          </div>
+        </div>
+
 
         {/* Bouton avec transition secondary -> primary au survol */}
-        <div className="mt-auto pt-3">
+        {/* <div className="mt-auto pt-3">
           <Button
             variant="secondary"
             size="md"
@@ -152,7 +135,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick, className = '
               </div>
             )}
           </Button>
-        </div>
+        </div> */}
       </div>
     </Link>
   );

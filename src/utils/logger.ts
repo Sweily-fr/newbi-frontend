@@ -5,63 +5,69 @@
  * Les logs d'avertissement et d'erreur sont conservés même en production.
  */
 
-// Détection de l'environnement de production via Vite
+// Déterminer si nous sommes en environnement de production
 const isProduction = import.meta.env.PROD;
 
-// Interface pour le logger
-interface Logger {
-  debug: (...args: unknown[]) => void;
-  info: (...args: unknown[]) => void;
-  log: (...args: unknown[]) => void;
-  warn: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-  time: (label: string) => void;
-  timeEnd: (label: string) => void;
-}
-
-// Implémentation du logger
-export const logger: Logger = {
-  // Les logs de debug et d'info sont désactivés en production
-  debug: (...args: unknown[]) => {
+/**
+ * Logger personnalisé avec désactivation automatique en production
+ */
+export const logger = {
+  /**
+   * Log d'information (désactivé en production)
+   */
+  info: (...args: any[]): void => {
     if (!isProduction) {
-      console.debug('[DEBUG]', ...args);
+      console.info('%c[INFO]', 'color: #5b50ff; font-weight: bold;', ...args);
     }
   },
   
-  info: (...args: unknown[]) => {
+  /**
+   * Log de débogage (désactivé en production)
+   */
+  debug: (...args: any[]): void => {
     if (!isProduction) {
-      console.info('[INFO]', ...args);
+      console.debug('%c[DEBUG]', 'color: #4a41e0; font-weight: bold;', ...args);
     }
   },
   
-  log: (...args: unknown[]) => {
+  /**
+   * Log standard (désactivé en production)
+   */
+  log: (...args: any[]): void => {
     if (!isProduction) {
-      console.log('[LOG]', ...args);
+      console.log('%c[LOG]', 'color: #5b50ff; font-weight: bold;', ...args);
     }
   },
   
-  // Les logs d'avertissement et d'erreur sont conservés même en production
-  warn: (...args: unknown[]) => {
-    console.warn('[WARN]', ...args);
+  /**
+   * Log d'avertissement (toujours actif)
+   */
+  warn: (...args: any[]): void => {
+    console.warn('%c[WARN]', 'color: #ff9800; font-weight: bold;', ...args);
   },
   
-  error: (...args: unknown[]) => {
-    console.error('[ERROR]', ...args);
+  /**
+   * Log d'erreur (toujours actif)
+   */
+  error: (...args: any[]): void => {
+    console.error('%c[ERROR]', 'color: #f44336; font-weight: bold;', ...args);
   },
   
-  // Fonctions de chronométrage
-  time: (label: string) => {
+  /**
+   * Démarre un timer (désactivé en production)
+   */
+  time: (label: string): void => {
     if (!isProduction) {
-      console.time(`[TIME] ${label}`);
+      console.time(label);
     }
   },
   
-  timeEnd: (label: string) => {
+  /**
+   * Termine un timer et affiche le temps écoulé (désactivé en production)
+   */
+  timeEnd: (label: string): void => {
     if (!isProduction) {
-      console.timeEnd(`[TIME] ${label}`);
+      console.timeEnd(label);
     }
   }
 };
-
-// Export par défaut
-export default logger;

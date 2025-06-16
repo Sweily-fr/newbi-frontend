@@ -44,8 +44,6 @@ interface SignatureLayoutProps {
   effectiveVerticalSpacing: number;
   iconTextSpacing: number; // Valeur par défaut fournie dans le composant
   fontSize: number; // Valeur par défaut fournie dans le composant
-  textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough'; // Valeur par défaut fournie dans le composant
-  fontFamily: string; // Valeur par défaut fournie dans le composant
 }
 
 export const SignatureLayout: React.FC<SignatureLayoutProps> = ({

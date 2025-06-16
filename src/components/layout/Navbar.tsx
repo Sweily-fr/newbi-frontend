@@ -86,12 +86,12 @@ export const Navbar = () => {
   // Créer un tableau d'éléments pour le dropdown
   const dropdownItems = [
     // Tableau de bord (désactivé)
-    {
-      label: "Tableau de bord",
-      onClick: () => {}, // Fonction vide pour désactiver la navigation
-      icon: <HomeTrendUp size="20" variant="Linear" color="#c7c7c7" />,
-      disabled: true, // Marquer comme désactivé
-    },
+    // {
+    //   label: "Tableau de bord",
+    //   onClick: () => {}, // Fonction vide pour désactiver la navigation
+    //   icon: <HomeTrendUp size="20" variant="Linear" color="#c7c7c7" />,
+    //   disabled: true, // Marquer comme désactivé
+    // },
     // Profil utilisateur
     {
       label: "Mon profil",

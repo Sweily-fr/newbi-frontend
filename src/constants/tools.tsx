@@ -1,4 +1,3 @@
-import { DocumentText1, Google, Send2, Trello, ArrangeHorizontalSquare, Designtools, MoneySend, Document, MoneyChange, Receipt2 } from "iconsax-react";
 import React from "react";
 
 // Définition du type pour un outil
@@ -24,8 +23,8 @@ export const TOOLS: Tool[] = [
     category: "Marketing & Communication",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Google size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/ArticlesSeo.svg" alt="Articles SEO" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/blog-seo-optimizer",
@@ -38,8 +37,8 @@ export const TOOLS: Tool[] = [
     maintenance: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Designtools size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/SignatureEmail.svg" alt="Signature Email" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/signatures-email",
@@ -52,8 +51,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Facture.svg" alt="Factures" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/factures",
@@ -66,8 +65,8 @@ export const TOOLS: Tool[] = [
     category: "Finances",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <DocumentText1 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Devis.svg" alt="Devis" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/devis",
@@ -79,8 +78,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Politiquedeconfidentialité.svg" alt="Politique de confidentialité" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-politique-confidentialite",
@@ -92,8 +91,8 @@ export const TOOLS: Tool[] = [
     category: "Site internet",
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <ArrangeHorizontalSquare size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Mentionslegales.svg" alt="Mentions légales" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/generator-mentions-legales",
@@ -104,40 +103,37 @@ export const TOOLS: Tool[] = [
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
     category: "Productivité",
-    comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Send2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Transfertdefichiers.svg" alt="Transfert de fichiers" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/transfert-fichiers-volumineux",
+    href: "/file-transfer",
   },
   {
     id: "gestion-taches",
-    name: "Gestion des tâches",
+    name: "Gestion des tâches Kanban",
     description:
-      "Gérez vos tâches et vos projets avec des outils simples et efficaces",
+      "Gérez vos tâches et vos projets avec un tableau Kanban intuitif et efficace",
     category: "Productivité",
-    comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Trello size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondestaches.svg" alt="Gestion des tâches" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/gestion-taches",
+    href: "/kanban",
   },
   {
     id: "depenses",
     name: "Dépenses",
-    description: "Suivez et gérez vos dépenses professionnelles facilement",
+    description: "Suivez et gérez vos dépenses professionnelles avec OCR",
     category: "Finances",
-    comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <MoneySend size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Depenses.svg" alt="Dépenses" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/depenses",
@@ -150,25 +146,24 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Document size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Signatureelectronique.svg" alt="Signature électronique" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/signature-electronique",
   },
   {
-    id: "bon-de-commande",
-    name: "Bon de commande",
+    id: "bons-de-commande",
+    name: "Bons de commande",
     description: "Créez et gérez vos bons de commande professionnels",
     category: "Finances",
-    comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <Receipt2 size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Bondecommande.svg" alt="Bon de commande" className="w-full h-full object-cover" />
       </div>
     ),
-    href: "/bon-de-commande",
+    href: "/bons-de-commande",
   },
   {
     id: "gestion-tresorerie",
@@ -178,8 +173,8 @@ export const TOOLS: Tool[] = [
     comingSoon: true,
     premium: true,
     icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "#f0eeff" }}>
-        <MoneyChange size="28" variant="Bold" color="#5b50ff" />
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Gestiondetresorerie.svg" alt="Gestion de trésorerie" className="w-full h-full object-cover" />
       </div>
     ),
     href: "/gestion-tresorerie",
