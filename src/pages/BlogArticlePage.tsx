@@ -7,6 +7,7 @@ import { BlogArticle } from '../types/blog';
 import { ROUTES } from '../routes/constants';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 const BlogArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -132,6 +133,7 @@ const BlogArticlePage: React.FC = () => {
         <div className="max-w-3xl mx-auto">
           <div className="prose prose-lg max-w-none">
             <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw]}
               components={{
                 h1: (props) => <h1 className="text-3xl font-bold mt-8 mb-4 text-gray-900" {...props} />,
@@ -156,6 +158,16 @@ const BlogArticlePage: React.FC = () => {
                     {...props} 
                   />
                 ),
+                table: (props) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="min-w-full border-collapse border border-gray-300 bg-white rounded-lg shadow-sm" {...props} />
+                  </div>
+                ),
+                thead: (props) => <thead className="bg-[#f0eeff]" {...props} />,
+                tbody: (props) => <tbody {...props} />,
+                tr: (props) => <tr className="border-b border-gray-200 hover:bg-gray-50" {...props} />,
+                th: (props) => <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-[#5b50ff] bg-[#f0eeff]" {...props} />,
+                td: (props) => <td className="border border-gray-300 px-4 py-3 text-gray-700" {...props} />,
               }}
             >
               {article.content}
