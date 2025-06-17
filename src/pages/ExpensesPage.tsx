@@ -145,20 +145,6 @@ const ExpensesPage: React.FC = () => {
               <Add size={20} className="mr-2" color="#ffffff" />
               Créer une dépense
             </Button>
-            <Button
-              variant="outline"
-              className="border-[#5b50ff] text-[#5b50ff] hover:bg-[#f0eeff]"
-              onClick={() => {
-                // Ouvrir le modal d'import OCR dans ExpenseList
-                const importButton = document.querySelector('[data-import-button]');
-                if (importButton) {
-                  (importButton as HTMLButtonElement).click();
-                }
-              }}
-            >
-              <Receipt2 size={20} className="mr-2" color="#5b50ff" />
-              Importer une facture
-            </Button>
           </div>
         }
       />
