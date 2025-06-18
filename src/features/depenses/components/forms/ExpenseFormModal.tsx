@@ -3,7 +3,7 @@ import Modal from "../../../../components/common/Modal";
 import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
 import Select from "../../../../components/common/Select";
-import { Expense, CreateExpenseInput, OCRMetadata } from "../../types";
+import { Expense, CreateExpenseInput, UpdateExpenseInput, OCRMetadata } from "../../types";
 import { useExpenses } from "../../hooks/useExpenses";
 import { ExpenseFileUpload, ExpenseOCRPreview } from "../index";
 import {
@@ -49,13 +49,33 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [showOCRPreview, setShowOCRPreview] = useState<boolean>(false);
 
+  // Fonction utilitaire pour formater une date de manière sécurisée
+  const formatDateSafely = (dateString: string): string => {
+    try {
+      // Essayer de parser la date
+      const date = new Date(dateString);
+      
+      // Vérifier si la date est valide
+      if (isNaN(date.getTime())) {
+        // Si la date est invalide, retourner la date du jour
+        return new Date().toISOString().split("T")[0];
+      }
+      
+      return date.toISOString().split("T")[0];
+    } catch (error) {
+      console.error("Erreur lors du formatage de la date:", error);
+      // En cas d'erreur, retourner la date du jour
+      return new Date().toISOString().split("T")[0];
+    }
+  };
+
   // Initialiser le formulaire avec les données de la dépense si elle existe
   useEffect(() => {
     if (expense) {
       setFormData({
         title: expense.title,
         amount: expense.amount,
-        date: new Date(expense.date).toISOString().split("T")[0],
+        date: formatDateSafely(expense.date),
         vendor: expense.vendor || "",
         documentNumber: expense.documentNumber || "",
         accountingAccount: expense.accountingAccount || "606900",
@@ -137,13 +157,22 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
     setLoading(true);
 
     try {
-      // Créer une copie des données du formulaire sans les champs non supportés par le backend
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { documentNumber, accountingAccount, ...submissionData } = formData;
-      
       if (expense?.id) {
-        await updateExpense(expense.id, submissionData as CreateExpenseInput);
+        // Maintenant que le backend accepte documentNumber et accountingAccount, nous les incluons dans la mise à jour
+        const updateData = { ...formData };
+        
+        // Vérifier si updateData contient au moins un champ à mettre à jour
+        if (Object.keys(updateData).length === 0) {
+          setErrors(prev => ({ ...prev, submit: "Aucune modification détectée. Veuillez modifier au moins un champ." }));
+          setLoading(false);
+          return;
+        }
+        
+        await updateExpense(expense.id, updateData as UpdateExpenseInput);
       } else {
+        // Pour la création, on peut exclure certains champs si nécessaire
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { documentNumber, accountingAccount, ...submissionData } = formData;
         await createExpense(submissionData as CreateExpenseInput);
       }
 

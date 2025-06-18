@@ -13,6 +13,8 @@ export const EXPENSE_FRAGMENT = gql`
     vendor
     vendorVatNumber
     invoiceNumber
+    documentNumber
+    accountingAccount
     vatAmount
     vatRate
     isVatDeductible
