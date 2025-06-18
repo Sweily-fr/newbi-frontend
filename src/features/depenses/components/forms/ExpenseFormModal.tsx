@@ -170,10 +170,8 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
         
         await updateExpense(expense.id, updateData as UpdateExpenseInput);
       } else {
-        // Pour la création, on peut exclure certains champs si nécessaire
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { documentNumber, accountingAccount, ...submissionData } = formData;
-        await createExpense(submissionData as CreateExpenseInput);
+        // Inclure tous les champs pour la création, y compris documentNumber et accountingAccount
+        await createExpense(formData as CreateExpenseInput);
       }
 
       if (onSuccess) {
