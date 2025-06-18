@@ -96,6 +96,8 @@ export interface Expense {
   vendor?: string;
   vendorVatNumber?: string;
   invoiceNumber?: string;
+  documentNumber: string;
+  accountingAccount: string;
   vatAmount?: number;
   vatRate?: number;
   isVatDeductible: boolean;
@@ -161,6 +163,8 @@ export interface CreateExpenseInput {
   vendor?: string;
   vendorVatNumber?: string;
   invoiceNumber?: string;
+  documentNumber: string;
+  accountingAccount: string;
   vatAmount?: number;
   vatRate?: number;
   isVatDeductible?: boolean;
@@ -181,6 +185,8 @@ export interface UpdateExpenseInput {
   vendor?: string;
   vendorVatNumber?: string;
   invoiceNumber?: string;
+  documentNumber?: string;
+  accountingAccount?: string;
   vatAmount?: number;
   vatRate?: number;
   isVatDeductible?: boolean;
