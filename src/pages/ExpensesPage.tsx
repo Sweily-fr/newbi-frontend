@@ -13,7 +13,7 @@ import {
   ExpenseCategory
 } from '../features/depenses/types';
 import { 
-  Add, 
+  Add,
   Receipt2, 
   SearchNormal1 as Search
 } from 'iconsax-react';
@@ -42,6 +42,7 @@ const ExpensesPage: React.FC = () => {
     refetchExpenses();
     logger.debug('Fetching expenses');
   }, [refetchExpenses]);
+  
   
   // Fonction pour filtrer les dépenses par la recherche
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,29 +138,13 @@ const ExpensesPage: React.FC = () => {
         description="Suivez et gérez vos dépenses professionnelles"
         icon={<Receipt2 size={32} variant="Bold" color="#5b50ff" />}
         actions={
-          <div className="flex gap-3">
-            <Button
-              className="bg-[#5b50ff] border-[#5b50ff] hover:bg-[#4a41e0] hover:border-[#4a41e0]"
-              onClick={handleCreateExpense}
-            >
-              <Add size={20} className="mr-2" color="#ffffff" />
-              Créer une dépense
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#5b50ff] text-[#5b50ff] hover:bg-[#f0eeff]"
-              onClick={() => {
-                // Ouvrir le modal d'import OCR dans ExpenseList
-                const importButton = document.querySelector('[data-import-button]');
-                if (importButton) {
-                  (importButton as HTMLButtonElement).click();
-                }
-              }}
-            >
-              <Receipt2 size={20} className="mr-2" color="#5b50ff" />
-              Importer une facture
-            </Button>
-          </div>
+          <Button
+            className="bg-[#5b50ff] border-[#5b50ff] hover:bg-[#4a41e0] hover:border-[#4a41e0]"
+            onClick={handleCreateExpense}
+          >
+            <Add size={20} className="mr-2" color="#ffffff" />
+            Créer une dépense
+          </Button>
         }
       />
       

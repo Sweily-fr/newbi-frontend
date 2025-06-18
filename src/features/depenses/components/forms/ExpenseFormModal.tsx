@@ -198,7 +198,7 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
       isOpen={isOpen} 
       onClose={onClose} 
       title={expense ? 'Modifier la dépense' : 'Nouvelle dépense'}
-      size="lg"
+      size="6xl"
     >
       <div className="flex flex-col gap-5">
         <div className="flex flex-col md:flex-row gap-4 w-full">
