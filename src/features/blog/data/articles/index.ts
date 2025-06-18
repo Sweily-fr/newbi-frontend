@@ -26,4 +26,5 @@ export { filePaymentArticle } from './filePaymentArticle';
 export { freelance2025Article } from './freelance2025Article';
 export { seoRankingArticle } from './seoRankingArticle';
 export { wetransferAlternativeArticle } from './wetransfer-alternative-article';
+export { gestionTresorerieFreelance } from './gestionTresorerieFreelance';
 

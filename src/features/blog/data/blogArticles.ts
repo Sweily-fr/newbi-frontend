@@ -26,10 +26,12 @@ import {
   filePaymentArticle,
   freelance2025Article,
   seoRankingArticle,
-  wetransferAlternativeArticle
+  wetransferAlternativeArticle,
+  gestionTresorerieFreelance
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  gestionTresorerieFreelance,
   seoRankingArticle,
   freelance2025Article,
   filePaymentArticle,
