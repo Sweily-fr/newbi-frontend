@@ -67,18 +67,6 @@
     <priority>0.4</priority>
   </url>
   
-  <!-- Pages d'authentification -->
-  <url>
-    <loc>https://www.newbi.fr/auth</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.newbi.fr/forgot-password</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  
   <!-- Pages d'outils (accessibles après connexion) -->
   <url>
     <loc>https://www.newbi.fr/outils</loc>
