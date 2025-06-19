@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const PURCHASE_ORDER_FRAGMENT = gql`
-  fragment PurchaseOrderFields on PurchaseOrder {
+export const QUOTE_FRAGMENT = gql`
+  fragment QuoteFields on Quote {
     id
     prefix
     number
@@ -98,22 +98,22 @@ export const PURCHASE_ORDER_FRAGMENT = gql`
   }
 `;
 
-export const GET_NEXT_PURCHASE_ORDER_NUMBER = gql`
-  query NextPurchaseOrderNumber($prefix: String) {
-    nextPurchaseOrderNumber(prefix: $prefix)
+export const GET_NEXT_QUOTE_NUMBER = gql`
+  query NextQuoteNumber($prefix: String) {
+    nextQuoteNumber(prefix: $prefix)
   }
 `;
 
-export const GET_PURCHASE_ORDERS = gql`
-  query GetPurchaseOrders(
+export const GET_QUOTES = gql`
+  query GetQuotes(
     $startDate: String
     $endDate: String
-    $status: PurchaseOrderStatus
+    $status: QuoteStatus
     $search: String
     $page: Int
     $limit: Int
   ) {
-    purchaseOrders(
+    quotes(
       startDate: $startDate
       endDate: $endDate
       status: $status
@@ -121,52 +121,52 @@ export const GET_PURCHASE_ORDERS = gql`
       page: $page
       limit: $limit
     ) {
-      purchaseOrders {
-        ...PurchaseOrderFields
+      quotes {
+        ...QuoteFields
       }
       totalCount
       hasNextPage
     }
   }
-  ${PURCHASE_ORDER_FRAGMENT}
+  ${QUOTE_FRAGMENT}
 `;
 
-export const GET_PURCHASE_ORDER = gql`
-  query GetPurchaseOrder($id: ID!) {
-    purchaseOrder(id: $id) {
-      ...PurchaseOrderFields
+export const GET_QUOTE = gql`
+  query GetQuote($id: ID!) {
+    quote(id: $id) {
+      ...QuoteFields
     }
   }
-  ${PURCHASE_ORDER_FRAGMENT}
+  ${QUOTE_FRAGMENT}
 `;
 
-export const CREATE_PURCHASE_ORDER_MUTATION = gql`
-  mutation CreatePurchaseOrder($input: CreatePurchaseOrderInput!) {
-    createPurchaseOrder(input: $input) {
-      ...PurchaseOrderFields
+export const CREATE_QUOTE_MUTATION = gql`
+  mutation CreateQuote($input: CreateQuoteInput!) {
+    createQuote(input: $input) {
+      ...QuoteFields
     }
   }
-  ${PURCHASE_ORDER_FRAGMENT}
+  ${QUOTE_FRAGMENT}
 `;
 
-export const UPDATE_PURCHASE_ORDER_MUTATION = gql`
-  mutation UpdatePurchaseOrder($id: ID!, $input: UpdatePurchaseOrderInput!) {
-    updatePurchaseOrder(id: $id, input: $input) {
-      ...PurchaseOrderFields
+export const UPDATE_QUOTE_MUTATION = gql`
+  mutation UpdateQuote($id: ID!, $input: UpdateQuoteInput!) {
+    updateQuote(id: $id, input: $input) {
+      ...QuoteFields
     }
   }
-  ${PURCHASE_ORDER_FRAGMENT}
+  ${QUOTE_FRAGMENT}
 `;
 
-export const DELETE_PURCHASE_ORDER_MUTATION = gql`
-  mutation DeletePurchaseOrder($id: ID!) {
-    deletePurchaseOrder(id: $id)
+export const DELETE_QUOTE_MUTATION = gql`
+  mutation DeleteQuote($id: ID!) {
+    deleteQuote(id: $id)
   }
 `;
 
-export const CHANGE_PURCHASE_ORDER_STATUS_MUTATION = gql`
-  mutation ChangePurchaseOrderStatus($id: ID!, $status: PurchaseOrderStatus!) {
-    changePurchaseOrderStatus(id: $id, status: $status) {
+export const CHANGE_QUOTE_STATUS_MUTATION = gql`
+  mutation ChangeQuoteStatus($id: ID!, $status: QuoteStatus!) {
+    changeQuoteStatus(id: $id, status: $status) {
       id
       status
       updatedAt
@@ -174,14 +174,14 @@ export const CHANGE_PURCHASE_ORDER_STATUS_MUTATION = gql`
   }
 `;
 
-export const CONVERT_PURCHASE_ORDER_TO_INVOICE_MUTATION = gql`
-  mutation ConvertPurchaseOrderToInvoice(
+export const CONVERT_QUOTE_TO_INVOICE_MUTATION = gql`
+  mutation ConvertQuoteToInvoice(
     $id: ID!
     $distribution: [Float]
     $isDeposit: Boolean
     $skipValidation: Boolean
   ) {
-    convertPurchaseOrderToInvoice(
+    convertQuoteToInvoice(
       id: $id
       distribution: $distribution
       isDeposit: $isDeposit
@@ -209,14 +209,14 @@ export const CONVERT_PURCHASE_ORDER_TO_INVOICE_MUTATION = gql`
 `;
 
 // Version détaillée de la mutation de conversion avec tous les champs client
-export const CONVERT_PURCHASE_ORDER_TO_INVOICE_DETAILED_MUTATION = gql`
-  mutation ConvertPurchaseOrderToInvoiceDetailed(
+export const CONVERT_QUOTE_TO_INVOICE_DETAILED_MUTATION = gql`
+  mutation ConvertQuoteToInvoiceDetailed(
     $id: ID!
     $distribution: [Float]
     $isDeposit: Boolean
     $skipValidation: Boolean
   ) {
-    convertPurchaseOrderToInvoice(
+    convertQuoteToInvoice(
       id: $id
       distribution: $distribution
       isDeposit: $isDeposit
@@ -269,16 +269,15 @@ export const CONVERT_PURCHASE_ORDER_TO_INVOICE_DETAILED_MUTATION = gql`
   }
 `;
 
-export const GET_PURCHASE_ORDER_STATS = gql`
-  query GetPurchaseOrderStats {
-    purchaseOrderStats {
+export const GET_QUOTE_STATS = gql`
+  query GetQuoteStats {
+    quoteStats {
       totalCount
       draftCount
       pendingCount
       canceledCount
       completedCount
       totalAmount
-      conversionRate
     }
   }
 `;

@@ -1,5 +1,5 @@
 /**
- * Types liés aux bons de commande et à leurs formulaires
+ * Types liés aux devis et à leurs formulaires
  */
 
 import { Client } from '../../clients/types';
@@ -7,13 +7,13 @@ import { CompanyInfo } from '../../profile/types';
 import { Item, CustomField } from '../../factures/types';
 
 /**
- * Structure d'un bon de commande
+ * Structure d'un devis
  */
-export interface PurchaseOrder {
+export interface Quote {
   id?: string;
   number?: string;
   prefix?: string;
-  status?: 'DRAFT' | 'PENDING' | 'COMPLETED' | 'CANCELED';
+  status?: 'DRAFT' | 'PENDING' | 'COMPLETED';
   createdAt?: string;
   issueDate?: string;
   validUntil?: string;
@@ -39,20 +39,13 @@ export interface PurchaseOrder {
     id: string;
     number: string;
   };
-  linkedInvoices?: Array<{
-    id: string;
-    prefix: string;
-    number: string;
-    status: string;
-    finalTotalTTC: number;
-  }>;
 }
 
 /**
- * Props pour le composant modal de formulaire de bon de commande
+ * Props pour le composant modal de formulaire de devis
  */
-export interface PurchaseOrderFormModalProps {
-  purchaseOrder?: PurchaseOrder;
+export interface QuoteFormModalProps {
+  quote?: Quote;
   onClose: () => void;
-  onSubmit: (data: PurchaseOrder) => void;
+  onSubmit: (data: Quote) => void;
 }

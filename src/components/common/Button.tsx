@@ -14,6 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   disabled,
   type = 'button',
+  icon,
   ...props
 }) => {
   // Classes de base pour tous les boutons
@@ -59,6 +60,11 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {isLoading && loaderPosition === 'left' && <Loader />}
+      {!isLoading && icon && (
+        <span className={`inline-flex items-center ${children ? 'mr-2' : ''}`}>
+          {icon}
+        </span>
+      )}
       {children}
       {isLoading && loaderPosition === 'right' && <Loader />}
     </button>

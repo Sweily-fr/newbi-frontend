@@ -13,6 +13,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loaderPosition?: 'left' | 'right';
   fullWidth?: boolean;
   children: ReactNode;
+  icon?: React.ReactNode;
 }
 
 // Form

@@ -49,7 +49,7 @@ export * from './common/Notification';
 export * from './common/Input';
 
 // Export des composants de mise en page
-// export * from './layout/Header';
+export * from './layout/PageHeader';
 export * from './layout/MainLayout';
 export * from './layout/Footer';
 export * from './layout/Navbar';
