@@ -52,8 +52,12 @@ export const FileTransferDownloadPage: React.FC = () => {
     try {
       logger.info('Début du téléchargement des fichiers');
       
-      // Appel à l'API pour télécharger les fichiers en utilisant des query params
-      const response = await fetch(`/api/file-transfer/download-all?link=${downloadLink}&key=${accessKey}`, {
+      // Construire l'URL complète en utilisant la variable d'environnement
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const endpoint = `${apiUrl}/file-transfer/download-all?link=${downloadLink}&key=${accessKey}`;
+      
+      // Appel direct à l'API sans passer par le proxy
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'Accept': 'application/octet-stream',

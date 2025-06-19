@@ -57,23 +57,8 @@ export default defineConfig(({ mode }) => {
             });
           },
         },
-        // Proxying API requests to backend for file transfers
-        '/api/file-transfer': {
-          target: env.VITE_API_URL || 'http://localhost:4000',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-          configure: (proxy) => {
-            proxy.on('error', (err) => {
-              console.error('File transfer proxy error:', err);
-            });
-            proxy.on('proxyReq', (_, req) => {
-              console.log('Sending File Request to API:', req.method, req.url);
-            });
-            proxy.on('proxyRes', (proxyRes, req) => {
-              console.log('Received File Response from API:', proxyRes.statusCode, req.url, 'Content-Type:', proxyRes.headers['content-type']);
-            });
-          },
-        },
+        // La configuration du proxy pour les transferts de fichiers a été supprimée
+        // car nous utilisons maintenant directement VITE_API_URL dans le code de l'application
       },
     },
   };

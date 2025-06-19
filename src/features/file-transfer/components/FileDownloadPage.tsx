@@ -38,14 +38,30 @@ const FileDownloadPage: React.FC = () => {
       // Indiquer que le téléchargement groupé est en cours
       setDownloadingAll(true);
       
-      // Appeler l'API de téléchargement groupé
-      const response = await fetch(`/api/file-transfer/download-all/${shareLink}/${accessKey}`, {
+      // Construire l'URL complète en utilisant la variable d'environnement
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const endpoint = `${apiUrl}/file-transfer/download-all?link=${shareLink}&key=${accessKey}`;
+      
+      logger.info(`Tentative de téléchargement depuis: ${endpoint}`);
+      
+      // Appel direct à l'API sans passer par le proxy
+      const response = await fetch(endpoint, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'include',
         headers: {
-          'Accept': '*/*',
+          'Accept': 'application/octet-stream',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
+      
+      logger.info(`Réponse reçue: ${response.status} ${response.statusText}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
+      }
       
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -108,12 +124,21 @@ const FileDownloadPage: React.FC = () => {
       // Mettre à jour l'état de téléchargement pour ce fichier
       setDownloadingFiles(prev => ({ ...prev, [file.id]: true }));
       
-      // Appeler l'API de téléchargement avec responseType blob pour éviter les problèmes d'encodage
-      const response = await fetch(`/api/file-transfer/download/${shareLink}/${accessKey}/${file.id}`, {
+      // Construire l'URL complète en utilisant la variable d'environnement
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const endpoint = `${apiUrl}/file-transfer/download?link=${shareLink}&key=${accessKey}&fileId=${file.id}`;
+      
+      logger.info(`Tentative de téléchargement du fichier: ${endpoint}`);
+      
+      // Appel direct à l'API avec responseType blob pour éviter les problèmes d'encodage
+      const response = await fetch(endpoint, {
         method: 'GET',
+        mode: 'cors',
         credentials: 'include',
         headers: {
-          'Accept': '*/*',  // Accepter tous les types de contenu
+          'Accept': 'application/octet-stream',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
       
