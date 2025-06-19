@@ -7,6 +7,7 @@ import {
   emailSignatureArticle,
   emailSignatureImportanceArticle,
   seoOptimizationArticle,
+  optimiserReferencementArticle,
   invoiceTemplateArticle,
   quoteCreationArticle,
   businessToolsArticle,
@@ -31,6 +32,7 @@ import {
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  optimiserReferencementArticle,
   gestionTresorerieFreelance,
   seoRankingArticle,
   freelance2025Article,

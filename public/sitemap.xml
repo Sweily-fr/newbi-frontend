@@ -15,6 +15,12 @@
   
   <!-- Articles de blog -->
   <url>
+    <loc>https://www.newbi.fr/blog/optimiser-referencement-google-article-seo</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-06-19</lastmod>
+  </url>
+  <url>
     <loc>https://www.newbi.fr/blog/gestion-tresorerie-freelance</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>

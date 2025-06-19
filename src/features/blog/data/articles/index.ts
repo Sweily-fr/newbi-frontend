@@ -6,6 +6,7 @@ export { legalNoticeArticle } from './legalNoticeArticle';
 export { emailSignatureArticle } from './emailSignatureArticle';
 export { emailSignatureImportanceArticle } from './emailSignatureImportanceArticle';
 export { seoOptimizationArticle } from './seoOptimizationArticle';
+export { optimiserReferencementArticle } from './optimiser-referencement-article';
 export { invoiceTemplateArticle } from './invoiceTemplateArticle';
 export { quoteCreationArticle } from './quoteCreationArticle';
 export { businessToolsArticle } from './businessToolsArticle';
