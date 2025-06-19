@@ -48,7 +48,7 @@ export const TOOLS: Tool[] = [
     name: "Factures",
     description:
       "Créez et gérez vos factures professionnelles en quelques clics",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -62,7 +62,7 @@ export const TOOLS: Tool[] = [
     name: "Devis",
     description:
       "Créez et suivez vos devis clients avec des modèles professionnels",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -75,7 +75,7 @@ export const TOOLS: Tool[] = [
     id: "confidentiality-policies",
     name: "Politique de confidentialité",
     description: "Créez des politiques de confidentialité professionnelles",
-    category: "Site internet",
+    category: "Conformité Légale & Documents Officiels",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -88,7 +88,7 @@ export const TOOLS: Tool[] = [
     id: "mentions-legales",
     name: "Mentions légales",
     description: "Créez des mentions légales professionnelles",
-    category: "Site internet",
+    category: "Conformité Légale & Documents Officiels",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -102,7 +102,7 @@ export const TOOLS: Tool[] = [
     name: "Transfert de fichiers volumineux",
     description:
       "Transférez des fichiers volumineux en toute sécurité jusqu'à 100Go sans limite de téléchargement",
-    category: "Productivité",
+    category: "Organisation & Productivité",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -116,7 +116,7 @@ export const TOOLS: Tool[] = [
     name: "Gestion des tâches Kanban",
     description:
       "Gérez vos tâches et vos projets avec un tableau Kanban intuitif et efficace",
-    category: "Productivité",
+    category: "Organisation & Productivité",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -129,7 +129,7 @@ export const TOOLS: Tool[] = [
     id: "depenses",
     name: "Dépenses",
     description: "Suivez et gérez vos dépenses professionnelles avec OCR",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -142,7 +142,7 @@ export const TOOLS: Tool[] = [
     id: "clients",
     name: "Clients",
     description: "Gérez votre base de clients et leurs informations de facturation",
-    category: "CRM",
+    category: "Gestion Commerciale & Catalogue",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -155,7 +155,7 @@ export const TOOLS: Tool[] = [
     id: "catalog",
     name: "Catalogue",
     description: "Gérez vos produits et services pour vos factures et devis",
-    category: "Gestion",
+    category: "Gestion Commerciale & Catalogue",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -168,7 +168,7 @@ export const TOOLS: Tool[] = [
     id: "signature-electronique",
     name: "Signature électronique",
     description: "Signez et faites signer vos documents en ligne de manière sécurisée",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     comingSoon: true,
     premium: true,
     icon: (
@@ -182,7 +182,7 @@ export const TOOLS: Tool[] = [
     id: "bons-de-commande",
     name: "Bons de commande",
     description: "Créez et gérez vos bons de commande professionnels",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     premium: true,
     icon: (
       <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
@@ -195,7 +195,7 @@ export const TOOLS: Tool[] = [
     id: "gestion-tresorerie",
     name: "Gestion de trésorerie",
     description: "Suivez et anticipez vos flux de trésorerie pour une meilleure gestion financière",
-    category: "Finances",
+    category: "Gestion Administrative & Financière",
     comingSoon: true,
     premium: true,
     icon: (
