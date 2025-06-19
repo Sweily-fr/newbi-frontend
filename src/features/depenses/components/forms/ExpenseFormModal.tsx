@@ -3,17 +3,8 @@ import Modal from "../../../../components/common/Modal";
 import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
 import Select from "../../../../components/common/Select";
-import { Expense, CreateExpenseInput, UpdateExpenseInput, OCRMetadata } from "../../types";
+import { Expense, CreateExpenseInput, UpdateExpenseInput } from "../../types";
 import { useExpenses } from "../../hooks/useExpenses";
-import { ExpenseFileUpload, ExpenseOCRPreview } from "../index";
-import {
-  Receipt2,
-  Calendar,
-  Money,
-  Bank,
-  DocumentText as FileText,
-  PercentageSquare as Percent,
-} from "iconsax-react";
 
 // Styles définis avec Tailwind CSS directement dans les composants
 
@@ -47,7 +38,8 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [showOCRPreview, setShowOCRPreview] = useState<boolean>(false);
+  // État pour la prévisualisation OCR (désactivé pour le moment)
+  // const [showOCRPreview, setShowOCRPreview] = useState<boolean>(false);
 
   // Fonction utilitaire pour formater une date de manière sécurisée
   const formatDateSafely = (dateString: string): string => {
@@ -83,9 +75,10 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
         vatRate: expense.vatRate || 20,
       });
 
-      if (expense.ocrMetadata) {
-        setShowOCRPreview(true);
-      }
+      // Fonctionnalité OCR désactivée pour le moment
+      // if (expense.ocrMetadata) {
+      //   setShowOCRPreview(true);
+      // }
     } else {
       // Réinitialiser le formulaire pour une nouvelle dépense
       setFormData({
@@ -188,33 +181,8 @@ const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
     }
   };
 
-  // Suppression de l'interface OCRData redondante
-  // Utilisation de l'interface OCRMetadata existante
-
-  // Cette fonction sera utilisée dans une future implémentation pour appliquer les données OCR
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleApplyOCRData = (ocrData: Partial<OCRMetadata>) => {
-    if (!ocrData) return;
-
-    setFormData((prev) => ({
-      ...prev,
-      title: ocrData.vendorName || prev.title,
-      amount: ocrData.totalAmount || prev.amount,
-      date: ocrData.invoiceDate
-        ? new Date(ocrData.invoiceDate).toISOString().split("T")[0]
-        : prev.date,
-      vendor: ocrData.vendorName || prev.vendor,
-      documentNumber: ocrData.invoiceNumber || prev.documentNumber,
-      vatAmount: ocrData.vatAmount || prev.vatAmount,
-      vatRate:
-        ocrData.vatAmount && ocrData.totalAmount
-          ? Math.round(
-              (ocrData.vatAmount / (ocrData.totalAmount - ocrData.vatAmount)) *
-                100
-            )
-          : prev.vatRate,
-    }));
-  };
+  // Fonctionnalité OCR désactivée pour le moment
+  // Voir l'historique git pour la récupérer si nécessaire
 
   return (
     <Modal

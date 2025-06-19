@@ -18,12 +18,9 @@ import {
   InfoCircle, 
   Eye, 
   Receipt2,
-  DocumentUpload,
   Add
 } from 'iconsax-react';
 import { formatCurrency, formatDate } from '../../../../utils/formatters';
-import { logger } from '../../../../utils/logger';
-import ExpenseImportModal from '../forms/ExpenseImportModal';
 
 // Styles définis avec Tailwind CSS directement dans les composants
 
@@ -115,7 +112,6 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
   onCreateExpense
 }) => {
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   
   const handleDelete = (expense: Expense) => {
     setExpenseToDelete(expense);
@@ -152,48 +148,6 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
     return items;
   };
   
-  const handleImportExpense = (ocrData: OCRMetadata, file: File) => {
-    logger.debug('Données OCR importées:', ocrData);
-    
-    // Créer un objet avec les données initiales pour la création de dépense
-    const initialData = {
-      title: ocrData.vendorName ? `Facture ${ocrData.vendorName}` : 'Nouvelle dépense',
-      amount: ocrData.totalAmount || 0,
-      date: ocrData.invoiceDate || new Date().toISOString().split('T')[0],
-      vendor: ocrData.vendorName || '',
-      vendorVatNumber: ocrData.vendorVatNumber || '',
-      invoiceNumber: ocrData.invoiceNumber || '',
-      vatAmount: ocrData.vatAmount || 0,
-      // Le taux de TVA est calculé à partir des montants si disponible
-      currency: ocrData.currency || 'EUR',
-      ocrFile: file,
-      ocrData: ocrData
-    };
-    
-    // Fermer le modal d'import
-    setIsImportModalOpen(false);
-    
-    // Appeler la fonction de création de dépense avec les données initiales si elle existe
-    if (onCreateExpense) {
-      onCreateExpense(initialData);
-    } else {
-      // Si la fonction n'est pas fournie, afficher un message dans la console
-      logger.warn('La fonction onCreateExpense n\'est pas définie. Impossible de créer une dépense.');
-      // On pourrait aussi afficher une notification à l'utilisateur ici
-    }
-  };
-  
-  // Rendu du modal d'importation
-  const renderImportModal = () => {
-    return (
-      <ExpenseImportModal
-        data-testid="expense-import-modal"
-        isOpen={isImportModalOpen}
-        onClose={() => setIsImportModalOpen(false)}
-        onCreateExpense={handleImportExpense}
-      />
-    );
-  };
   
   if (!expenses || expenses.length === 0) {
     return (
@@ -213,17 +167,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
             Créer une dépense
           </Button>
           
-          <Button 
-            variant="outline"
-            className="border-[#5b50ff] text-[#5b50ff] hover:bg-[#f0eeff]"
-            onClick={() => setIsImportModalOpen(true)}
-          >
-            <DocumentUpload size={18} className="mr-2" color="#5b50ff" />
-            Importer une facture
-          </Button>
         </div>
-        
-        {renderImportModal()}
       </div>
     );
   }
@@ -310,8 +254,6 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
         variant="danger"
       />
       
-      {/* Modal d'importation de dépense */}
-      {renderImportModal()}
     </div>
   );
 };
