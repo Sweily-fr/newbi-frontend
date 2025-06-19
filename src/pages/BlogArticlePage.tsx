@@ -62,9 +62,9 @@ const BlogArticlePage: React.FC = () => {
         title={article.metaTitle || article.title}
         description={article.metaDescription || article.excerpt}
         keywords={article.metaKeywords}
+        canonicalUrl={ROUTES.BLOG_ARTICLE.replace(':slug', article.slug)}
         schemaType="Article"
         schemaName={article.title}
-        ogImage={article.featuredImage}
         additionalSchemaData={{
           datePublished: article.publishDate,
           dateModified: article.updatedDate || article.publishDate,
@@ -77,10 +77,11 @@ const BlogArticlePage: React.FC = () => {
             name: 'Newbi',
             logo: {
               '@type': 'ImageObject',
-              url: 'https://www.newbi.fr/images/logo.png'
+              url: 'https://www.newbi.fr/images/logo_newbi/PNG/Logo_Texte_Purple.png'
             }
           },
-          image: article.featuredImage
+          // Ajoutez une image par défaut pour les articles si nécessaire
+          // image: 'https://www.newbi.fr/images/blog/default-article.jpg'
         }}
       />
       

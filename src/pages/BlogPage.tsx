@@ -64,6 +64,7 @@ const BlogPage: React.FC = () => {
         title="Blog Newbi | Conseils et astuces pour entrepreneurs et TPE/PME"
         description="Découvrez des articles pratiques sur la facturation, les devis, la gestion d'entreprise et plus encore. Conseils d'experts pour entrepreneurs et TPE/PME."
         keywords="blog entreprise, conseils entrepreneurs, facturation, devis, gestion TPE/PME"
+        canonicalUrl={ROUTES.BLOG}
         schemaType="Blog"
         ogImage="/images/blog/blog-newbi-og.jpg"
       />
