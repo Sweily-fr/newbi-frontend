@@ -29,3 +29,7 @@ export { default as BlogPage } from './BlogPage';
 export { default as BlogArticlePage } from './BlogArticlePage';
 // Page Kanban
 export { default as KanbanPage } from './KanbanPage';
+// Page Clients
+export { default as ClientsPage } from './ClientsPage';
+// Page Catalogue
+export { default as CatalogPage } from './CatalogPage';

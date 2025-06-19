@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import {
   HomePage,
   AuthPage,
@@ -28,11 +28,31 @@ import {
   BlogPage,
   BlogArticlePage,
   KanbanPage,
+  ClientsPage,
+  CatalogPage,
 } from '../pages';
 import { ProtectedRoute, PublicRoute, SubscriptionRoute } from './guards';
 import { ROUTES } from './constants';
 import { MainLayout } from '../components/layout/MainLayout';
 import { DeviceRedirect } from '../utils/DeviceRedirect';
+
+// Composant pour gérer les redirections depuis les anciens onglets
+const ProfileWithRedirect = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const tab = searchParams.get('tab');
+  
+  // Redirige selon l'onglet demandé
+  if (tab === 'clients') {
+    return <Navigate to={ROUTES.CLIENTS} replace />;
+  }
+  
+  if (tab === 'products' || tab === 'products_locked') {
+    return <Navigate to="/catalogue" replace />;
+  }
+  
+  return <ProfilePage />;
+};
 
 export const AppRoutes = () => {
   return (
@@ -136,6 +156,35 @@ export const AppRoutes = () => {
             </SubscriptionRoute>
           </ProtectedRoute>
         } />
+
+        <Route path={ROUTES.CLIENTS} element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <ClientsPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+        
+        {/* Route pour la gestion du catalogue */}
+        <Route path="/catalogue" element={
+          <ProtectedRoute>
+            <SubscriptionRoute>
+              <CatalogPage />
+            </SubscriptionRoute>
+          </ProtectedRoute>
+        } />
+        
+        {/* Route de profil avec gestion de la redirection */}
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <SubscriptionRoute>
+                <ProfileWithRedirect />
+              </SubscriptionRoute>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Pages légales */}
         <Route path={ROUTES.LEGAL_NOTICE} element={<PublicRoute><LegalNoticePage /></PublicRoute>} />

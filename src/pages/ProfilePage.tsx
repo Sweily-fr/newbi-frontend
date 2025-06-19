@@ -5,8 +5,7 @@ import {
   PersonalInfoForm,
   CompanyInfoForm,
 } from "../features/profile";
-import { ClientsManager } from "../features/clients/components/business/ClientsManager";
-import { ProductsManager } from "../features/products/components/business/ProductsManager";
+
 import { IntegrationsManager } from "../features/integrations/components/IntegrationsManager";
 import {
   TabNavigation,
@@ -27,8 +26,6 @@ import {
   Card,
   InfoCircle,
   Lock1,
-  Profile2User,
-  ShoppingBag,
   User,
   Verify,
   Link21,
@@ -139,50 +136,6 @@ export const ProfilePage = () => {
       ),
     });
 
-    // Ajouter l'onglet Catalogue Produits/Services pour les utilisateurs premium
-    tabs.push({
-      id: "products",
-      label: "Catalogue",
-      icon: (
-        <div className="flex items-center justify-between w-full">
-          <ShoppingBag
-            size="20"
-            variant="Linear"
-            color={getIconColor("products")}
-            className="w-5 h-5"
-          />
-          <Verify
-            size="20"
-            variant="Bold"
-            color="#FFD700"
-            className="w-5 h-5 ml-4 absolute right-8"
-          />
-        </div>
-      ),
-    });
-
-    // Ajouter l'onglet Mes clients pour les utilisateurs premium
-    tabs.push({
-      id: "clients",
-      label: "Mes clients",
-      icon: (
-        <div className="flex items-center justify-between w-full">
-          <Profile2User
-            size="20"
-            variant="Linear"
-            color={getIconColor("clients")}
-            className="w-5 h-5"
-          />
-          <Verify
-            size="20"
-            variant="Bold"
-            color="#FFD700"
-            className="w-5 h-5 ml-4 absolute right-8"
-          />
-        </div>
-      ),
-    });
-    
     // Ajouter l'onglet Intégrations pour les utilisateurs premium
     tabs.push({
       id: "integrations",
@@ -227,50 +180,6 @@ export const ProfilePage = () => {
       ),
     });
 
-    // Ajouter l'onglet Catalogue Produits/Services désactivé pour les utilisateurs non premium
-    tabs.push({
-      id: "products_locked",
-      label: "Catalogue",
-      icon: (
-        <div className="flex items-center justify-between w-full">
-          <ShoppingBag
-            size="20"
-            variant="Linear"
-            color={getIconColor("products_locked")}
-            className="w-5 h-5"
-          />
-          <Lock1
-            size="20"
-            variant="Linear"
-            color={getIconColor("products_locked")}
-            className="w-4 h-4 text-gray-400 ml-4"
-          />
-        </div>
-      ),
-    });
-
-    // Ajouter l'onglet Mes clients désactivé pour les utilisateurs non premium
-    tabs.push({
-      id: "clients_locked",
-      label: "Mes clients",
-      icon: (
-        <div className="flex items-center justify-between w-full">
-          <Profile2User
-            size="20"
-            variant="Linear"
-            color={getIconColor("clients_locked")}
-            className="w-5 h-5"
-          />
-          <Lock1
-            size="20"
-            variant="Linear"
-            color={getIconColor("clients_locked")}
-            className="w-4 h-4 text-gray-400 ml-4"
-          />
-        </div>
-      ),
-    });
-    
     // Ajouter l'onglet Intégrations désactivé pour les utilisateurs non premium
     tabs.push({
       id: "integrations_locked",
@@ -527,29 +436,7 @@ export const ProfilePage = () => {
               </>
             )}
 
-            {activeTab === "clients" && subscription?.licence && (
-              <div className="bg-white shadow-sm rounded-2xl">
-                <div className="px-4 py-5 sm:p-6">
-                  <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                    Gestion des clients
-                  </h2>
-                  <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
-                    <p className="text-sm text-gray-600">
-                      <span className="text-[#5b50ff] font-medium">
-                        Astuce :
-                      </span>{" "}
-                      Gérez efficacement vos clients en un seul endroit. Une
-                      base de clients bien organisée vous permettra d'utiliser
-                      tous les outils de Newbi de manière optimale. Les
-                      informations de vos clients sont automatiquement intégrées
-                      dans vos factures, devis et autres documents, vous faisant
-                      gagner un temps précieux dans vos tâches administratives.
-                    </p>
-                  </div>
-                  <ClientsManager />
-                </div>
-              </div>
-            )}
+
 
             {(activeTab === "company_locked" ||
               activeTab === "products_locked" ||
@@ -578,32 +465,6 @@ export const ProfilePage = () => {
                     <CreditCardIcon className="h-5 w-5" />
                     Passer Premium
                   </Button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "products" && subscription?.licence && (
-              <div className="bg-white shadow-sm rounded-2xl">
-                <div className="px-4 py-5 sm:p-6">
-                  <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                    Gestion des produits
-                  </h2>
-                  <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
-                    <p className="text-sm text-gray-600">
-                      <span className="text-[#5b50ff] font-medium">
-                        Astuce :
-                      </span>{" "}
-                      Créez et organisez votre catalogue de produits et services
-                      pour simplifier vos processus de facturation. Ajoutez des
-                      descriptions détaillées, fixez vos tarifs et personnalisez
-                      vos offres. Lors de la création de factures ou devis, il
-                      vous suffira de sélectionner les éléments de votre
-                      catalogue pour les intégrer automatiquement, avec calcul
-                      instantané des montants et taxes applicables. Un gain de
-                      temps et de précision considérable !
-                    </p>
-                  </div>
-                  <ProductsManager />
                 </div>
               </div>
             )}

@@ -139,6 +139,32 @@ export const TOOLS: Tool[] = [
     href: "/depenses",
   },
   {
+    id: "clients",
+    name: "Clients",
+    description: "Gérez votre base de clients et leurs informations de facturation",
+    category: "CRM",
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Clients.svg" alt="Gestion des clients" className="w-full h-full object-cover" />
+      </div>
+    ),
+    href: "/clients",
+  },
+  {
+    id: "catalog",
+    name: "Catalogue",
+    description: "Gérez vos produits et services pour vos factures et devis",
+    category: "Gestion",
+    premium: true,
+    icon: (
+      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
+        <img src="/images/tools_img/Catalog.svg" alt="Catalogue produits/services" className="w-full h-full object-cover" />
+      </div>
+    ),
+    href: "/catalogue",
+  },
+  {
     id: "signature-electronique",
     name: "Signature électronique",
     description: "Signez et faites signer vos documents en ligne de manière sécurisée",
