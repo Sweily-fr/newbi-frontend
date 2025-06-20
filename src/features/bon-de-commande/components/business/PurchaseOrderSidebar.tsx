@@ -2,32 +2,50 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Sidebar } from "../../../../components/layout/Sidebar";
 import { Button } from "../../../../components/";
 import { formatDate } from "../../../../utils/date";
-import { getUnitAbbreviation } from "../../../../utils/unitAbbreviations";
-import { QuoteInvoiceCreationModal } from "./QuoteInvoiceCreationModal";
-import { QuoteInvoiceProgress } from "./QuoteInvoiceProgress";
 import { useQuery } from "@apollo/client";
-import { GET_QUOTE } from "../../graphql/quotes";
-import { QuotePreview } from "../forms/QuotePreview";
-import { Quote } from "../../types";
+type QuoteStatus = 'DRAFT' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED' | 'CANCELED' | 'EXPIRED';
 import { ConfirmationModal } from "../../../../components/common/ConfirmationModal";
 import {
   TickCircle,
   ArrowRight,
-  Money,
   Clock,
   Edit2,
   Trash,
   CloseCircle,
-  AddCircle,
 } from "iconsax-react";
 
-interface Invoice {
-  id: string;
-  prefix: string;
-  number: string;
-  status: "DRAFT" | "PENDING" | "COMPLETED";
-  finalTotalTTC?: number;
-  isDeposit?: boolean;
+// Type pour les éléments du bon de commande
+interface PurchaseOrderItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  vatRate: number;
+  unit?: string;
+  discount?: number;
+  discountType?: string;
+  details?: string;
+}
+
+// Type pour les informations de l'entreprise
+interface CompanyInfo {
+  name: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  siret?: string;
+  vatNumber?: string;
+  logo?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  bankDetails?: {
+    iban: string;
+    bic: string;
+    bankName: string;
+  };
 }
 
 interface QuoteItem {
@@ -42,14 +60,39 @@ interface QuoteItem {
 }
 
 // Type étendu pour inclure le statut CANCELED qui est utilisé dans l'interface mais pas dans le type Quote
-type ExtendedQuoteStatus = Quote["status"] | "CANCELED";
+type ExtendedQuoteStatus = QuoteStatus | "CANCELED";
 
-// Type étendu pour le devis dans la sidebar
-type SidebarQuote = Omit<Quote, "status"> & {
-  status: ExtendedQuoteStatus;
+// Type pour le bon de commande dans la sidebar
+interface SidebarQuote {
   id: string;
   prefix: string;
   number: string;
+  status: QuoteStatus;
+  issueDate: string;
+  validUntil?: string;
+  totalHT: number;
+  totalTTC: number;
+  totalVAT: number;
+  finalTotalHT: number;
+  finalTotalTTC: number;
+  discountAmount?: number;
+  vatRates?: Array<{
+    rate: number;
+    amount: number;
+    baseAmount: number;
+  }>;
+  client: {
+    name: string;
+    email?: string;
+    address?: {
+      street?: string;
+      city?: string;
+      postalCode?: string;
+      country?: string;
+    };
+  };
+  items?: PurchaseOrderItem[];
+  companyInfo?: CompanyInfo;
   issueDate: string;
   totalHT: number;
   totalTTC: number;
@@ -72,13 +115,7 @@ type SidebarQuote = Omit<Quote, "status"> & {
       country?: string;
     };
   };
-  convertedToInvoice?: {
-    id: string;
-    prefix: string;
-    number: string;
-    status: string;
-  };
-  linkedInvoices?: Invoice[];
+
 };
 
 interface QuoteSidebarProps {
@@ -98,38 +135,46 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
   onDelete,
   onStatusChange,
 }) => {
-  const [isInvoiceCreationModalOpen, setIsInvoiceCreationModalOpen] =
-    useState(false);
   // État pour la popup de confirmation d'annulation
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
-  // État pour le statut et la facturation
-  const showStatusDetails = true;
-  // État non utilisé - à réactiver si besoin
-  // const [showPreview, setShowPreview] = useState(true);
-  const showPreview = true; // Valeur fixe pour l'instant
-  // État local pour stocker les données du devis mises à jour
+  // État local pour stocker les données du bon de commande mises à jour
   const [quote, setQuote] = useState<SidebarQuote>(initialQuote);
-
-  // Palette de couleurs pour les statuts avec la charte graphique Newbi
-  const statusColors = {
-    DRAFT: "bg-[#f0eeff] text-[#5b50ff] border border-[#e6e1ff]",
-    PENDING: "bg-[#fff8e6] text-[#e6a700] border border-[#ffe7a0]",
-    ACCEPTED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
-    COMPLETED: "bg-[#e6fff0] text-[#00c853] border border-[#a0ffc8]",
-    REJECTED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]",
-    CANCELED: "bg-[#ffebee] text-[#f44336] border border-[#ffcdd2]",
-    EXPIRED: "bg-gray-100 text-gray-700 border border-gray-200",
+  
+  // Fonction pour gérer la suppression
+  const handleDelete = () => {
+    if (onDelete) onDelete();
+  };
+  // Fonction pour gérer le changement de statut
+  const handleStatusChange = (newStatus: QuoteStatus) => {
+    if (onStatusChange) onStatusChange(newStatus);
   };
 
-  // Texte des statuts en français
-  const statusText = {
-    DRAFT: "Brouillon",
-    PENDING: "En attente",
-    ACCEPTED: "Accepté",
-    COMPLETED: "Accepté",
-    REJECTED: "Refusé",
-    CANCELED: "Annulé",
-    EXPIRED: "Expiré",
+  // Fonction utilitaire pour obtenir la couleur du statut
+  const getStatusColor = (status: QuoteStatus) => {
+    const colors: Record<QuoteStatus, string> = {
+      DRAFT: "bg-gray-100 text-gray-700",
+      PENDING: "bg-blue-50 text-blue-700",
+      ACCEPTED: "bg-green-50 text-green-700",
+      REJECTED: "bg-red-50 text-red-700",
+      COMPLETED: "bg-purple-50 text-purple-700",
+      CANCELED: "bg-gray-200 text-gray-700",
+      EXPIRED: "bg-orange-50 text-orange-700",
+    };
+    return colors[status] || "bg-gray-100 text-gray-700";
+  };
+
+  // Fonction utilitaire pour obtenir le texte du statut
+  const getStatusText = (status: QuoteStatus) => {
+    const texts: Record<QuoteStatus, string> = {
+      DRAFT: "Brouillon",
+      PENDING: "En attente",
+      ACCEPTED: "Accepté",
+      REJECTED: "Refusé",
+      COMPLETED: "Terminé",
+      CANCELED: "Annulé",
+      EXPIRED: "Expiré",
+    };
+    return texts[status] || status;
   };
 
   // Utiliser useQuery pour obtenir les données à jour du devis
@@ -152,12 +197,8 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
     setQuote(initialQuote);
   }, [initialQuote]);
 
-  const handleCreateInvoice = () => {
-    setIsInvoiceCreationModalOpen(true);
-  };
-
-  const handleInvoiceCreated = useCallback(() => {
-    // Forcer une récupération des données à jour depuis le serveur
+  // Fonction de rafraîchissement des données
+  const refreshData = useCallback(() => {
     refetch().then(({ data }) => {
       if (data?.quote) {
         setQuote(data.quote);
@@ -322,12 +363,6 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
     };
   };
 
-  // Fonction pour basculer l'affichage de la prévisualisation
-  // Fonction non utilisée - à conserver pour référence future
-  // const togglePreview = useCallback(() => {
-  //   setShowPreview(prev => !prev);
-  // }, []);
-
   // Définir l'interface pour les actions de statut
   interface StatusAction {
     label: string;
@@ -475,208 +510,6 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
         className="custom-scrollbar bg-white"
         actions={
           <>
-            {/* Contenu détaillé - affiché uniquement si showStatusDetails est true */}
-            {showStatusDetails && (
-              <div className="transition-all duration-300 overflow-hidden">
-                {/* Progression des factures */}
-                {quote.linkedInvoices && quote.linkedInvoices.length > 0 && (
-                  <div className="mb-4">
-                    <QuoteInvoiceProgress
-                      quoteTotal={quote.finalTotalTTC}
-                      linkedInvoices={quote.linkedInvoices}
-                      quoteId={quote.id}
-                      refreshInterval={2000} // Rafraîchir toutes les 2 secondes
-                      key={`invoice-progress-${quote.linkedInvoices.length}`} // Forcer le remontage du composant quand le nombre de factures change
-                    />
-                  </div>
-                )}
-
-                {/* Conteneur principal pour tous les boutons d'action */}
-                <div className="space-y-3">
-                  {/* Vérifier si toutes les factures sont complétées et si le montant total est atteint */}
-                  {quote.linkedInvoices &&
-                    quote.linkedInvoices.length > 0 &&
-                    (() => {
-                      const totalInvoiced = quote.linkedInvoices.reduce(
-                        (sum, inv) => sum + (inv.finalTotalTTC || 0),
-                        0
-                      );
-                      const remainingAmount =
-                        quote.finalTotalTTC - totalInvoiced;
-                      const isFullyPaid =
-                        quote.linkedInvoices.every(
-                          (inv) => inv.status === "COMPLETED"
-                        ) && Math.abs(remainingAmount) < 0.01; // Tolérance pour les erreurs d'arrondi
-                      const hasMaxInvoices = quote.linkedInvoices.length >= 3;
-
-                      if (isFullyPaid) {
-                        return (
-                          <Button
-                            variant="outline"
-                            color="green"
-                            fullWidth
-                            disabled={true}
-                            className="border border-[#00c853] text-[#00c853] rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center"
-                          >
-                            <TickCircle
-                              size={20}
-                              color="#00c853"
-                              className="mr-2"
-                              variant="Bold"
-                            />
-                            Payée
-                          </Button>
-                        );
-                      } else if (
-                        Math.abs(remainingAmount) < 0.01 ||
-                        hasMaxInvoices
-                      ) {
-                        // Ne pas afficher les boutons si le reste à facturer est 0 ou si 3 factures sont déjà liées
-                        return null;
-                      }
-
-                      // Sinon, afficher les boutons d'action normaux avec le nouveau style
-                      return statusActions.map((action, index) => {
-                        // Déterminer la couleur et l'icône en fonction de l'action
-                        let buttonClass = "";
-                        let icon = null;
-
-                        if (action.color === "primary") {
-                          buttonClass =
-                            "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                          icon = (
-                            <Money
-                              size={20}
-                              color="#fff"
-                              className="mr-2"
-                              variant="Linear"
-                            />
-                          );
-                        } else if (action.color === "green") {
-                          buttonClass =
-                            "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                          icon = (
-                            <TickCircle
-                              size={20}
-                              color="#fff"
-                              className="mr-2"
-                              variant="Bold"
-                            />
-                          );
-                        } else {
-                          buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
-                          icon = (
-                            <AddCircle
-                              size={20}
-                              color="#5b50ff"
-                              className="mr-2"
-                              variant="Linear"
-                            />
-                          );
-                        }
-
-                        return (
-                          <Button
-                            key={index}
-                            variant={
-                              action.color === "primary" ||
-                              action.color === "green"
-                                ? "primary"
-                                : "outline"
-                            }
-                            fullWidth
-                            className={buttonClass}
-                            onClick={action.action}
-                            disabled={action.disabled}
-                          >
-                            {icon}
-                            {action.label}
-                            {(action.color === "primary" ||
-                              action.color === "green") && (
-                              <ArrowRight
-                                size={18}
-                                className="ml-2"
-                                variant="Bold"
-                              />
-                            )}
-                          </Button>
-                        );
-                      });
-                    })()}
-
-                  {/* Afficher les boutons d'action normaux si pas de factures liées */}
-                  {(!quote.linkedInvoices ||
-                    quote.linkedInvoices.length === 0) &&
-                    statusActions.map((action, index) => {
-                      // Déterminer la couleur et l'icône en fonction de l'action
-                      let buttonClass = "";
-                      let icon = null;
-
-                      if (action.color === "primary") {
-                        buttonClass =
-                          "bg-[#5b50ff] hover:bg-[#4a41e0] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                        icon = (
-                          <Money
-                            size={20}
-                            color="#fff"
-                            className="mr-2"
-                            variant="Linear"
-                          />
-                        );
-                      } else if (action.color === "green") {
-                        buttonClass =
-                          "bg-[#00c853] hover:bg-[#00a844] text-white rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md";
-                        icon = (
-                          <TickCircle
-                            size={20}
-                            color="#fff"
-                            className="mr-2"
-                            variant="Bold"
-                          />
-                        );
-                      } else {
-                        buttonClass = `border border-[#5b50ff] text-[#5b50ff] hover:bg-gray-100 rounded-2xl py-2.5 transition-all duration-200 flex items-center justify-center hover:shadow-md`;
-                        icon = (
-                          <AddCircle
-                            size={20}
-                            color="#5b50ff"
-                            className="mr-2"
-                            variant="Linear"
-                          />
-                        );
-                      }
-
-                      return (
-                        <Button
-                          key={index}
-                          variant={
-                            action.color === "primary" ||
-                            action.color === "green"
-                              ? "primary"
-                              : "outline"
-                          }
-                          fullWidth
-                          className={buttonClass}
-                          onClick={action.action}
-                          disabled={action.disabled}
-                        >
-                          {icon}
-                          {action.label}
-                          {(action.color === "primary" ||
-                            action.color === "green") && (
-                            <ArrowRight
-                              size={18}
-                              className="ml-2"
-                              variant="Bold"
-                            />
-                          )}
-                        </Button>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
-
             {/* Conteneur pour les boutons d'édition et de suppression/annulation - toujours visible */}
             {quote.status !== "COMPLETED" && quote.status !== "CANCELED" && (
               <div className="mt-4">
@@ -694,6 +527,14 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
                       variant="Linear"
                     />
                     Modifier
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    onClick={handleDelete}
+                    className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                  >
+                    Supprimer
                   </Button>
 
                   {quote.status === "DRAFT" ? (
@@ -743,9 +584,9 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             <div className="text-3xl font-bold mb-4">
               {quote.totalTTC?.toFixed(2) || "0.00"} €
             </div>
-            <button 
+            <button
               className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
-              onClick={() => onStatusChange("COMPLETED")}
+              onClick={() => handleStatusChange("ACCEPTED")}
             >
               <Clock size={18} className="mr-2 text-[#5b50ff]" color="#5b50ff" variant="Bold" />
               À encaisser
@@ -806,16 +647,6 @@ export const QuoteSidebar: React.FC<QuoteSidebarProps> = ({
             </dl>
           </div>
         </div>
-
-        {/* Modal de création de facture */}
-        <QuoteInvoiceCreationModal
-          isOpen={isInvoiceCreationModalOpen}
-          onClose={() => setIsInvoiceCreationModalOpen(false)}
-          quoteId={quote.id}
-          quoteTotal={quote.finalTotalTTC}
-          linkedInvoices={quote.linkedInvoices}
-          onInvoiceCreated={handleInvoiceCreated}
-        />
 
         {/* Modal de confirmation d'annulation */}
         <ConfirmationModal
