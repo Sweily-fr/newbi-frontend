@@ -191,13 +191,13 @@ export const Navbar = () => {
               <div className="hidden md:flex md:items-center space-x-5">
                 {isAuthenticated && (
                   <>
-                    <span
-                      className="text-sm font-medium text-gray-400 cursor-not-allowed flex items-center space-x-2"
-                      title="Fonctionnalité à venir"
+                    <Link
+                      to="/dashboard"
+                      className="text-sm font-medium text-gray-700 hover:text-[#5b50ff] flex items-center space-x-2 transition-colors"
                     >
-                      <HomeTrendUp size={20} color="#c7c7c7" variant="Bold" className="mr-2" />
+                      <HomeTrendUp size={20} className="text-current mr-2" />
                       Tableau de bord
-                    </span>
+                    </Link>
                     <Button
                       variant="outline"
                       size="md"

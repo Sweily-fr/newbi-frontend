@@ -24,6 +24,7 @@ import {
   FileTransferPage,
   FileTransferDownloadPage,
   NotFoundPage,
+  DashboardPage,
   BlogPage,
   BlogArticlePage,
   KanbanPage,
@@ -79,7 +80,12 @@ export const AppRoutes = () => {
         } />
 
         {/* Routes protégées nécessitant une authentification */}
-
+        <Route path={ROUTES.DASHBOARD} element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } />
+        
         <Route path={ROUTES.PROFILE} element={
           <ProtectedRoute>
             <ProfilePage />

@@ -30,5 +30,6 @@ export const ROUTES = {
   CONTACT: '/contact',
   COOKIE_PREFERENCES: '/preferences-cookies',
   MOBILE: '/mobile',
+  DASHBOARD: '/dashboard',
   NOT_FOUND: '/404',
 } as const;

@@ -32,3 +32,5 @@ export { default as KanbanPage } from './KanbanPage';
 export { default as ClientsPage } from './ClientsPage';
 // Page Catalogue
 export { default as CatalogPage } from './CatalogPage';
+// Page Dashboard
+export { default as DashboardPage } from './DashboardPage';
