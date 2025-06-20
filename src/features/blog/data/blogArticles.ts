@@ -17,6 +17,7 @@ import {
   seoSoloOptimizationArticle,
   erpArticle,
   gestionIndependantArticle,
+  gestionTresorerieIndependantArticle,
   calendrierImpots2025Article,
   modifierCodeApeArticle,
   compteBancaireFreelanceArticle,
@@ -27,13 +28,12 @@ import {
   filePaymentArticle,
   freelance2025Article,
   seoRankingArticle,
-  wetransferAlternativeArticle,
-  gestionTresorerieFreelance
+  wetransferAlternativeArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
   optimiserReferencementArticle,
-  gestionTresorerieFreelance,
+  gestionTresorerieIndependantArticle,
   seoRankingArticle,
   freelance2025Article,
   filePaymentArticle,
