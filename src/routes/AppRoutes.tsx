@@ -6,7 +6,6 @@ import {
   ToolsPage,
   InvoicesPage,
   QuotesPage,
-  PurchaseOrderPage,
   ExpensesPage,
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -105,14 +104,6 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <SubscriptionRoute>
               <QuotesPage />
-            </SubscriptionRoute>
-          </ProtectedRoute>
-        } />
-
-        <Route path={ROUTES.PURCHASE_ORDER} element={
-          <ProtectedRoute>
-            <SubscriptionRoute>
-              <PurchaseOrderPage />
             </SubscriptionRoute>
           </ProtectedRoute>
         } />

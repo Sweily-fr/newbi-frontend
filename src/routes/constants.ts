@@ -26,7 +26,6 @@ export const ROUTES = {
   KANBAN_BOARD: '/kanban/:boardId',
   BLOG: '/blog',
   BLOG_ARTICLE: '/blog/:slug',
-  PURCHASE_ORDER: '/bons-de-commande',
   TERMS: '/conditions-generales-de-vente',
   CONTACT: '/contact',
   COOKIE_PREFERENCES: '/preferences-cookies',

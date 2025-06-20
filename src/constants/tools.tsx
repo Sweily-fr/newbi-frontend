@@ -164,47 +164,6 @@ export const TOOLS: Tool[] = [
     ),
     href: "/catalogue",
   },
-  {
-    id: "signature-electronique",
-    name: "Signature électronique",
-    description: "Signez et faites signer vos documents en ligne de manière sécurisée",
-    category: "Gestion Administrative & Financière",
-    comingSoon: true,
-    premium: true,
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
-        <img src="/images/tools_img/Signatureelectronique.svg" alt="Signature électronique" className="w-full h-full object-cover" />
-      </div>
-    ),
-    href: "/signature-electronique",
-  },
-  {
-    id: "bons-de-commande",
-    name: "Bons de commande",
-    description: "Créez et gérez vos bons de commande professionnels",
-    category: "Gestion Administrative & Financière",
-    premium: true,
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
-        <img src="/images/tools_img/Bondecommande.svg" alt="Bon de commande" className="w-full h-full object-cover" />
-      </div>
-    ),
-    href: "/bons-de-commande",
-  },
-  {
-    id: "gestion-tresorerie",
-    name: "Gestion de trésorerie",
-    description: "Suivez et anticipez vos flux de trésorerie pour une meilleure gestion financière",
-    category: "Gestion Administrative & Financière",
-    comingSoon: true,
-    premium: true,
-    icon: (
-      <div className="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden">
-        <img src="/images/tools_img/Gestiondetresorerie.svg" alt="Gestion de trésorerie" className="w-full h-full object-cover" />
-      </div>
-    ),
-    href: "/gestion-tresorerie",
-  },
 ];
 
 // Fonction utilitaire pour trouver un outil par son ID
