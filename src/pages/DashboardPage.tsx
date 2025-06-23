@@ -1,4 +1,4 @@
-import { ExpensesChart } from "@/features/dashboard/components";
+import { ExpensesChart, RevenueChart } from "@/features/dashboard/components";
 
 export default function DashboardPage() {
   return (
@@ -10,12 +10,12 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-1/2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="h-full">
           <ExpensesChart />
         </div>
-        <div className="w-full md:w-1/2 bg-muted/50 rounded-lg flex items-center justify-center">
-          <p className="text-muted-foreground">Autre contenu ici</p>
+        <div className="h-full">
+          <RevenueChart />
         </div>
       </div>
     </div>
