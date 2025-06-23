@@ -571,13 +571,14 @@ export const useQuoteForm = ({
         } : undefined;
 
         // Retourner les données du formulaire sans créer de client
-        return {
+        const clientData: any = {
           id: "", // ID vide, sera géré côté serveur
           type: newClient.type,
-          name: newClient.name,
+          // Pour un client particulier, on utilise la concaténation du prénom et du nom comme nom complet
+          name: newClient.type === "INDIVIDUAL" 
+            ? `${newClient.firstName || ''} ${newClient.lastName || ''}`.trim() 
+            : newClient.name,
           email: newClient.email,
-          firstName: newClient.type === "INDIVIDUAL" ? newClient.firstName : undefined,
-          lastName: newClient.type === "INDIVIDUAL" ? newClient.lastName : undefined,
           address: {
             street: newClient.street || "",
             city: newClient.city || "",
@@ -588,7 +589,15 @@ export const useQuoteForm = ({
           shippingAddress: shippingAddressData,
           siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
           vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
+        };
+        
+        // Ajouter les champs spécifiques aux particuliers
+        if (newClient.type === "INDIVIDUAL") {
+          clientData.firstName = newClient.firstName;
+          clientData.lastName = newClient.lastName;
         }
+        
+        return clientData;
       } else if (quote && quote.client) {
         // Si on modifie un devis existant et que le client est déjà dans le devis
         return {
@@ -723,6 +732,29 @@ export const useQuoteForm = ({
       // Créer un nouveau client si nécessaire
       let clientId = "";
       if (isNewClient) {
+        // Validation des champs obligatoires pour les nouveaux clients
+        if (newClient.type === "INDIVIDUAL") {
+          if (!newClient.firstName?.trim() || !newClient.lastName?.trim()) {
+            Notification.error("Pour un client particulier, le prénom et le nom sont obligatoires");
+            setIsSubmitting(false);
+            return;
+          }
+        }
+        
+        // Validation pour les entreprises
+        if (newClient.type === "COMPANY" && !newClient.name?.trim()) {
+          Notification.error("Le nom de l'entreprise est obligatoire");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Validation de l'email pour tous les types de clients
+        if (!newClient.email?.trim()) {
+          Notification.error("L'email est obligatoire pour tous les clients");
+          setIsSubmitting(false);
+          return;
+        }
+
         try {
           // Préparer l'objet d'adresse de livraison si nécessaire
           const shippingAddressData = newClient.hasDifferentShippingAddress && newClient.shippingAddress ? {
@@ -733,25 +765,36 @@ export const useQuoteForm = ({
           } : undefined;
 
           // Créer un nouveau client dans la base de données
+          // Préparer les données du client pour la création
+          const clientInput: any = {
+            type: newClient.type,
+            // Pour un client particulier, on utilise la concaténation du prénom et du nom comme nom complet
+            name: newClient.type === "INDIVIDUAL" 
+              ? `${newClient.firstName || ''} ${newClient.lastName || ''}`.trim() 
+              : newClient.name,
+            email: newClient.email,
+            address: {
+              street: newClient.street || "",
+              city: newClient.city || "",
+              postalCode: newClient.postalCode || "",
+              country: newClient.country || "",
+            },
+            hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
+            shippingAddress: shippingAddressData,
+          };
+          
+          // Ajouter les champs spécifiques au type de client
+          if (newClient.type === "COMPANY") {
+            clientInput.siret = newClient.siret;
+            clientInput.vatNumber = newClient.vatNumber;
+          } else if (newClient.type === "INDIVIDUAL") {
+            clientInput.firstName = newClient.firstName;
+            clientInput.lastName = newClient.lastName;
+          }
+          
           const { data } = await createClient({
             variables: {
-              input: {
-                type: newClient.type,
-                name: newClient.name,
-                email: newClient.email,
-                address: {
-                  street: newClient.street || "",
-                  city: newClient.city || "",
-                  postalCode: newClient.postalCode || "",
-                  country: newClient.country || "",
-                },
-                hasDifferentShippingAddress: newClient.hasDifferentShippingAddress || false,
-                shippingAddress: shippingAddressData,
-                siret: newClient.type === "COMPANY" ? newClient.siret : undefined,
-                vatNumber: newClient.type === "COMPANY" ? newClient.vatNumber : undefined,
-                firstName: newClient.type === "INDIVIDUAL" ? newClient.firstName : undefined,
-                lastName: newClient.type === "INDIVIDUAL" ? newClient.lastName : undefined,
-              },
+              input: clientInput,
             },
           });
           

@@ -220,8 +220,15 @@ export const QuoteFormModal: React.FC<QuoteFormModalProps> = ({
     if (!selectedClient && !isNewClient) {
       errors.client = true;
     } else if (isNewClient) {
+      // Pour un client particulier, vérifier firstName et lastName
+      // Pour une entreprise, vérifier name
+      const isIndividual = newClient.type === 'INDIVIDUAL';
+      const hasNameError = isIndividual 
+        ? !newClient.firstName || !newClient.lastName
+        : !newClient.name;
+        
       if (
-        !newClient.name ||
+        hasNameError ||
         !newClient.email ||
         !newClient.street ||
         !newClient.city ||

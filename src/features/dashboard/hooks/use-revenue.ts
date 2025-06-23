@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { GET_COMPLETED_INVOICES } from '../graphql/queries';
-import { useMemo } from 'react';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { useMemo, useState, useEffect } from 'react';
+import { format, subMonths, startOfMonth, endOfMonth, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 // Interface pour la réponse de la requête GET_COMPLETED_INVOICES
@@ -34,12 +34,37 @@ interface RevenueData {
   date: Date; // Pour le tri
 }
 
-export function useRevenue() {
-  // Définir la plage de dates pour les 12 derniers mois
-  const endDate = endOfMonth(new Date());
-  const startDate = startOfMonth(subMonths(new Date(), 11)); // 12 mois de données
+interface UseRevenueOptions {
+  months?: '1' | '3' | '6' | '12';
+}
 
-  const { data, loading, error } = useQuery<GetCompletedInvoicesResponse>(GET_COMPLETED_INVOICES, {
+export function useRevenue({ months = '12' }: UseRevenueOptions = {}) {
+  // Définir la plage de dates en fonction de la période sélectionnée
+  const [dateRange, setDateRange] = useState<{ startDate: Date; endDate: Date }>({
+    startDate: startOfMonth(subMonths(new Date(), 11)),
+    endDate: endOfMonth(new Date())
+  });
+
+  // Mettre à jour la plage de dates lorsque la période change
+  useEffect(() => {
+    const endDate = endOfMonth(new Date());
+    let startDate: Date;
+
+    if (months === '1') {
+      // Pour les 30 derniers jours
+      startDate = subDays(new Date(), 30);
+    } else {
+      // Pour X derniers mois
+      const monthsCount = parseInt(months, 10);
+      startDate = startOfMonth(subMonths(new Date(), monthsCount - 1));
+    }
+
+    setDateRange({ startDate, endDate });
+  }, [months]);
+
+  const { startDate, endDate } = dateRange;
+
+  const { data, loading, error, refetch } = useQuery<GetCompletedInvoicesResponse>(GET_COMPLETED_INVOICES, {
     variables: {
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString()
@@ -127,7 +152,7 @@ export function useRevenue() {
       return acc;
     }, {});
     
-    // S'assurer que tous les mois sont représentés, même sans données
+    // S'assurer que toutes les périodes sont représentées, même sans données
     const allMonths: Record<string, RevenueData> = {};
     const currentDate = new Date(startDate);
     const endDateObj = new Date(endDate);
@@ -172,11 +197,21 @@ export function useRevenue() {
     return sortedData;
   }, [data, startDate, endDate, totalRevenue, totalInvoices]); // Ajout des dépendances manquantes
 
+  // Fonction pour recharger les données
+  const refreshData = () => {
+    refetch({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    });
+  };
+
   return {
     data: formattedData,
     loading,
     error,
     totalRevenue,
-    totalInvoices
+    totalInvoices,
+    refreshData,
+    dateRange: { startDate, endDate }
   };
 }

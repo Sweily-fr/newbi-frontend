@@ -1,5 +1,6 @@
 "use client"
 
+import React from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts"
 import { useRevenue } from "../hooks/use-revenue"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,6 +12,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+// Options pour le filtre de période
+const PERIOD_OPTIONS = [
+  { value: '12', label: '12 derniers mois' },
+  { value: '6', label: '6 derniers mois' },
+  { value: '3', label: '3 derniers mois' },
+  { value: '1', label: '30 derniers jours' },
+] as const;
+
 // Configuration pour le graphique
 const CHART_COLORS = {
   revenue: "#8b5cf6", // Violet plus clair pour le CA
@@ -49,13 +65,15 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
 };
 
 export function RevenueChart() {
+  const [selectedPeriod, setSelectedPeriod] = React.useState<string>('12');
   const { 
     data: revenueData, 
     loading, 
     error, 
     totalRevenue, 
-    totalInvoices 
-  } = useRevenue()
+    totalInvoices,
+    refreshData
+  } = useRevenue({ months: selectedPeriod as '1' | '3' | '6' | '12' })
   
   // Formatage du chiffre d'affaires total
   const formattedTotalRevenue = new Intl.NumberFormat('fr-FR', {
@@ -63,7 +81,12 @@ export function RevenueChart() {
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(totalRevenue);
+  }).format(totalRevenue || 0);
+  
+  // Recharger les données lorsque la période change
+  React.useEffect(() => {
+    refreshData();
+  }, [selectedPeriod, refreshData]);
 
   if (loading) {
     return (
@@ -126,12 +149,30 @@ export function RevenueChart() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">
-          Chiffre d'affaires
-        </CardTitle>
-        <CardDescription className="text-sm">
-          Évolution sur les 12 derniers mois
-        </CardDescription>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-base font-semibold">
+              Chiffre d'affaires
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
+            </CardDescription>
+          </div>
+          <div className="w-40">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-[180px] h-8 text-sm">
+                <SelectValue placeholder="Sélectionner une période" />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIOD_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="pb-0">
         <div className="h-[300px] w-full">
@@ -179,7 +220,7 @@ export function RevenueChart() {
               {formattedTotalRevenue} sur {totalInvoices} facture{totalInvoices > 1 ? 's' : ''}
             </div>
             <div className="text-xs text-muted-foreground">
-              Données des 12 derniers mois
+              Données des {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
             </div>
           </div>
         </div>

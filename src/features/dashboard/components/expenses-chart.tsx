@@ -1,8 +1,16 @@
 "use client"
 
+import React from 'react';
 import { TrendingUp } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { useExpenses } from "../hooks/use-expenses"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Card,
@@ -26,18 +34,57 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+const PERIOD_OPTIONS = [
+  { value: '12', label: '12 derniers mois' },
+  { value: '6', label: '6 derniers mois' },
+  { value: '3', label: '3 derniers mois' },
+  { value: '1', label: '30 derniers jours' },
+] as const;
+
 export function ExpensesChart() {
-  const { data: expenses, loading, error } = useExpenses()
-  
-  // Log des données reçues pour le débogage
-  console.log('Données reçues dans ExpensesChart:', {
-    loading,
+  const [selectedPeriod, setSelectedPeriod] = React.useState<string>('12');
+  const { 
+    data: expenses, 
+    loading, 
     error,
-    expenses: expenses ? JSON.parse(JSON.stringify(expenses)) : null,
-    'type de expenses': expenses ? typeof expenses : 'null',
-    'est un tableau': Array.isArray(expenses),
-    'longueur': Array.isArray(expenses) ? expenses.length : 'N/A'
-  });
+    totalExpenses,
+    refreshData 
+  } = useExpenses({ months: selectedPeriod as '1' | '3' | '6' | '12' });
+  
+  // Recharger les données lorsque la période change
+  React.useEffect(() => {
+    refreshData();
+  }, [selectedPeriod, refreshData]);
+  
+  // Formater le montant total des dépenses
+  const formattedTotalExpenses = new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(totalExpenses || 0);
+
+  // Définir le type des données du graphique
+  interface ChartDataPoint {
+    name: string;
+    value: number;
+    count: number;
+    total: number;
+    month: string;
+  }
+
+  // Formater les données pour le graphique
+  const chartData = React.useMemo<ChartDataPoint[]>(() => {
+    if (!expenses || !Array.isArray(expenses)) return [];
+    
+    return expenses.map(expense => ({
+      name: expense.name || 'Mois inconnu',
+      value: expense.total || 0,
+      count: expense.count || 0,
+      total: expense.total || 0,
+      month: expense.name || 'Mois inconnu'
+    }));
+  }, [expenses]);
 
   if (loading) {
     return (
@@ -85,16 +132,6 @@ export function ExpensesChart() {
     )
   }
 
-  // Formater les données pour le graphique
-  const chartData = expenses.map(expense => ({
-    name: expense.name || 'Mois inconnu',
-    value: expense.total || 0,
-    count: expense.count || 0,
-    // Ajouter des champs supplémentaires pour le tooltip si nécessaire
-    total: expense.total || 0,
-    month: expense.name || 'Mois inconnu'
-  }));
-
   console.log('=== DONNÉES POUR LE GRAPHIQUE ===');
   console.log('Nombre d\'entrées:', chartData.length);
   console.log('Première entrée:', chartData[0]);
@@ -102,7 +139,7 @@ export function ExpensesChart() {
   console.log('=== FIN DES DONNÉES POUR LE GRAPHIQUE ===');
 
   // Si pas de données, afficher un message
-  if (chartData.length === 0 || chartData.every(item => item.value === 0)) {
+  if (!chartData || chartData.length === 0 || chartData.every(item => item.value === 0)) {
     return (
       <Card>
         <CardHeader>
@@ -121,7 +158,6 @@ export function ExpensesChart() {
   }
 
   // Trier les données par date (le hook useExpenses renvoie déjà les données triées par date)
-  // On utilise le tri existant du hook useExpenses qui gère correctement les dates
   const sortedData = [...chartData];
 
   // Définir le type de retour de la fonction calculateTrend
@@ -150,10 +186,34 @@ export function ExpensesChart() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Dépenses mensuelles</CardTitle>
-        <CardDescription className="text-sm">
-          Évolution sur les 12 derniers mois
-        </CardDescription>
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-semibold">Dépenses mensuelles</CardTitle>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <span className="font-medium">{formattedTotalExpenses}</span>
+                <span className="ml-1 text-xs">sur la période</span>
+              </div>
+            </div>
+            <CardDescription className="text-sm">
+              Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
+            </CardDescription>
+          </div>
+          <div className="w-40">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-[180px] h-8 text-sm">
+                <SelectValue placeholder="Sélectionner une période" />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIOD_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="pb-0">
         <div className="h-[300px] w-full">

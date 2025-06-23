@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { GET_EXPENSES } from '../graphql/queries';
-import { useMemo } from 'react';
+import { subMonths, startOfMonth, endOfMonth, subDays } from 'date-fns';
 
 
 // Interface pour la réponse de la requête GET_EXPENSES
@@ -25,14 +26,48 @@ interface Expense {
   status?: string;
 }
 
-interface ExpenseData {
+export interface ExpenseData {
   name: string;  // Contient le mois au format 'janv. 2023'
   total: number;
   count: number;
+  date: Date; // Pour le tri
 }
 
-export function useExpenses() {
-    const { data, loading, error } = useQuery<GetExpensesResponse>(GET_EXPENSES, {
+interface UseExpensesOptions {
+  months?: '1' | '3' | '6' | '12';
+}
+
+export function useExpenses({ months = '12' }: UseExpensesOptions = {}) {
+  // Définir la plage de dates en fonction de la période sélectionnée
+  const [dateRange, setDateRange] = useState<{ startDate: Date; endDate: Date }>({
+    startDate: startOfMonth(subMonths(new Date(), 11)),
+    endDate: endOfMonth(new Date())
+  });
+
+  // Mettre à jour la plage de dates lorsque la période change
+  useEffect(() => {
+    const endDate = endOfMonth(new Date());
+    let startDate: Date;
+
+    if (months === '1') {
+      // Pour les 30 derniers jours
+      startDate = subDays(new Date(), 30);
+    } else {
+      // Pour X derniers mois
+      const monthsCount = parseInt(months, 10);
+      startDate = startOfMonth(subMonths(new Date(), monthsCount - 1));
+    }
+
+    setDateRange({ startDate, endDate });
+  }, [months]);
+
+  const { startDate, endDate } = dateRange;
+
+  const { data, loading, error, refetch } = useQuery<GetExpensesResponse>(GET_EXPENSES, {
+    variables: {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    },
       onError: (err) => {
         console.error('Erreur lors de la récupération des dépenses:', err);
       },
@@ -163,7 +198,8 @@ export function useExpenses() {
             acc[sortKey] = {
               name: monthYear,
               total: 0,
-              count: 0
+              count: 0,
+              date: new Date(year, parseInt(month) - 1, 1) // Créer une date au premier jour du mois
             };
           }
   
@@ -210,6 +246,7 @@ export function useExpenses() {
         name: data.name,
         total: data.total,
         count: data.count,
+        date: data.date, // Inclure la date pour le tri
         sortKey // Ajouter la clé de tri à chaque élément
       }));
       
@@ -229,7 +266,8 @@ export function useExpenses() {
           const formattedItem: ExpenseData = {
             name: item.name,
             total: Number(item.total.toFixed(2)),
-            count: item.count
+            count: item.count,
+            date: item.date // Inclure la date dans l'élément formaté
           };
           console.log('Élément formaté:', formattedItem);
           return formattedItem;
@@ -240,9 +278,27 @@ export function useExpenses() {
       return sortedData;
     }, [data]);
   
+    // Fonction pour recharger les données
+    const refreshData = useCallback(() => {
+      return refetch({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      });
+    }, [refetch, startDate, endDate]);
+
+    // Calculer le total des dépenses
+    const totalExpenses = useMemo(() => {
+      return formattedData.reduce((sum, item) => sum + item.total, 0);
+    }, [formattedData]);
+
     return {
       data: formattedData,
       loading,
-      error
+      error,
+      totalExpenses,
+      totalCount: data?.expenses?.totalCount || 0,
+      hasNextPage: data?.expenses?.hasNextPage || false,
+      refreshData,
+      dateRange: { startDate, endDate }
     };
   }

@@ -1,4 +1,4 @@
-import { ExpensesChart, RevenueChart } from "@/features/dashboard/components";
+import { ExpensesChart, RevenueChart, RevenueExpensesChart } from "@/features/dashboard/components";
 
 export default function DashboardPage() {
   return (
@@ -18,6 +18,10 @@ export default function DashboardPage() {
           <RevenueChart />
         </div>
       </div>
+      <div>
+          <h2 className="text-lg font-semibold mb-4">Synthèse mensuelle</h2>
+          <RevenueExpensesChart />
+        </div>
     </div>
   );
 }
