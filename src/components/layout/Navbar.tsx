@@ -12,13 +12,13 @@ import {
   DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
 import { Logo } from "../../assets/logo";
-import { ButtonLink } from "../";
 import { useQuery } from "@apollo/client";
 import { GET_PROFILE } from "../../features/profile/graphql";
 import axios from "axios";
 import { PremiumModal } from "../specific/subscription/PremiumModal";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { ArrowRight, Verify, HomeTrendUp } from "iconsax-react";
+import { ArrowRight } from "lucide-react";
+import { Verify, HomeTrendUp } from "iconsax-react";
 import { Badge } from "../ui/badge";
 
 export const Navbar = () => {
@@ -87,8 +87,8 @@ export const Navbar = () => {
   const renderDropdownItems = () => {
     const items = [
       // Profil utilisateur
-      <DropdownMenuItem 
-        key="profile" 
+      <DropdownMenuItem
+        key="profile"
         className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
         onClick={handleProfileClick}
       >
@@ -102,7 +102,9 @@ export const Navbar = () => {
         <DropdownMenuItem
           key="subscription"
           className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
-          onClick={() => isPremium ? handleSubscription() : setIsPremiumModalOpen(true)}
+          onClick={() =>
+            isPremium ? handleSubscription() : setIsPremiumModalOpen(true)
+          }
         >
           <span>{isPremium ? "Gérer mon abonnement" : "Passer Premium"}</span>
         </DropdownMenuItem>
@@ -110,7 +112,9 @@ export const Navbar = () => {
     }
 
     // Séparateur avant la section Communauté
-    items.push(<DropdownMenuSeparator key="before-community" className="my-1" />);
+    items.push(
+      <DropdownMenuSeparator key="before-community" className="my-1" />
+    );
 
     // Communauté (uniquement pour les membres premium)
     if (isPremium) {
@@ -118,7 +122,12 @@ export const Navbar = () => {
         <DropdownMenuItem
           key="community"
           className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
-          onClick={() => window.open("https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL", "_blank")}
+          onClick={() =>
+            window.open(
+              "https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL",
+              "_blank"
+            )
+          }
         >
           <span>Communauté</span>
         </DropdownMenuItem>
@@ -130,7 +139,12 @@ export const Navbar = () => {
       <DropdownMenuItem
         key="help"
         className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
-        onClick={() => window.open("https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL", "_blank")}
+        onClick={() =>
+          window.open(
+            "https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL",
+            "_blank"
+          )
+        }
       >
         <span>Aide</span>
       </DropdownMenuItem>
@@ -167,9 +181,9 @@ export const Navbar = () => {
   // Générer les initiales pour l'avatar
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
       .toUpperCase()
       .substring(0, 2);
   };
@@ -177,11 +191,9 @@ export const Navbar = () => {
   const avatarTrigger = (
     <div className="relative">
       <Avatar className="h-10 w-10 border-2 border-white">
-        {profilePicture && (
-          <AvatarImage src={profilePicture} alt={fullName} />
-        )}
+        {profilePicture && <AvatarImage src={profilePicture} alt={fullName} />}
         <AvatarFallback className="bg-[#5b50ff] text-white font-medium">
-          {fullName ? getInitials(fullName) : 'US'}
+          {fullName ? getInitials(fullName) : "US"}
         </AvatarFallback>
       </Avatar>
       {subscription?.licence && (
@@ -234,18 +246,15 @@ export const Navbar = () => {
                     {isAuthenticated &&
                     subscription &&
                     !subscription.licence ? (
-                      <ButtonLink
-                        to="#"
-                        variant="primary"
-                        size="md"
-                        className="ml-2 shadow-md transform hover:translate-y-[-2px]"
+                      <Button
+                        variant="default"
+                        size="default"
+                        className="ml-2 shadow-md transform hover:translate-y-[-2px] bg-[#5b50ff] hover:bg-[#4a41d0] text-white flex items-center"
                         onClick={() => setIsPremiumModalOpen(true)}
                       >
-                        <span className="flex items-center">
-                          <CheckBadgeIcon className="h-4 w-4 mr-1" />
-                          Passer premium
-                        </span>
-                      </ButtonLink>
+                        <CheckBadgeIcon className="h-4 w-4 mr-1" />
+                        Passer premium
+                      </Button>
                     ) : (
                       <div className="relative">
                         {/* Espace vide pour maintenir l'alignement */}
@@ -257,13 +266,12 @@ export const Navbar = () => {
 
               <div className="flex items-center space-x-3">
                 {!isAuthenticated && (
-                  <ButtonLink
-                    to="/auth"
-                    className="bg-[#5b50ff] text-white hover:bg-[#4a41d0] px-4 py-2 rounded-2xl text-md font-medium transition-colors duration-200"
-                  >
-                    Commencer gratuitement
-                    <ArrowRight size={20} color="white" className="ml-2" />
-                  </ButtonLink>
+                  <Button asChild>
+                    <Link to="/auth" className="flex items-center">
+                      Commencer gratuitement
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Link>
+                  </Button>
                 )}
 
                 {isAuthenticated && (
@@ -274,7 +282,7 @@ export const Navbar = () => {
                           {avatarTrigger}
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent 
+                      <DropdownMenuContent
                         className="w-72 p-2 border border-gray-200 shadow-lg rounded-lg bg-white z-[1001]"
                         align="end"
                         sideOffset={8}
