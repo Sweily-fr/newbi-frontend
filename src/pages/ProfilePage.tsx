@@ -1,26 +1,17 @@
-import { useQuery } from "@apollo/client";
-import { useState, useContext, useEffect } from "react";
-import {
-  GET_PROFILE,
-  PersonalInfoForm,
-  CompanyInfoForm,
-} from "../features/profile";
-
-import { IntegrationsManager } from "../features/integrations/components/IntegrationsManager";
-import {
-  TabNavigation,
-  TabItem,
-} from "../components/specific/navigation/TabNavigation";
-import {
-  CreditCardIcon,
-} from "@heroicons/react/24/outline";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { SubscriptionContext } from "../context/SubscriptionContext.context";
-import { Button } from "../components/";
-import { PremiumModal } from "../components/specific/subscription/PremiumModal";
-import axios from "axios";
-import { SEOHead } from "../components/specific/SEO/SEOHead";
-import { LogoLoader } from "../components/common/LogoLoader";
+import { useQuery } from "@apollo/client"
+import { useState, useContext, useEffect } from "react"
+import { GET_PROFILE } from "../features/profile/graphql/profile"
+import { IntegrationsManager } from "../features/integrations/components/IntegrationsManager"
+import { PersonalInfoForm } from "../features/profile/components/PersonalInfoForm"
+import { CompanyInfoForm } from "../features/profile/components/CompanyInfoForm"
+import { CreditCardIcon } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
+import { SubscriptionContext } from "../context/SubscriptionContext.context"
+import { Button } from "../components/ui/button"
+import { PremiumModal } from "../components/specific/subscription/PremiumModal"
+import axios from "axios"
+import { SEOHead } from "../components/specific/SEO/SEOHead"
+import { LogoLoader } from "../components/common/LogoLoader"
 import {
   Building,
   Card,
@@ -29,7 +20,7 @@ import {
   User,
   Verify,
   Link21,
-} from "iconsax-react";
+} from "iconsax-react"
 
 export const ProfilePage = () => {
   const { loading, error, data } = useQuery(GET_PROFILE);
@@ -98,7 +89,7 @@ export const ProfilePage = () => {
   };
 
   // Définir les onglets en fonction de l'état d'abonnement
-  const tabs: TabItem[] = [
+  const tabs = [
     {
       id: "profile",
       label: "Profile",
@@ -297,7 +288,7 @@ export const ProfilePage = () => {
           {subscription?.stripeCustomerId && (
             <Button
               onClick={handlePremiumClick}
-              variant={subscription?.licence ? "secondary" : "primary"}
+              variant={subscription?.licence ? "secondary" : "default"}
               className="flex items-center gap-2"
             >
               <Card size="20" variant="Bold" color="#fff" />
@@ -310,7 +301,7 @@ export const ProfilePage = () => {
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Navigation à gauche */}
-          <div className="w-full md:w-80 flex-shrink-0">
+          <div className="w-full md:w-72 flex-shrink-0">
             <div className="sticky top-[100px] bg-white shadow-sm rounded-2xl p-4">
               <div className="flex flex-col items-center justify-center mb-6">
                 <div className="w-32 h-32 rounded-full bg-[#5b50ff]/10 flex items-center justify-center overflow-hidden relative mb-2">
@@ -359,13 +350,19 @@ export const ProfilePage = () => {
                   {data?.me?.profile?.title || "Utilisateur"}
                 </p>
               </div>
-              <TabNavigation
-                tabs={tabs}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                className="flex-col items-center space-y-3 space-x-0"
-                variant="default"
-              />
+              <div className="flex flex-col space-y-3">
+                {tabs.map((tab) => (
+                  <Button
+                    key={tab.id}
+                    variant={activeTab === tab.id ? 'default' : 'ghost'}
+                    className={`w-full justify-start ${activeTab === tab.id ? '' : 'text-gray-700 hover:!bg-[#f0eeff]'}`}
+                    onClick={() => handleTabChange(tab.id)}
+                  >
+                    {tab.icon && <span className="mr-2">{tab.icon}</span>}
+                    {tab.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -459,7 +456,7 @@ export const ProfilePage = () => {
                   </p>
                   <Button
                     onClick={() => setIsPremiumModalOpen(true)}
-                    variant="primary"
+                    variant="default"
                     className="flex items-center gap-2"
                   >
                     <CreditCardIcon className="h-5 w-5" />
