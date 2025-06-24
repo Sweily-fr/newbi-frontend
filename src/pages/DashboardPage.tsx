@@ -1,8 +1,12 @@
-import { ExpensesChart, RevenueChart, RevenueExpensesChart } from "@/features/dashboard/components";
+import {
+  ExpensesChart,
+  RevenueChart,
+  RevenueExpensesChart,
+} from "@/features/dashboard/components";
 
 export default function DashboardPage() {
   return (
-    <div className="flex-1 space-y-8 p-8">
+    <div className="flex-1 space-y-6 p-8">
       <div>
         <h1 className="text-3xl font-bold">Tableau de bord</h1>
         <p className="text-muted-foreground">
@@ -12,16 +16,15 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="h-full">
-          <ExpensesChart />
+          <RevenueChart />
         </div>
         <div className="h-full">
-          <RevenueChart />
+          <ExpensesChart />
         </div>
       </div>
       <div>
-          <h2 className="text-lg font-semibold mb-4">Synthèse mensuelle</h2>
-          <RevenueExpensesChart />
-        </div>
+        <RevenueExpensesChart />
+      </div>
     </div>
   );
 }

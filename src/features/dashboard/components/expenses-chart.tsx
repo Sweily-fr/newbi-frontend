@@ -30,7 +30,7 @@ import {
 const chartConfig = {
   expenses: {
     label: "Dépenses",
-    color: "var(--chart-1)",
+    color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig
 
@@ -185,47 +185,45 @@ export function ExpensesChart() {
 
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base font-semibold">Dépenses mensuelles</CardTitle>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <span className="font-medium">{formattedTotalExpenses}</span>
-                <span className="ml-1 text-xs">sur la période</span>
-              </div>
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold">Dépenses mensuelles</CardTitle>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <span className="font-medium">{formattedTotalExpenses}</span>
+              <span className="ml-1 text-xs">sur la période</span>
             </div>
-            <CardDescription className="text-sm">
-              Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
-            </CardDescription>
           </div>
-          <div className="w-40">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-[180px] h-8 text-sm">
-                <SelectValue placeholder="Sélectionner une période" />
-              </SelectTrigger>
-              <SelectContent>
-                {PERIOD_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <CardDescription className="text-sm">
+            Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
+          </CardDescription>
         </div>
+        <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+          <SelectTrigger className="hidden w-[160px] rounded-lg sm:flex h-8" aria-label="Sélectionner une période">
+            <SelectValue placeholder="Sélectionner une période" />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value} className="rounded-lg">
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
-      <CardContent className="pb-0">
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="h-[300px] w-full">
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={sortedData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
+          <ChartContainer config={chartConfig} className="h-full w-full">
+            <AreaChart
+              accessibilityLayer
+              data={sortedData}
+              margin={{
+                left: 12,
+                right: 12,
+                top: 5,
+                bottom: 0,
+              }}
+            >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="name"

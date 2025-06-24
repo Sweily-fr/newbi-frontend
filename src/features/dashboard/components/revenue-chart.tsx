@@ -29,7 +29,7 @@ const PERIOD_OPTIONS = [
 
 // Configuration pour le graphique
 const CHART_COLORS = {
-  revenue: "#8b5cf6", // Violet plus clair pour le CA
+  revenue: "hsl(var(--primary))", // Couleur primaire de shadcn
 }
 
 // Composant personnalisé pour le tooltip
@@ -148,33 +148,29 @@ export function RevenueChart() {
 
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-base font-semibold">
-              Chiffre d'affaires
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
-            </CardDescription>
-          </div>
-          <div className="w-40">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-[180px] h-8 text-sm">
-                <SelectValue placeholder="Sélectionner une période" />
-              </SelectTrigger>
-              <SelectContent>
-                {PERIOD_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <CardTitle className="text-base font-semibold">
+            Chiffre d'affaires
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
+          </CardDescription>
         </div>
+        <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+          <SelectTrigger className="hidden w-[160px] rounded-lg sm:flex h-8" aria-label="Sélectionner une période">
+            <SelectValue placeholder="Sélectionner une période" />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value} className="rounded-lg">
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
-      <CardContent className="pb-0">
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart

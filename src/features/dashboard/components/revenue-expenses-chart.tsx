@@ -1,44 +1,42 @@
 "use client"
 
-import { Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Line, ComposedChart, Legend } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, Tooltip } from "recharts"
 import { useRevenue } from "../hooks/use-revenue"
 import { useExpenses } from "../hooks/use-expenses"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { subDays, subMonths, subYears, format, isAfter, isBefore } from "date-fns"
+import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { DateRange } from 'react-day-picker'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Types pour les données brutes
-interface RawRevenueData {
-  date: string | Date;
-  total: number;
-  count: number;
-}
+const chartConfig = {
+  revenue: {
+    label: "CA",
+    color: "hsl(142.1, 76.2%, 36.3%)",
+  },
+  expense: {
+    label: "Dépenses",
+    color: "hsl(var(--destructive))",
+  },
+} satisfies ChartConfig
 
-interface RawExpenseData {
-  date: string | Date;
-  total: number;
-}
+// Options pour le filtre de période
+const PERIOD_OPTIONS = [
+  { value: '12', label: '12 derniers mois' },
+  { value: '6', label: '6 derniers mois' },
+  { value: '3', label: '3 derniers mois' },
+  { value: '1', label: '30 derniers jours' },
+] as const;
 
-// Configuration des couleurs
-const CHART_COLORS = {
-  revenue: "#8b5cf6", // Violet pour le CA
-  expense: "#f97316", // Orange pour les dépenses
-  average: "#10b981", // Vert pour la moyenne
-}
-
-// Composant personnalisé pour le tooltip
 interface TooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -54,7 +52,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     const revenueData = payload.find(item => item.dataKey === 'revenue');
     const expenseData = payload.find(item => item.dataKey === 'expense');
-    const averageData = payload.find(item => item.dataKey === 'average');
 
     return (
       <div className="bg-background border rounded-lg p-4 shadow-lg text-sm">
@@ -62,7 +59,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
         {revenueData && (
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: CHART_COLORS.revenue }} />
+              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: chartConfig.revenue.color }} />
               <span>CA:</span>
             </div>
             <span className="font-medium">
@@ -71,28 +68,13 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
           </div>
         )}
         {expenseData && (
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: CHART_COLORS.expense }} />
+              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: chartConfig.expense.color }} />
               <span>Dépenses:</span>
             </div>
             <span className="font-medium">
               {expenseData.value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
-            </span>
-          </div>
-        )}
-        {averageData && (
-          <div className="flex items-center justify-between pt-2 mt-2 border-t">
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full mr-2" style={{ 
-                backgroundColor: CHART_COLORS.average,
-                borderRadius: '50%',
-                display: 'inline-block'
-              }} />
-              <span>Moyenne:</span>
-            </div>
-            <span className="font-medium">
-              {averageData.value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
             </span>
           </div>
         )}
@@ -107,247 +89,91 @@ interface RevenueExpensesChartProps {
 }
 
 export function RevenueExpensesChart({ className }: RevenueExpensesChartProps) {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subMonths(new Date(), 12),
-    to: new Date(),
-  });
+  const [selectedPeriod, setSelectedPeriod] = useState('12');
+  const { data: revenueData, loading: revenueLoading, error: revenueError, refreshData: refreshRevenue } = useRevenue({ months: selectedPeriod as '1' | '3' | '6' | '12' });
+  const { data: expensesData, loading: expensesLoading, error: expensesError, refreshData: refreshExpenses } = useExpenses({ months: selectedPeriod as '1' | '3' | '6' | '12' });
   
-  // Gestion du filtre actif
-  const [activeFilter, setActiveFilter] = useState<string>('1y');
-
-  const handleDateRangeChange = (range: DateRange | undefined) => {
-    setDateRange(range);
-    setActiveFilter('custom');
+  // Recharger les données lorsque la période change
+  const handlePeriodChange = (value: string) => {
+    setSelectedPeriod(value);
+    refreshRevenue();
+    refreshExpenses();
   };
   
-  // Gestion des filtres rapides
-  const handleQuickFilter = (filter: string) => {
-    const today = new Date();
-    let fromDate: Date;
-    
-    switch(filter) {
-      case '7d':
-        fromDate = subDays(today, 7);
-        break;
-      case '30d':
-        fromDate = subDays(today, 30);
-        break;
-      case '90d':
-        fromDate = subDays(today, 90);
-        break;
-      case '6m':
-        fromDate = subMonths(today, 6);
-        break;
-      case '1y':
-        fromDate = subYears(today, 1);
-        break;
-      case 'all':
-        setDateRange(undefined);
-        setActiveFilter('all');
-        return;
-      default:
-        fromDate = subYears(today, 1);
-    }
-    
-    setDateRange({
-      from: fromDate,
-      to: today
-    });
-    setActiveFilter(filter);
-  };
-
-  // Utiliser useMemo pour éviter de recalculer les données à chaque rendu
-  const { data: revenueData, loading: revenueLoading, error: revenueError } = useRevenue();
-  const { data: expensesData, loading: expensesLoading, error: expensesError } = useExpenses();
-  
-  // Filtrer les données en fonction de la plage de dates sélectionnée
-  const filteredData = useMemo(() => {
-    const formattedRevenueData = revenueData || [];
-    const formattedExpensesData = expensesData || [];
-    
+  const chartData = useMemo(() => {
     if (!revenueData || !expensesData) return [];
 
-    // Créer un objet pour regrouper les données par mois
-    interface MonthData {
-      name: string;
-      revenue: number;
-      expense: number;
-      month: Date;
-    }
-    const dataByMonth: Record<string, MonthData> = {};
+    const dataByMonth: Record<string, { name: string; revenue: number; expense: number }> = {};
 
     // Traiter les revenus
-    (formattedRevenueData as RawRevenueData[]).forEach((item) => {
-      if (!item || !item.date) return; // Ignorer les entrées invalides
+    (revenueData as Array<{ date: string | Date; total: number }>).forEach((item) => {
+      if (!item?.date) return;
       
-      let date: Date;
-      try {
-        date = item.date instanceof Date ? item.date : new Date(item.date);
-        if (isNaN(date.getTime())) return; // Ignorer les dates invalides
-      } catch (e) {
-        return; // En cas d'erreur de conversion de date
-      }
+      const date = item.date instanceof Date ? item.date : new Date(item.date);
+      if (isNaN(date.getTime())) return;
       
-      if (isNaN(date.getTime())) return; // Ignorer les dates invalides
       const monthKey = format(date, 'yyyy-MM');
-      
-      if (dateRange?.from && isBefore(date, dateRange.from)) return;
-      if (dateRange?.to && isAfter(date, dateRange.to)) return;
       
       if (!dataByMonth[monthKey]) {
         dataByMonth[monthKey] = {
           name: format(date, 'MMM yyyy', { locale: fr }),
           revenue: 0,
-          expense: 0,
-          month: date,
+          expense: 0
         };
       }
-      dataByMonth[monthKey].revenue += item.total;
+      
+      dataByMonth[monthKey].revenue += item.total || 0;
     });
 
     // Traiter les dépenses
-    (formattedExpensesData as RawExpenseData[]).forEach((item) => {
-      if (!item || !item.date) return; // Ignorer les entrées invalides
+    (expensesData as Array<{ date: string | Date; total: number }>).forEach((item) => {
+      if (!item?.date) return;
       
-      let date: Date;
-      try {
-        date = item.date instanceof Date ? item.date : new Date(item.date);
-        if (isNaN(date.getTime())) return; // Ignorer les dates invalides
-      } catch (e) {
-        return; // En cas d'erreur de conversion de date
-      }
+      const date = item.date instanceof Date ? item.date : new Date(item.date);
+      if (isNaN(date.getTime())) return;
       
-      if (isNaN(date.getTime())) return; // Ignorer les dates invalides
       const monthKey = format(date, 'yyyy-MM');
-      
-      if (dateRange?.from && isBefore(date, dateRange.from)) return;
-      if (dateRange?.to && isAfter(date, dateRange.to)) return;
       
       if (!dataByMonth[monthKey]) {
         dataByMonth[monthKey] = {
           name: format(date, 'MMM yyyy', { locale: fr }),
           revenue: 0,
-          expense: 0,
-          month: date,
+          expense: 0
         };
       }
-      dataByMonth[monthKey].expense += item.total;
+      
+      dataByMonth[monthKey].expense += item.total || 0;
     });
 
-    // Convertir l'objet en tableau et trier par date
-    return Object.values(dataByMonth).sort((a, b) => a.month.getTime() - b.month.getTime());
-  }, [revenueData, expensesData, dateRange]);
+    // Trier les données par date
+    return Object.values(dataByMonth).sort((a, b) => {
+      const dateA = new Date(a.name);
+      const dateB = new Date(b.name);
+      return dateA.getTime() - dateB.getTime();
+    });
+  }, [revenueData, expensesData]);
 
-  // Calculer la moyenne des revenus (utilisée dans le graphique)
-  const averageRevenue = useMemo(() => {
-    if (filteredData.length === 0) return 0;
-    const totalRevenue = filteredData.reduce((sum, item) => sum + item.revenue, 0);
-    return totalRevenue / filteredData.length;
-  }, [filteredData]);
-  
-  // Cette valeur est utilisée dans le graphique via la propriété 'average' des données
-  const loading = revenueLoading || expensesLoading;
-  const error = revenueError || expensesError;
-  
-  // Préparer les données pour le graphique avec les moyennes
-  const chartData = filteredData.map(item => ({
-    ...item,
-    average: averageRevenue // Ligne moyenne pour référence visuelle
-  }));
-
-  // La fonction handleDateRangeChange est déjà définie plus haut, donc on la supprime ici
-
-  if (loading) {
+  if (revenueLoading || expensesLoading) {
     return (
-      <Card className={className}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="text-sm font-medium">Activité mensuelle</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground">
-              Chargement des données...
-            </CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <DateRangePicker 
-              date={dateRange} 
-              onDateChange={handleDateRangeChange} 
-              className="w-[250px]"
-              disabled={true}
-            />
-          </div>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
         </CardHeader>
-        <CardContent className="h-[300px] flex items-center justify-center">
-          <Skeleton className="h-[250px] w-full" />
+        <CardContent>
+          <Skeleton className="h-[300px] w-full" />
         </CardContent>
       </Card>
     );
   }
 
-  if (error) {
+  if (revenueError || expensesError) {
     return (
-      <Card className={className}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="text-sm font-medium">Activité mensuelle</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground">
-              Erreur lors du chargement des données
-            </CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <DateRangePicker 
-              date={dateRange} 
-              onDateChange={handleDateRangeChange} 
-              className="w-[250px]"
-              disabled={true}
-            />
-          </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Erreur</CardTitle>
         </CardHeader>
-        <CardContent className="h-[300px] flex items-center justify-center">
-          <p className="text-red-500 text-center">
-            Impossible de charger les données: {error.message}
-            <br />
-            <button 
-              onClick={() => window.location.reload()} 
-              className="text-primary underline mt-2 inline-block"
-            >
-              Réessayer
-            </button>
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (filteredData.length === 0) {
-    return (
-      <Card className={className}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="text-sm font-medium">Activité mensuelle</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground">
-              Aucune donnée disponible {dateRange ? 'pour la période sélectionnée' : 'pour les 12 derniers mois'}
-            </CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <DateRangePicker 
-              date={dateRange} 
-              onDateChange={handleDateRangeChange} 
-              className="w-[250px]"
-            />
-          </div>
-        </CardHeader>
-        <CardContent className="h-[300px] flex flex-col items-center justify-center gap-4">
-          <p className="text-muted-foreground text-center">
-            Aucune donnée trouvée {dateRange ? 'pour la période sélectionnée' : 'pour les 12 derniers mois'}.
-          </p>
-          {dateRange && (
-            <button 
-              onClick={() => setDateRange(undefined)} 
-              className="text-primary underline text-sm"
-            >
-              Réinitialiser la période
-            </button>
-          )}
+        <CardContent>
+          <p>Une erreur est survenue lors du chargement des données.</p>
         </CardContent>
       </Card>
     );
@@ -355,129 +181,72 @@ export function RevenueExpensesChart({ className }: RevenueExpensesChartProps) {
 
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-col space-y-4 pb-2">
-        <div className="flex flex-col space-y-1">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Activité mensuelle</CardTitle>
-            <div className="flex items-center space-x-2">
-              <DateRangePicker 
-                date={dateRange} 
-                onDateChange={handleDateRangeChange} 
-                className="w-[200px]"
-              />
-              {dateRange && (
-                <Button 
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setDateRange(undefined);
-                    setActiveFilter('all');
-                  }} 
-                  className="text-xs text-muted-foreground hover:text-primary"
-                >
-                  Réinitialiser
-                </Button>
-              )}
-            </div>
-          </div>
-          <CardDescription className="text-xs text-muted-foreground">
-            Comparaison des revenus et dépenses par mois
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <CardTitle className="text-base font-semibold">CA et Dépenses</CardTitle>
+          <CardDescription className="text-sm">
+            Évolution sur {selectedPeriod} {selectedPeriod === '1' ? 'mois' : 'derniers mois'}
           </CardDescription>
         </div>
-        
-        {/* Boutons de filtre rapide */}
-        <div className="flex flex-wrap gap-2 pt-2">
-          {[
-            { id: '7d', label: '7j' },
-            { id: '30d', label: '30j' },
-            { id: '90d', label: '90j' },
-            { id: '6m', label: '6 mois' },
-            { id: '1y', label: '1 an' },
-            { id: 'all', label: 'Tout' },
-          ].map((filter) => (
-            <Button
-              key={filter.id}
-              variant={activeFilter === filter.id ? 'default' : 'outline'}
-              size="sm"
-              className={cn(
-                'h-7 px-2.5 text-xs',
-                activeFilter === filter.id ? 'bg-primary hover:bg-primary/90' : 'bg-background hover:bg-accent hover:text-accent-foreground'
-              )}
-              onClick={() => handleQuickFilter(filter.id)}
-            >
-              {filter.label}
-            </Button>
-          ))}
-        </div>
-
+        <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
+          <SelectTrigger className="hidden w-[160px] rounded-lg sm:flex h-8" aria-label="Sélectionner une période">
+            <SelectValue placeholder="Sélectionner une période" />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value} className="rounded-lg">
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
-      <CardContent className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
-            data={chartData}
-            margin={{
-              top: 10,
-              right: 10,
-              left: 0,
-              bottom: 0,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis 
-              tickFormatter={(value) => {
-                if (value >= 1000) return `${value / 1000}k`;
-                return value;
-              }}
-              tick={{ fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <RechartsTooltip 
-              content={<CustomTooltip />} 
-              cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
-            />
-            <Legend 
-              verticalAlign="top"
-              height={36}
-              formatter={(value) => {
-                if (value === 'revenue') return 'CA';
-                if (value === 'expense') return 'Dépenses';
-                if (value === 'average') return 'Moyenne CA';
-                return value;
-              }}
-            />
-            <Bar 
-              dataKey="revenue" 
-              name="CA"
-              fill={CHART_COLORS.revenue} 
-              radius={[4, 4, 0, 0]}
-              barSize={16}
-            />
-            <Bar 
-              dataKey="expense" 
-              name="Dépenses"
-              fill={CHART_COLORS.expense} 
-              radius={[4, 4, 0, 0]}
-              barSize={16}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="average" 
-              name="Moyenne CA"
-              stroke={CHART_COLORS.average} 
-              strokeWidth={2}
-              dot={false}
-              strokeDasharray="5 5"
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        <div className="h-[300px] w-full">
+          <ChartContainer config={chartConfig} className="h-full w-full">
+            <BarChart 
+              data={chartData}
+              margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                tickMargin={8}
+                axisLine={false}
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar 
+                dataKey="revenue" 
+                fill="hsl(142.1, 76.2%, 36.3%)" 
+                radius={[4, 4, 0, 0]} 
+                name="CA"
+                barSize={16}
+              />
+              <Bar 
+                dataKey="expense" 
+                fill="hsl(var(--destructive))" 
+                radius={[4, 4, 0, 0]} 
+                name="Dépenses"
+                barSize={16}
+              />
+            </BarChart>
+          </ChartContainer>
+        </div>
       </CardContent>
+      <CardFooter className="pt-0">
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2 leading-none font-medium">
+              Vue d'ensemble de votre activité
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Comparaison entre votre chiffre d'affaires et vos dépenses
+            </div>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
-  )
+  );
 }
