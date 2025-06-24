@@ -2,7 +2,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useContext, useState } from "react";
 import { SubscriptionContext } from "../../context/SubscriptionContext.context";
-import { Dropdown, Avatar, Button } from "../";
+import { Button } from "../ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "../ui/dropdown-menu";
 import { Logo } from "../../assets/logo";
 import { ButtonLink } from "../";
 import { useQuery } from "@apollo/client";
@@ -13,11 +21,6 @@ import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import {
   ArrowRight,
   Verify,
-  Profile,
-  LogoutCurve,
-  People,
-  Card,
-  InfoCircle,
   HomeTrendUp,
 } from "iconsax-react";
 
@@ -83,69 +86,75 @@ export const Navbar = () => {
   // Construire les éléments du menu déroulant
   const isPremium = subscription?.licence;
 
-  // Créer un tableau d'éléments pour le dropdown
-  const dropdownItems = [
-    // Tableau de bord (désactivé)
-    // {
-    //   label: "Tableau de bord",
-    //   onClick: () => {}, // Fonction vide pour désactiver la navigation
-    //   icon: <HomeTrendUp size="20" variant="Linear" color="#c7c7c7" />,
-    //   disabled: true, // Marquer comme désactivé
-    // },
-    // Profil utilisateur
-    {
-      label: "Mon profil",
-      onClick: handleProfileClick,
-      icon: <Profile size="20" variant="Linear" color="#5b50ff" />,
-    },
-  ];
+  // Créer les éléments du menu déroulant
+  const renderDropdownItems = () => {
+    const items = [
+      // Profil utilisateur
+      <DropdownMenuItem 
+        key="profile" 
+        className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
+        onClick={handleProfileClick}
+      >
+        <span>Mon profil</span>
+      </DropdownMenuItem>,
+    ];
 
-  // Ajouter l'option d'abonnement si l'utilisateur a un ID client Stripe
-  if (subscription?.stripeCustomerId) {
-    // Ajouter l'option de gestion d'abonnement
-    dropdownItems.push({
-      label: isPremium ? "Gérer mon abonnement" : "Passer Premium",
-      onClick: () => {
-        if (isPremium) {
-          handleSubscription();
-        } else {
-          setIsPremiumModalOpen(true);
-        }
-      },
-      icon: <Card size="20" variant="Linear" color="#5b50ff" />,
-    });
-  }
-  // Ajouter l'option Communauté uniquement pour les membres premium
-  if (isPremium) {
-    dropdownItems.push({
-      label: "Communauté",
-      onClick: () => {
-        window.open(
-          "https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL",
-          "_blank"
-        );
-      },
-      icon: <People size="20" variant="Linear" color="#5b50ff" />,
-    });
-  }
+    // Gestion d'abonnement
+    if (subscription?.stripeCustomerId) {
+      items.push(
+        <DropdownMenuItem
+          key="subscription"
+          className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
+          onClick={() => isPremium ? handleSubscription() : setIsPremiumModalOpen(true)}
+        >
+          <span>{isPremium ? "Gérer mon abonnement" : "Passer Premium"}</span>
+        </DropdownMenuItem>
+      );
+    }
 
-  // Ajouter l'option Aide
-  dropdownItems.push({
-    label: "Aide",
-    onClick: () => {
-      window.open("https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL", "_blank");
-    },
-    icon: <InfoCircle size="20" variant="Linear" color="#5b50ff" />,
-  });
+    // Séparateur avant la section Communauté
+    items.push(<DropdownMenuSeparator key="before-community" className="my-1" />);
 
-  // Ajouter l'option de déconnexion
-  dropdownItems.push({
-    label: "Déconnexion",
-    onClick: handleLogout,
-    icon: <LogoutCurve size="20" variant="Linear" color="#ef4444" />,
-    hasDivider: true,
-    variant: "danger",
-  });
+    // Communauté (uniquement pour les membres premium)
+    if (isPremium) {
+      items.push(
+        <DropdownMenuItem
+          key="community"
+          className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
+          onClick={() => window.open("https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL", "_blank")}
+        >
+          <span>Communauté</span>
+        </DropdownMenuItem>
+      );
+    }
+
+    // Aide
+    items.push(
+      <DropdownMenuItem
+        key="help"
+        className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-[#f0eeff] cursor-pointer"
+        onClick={() => window.open("https://chat.whatsapp.com/FGLms8EYhpv1o5rkrnIldL", "_blank")}
+      >
+        <span>Aide</span>
+      </DropdownMenuItem>
+    );
+
+    // Séparateur avant la déconnexion
+    items.push(<DropdownMenuSeparator key="separator" className="my-1" />);
+
+    // Déconnexion
+    items.push(
+      <DropdownMenuItem
+        key="logout"
+        className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-red-50 cursor-pointer text-red-500"
+        onClick={handleLogout}
+      >
+        <span>Déconnexion</span>
+      </DropdownMenuItem>
+    );
+
+    return items;
+  };
 
   // Construire le nom pour l'avatar à partir des données du profil
   const firstName = userData?.me?.profile?.firstName || "";
@@ -158,15 +167,32 @@ export const Navbar = () => {
       "/" +
       userData?.me?.profile?.profilePicture || "";
 
+  // Générer les initiales pour l'avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   const avatarTrigger = (
-    <Avatar
-      size="lg"
-      hasRing={true}
-      ringColor="white"
-      name={fullName}
-      src={profilePicture}
-      onClick={() => {}}
-    />
+    <div className="relative">
+      <Avatar className="h-10 w-10 border-2 border-white">
+        {profilePicture && (
+          <AvatarImage src={profilePicture} alt={fullName} />
+        )}
+        <AvatarFallback className="bg-[#5b50ff] text-white font-medium">
+          {fullName ? getInitials(fullName) : 'US'}
+        </AvatarFallback>
+      </Avatar>
+      {subscription?.licence && (
+        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+          <Verify size={16} color="#FFD700" variant="Bold" />
+        </div>
+      )}
+    </div>
   );
 
   return (
@@ -200,7 +226,7 @@ export const Navbar = () => {
                     </Link>
                     <Button
                       variant="outline"
-                      size="md"
+                      size="default"
                       className="shadow-sm transform hover:translate-y-[-2px]"
                       onClick={() => navigate("/outils")}
                     >
@@ -244,21 +270,23 @@ export const Navbar = () => {
                 )}
 
                 {isAuthenticated && (
-                  <div className="relative flex items-center ml-2 z-[9999]">
-                    <div className="relative">
-                      <Dropdown
-                        trigger={avatarTrigger}
-                        items={dropdownItems}
-                        position="right"
-                        width="w-72"
-                        className="overflow-hidden"
-                      />
-                      {subscription && subscription.licence && (
-                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full shadow-sm">
-                          <Verify size={20} color="#FFD700" variant="Bold" />
-                        </div>
-                      )}
-                    </div>
+                  <div className="relative">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="outline-none">
+                          {avatarTrigger}
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent 
+                        className="w-72 p-2 border border-gray-200 shadow-lg rounded-lg bg-white z-[1001]"
+                        align="end"
+                        sideOffset={8}
+                        alignOffset={-10}
+                        side="bottom"
+                      >
+                        {renderDropdownItems()}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 )}
               </div>
