@@ -18,11 +18,8 @@ import { GET_PROFILE } from "../../features/profile/graphql";
 import axios from "axios";
 import { PremiumModal } from "../specific/subscription/PremiumModal";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-import {
-  ArrowRight,
-  Verify,
-  HomeTrendUp,
-} from "iconsax-react";
+import { ArrowRight, Verify, HomeTrendUp } from "iconsax-react";
+import { Badge } from "../ui/badge";
 
 export const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -208,9 +205,9 @@ export const Navbar = () => {
                   className="scale-110 transform-gpu"
                 />
               </Link>
-              <span className="ml-3 text-xs font-medium text-[#5b50ff] border border-[#5b50ff] rounded-full px-2 py-0.5">
+              <Badge variant="outline" className="ml-3 font-medium">
                 Version Beta
-              </span>
+              </Badge>
             </div>
 
             <div className="flex items-center">
