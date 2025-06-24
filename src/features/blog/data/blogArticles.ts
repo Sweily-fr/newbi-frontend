@@ -28,10 +28,16 @@ import {
   filePaymentArticle,
   freelance2025Article,
   seoRankingArticle,
-  wetransferAlternativeArticle
+  wetransferAlternativeArticle,
+  quoteTimeArticle,
+  organisationTempsFreelance,
+  facturationFreelanceArticle,
+  gestionDepensesIndependant2025
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  organisationTempsFreelance,
+  quoteTimeArticle,
   optimiserReferencementArticle,
   gestionTresorerieIndependantArticle,
   seoRankingArticle,
@@ -60,7 +66,9 @@ export const blogArticles: BlogArticle[] = [
   modifierCodeApeArticle,
   compteBancaireFreelanceArticle,
   freelanceToolsArticle,
-  wetransferAlternativeArticle
+  wetransferAlternativeArticle,
+  facturationFreelanceArticle,
+  gestionDepensesIndependant2025
 ].sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
 // Fonction utilitaire pour trouver un article par son slug

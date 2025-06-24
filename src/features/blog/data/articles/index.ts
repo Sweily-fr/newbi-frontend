@@ -1,4 +1,6 @@
 // Export des articles de blog
+export { facturationFreelanceArticle } from './facturation-freelance-article';
+export { gestionDepensesIndependant2025 } from './gestion-depenses-independant-2025';
 export { invoiceArticle } from './invoiceArticle';
 export { excelQuoteArticle } from './excelQuoteArticle';
 export { businessManagementArticle } from './businessManagementArticle';
@@ -17,6 +19,7 @@ export { seoSoloOptimizationArticle } from './seoSoloOptimizationArticle';
 export { gestionIndependantArticle } from './gestionIndependantArticle';
 export { erpArticle } from './erpArticle';
 export { compteBancaireFreelanceArticle } from './compte-bancaire-freelance';
+export { organisationTempsFreelance } from './organisation-temps-freelance';
 export { calendrierImpots2025Article } from './calendrier-impots-2025';
 export { gestionTresorerieIndependantArticle } from './gestion-tresorerie-independant';
 export { modifierCodeApeArticle } from './modifier-code-ape';
@@ -29,4 +32,6 @@ export { freelance2025Article } from './freelance2025Article';
 export { seoRankingArticle } from './seoRankingArticle';
 export { wetransferAlternativeArticle } from './wetransfer-alternative-article';
 export { gestionTresorerieFreelance } from './gestionTresorerieFreelance';
+export { quoteTimeArticle } from './quoteTimeArticle';
+
 

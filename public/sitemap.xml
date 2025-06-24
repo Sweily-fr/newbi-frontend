@@ -15,6 +15,24 @@
   
   <!-- Articles de blog -->
   <url>
+    <loc>https://www.newbi.fr/blog/organisation-temps-freelance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-06-24</lastmod>
+  </url>
+  <url>
+    <loc>https://www.newbi.fr/blog/temps-pour-faire-un-devis</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-06-24</lastmod>
+  </url>
+  <url>
+    <loc>https://www.newbi.fr/blog/guide-facturation-freelance</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-06-24</lastmod>
+  </url>
+  <url>
     <loc>https://www.newbi.fr/blog/optimiser-referencement-google-article-seo</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
