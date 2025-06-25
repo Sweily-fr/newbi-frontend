@@ -1,5 +1,5 @@
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Combine multiple class names with Tailwind CSS classes
