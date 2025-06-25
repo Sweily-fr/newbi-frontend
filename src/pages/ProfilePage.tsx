@@ -12,9 +12,7 @@ import {
   TabNavigation,
   TabItem,
 } from "../components/specific/navigation/TabNavigation";
-import {
-  CreditCardIcon,
-} from "@heroicons/react/24/outline";
+import { CreditCardIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { SubscriptionContext } from "../context/SubscriptionContext.context";
 import { Button } from "../components/";
@@ -182,7 +180,7 @@ export const ProfilePage = () => {
         </div>
       ),
     });
-    
+
     // Ajouter l'onglet Intégrations pour les utilisateurs premium
     tabs.push({
       id: "integrations",
@@ -270,7 +268,7 @@ export const ProfilePage = () => {
         </div>
       ),
     });
-    
+
     // Ajouter l'onglet Intégrations désactivé pour les utilisateurs non premium
     tabs.push({
       id: "integrations_locked",

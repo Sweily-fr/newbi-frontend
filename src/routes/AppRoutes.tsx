@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import {
   HomePage,
   AuthPage,
-  ProfilePage,
+   ProfilePage,
   ToolsPage,
   InvoicesPage,
   QuotesPage,

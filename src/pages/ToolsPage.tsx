@@ -5,10 +5,21 @@ import { Button, SearchInput, Modal } from "../components";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../hooks/useSubscription";
 import { PremiumModal } from "../components/specific/subscription/PremiumModal";
-import { Add, ArrowDown2, ArrowUp2, Building, Category, InfoCircle, Verify, CloseCircle } from 'iconsax-react';
+import {
+  Add,
+  ArrowDown2,
+  ArrowUp2,
+  Building,
+  Category,
+  InfoCircle,
+  Verify,
+  CloseCircle,
+} from "iconsax-react";
 import { SEOHead } from "../components/specific/SEO/SEOHead";
 import { useCompany } from "../features/profile/hooks/useCompany";
 import { seoConfig } from "../config/seoConfig";
+// import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 export const ToolsPage = () => {
   // État pour le tri et la recherche
@@ -23,21 +34,23 @@ export const ToolsPage = () => {
   // Récupérer les informations d'authentification et d'abonnement
   const { isAuthenticated } = useAuth();
   const { subscription, hasActiveSubscription } = useSubscription();
-  
+
   // Récupérer les informations d'entreprise
   const { company } = useCompany();
-  
+
   // Vérifier si les informations d'entreprise essentielles sont remplies
   const hasRequiredCompanyInfo = useMemo(() => {
     if (!company) return false;
-    
+
     // Vérifier les champs obligatoires de l'entreprise
-    return !!company.name && 
-           !!company.siret && 
-           !!company.address && 
-           !!company.address.street && 
-           !!company.address.city && 
-           !!company.address.postalCode;
+    return (
+      !!company.name &&
+      !!company.siret &&
+      !!company.address &&
+      !!company.address.street &&
+      !!company.address.city &&
+      !!company.address.postalCode
+    );
   }, [company]);
 
   // La fonction handleToolClick est maintenant définie à l'intérieur du useMemo
@@ -51,8 +64,8 @@ export const ToolsPage = () => {
         schemaType={seoConfig.tools.schemaType}
         canonicalUrl={seoConfig.tools.canonicalUrl}
         additionalSchemaData={{
-          'applicationCategory': 'BusinessApplication',
-          'operatingSystem': 'Web'
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
         }}
         schemaPrice="0" // Mise à jour pour refléter que l'outil est gratuit
         isPremium={true}
@@ -71,7 +84,12 @@ export const ToolsPage = () => {
               onClick={() => setSortType("category")}
               title="Trier par catégorie"
             >
-              <Category size="16" variant="Linear" color={sortType === "category" ? "#5b50ff" : "#6b7280"} className="mr-1"/>
+              <Category
+                size="16"
+                variant="Linear"
+                color={sortType === "category" ? "#5b50ff" : "#6b7280"}
+                className="mr-1"
+              />
               <span>Catégorie</span>
             </button>
             <button
@@ -87,7 +105,15 @@ export const ToolsPage = () => {
               title="Trier de A à Z"
             >
               <span>A → Z</span>
-             <ArrowDown2 size="16" variant="Linear" color={sortType === "name" && sortDirection === "asc" ? "#5b50ff" : "#6b7280"}/>
+              <ArrowDown2
+                size="16"
+                variant="Linear"
+                color={
+                  sortType === "name" && sortDirection === "asc"
+                    ? "#5b50ff"
+                    : "#6b7280"
+                }
+              />
             </button>
             <button
               className={`flex items-center gap-1 border rounded-md px-3 py-1.5 text-sm ${
@@ -102,7 +128,15 @@ export const ToolsPage = () => {
               title="Trier de Z à A"
             >
               <span>Z → A</span>
-              <ArrowUp2 size="16" variant="Linear" color={sortType === "name" && sortDirection === "desc" ? "#5b50ff" : "#6b7280"}/>
+              <ArrowUp2
+                size="16"
+                variant="Linear"
+                color={
+                  sortType === "name" && sortDirection === "desc"
+                    ? "#5b50ff"
+                    : "#6b7280"
+                }
+              />
             </button>
           </div>
 
@@ -111,6 +145,12 @@ export const ToolsPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             width="w-64"
+          />
+
+          <Input
+            placeholder="Rechercher des outils"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-64"
           />
 
           <Button
@@ -129,7 +169,7 @@ export const ToolsPage = () => {
             {/* Badge Premium */}
             {isAuthenticated && subscription && !hasActiveSubscription && (
               <span className="absolute -top-4 -right-2 bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs p-1 rounded-full font-semibold shadow-sm">
-                <Verify size="16" variant="Linear" color="#5b50ff"/>
+                <Verify size="16" variant="Linear" color="#5b50ff" />
               </span>
             )}
             <Building color="currentColor" size="16" variant="Outline" />
@@ -140,10 +180,15 @@ export const ToolsPage = () => {
         {/* Filtrer les outils en fonction de la recherche */}
         {useMemo(() => {
           // Fonction pour gérer les URL des outils
-          const getToolUrl = (isPremium: boolean, href: string, toolId: string) => {
+          const getToolUrl = (
+            isPremium: boolean,
+            href: string,
+            toolId: string
+          ) => {
             // Vérifier si l'outil est un outil de facturation (factures ou devis)
-            const isInvoicingTool = toolId === "invoices" || toolId === "quotes";
-            
+            const isInvoicingTool =
+              toolId === "invoices" || toolId === "quotes";
+
             // Si l'utilisateur est authentifié mais n'a pas d'abonnement premium et que l'outil est premium
             if (
               isAuthenticated &&
@@ -154,21 +199,27 @@ export const ToolsPage = () => {
             ) {
               return "#"; // Empêcher la navigation pour les outils premium
             }
-            
+
             // Si c'est un outil de facturation et que les informations d'entreprise ne sont pas complètes
-            if (isAuthenticated && isInvoicingTool && !hasRequiredCompanyInfo && !searchQuery) {
+            if (
+              isAuthenticated &&
+              isInvoicingTool &&
+              !hasRequiredCompanyInfo &&
+              !searchQuery
+            ) {
               return "#"; // Empêcher la navigation pour les outils de facturation sans infos entreprise
             }
-            
+
             // Sinon, permettre la navigation normale
             return href;
           };
-          
+
           // Fonction pour gérer le clic sur un outil
-          const handleToolCardClick = (tool: typeof TOOLS[0]) => {
+          const handleToolCardClick = (tool: (typeof TOOLS)[0]) => {
             // Vérifier si l'outil est un outil de facturation (factures ou devis)
-            const isInvoicingTool = tool.id === "invoices" || tool.id === "quotes";
-            
+            const isInvoicingTool =
+              tool.id === "invoices" || tool.id === "quotes";
+
             // Si l'utilisateur est authentifié mais n'a pas d'abonnement premium et que l'outil est premium
             if (
               isAuthenticated &&
@@ -181,9 +232,14 @@ export const ToolsPage = () => {
               setIsPremiumModalOpen(true);
               return;
             }
-            
+
             // Si c'est un outil de facturation et que les informations d'entreprise ne sont pas complètes
-            if (isAuthenticated && isInvoicingTool && !hasRequiredCompanyInfo && !searchQuery) {
+            if (
+              isAuthenticated &&
+              isInvoicingTool &&
+              !hasRequiredCompanyInfo &&
+              !searchQuery
+            ) {
               // Ouvrir la modal d'information sur les informations d'entreprise requises
               setIsCompanyInfoModalOpen(true);
               return;
@@ -201,13 +257,13 @@ export const ToolsPage = () => {
               tool.category.toLowerCase().includes(query)
             );
           });
-          
+
           // Utiliser tous les outils filtrés (les outils en développement sont maintenant dans la catégorie "À venir")
           const filteredTools = allFilteredTools;
 
           // Trier les outils si nécessaire
           let sortedTools = [...filteredTools];
-          
+
           if (sortType === "name") {
             // Tri par nom
             sortedTools = sortedTools.sort((a, b) => {
@@ -224,20 +280,20 @@ export const ToolsPage = () => {
               const categoryB = b.category.toLowerCase();
               const nameA = a.name.toLowerCase();
               const nameB = b.name.toLowerCase();
-              
+
               // D'abord comparer les catégories
               const categoryComparison = categoryA.localeCompare(categoryB);
-              
+
               // Si les catégories sont différentes, retourner la comparaison des catégories
               if (categoryComparison !== 0) {
                 return categoryComparison;
               }
-              
+
               // Si les catégories sont identiques, trier par nom
               return nameA.localeCompare(nameB);
             });
           }
-          
+
           // Regrouper les outils par catégorie pour l'affichage
           const toolsByCategory = sortedTools.reduce((acc, tool) => {
             if (!acc[tool.category]) {
@@ -246,17 +302,17 @@ export const ToolsPage = () => {
             acc[tool.category].push(tool);
             return acc;
           }, {} as Record<string, typeof sortedTools>);
-          
+
           // Obtenir les catégories triées avec Facturation en premier et À venir en dernier
           const categories = Object.keys(toolsByCategory).sort((a, b) => {
             // Mettre Facturation en premier
             if (a === "Facturation") return -1;
             if (b === "Facturation") return 1;
-            
+
             // Mettre À venir en dernier
             if (a === "À venir") return 1;
             if (b === "À venir") return -1;
-            
+
             // Tri alphabétique pour les autres catégories
             return a.localeCompare(b);
           });
@@ -285,7 +341,11 @@ export const ToolsPage = () => {
                         // Ajouter des propriétés supplémentaires pour correspondre à l'image
                         id: `${index + 1}`.padStart(2, "0"),
                         // Modifier l'URL pour intercepter les clics sur les outils premium
-                        href: getToolUrl(tool.premium === true, tool.href, tool.id),
+                        href: getToolUrl(
+                          tool.premium === true,
+                          tool.href,
+                          tool.id
+                        ),
                       }}
                       onClick={() => handleToolCardClick(tool)}
                     />
@@ -310,7 +370,11 @@ export const ToolsPage = () => {
                               // Ajouter des propriétés supplémentaires pour correspondre à l'image
                               id: `${index + 1}`.padStart(2, "0"),
                               // Modifier l'URL pour intercepter les clics sur les outils premium
-                              href: getToolUrl(tool.premium === true, tool.href, tool.id),
+                              href: getToolUrl(
+                                tool.premium === true,
+                                tool.href,
+                                tool.id
+                              ),
                             }}
                             onClick={() => handleToolCardClick(tool)}
                           />
@@ -337,7 +401,12 @@ export const ToolsPage = () => {
                       href="mailto:contact@newbi.fr?subject=Suggestion%20d'un%20nouvel%20outil&body=Bonjour,%0A%0AJ'aimerais%20suggérer%20un%20nouvel%20outil%20pour%20la%20plateforme%20Newbi.%0A%0ANom%20de%20l'outil%20:%20%0A%0ADescription%20:%20%0A%0AUtilisation%20principale%20:%20%0A%0AMerci%20de%20prendre%20en%20considération%20ma%20suggestion.%0A%0ACordialement,"
                       className="inline-flex items-center px-5 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-2xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
                     >
-                      <Add size="20" variant="Linear" color="gray" className="mr-2" />
+                      <Add
+                        size="20"
+                        variant="Linear"
+                        color="gray"
+                        className="mr-2"
+                      />
                       Suggérer un outil
                     </a>
                   </div>
@@ -366,7 +435,7 @@ export const ToolsPage = () => {
             window.location.href = "/auth";
           }}
         />
-        
+
         {/* Modal Informations d'entreprise manquantes */}
         <Modal
           isOpen={isCompanyInfoModalOpen}
@@ -379,29 +448,32 @@ export const ToolsPage = () => {
                 <Building size="32" variant="Bold" color="#5b50ff" />
               </div>
             </div>
-            
+
             <div className="text-center mb-6">
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 Complétez vos informations d'entreprise
               </h3>
               <p className="text-sm text-gray-500">
-                Pour utiliser les outils de facturation (factures et devis), vous devez d'abord renseigner les informations essentielles de votre entreprise.
+                Pour utiliser les outils de facturation (factures et devis),
+                vous devez d'abord renseigner les informations essentielles de
+                votre entreprise.
               </p>
             </div>
-            
+
             <div className="bg-[#f0eeff] border border-[#5b50ff]/20 p-4 mb-6 rounded-lg">
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-0.5">
-                  <InfoCircle size="18" variant="Linear" color="#5b50ff"/>
+                  <InfoCircle size="18" variant="Linear" color="#5b50ff" />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-gray-700">
-                    Ces informations sont nécessaires pour générer des factures et devis conformes à la législation.
+                    Ces informations sont nécessaires pour générer des factures
+                    et devis conformes à la législation.
                   </p>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col space-y-3">
               <button
                 onClick={() => {
@@ -411,16 +483,31 @@ export const ToolsPage = () => {
                 className="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-[#5b50ff] hover:bg-[#4a41e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
               >
                 Compléter mes informations
-                <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <svg
+                  className="ml-2 h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
                 </svg>
               </button>
-              
+
               <button
                 onClick={() => setIsCompanyInfoModalOpen(false)}
                 className="w-full inline-flex justify-center items-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-xl shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5b50ff]"
               >
-                <CloseCircle size="16" variant="Linear" color="#6b7280" className="mr-2" />
+                <CloseCircle
+                  size="16"
+                  variant="Linear"
+                  color="#6b7280"
+                  className="mr-2"
+                />
                 Fermer
               </button>
             </div>
