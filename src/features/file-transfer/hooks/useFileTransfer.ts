@@ -3,53 +3,20 @@ import { useMutation, useQuery } from '@apollo/client';
 import { 
   MY_FILE_TRANSFERS, 
   FILE_TRANSFER_BY_ID, 
-  GET_FILE_TRANSFER_BY_LINK,
-  CREATE_FILE_TRANSFER_BASE64,
-  DELETE_FILE_TRANSFER, 
-  GENERATE_FILE_TRANSFER_PAYMENT_LINK
+  GET_FILE_TRANSFER_BY_LINK 
 } from '../graphql/queries';
 import { 
+  CREATE_FILE_TRANSFER_BASE64,
+  DELETE_FILE_TRANSFER, 
+  GENERATE_FILE_TRANSFER_PAYMENT_LINK 
+} from '../graphql/mutations';
+import { 
   FileTransfer, 
+  FileTransferResponse, 
   FileTransferPaymentResponse,
   FileUploadProgress,
   FileTransferStatus
 } from '../types';
-
-// Types pour les mutations GraphQL
-interface CreateFileTransferBase64Mutation {
-  createFileTransferBase64: {
-    fileTransfer: FileTransfer;
-  };
-}
-
-interface CreateFileTransferBase64MutationVariables {
-  input: {
-    name: string;
-    type: string;
-    size: number;
-    file: File;
-  };
-}
-
-// Options pour le transfert de fichiers
-interface FileTransferOptions {
-  expiryDays?: number;
-  isPaymentRequired?: boolean;
-  paymentAmount?: number;
-  paymentCurrency?: string;
-  recipientEmail?: string;
-  onProgress?: (progress: {
-    totalFiles: number;
-    completedFiles: number;
-    currentFile: string;
-    progress: number;
-  }) => void;
-}
-
-// Type pour le résultat de l'upload
-interface UploadResult {
-  downloadUrl?: string;
-}
 
 // Utilitaire de logging personnalisé
 import { logger } from '../../../utils/logger';
@@ -132,86 +99,47 @@ export const useFileTransferByLink = (shareLink: string, accessKey: string) => {
   };
 };
 
-// Fonction pour uploader un fichier avec FormData via la mutation GraphQL
-const uploadFileWithFormData = async (file: File, onProgress?: (progress: number) => void): Promise<UploadResult> => {
-  const formData = new FormData();
-  const operations = {
-    query: `
-      mutation CreateFileTransferBase64($input: CreateFileTransferBase64Input!) {
-        createFileTransferBase64(input: $input) {
-          fileTransfer {
-            id
-            name
-            downloadUrl
-          }
-        }
+// Fonction utilitaire pour convertir un fichier en base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file); // Utilise readAsDataURL qui inclut déjà l'en-tête MIME
+    reader.onload = () => {
+      const result = reader.result as string;
+      // readAsDataURL retourne déjà le format "data:mime/type;base64,content"
+      // Vérifier que le résultat est bien au format attendu
+      if (!result || typeof result !== 'string') {
+        reject(new Error('Échec de la conversion en base64'));
+        return;
       }
-    `,
-    variables: {
-      input: {
-        name: file.name,
-        type: file.type,
-        size: file.size
+      
+      // S'assurer que le format est correct
+      if (!result.includes(';base64,')) {
+        logger.error('Format base64 incorrect:', result.substring(0, 50));
+        reject(new Error('Format base64 incorrect'));
+        return;
       }
-    }
-  };
-
-  formData.append('operations', JSON.stringify(operations));
-  formData.append('map', JSON.stringify({ '0': ['variables.input.file'] }));
-  formData.append('0', file);
-
-  const xhr = new XMLHttpRequest();
-  const uploadPromise = new Promise<UploadResult>((resolve, reject) => {
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable && onProgress) {
-        const progress = Math.round((event.loaded / event.total) * 100);
-        onProgress(progress);
-      }
-    });
-
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          const fileTransfer = response.data?.createFileTransferBase64?.fileTransfer;
-          if (fileTransfer) {
-            resolve({ downloadUrl: fileTransfer.downloadUrl });
-          } else {
-            reject(new Error('Format de réponse invalide'));
-          }
-        } catch (error) {
-          reject(new Error('Réponse du serveur invalide'));
-        }
-      } else {
-        reject(new Error(`Erreur serveur: ${xhr.status}`));
-      }
+      
+      resolve(result);
     };
-
-    xhr.onerror = () => {
-      reject(new Error('Erreur réseau lors de l\'upload'));
-    };
+    reader.onerror = error => reject(error);
   });
-
-  xhr.open('POST', '/graphql', true);
-  xhr.send(formData);
-
-  return uploadPromise;
 };
 
 export const useCreateFileTransfer = () => {
-  const [createFileTransferBase64] = useMutation<CreateFileTransferBase64Mutation, CreateFileTransferBase64MutationVariables>(
-    CREATE_FILE_TRANSFER_BASE64
-  );
-
   const [uploadProgress, setUploadProgress] = useState<FileUploadProgress[]>([]);
-
-  const upload = async (files: File[], options?: FileTransferOptions): Promise<FileTransfer[]> => {
-    const results: FileTransfer[] = [];
-    const errors: Error[] = [];
-    const totalFiles = files.length;
-    let completedFiles = 0;
-
-    // Initialiser le suivi de progression
+  
+  const [createFileTransferBase64, { loading, error, data }] = useMutation(CREATE_FILE_TRANSFER_BASE64);
+  
+  const upload = async (
+    files: File[], 
+    expiryDays?: number,
+    isPaymentRequired?: boolean,
+    paymentAmount?: number,
+    paymentCurrency?: string,
+    recipientEmail?: string
+  ) => {
+    // Initialiser le suivi de progression pour chaque fichier
     setUploadProgress(
       files.map(file => ({
         fileName: file.name,
@@ -219,82 +147,111 @@ export const useCreateFileTransfer = () => {
         status: 'pending'
       }))
     );
-
-    // Traiter chaque fichier
-    const filePromises = files.map(async (file, index) => {
-      try {
-        let uploadResult: UploadResult;
-
-        // Mettre à jour le statut en 'uploading'
-        setUploadProgress(prev => 
-          prev.map((p, i) => i === index ? { ...p, status: 'uploading', progress: 0 } : p)
-        );
-
-        // Utiliser uniquement uploadFileWithFormData
-        logger.info(`Utilisation de FormData pour ${file.name} (${Math.round(file.size / (1024 * 1024))}MB)`);
-        uploadResult = await uploadFileWithFormData(file, (progress) => {
+    
+    try {
+      // Convertir les fichiers en base64
+      const base64Files = [];
+      let currentFileIndex = 0;
+      
+      for (const file of files) {
+        try {
+          // Debug: Afficher les informations du fichier original
+          logger.info('Fichier original:', file.name, file.size, file.type);
+          
+          // Mettre à jour la progression pour montrer que le fichier est en cours de traitement
           setUploadProgress(prev => 
-            prev.map((p, i) => i === index ? { ...p, status: 'uploading', progress } : p)
+            prev.map((item, index) => 
+              index === currentFileIndex 
+                ? { ...item, progress: 10, status: 'uploading' } 
+                : item
+            )
           );
-        });
-
-        // Créer le transfert de fichier
-        const response = await createFileTransferBase64({
-          variables: {
-            input: {
-              name: file.name,
-              base64: uploadResult.base64Content || '',
-              type: file.type,
-              size: file.size,
-              downloadUrl: uploadResult.downloadUrl
-            }
+          
+          // Convertir le fichier en base64
+          const base64 = await fileToBase64(file);
+          
+          // Debug: Vérifier la longueur du base64 et son début
+          logger.info(`Base64 length: ${base64.length}`);
+          logger.info(`Base64 start: ${base64.substring(0, 100)}...`);
+          
+          // Vérifier que le format est correct
+          if (!base64.includes(';base64,')) {
+            logger.error(`Format base64 incorrect pour le fichier ${file.name}`);
+            throw new Error(`Format base64 incorrect pour le fichier ${file.name}`);
           }
-        });
-
-        if (!response.data?.createFileTransferBase64?.fileTransfer) {
-          throw new Error('Réponse invalide du serveur');
+          
+          // Ajouter le fichier converti à la liste
+          base64Files.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            base64
+          });
+          
+          // Mettre à jour la progression pour montrer que le fichier est prêt à être envoyé
+          setUploadProgress(prev => 
+            prev.map((item, index) => 
+              index === currentFileIndex 
+                ? { ...item, progress: 50, status: 'uploading' } 
+                : item
+            )
+          );
+          
+          currentFileIndex++;
+        } catch (error) {
+          logger.error(`Erreur lors de la conversion du fichier ${file.name} en base64:`, error);
+          throw error;
         }
-
-        const fileTransfer = response.data.createFileTransferBase64.fileTransfer;
-        results.push(fileTransfer);
-
-        // Mettre à jour la progression
-        completedFiles++;
-        const progress = Math.round((completedFiles / totalFiles) * 100);
-        setUploadProgress(prev => 
-          prev.map((p, i) => i === index ? { ...p, status: 'success', progress: 100 } : p)
-        );
-
-        // Notifier de la progression globale si des options sont fournies
-        options?.onProgress?.({ 
-          totalFiles,
-          completedFiles,
-          currentFile: file.name,
-          progress
-        });
-
-        return fileTransfer;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-        logger.error(`Erreur lors de la création du transfert: ${error}`);
-        setUploadProgress(prev => 
-          prev.map((p, i) => i === index ? { ...p, status: 'error', progress: 0, error: errorMessage } : p)
-        );
-        errors.push(new Error(`Échec du transfert de ${file.name}: ${errorMessage}`));
-        throw error;
       }
-    });
-
-    await Promise.all(filePromises);
-
-    if (errors.length > 0) {
-      throw new Error(`Échec du transfert de fichiers: ${errors.map(e => e.message).join(', ')}`);
+      
+      // Debug: Afficher le nombre de fichiers à envoyer
+      logger.info(`Envoi de ${base64Files.length} fichiers au serveur`);
+      
+      // Envoyer les fichiers en base64 au serveur
+      const result = await createFileTransferBase64({
+        variables: {
+          files: base64Files,
+          input: {
+            expiryDays,
+            isPaymentRequired,
+            paymentAmount,
+            paymentCurrency,
+            recipientEmail
+          }
+        }
+      });
+      
+      // Debug: Vérifier la réponse du serveur
+      logger.info('Réponse du serveur:', result.data?.createFileTransferBase64);
+      
+      // Marquer tous les fichiers comme téléchargés avec succès
+      setUploadProgress(prev => 
+        prev.map(item => ({ ...item, progress: 100, status: 'success' }))
+      );
+      
+      return result.data?.createFileTransferBase64 as FileTransferResponse;
+    } catch (err) {
+      // Marquer les fichiers comme ayant échoué
+      setUploadProgress(prev => 
+        prev.map(item => ({ 
+          ...item, 
+          status: 'error', 
+          error: err instanceof Error ? err.message : 'Une erreur est survenue'
+        }))
+      );
+      
+      logger.error('Erreur lors de la création du transfert de fichiers:', err);
+      throw err;
     }
-
-    return results;
   };
-
-  return { upload, uploadProgress };
+  
+  return {
+    upload,
+    uploadProgress,
+    loading,
+    error,
+    data: data?.createFileTransfer as FileTransferResponse
+  };
 };
 
 export const useDeleteFileTransfer = () => {
