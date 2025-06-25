@@ -25,7 +25,9 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobilePage = location.pathname === ROUTES.MOBILE;
   // Vérifier si on est sur la page des signatures email
   const isEmailSignaturesPage = location.pathname === ROUTES.EMAIL_SIGNATURES;
-  const shouldHideNavAndFooter = isAuthPage || isMobilePage || isMobile || isTablet;
+  // Vérifier si on est sur la page de téléchargement de fichiers
+  const isFileDownloadPage = location.pathname === ROUTES.FILE_TRANSFER_DOWNLOAD;
+  const shouldHideNavAndFooter = isAuthPage || isMobilePage || isMobile || isTablet || isFileDownloadPage;
   
   // Vérifier si la page actuelle est une page d'outils
   const isToolsPage = 
@@ -40,7 +42,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       {!shouldHideNavAndFooter && <Navbar />}
-      <main className={`flex-grow pt-20 ${!isMobilePage && !isMobile && !isTablet ? 'bg-gray-50' : 'bg-white'}`}>
+      <main className={`flex-grow ${isFileDownloadPage ? '' : 'pt-20'} ${!isMobilePage && !isMobile && !isTablet ? 'bg-gray-50' : 'bg-white'}`}>
         {children}
         {isToolsPage && <CommunityButton />}
       </main>

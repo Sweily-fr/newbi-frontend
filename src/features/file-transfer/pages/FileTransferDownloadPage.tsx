@@ -6,7 +6,8 @@ import { FileTransferPaymentCheckout } from '../components/FileTransferPaymentCh
 import { logger } from '../../../utils/logger';
 import { Spinner } from '../../../components/common/Spinner';
 import { Button } from '../../../components/common/Button';
-import { ArrowDown, TickCircle } from 'iconsax-react';
+import { ArrowDown, TickCircle, DocumentDownload, InfoCircle } from 'iconsax-react';
+import { CircleArrowDown } from 'lucide-react';
 
 // Composant pour la page de téléchargement de fichiers
 export const FileTransferDownloadPage: React.FC = () => {
@@ -204,16 +205,34 @@ export const FileTransferDownloadPage: React.FC = () => {
   // Si un paiement est requis et n'a pas encore été effectué
   if (fileTransfer.paymentInfo?.isPaymentRequired && !isPaid && !fileTransfer.paymentInfo?.isPaid) {
     return (
-      <div className="container mx-auto py-10 px-4">
-        <FileTransferPaymentCheckout
-          transferId={fileTransfer.id}
-          amount={fileTransfer.paymentInfo.paymentAmount}
-          currency={fileTransfer.paymentInfo.paymentCurrency || 'eur'}
-          fileName={fileTransfer.files && fileTransfer.files.length > 0 ? fileTransfer.files[0].originalName : 'Fichiers'}
-          fileSize={formatFileSize(fileTransfer.totalSize || 0)}
-          senderName={'Expéditeur'} // Utiliser une valeur par défaut car le champ n'est pas disponible
-          onPaymentSuccess={handlePaymentSuccess}
-        />
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#5b50ff] to-[#4a41e0]">
+        {/* En-tête avec logo */}
+        <div className="w-full py-6 px-4 flex justify-center">
+          <img 
+            src="/images/logo_newbi/PNG/Logo_Texte_White.png" 
+            alt="Newbi" 
+            className="h-10 object-contain" 
+          />
+        </div>
+        
+        <div className="flex-grow flex items-center justify-center px-4 py-10">
+          <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-6 md:p-8">
+            <FileTransferPaymentCheckout
+              transferId={fileTransfer.id}
+              amount={fileTransfer.paymentInfo.paymentAmount}
+              currency={fileTransfer.paymentInfo.paymentCurrency || 'eur'}
+              fileName={fileTransfer.files && fileTransfer.files.length > 0 ? fileTransfer.files[0].originalName : 'Fichiers'}
+              fileSize={formatFileSize(fileTransfer.totalSize || 0)}
+              senderName={'Expéditeur'} // Utiliser une valeur par défaut car le champ n'est pas disponible
+              onPaymentSuccess={handlePaymentSuccess}
+            />
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="py-4 px-6 text-center text-white text-sm opacity-80">
+          © {new Date().getFullYear()} Newbi. Tous droits réservés.
+        </div>
       </div>
     );
   }
@@ -223,37 +242,55 @@ export const FileTransferDownloadPage: React.FC = () => {
   const canDownload = fileTransfer.isAccessible || isPaid;
   
   return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
-        <div className="text-center mb-6">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#5b50ff] to-[#4a41e0]">
+      {/* En-tête avec logo */}
+      <div className="w-full pt-6 px-4 flex justify-center">
+        <img 
+          src="/images/logo_newbi/PNG/Logo_Texte_White.png" 
+          alt="Newbi" 
+          className="h-24 object-contain" 
+        />
+      </div>
+      
+      <div className="flex-grow flex items-center justify-center px-4 pb-10">
+        <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-6 md:p-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-[#f0eeff] rounded-full flex items-center justify-center mx-auto mb-4">
+            <DocumentDownload size="32" color="#5b50ff" variant="Bold" />
+          </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Téléchargement de fichiers</h2>
           <p className="text-gray-600">
             Un utilisateur vous a partagé {fileTransfer.files && fileTransfer.files.length > 1 ? 'des fichiers' : 'un fichier'}
           </p>
         </div>
 
-        <div className="bg-[#f0eeff] rounded-lg p-4 mb-6">
-          <div className="mb-3">
+        <div className="bg-[#f0eeff] rounded-xl p-5 mb-8">
+          <div className="mb-3 flex items-center">
+            <InfoCircle size="20" color="#5b50ff" className="mr-2" />
             <h3 className="font-medium text-gray-800">Détails du transfert</h3>
           </div>
-          <div>
-            <p className="text-gray-700 mb-1">
-              <span className="font-medium">Nom:</span> {fileTransfer.files && fileTransfer.files.length > 0 ? fileTransfer.files[0].originalName : 'Fichiers'}
-            </p>
-            <p className="text-gray-700 mb-1">
-              <span className="font-medium">Taille:</span> {formatFileSize(fileTransfer.totalSize || 0)}
-            </p>
-            <p className="text-gray-700 mb-1">
-              <span className="font-medium">Nombre de fichiers:</span> {fileTransfer.files ? fileTransfer.files.length : 1}
-            </p>
-            <p className="text-gray-700 mb-1">
-              <span className="font-medium">Expire le:</span> {new Date(fileTransfer.expiryDate).toLocaleDateString()}
-            </p>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Nom:</span> 
+              <span className="font-medium text-gray-800 truncate max-w-[70%] text-right">{fileTransfer.files && fileTransfer.files.length > 0 ? fileTransfer.files[0].originalName : 'Fichiers'}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Taille:</span> 
+              <span className="font-medium text-gray-800">{formatFileSize(fileTransfer.totalSize || 0)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Nombre de fichiers:</span> 
+              <span className="font-medium text-gray-800">{fileTransfer.files ? fileTransfer.files.length : 1}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Expire le:</span> 
+              <span className="font-medium text-gray-800">{new Date(fileTransfer.expiryDate).toLocaleDateString()}</span>
+            </div>
           </div>
         </div>
 
         {fileTransfer.paymentInfo?.isPaymentRequired && isPaid && (
-          <div className="flex items-center mb-4 p-3 bg-green-50 text-green-700 rounded-md">
+          <div className="flex items-center mb-6 p-4 bg-green-50 text-green-700 rounded-xl border border-green-100">
             <TickCircle size="20" className="mr-2" />
             <span>Paiement effectué avec succès</span>
           </div>
@@ -263,18 +300,27 @@ export const FileTransferDownloadPage: React.FC = () => {
           <Button
             onClick={handleDownload}
             disabled={isDownloading || !canDownload}
-            className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white py-3 px-6 rounded-full flex items-center justify-center transition-all"
+            className="bg-[#5b50ff] hover:bg-[#4a41e0] text-white py-4 px-8 rounded-full flex items-center justify-between transition-all shadow-lg shadow-indigo-200 w-full md:w-auto md:min-w-[200px]"
           >
             {isDownloading ? (
-              <Spinner size="sm" className="mr-2" />
+              <>
+                <Spinner size="sm" color='#fff' className="mr-2" />
+                <span>Préparation...</span>
+              </>
             ) : (
               <>
                 Télécharger
-                <ArrowDown size="20" className="ml-2" />
+                <CircleArrowDown color="#fff" className="ml-2" />
               </>
             )}
           </Button>
         </div>
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <div className="py-4 px-6 text-center text-white text-sm opacity-80">
+        © {new Date().getFullYear()} Newbi. Tous droits réservés.
       </div>
     </div>
   );

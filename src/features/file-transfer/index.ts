@@ -1,6 +1,5 @@
 // Composants
 export { default as FileTransferPage } from './components/FileTransferPage';
-export { default as FileDownloadPage } from './components/FileDownloadPage';
 export { default as FileDropzone } from './components/FileDropzone';
 export { default as FilePreview } from './components/FilePreview';
 export { default as FileTransferForm } from './components/FileTransferForm';
