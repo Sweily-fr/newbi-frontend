@@ -8,6 +8,7 @@ import { CreditCardIcon } from "@heroicons/react/24/outline"
 import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 import { SubscriptionContext } from "../context/SubscriptionContext.context"
 import { Button } from "../components/ui/button"
+import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert"
 import { PremiumModal } from "../components/specific/subscription/PremiumModal"
 import axios from "axios"
 import { SEOHead } from "../components/specific/SEO/SEOHead"
@@ -277,14 +278,6 @@ export const ProfilePage = () => {
       />
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Mon Espace
-            </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Gérez vos informations personnelles et professionnelles
-            </p>
-          </div>
           {subscription?.stripeCustomerId && (
             <Button
               onClick={handlePremiumClick}
@@ -373,15 +366,6 @@ export const ProfilePage = () => {
                 {/* Informations personnelles */}
                 <div className="bg-white shadow-sm rounded-2xl">
                   <div className="px-4 py-5 sm:p-6">
-                    <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4 flex items-center gap-2">
-                      <InfoCircle size="20" variant="Linear" color="#5b50ff" />
-                      Informations personnelles
-                    </h2>
-                    <p className="text-sm text-gray-500 mb-6">
-                      Les informations personnelles sont utilisées dans les
-                      outils et pour garantir une expérience utilisateur
-                      optimale.
-                    </p>
                     <PersonalInfoForm initialData={profileData} />
                   </div>
                 </div>
@@ -396,37 +380,6 @@ export const ProfilePage = () => {
                     <h2 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                       Informations de l'entreprise
                     </h2>
-                    <div className="bg-[#f0eeff] p-3 rounded-2xl border border-[#e6e1ff] mb-4">
-                      <p className="text-sm text-gray-600">
-                        <span className="text-[#5b50ff] font-medium">
-                          Important :
-                        </span>{" "}
-                        Renseignez avec précision les informations légales de
-                        votre entreprise. Ces données sont obligatoires sur vos
-                        documents commerciaux (factures, devis, contrats)
-                        conformément à la législation en vigueur. Des
-                        informations incomplètes ou erronées peuvent entraîner
-                        la nullité de vos documents et des sanctions
-                        administratives. Newbi intègre automatiquement ces
-                        informations dans tous vos documents générés,
-                        garantissant leur conformité légale.
-                      </p>
-                    </div>
-                    <div className="bg-amber-50 p-3 rounded-2xl border border-amber-200 mb-10">
-                      <p className="text-sm text-amber-600 mb-4">
-                        <span className="text-amber-600 font-medium">
-                          Rappel :
-                        </span>{" "}
-                        Bien que Newbi facilite la génération de documents
-                        commerciaux, nous vous recommandons vivement de faire
-                        relire tous vos documents par un professionnel compétent
-                        (expert-comptable, avocat) avant leur utilisation
-                        officielle. Newbi ne peut être tenu responsable des
-                        conséquences juridiques ou fiscales résultant de
-                        l'utilisation des documents générés par notre
-                        plateforme.
-                      </p>
-                    </div>
                     <CompanyInfoForm initialData={companyData} />
                   </div>
                 </div>

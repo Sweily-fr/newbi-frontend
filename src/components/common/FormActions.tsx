@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button } from './Button';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { FormActionsProps } from '../../types/ui';
 
 /**
@@ -20,22 +22,30 @@ export const FormActions: React.FC<FormActionsProps> = ({
   };
 
   return (
-    <div className={`flex space-x-4 mt-4 ${alignmentClasses[align]} ${className}`}>
+    <div className={cn('flex gap-4 mt-6', alignmentClasses[align], className)}>
       {onCancel && (
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
+          className="min-w-[120px]"
         >
           {cancelText}
         </Button>
       )}
       <Button
         type="submit"
-        variant="primary"
-        isLoading={isSubmitting}
+        disabled={isSubmitting}
+        className="min-w-[200px] transition-colors"
       >
-        {submitText}
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {submitText}
+          </>
+        ) : (
+          submitText
+        )}
       </Button>
     </div>
   );

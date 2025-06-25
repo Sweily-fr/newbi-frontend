@@ -2,20 +2,22 @@ import { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { UPDATE_PROFILE, UPLOAD_PROFILE_PICTURE, DELETE_PROFILE_PICTURE, GET_PROFILE } from '../graphql';
-import { 
-  Form, 
-  TextField, 
-  FormActions, 
-  FieldGroup,
-  ImageUploader,
-  Button
-} from '../../../components';
-import { Notification } from '../../../components/';
-import { getNameValidationRules, getPhoneValidationRules } from '../../../utils/validators';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ImageUploader } from '@/components/common/ImageUploader';
+import { Notification } from '@/components/common/Notification';
+import { getNameValidationRules, getPhoneValidationRules } from '@/utils/validators';
 import { DisableAccountModal } from './DisableAccountModal';
 import { CancelSubscriptionModal } from './CancelSubscriptionModal';
-import { SubscriptionContext } from '../../../context/SubscriptionContext.context';
+import { SubscriptionContext } from '@/context/SubscriptionContext.context';
 import axios from 'axios';
+
+interface PersonalInfoFormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
 
 interface PersonalInfoFormProps {
   initialData: {
@@ -30,7 +32,6 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
   // État pour stocker l'image en base64
   const [profileImageBase64, setProfileImageBase64] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [pictureToDelete, setPictureToDelete] = useState(false);
   
   // État pour les modales
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
@@ -39,25 +40,16 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
   // Accéder au contexte d'abonnement
   const { subscription } = useContext(SubscriptionContext);
   
-  // État local pour les données du formulaire
-  const [formData, setFormData] = useState({
-    firstName: initialData?.firstName || '',
-    lastName: initialData?.lastName || '',
-    phone: initialData?.phone || '',
-    profilePicture: initialData?.profilePicture || ''
-  });
-  
-  const { 
-    register, 
-    handleSubmit: hookFormSubmit, 
-    formState: { errors } 
-  } = useForm({
+  // Initialisation de react-hook-form
+  const { register, handleSubmit, formState: { errors } } = useForm<PersonalInfoFormData>({
     defaultValues: {
       firstName: initialData?.firstName || '',
       lastName: initialData?.lastName || '',
-      phone: initialData?.phone || '',
+      phone: initialData?.phone || ''
     }
   });
+
+
 
   const [updateProfile, { loading: updateLoading }] = useMutation(UPDATE_PROFILE, {
     refetchQueries: [{ query: GET_PROFILE }],
@@ -71,7 +63,6 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
       if (!updateLoading && !uploadLoading && !deleteLoading) {
         setPreviewImage(null);
         setProfileImageBase64(null);
-        setPictureToDelete(false);
       }
     },
     onError: (error) => {
@@ -84,20 +75,12 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
 
   const [uploadProfilePicture, { loading: uploadLoading }] = useMutation(UPLOAD_PROFILE_PICTURE, {
     refetchQueries: [{ query: GET_PROFILE }],
-    onCompleted: (data) => {
-      // Mettre à jour l'état local avec la nouvelle URL de l'image
-      const newProfilePicture = data.uploadProfilePicture.profile.profilePicture;
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: newProfilePicture
-      }));
-      
+    onCompleted: () => {
       // Pas de notification ici car elle est redondante avec celle de la mise à jour du profil
       
-      // Réinitialiser les états après la sauvegarde réussie
+      // Réinitialiser les états après la suppression réussie
       setPreviewImage(null);
       setProfileImageBase64(null);
-      setPictureToDelete(false);
     },
     onError: (error) => {
       Notification.error(`Erreur lors de l'upload de la photo: ${error.message}`, {
@@ -110,12 +93,6 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
   const [deleteProfilePicture, { loading: deleteLoading }] = useMutation(DELETE_PROFILE_PICTURE, {
     refetchQueries: [{ query: GET_PROFILE }],
     onCompleted: () => {
-      // Mettre à jour l'état local
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: ''
-      }));
-      
       Notification.success('Photo de profil supprimée avec succès', {
         duration: 5000,
         position: 'bottom-left'
@@ -124,7 +101,6 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
       // Réinitialiser les états après la suppression réussie
       setPreviewImage(null);
       setProfileImageBase64(null);
-      setPictureToDelete(false);
     },
     onError: (error) => {
       Notification.error(`Erreur lors de la suppression de la photo: ${error.message}`, {
@@ -159,17 +135,21 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
     reader.readAsDataURL(file);
   };
 
-  // Gestion de la suppression de l'image
-  const handleDeleteImage = () => {
-    setPreviewImage(null);
-    setProfileImageBase64(null);
-    setPictureToDelete(true);
-    
-    // Mettre à jour l'état local immédiatement pour l'UI
-    setFormData(prev => ({
-      ...prev,
-      profilePicture: ''
-    }));
+  // Fonction pour gérer la suppression de l'image
+  const handleDeleteImage = async () => {
+    try {
+      // Déclencher directement la suppression de l'image
+      await deleteProfilePicture();
+      // Réinitialiser les états
+      setPreviewImage(null);
+      setProfileImageBase64(null);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'image:', error);
+      Notification.error('Une erreur est survenue lors de la suppression de l\'image', {
+        duration: 5000,
+        position: 'bottom-left'
+      });
+    }
   };
 
   // Fonction pour gérer le clic sur le bouton de désactivation du compte
@@ -217,7 +197,7 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
     }
   };
 
-  const onSubmit = hookFormSubmit(async (data) => {
+  const onSubmit = async (data: PersonalInfoFormData) => {
     try {
       // Mise à jour du profil (sans l'image)
       await updateProfile({
@@ -238,103 +218,138 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
           },
         });
       } 
-      // Si l'image doit être supprimée explicitement
-      else if (pictureToDelete) {
-        await deleteProfilePicture();
-      }
-    } catch (error) {
+      // La suppression de l'image est maintenant gérée directement dans handleDeleteImage
+    } catch (error: unknown) {
       console.error('Erreur lors de la mise à jour du profil:', error);
     }
-  });
+  };
 
   return (
-    <>
-      <Form onSubmit={onSubmit}>
-        <FieldGroup>
-          <div className="flex justify-center mb-6">
-            <ImageUploader
-              imageUrl={formData.profilePicture || ''}
-              apiBaseUrl={`${import.meta.env.VITE_API_URL}/`}
-              previewImage={previewImage}
-              isLoading={updateLoading || uploadLoading || deleteLoading}
-              loadingMessage="Traitement de l'image en cours..."
-              onFileSelect={handleFileSelect}
-              onDelete={handleDeleteImage}
-              // Ne pas passer fileInputRef pour éviter l'erreur de type
-              maxSizeMB={2}
-              acceptedFileTypes="image/*"
-              helpText="Format recommandé : PNG ou JPG, max 2MB"
-            />
+    <div className="space-y-6">
+      <div className=" bg-card text-card-foreground">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">Informations personnelles</h3>
+          <p className="text-sm text-muted-foreground">Gérez vos informations personnelles et les paramètres de votre compte.</p>
+        </div>
+        <div className="p-6 pt-0 space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex flex-col items-start gap-4">
+              <div className="relative">
+                <ImageUploader
+                  imageUrl={initialData?.profilePicture || ''}
+                  apiBaseUrl={`${import.meta.env.VITE_API_URL}`}
+                  previewImage={previewImage}
+                  isLoading={updateLoading || uploadLoading || deleteLoading}
+                  loadingMessage="Traitement de l'image en cours..."
+                  onFileSelect={handleFileSelect}
+                  onDelete={handleDeleteImage}
+                  maxSizeMB={2}
+                  acceptedFileTypes="image/*"
+                  imageSize={96}
+                  roundedStyle="full"
+                  objectFit="cover"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Prénom</Label>
+                <Input 
+                  id="firstName" 
+                  {...register('firstName', getNameValidationRules('Le prénom'))}
+                  className={errors.firstName ? 'border-red-500' : ''}
+                />
+                {errors.firstName && (
+                  <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Nom</Label>
+                <Input 
+                  id="lastName" 
+                  {...register('lastName', getNameValidationRules('Le nom'))}
+                  className={errors.lastName ? 'border-red-500' : ''}
+                />
+                {errors.lastName && (
+                  <p className="text-sm text-red-500">{errors.lastName.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2 md:col-span-1">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input 
+                  id="phone" 
+                  type="tel"
+                  {...register('phone', getPhoneValidationRules())}
+                  className={errors.phone ? 'border-red-500' : ''}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Format: +33 suivi de 9 chiffres minimum (ex: +33612345678) ou 06/07 suivi de 8 chiffres (ex: 0612345678)
+                </p>
+                {errors.phone && (
+                  <p className="text-sm text-red-500">{errors.phone.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button 
+                type="submit" 
+                disabled={updateLoading || uploadLoading || deleteLoading}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {(updateLoading || uploadLoading || deleteLoading) ? (
+                  <span>Enregistrement...</span>
+                ) : (
+                  <span>Enregistrer les modifications</span>
+                )}
+              </Button>
+            </div>
+          </form>
+
+          {/* Séparateur */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Zone de danger
+              </span>
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <TextField
-              id="firstName"
-              name="firstName"
-              label="Prénom"
-              register={register}
-              validation={getNameValidationRules('Le prénom')}
-              error={errors.firstName}
-            />
 
-            <TextField
-              id="lastName"
-              name="lastName"
-              label="Nom"
-              register={register}
-              validation={getNameValidationRules('Le nom')}
-              error={errors.lastName}
-            />
-
-            <TextField
-              id="phone"
-              name="phone"
-              label="Téléphone"
-              type="tel"
-              register={register}
-              validation={getPhoneValidationRules()}
-              error={errors.phone}
-              helpText="Format: +33 suivi de 9 chiffres minimum (ex: +33612345678) ou 06/07 suivi de 8 chiffres (ex: 0612345678)"
-            />
+          {/* Zone de danger */}
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-destructive">Désactiver mon compte</h4>
+              <p className="text-sm text-muted-foreground">
+                La désactivation de votre compte le rendra inaccessible. Vous pourrez le réactiver ultérieurement en vous reconnectant.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleDisableAccountClick}
+              className="text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+            >
+              Désactiver mon compte
+            </Button>
           </div>
-        </FieldGroup>
-
-        <FormActions
-          isSubmitting={updateLoading || uploadLoading || deleteLoading}
-          submitText={(updateLoading || uploadLoading || deleteLoading) ? 'Enregistrement...' : 'Enregistrer'}
-        />
-      </Form>
-      
-      {/* Section pour la désactivation du compte */}
-      <div className="mt-10 pt-6 border-t border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900 mb-3">Désactivation du compte</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          La désactivation de votre compte rendra celui-ci inaccessible. Vous pourrez le réactiver ultérieurement en tentant de vous connecter avec vos identifiants habituels.
-        </p>
-        {subscription?.licence && (
-          <p className="text-sm text-blue-600 mb-4">
-            <strong>Note :</strong> Vous disposez d'un abonnement premium actif. Vous devez d'abord résilier votre abonnement avant de pouvoir désactiver votre compte.
-          </p>
-        )}
-        <Button 
-          variant="danger" 
-          onClick={handleDisableAccountClick}
-        >
-          Désactiver mon compte
-        </Button>
+        </div>
       </div>
-      
-      {/* Modal de désactivation du compte */}
-      <DisableAccountModal 
-        isOpen={isDisableModalOpen} 
-        onClose={() => setIsDisableModalOpen(false)} 
-      />
 
-      {/* Modal d'information sur l'abonnement actif */}
-      <CancelSubscriptionModal 
-        isOpen={isCancelSubscriptionModalOpen} 
+      <DisableAccountModal
+        isOpen={isDisableModalOpen}
+        onClose={() => setIsDisableModalOpen(false)}
+      />
+      
+      <CancelSubscriptionModal
+        isOpen={isCancelSubscriptionModalOpen}
         onClose={() => setIsCancelSubscriptionModalOpen(false)}
         onManageSubscription={handleSubscription}
       />
-    </>
+    </div>
   );
 };
