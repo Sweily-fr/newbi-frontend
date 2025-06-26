@@ -1,90 +1,41 @@
 import React from 'react';
 import { TableContactInfo } from './TableContactInfo';
+import { useEmailSignature } from '../../context/useEmailSignature';
 
-interface SignatureData {
-  firstName?: string;
-  lastName?: string;
-  jobTitle?: string;
-  companyName?: string;
-  phone?: string;
-  mobilePhone?: string;
-  email?: string;
-  website?: string;
-  address?: string;
-  companyLogo?: string;
-  profilePhoto?: string;
-  socialLinks?: Record<string, string>;
-}
-
-interface TableSignatureLayoutProps {
-  data?: SignatureData;
-  showCompanyName?: boolean;
-  showSocialLinks?: boolean;
-  showJobTitle?: boolean;
-  showLogo?: boolean;
-  showProfilePhoto?: boolean;
-  showEmailIcon?: boolean;
-  showPhoneIcon?: boolean;
-  showAddressIcon?: boolean;
-  showWebsiteIcon?: boolean;
-  logoSize?: number;
-  profilePhotoSize?: number;
-  primaryColor?: string;
-  secondaryColor?: string;
-  textAlignment?: 'left' | 'center' | 'right';
-  verticalSpacing?: number;
-  horizontalSpacing?: number;
-  iconTextSpacing?: number;
-  fontSize?: number;
-  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  fontFamily?: string;
-}
-
-export const TableSignatureLayout: React.FC<TableSignatureLayoutProps> = ({
-  data = {},
-  showCompanyName = true,
-  showSocialLinks = true,
-  showJobTitle = true,
-  showLogo = true,
-  showProfilePhoto = true,
-  showEmailIcon = true,
-  showPhoneIcon = true,
-  showAddressIcon = true,
-  showWebsiteIcon = true,
-  logoSize = 100,
-  profilePhotoSize = 80,
-  primaryColor = '#5b50ff',
-  secondaryColor = '#333333',
-  textAlignment = 'left',
-  verticalSpacing = 10,
-  horizontalSpacing = 15,
-  iconTextSpacing = 5,
-  fontSize = 14,
-  textStyle = 'normal',
-  fontFamily = 'Arial, sans-serif'
-}) => {
-  // Extraction sécurisée des données
+export const TableSignatureLayout: React.FC = () => {
+  // Utiliser le contexte au lieu des props
+  const {
+    signatureData,
+    showCompanyName,
+    showJobTitle,
+    showLogo,
+    showProfilePhoto,
+    logoSize,
+    profilePhotoSize,
+    primaryColor,
+    secondaryColor,
+    textAlignment,
+    verticalSpacing,
+    horizontalSpacing,
+    fontSize,
+    textStyle,
+    fontFamily
+  } = useEmailSignature();
+  // Extraction des données du contexte
   const {
     firstName = '',
     lastName = '',
     jobTitle = '',
     companyName = '',
-    phone = '',
-    mobilePhone = '',
-    email = '',
-    website = '',
-    address = '',
     companyLogo = '',
-    profilePhoto = '',
-    socialLinks = {}
-  } = data;
+    profilePhoto = ''
+  } = signatureData;
 
   // Validation et conversion sécurisée des valeurs numériques
   const safeLogoSize = Math.max(20, Number(logoSize) || 100);
   const safeProfilePhotoSize = Math.max(20, Number(profilePhotoSize) || 80);
   const safeVerticalSpacing = Math.max(0, Number(verticalSpacing) || 10);
   const safeHorizontalSpacing = Math.max(0, Number(horizontalSpacing) || 15);
-  const safeIconTextSpacing = Math.max(0, Number(iconTextSpacing) || 5);
   const safeFontSize = Math.max(8, Number(fontSize) || 14);
 
   const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName;
@@ -204,27 +155,7 @@ export const TableSignatureLayout: React.FC<TableSignatureLayoutProps> = ({
             verticalAlign: 'top',
             paddingLeft: `${safeHorizontalSpacing}px`
           }}>
-            <TableContactInfo
-              phone={phone}
-              mobilePhone={mobilePhone}
-              email={email}
-              website={website}
-              address={address}
-              showEmailIcon={showEmailIcon}
-              showPhoneIcon={showPhoneIcon}
-              showAddressIcon={showAddressIcon}
-              showWebsiteIcon={showWebsiteIcon}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              textAlignment={textAlignment}
-              verticalSpacing={safeVerticalSpacing}
-              iconTextSpacing={safeIconTextSpacing}
-              fontSize={safeFontSize}
-              textStyle={textStyle}
-              fontFamily={fontFamily}
-              socialLinks={socialLinks}
-              showSocialLinks={showSocialLinks}
-            />
+            <TableContactInfo />
           </td>
         </tr>
 

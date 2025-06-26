@@ -7,7 +7,7 @@ export const exportContent = (content: string, format: 'html' | 'markdown' | 'te
       return content;
     case 'markdown':
       // Conversion HTML vers Markdown (simplifiée)
-      let markdown = content
+      const markdown = content
         .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n')
         .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n')
         .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n')

@@ -410,13 +410,13 @@ export const useExpenses = () => {
   }, []);
   
   // Déterminer le fournisseur en fonction du nom de fichier
-  let vendor = '';
-  let address = '';
-  let siren = '';
-  let vatNumber = '';
-  let invoiceNumberPrefix = '';
-  let paymentMethod = '';
-  let bankDetails = '';
+  const vendor = '';
+  const address = '';
+  const siren = '';
+  const vatNumber = '';
+  const invoiceNumberPrefix = '';
+  const paymentMethod = '';
+  const bankDetails = '';
   
   // Extraire une date potentielle du nom de fichier
   const extractDateFromFileName = (): Date | null => {

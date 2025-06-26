@@ -1,48 +1,25 @@
 import React from 'react';
+import { useEmailSignature } from '../../context/useEmailSignature';
 
-interface TableContactInfoProps {
-  phone?: string;
-  mobilePhone?: string;
-  email?: string;
-  website?: string;
-  address?: string;
-  showEmailIcon: boolean;
-  showPhoneIcon: boolean;
-  showAddressIcon: boolean;
-  showWebsiteIcon: boolean;
-  primaryColor?: string;
-  secondaryColor?: string;
-  textAlignment?: 'left' | 'center' | 'right';
-  verticalSpacing?: number;
-  iconTextSpacing?: number;
-  fontSize?: number;
-  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  fontFamily?: string;
-  socialLinks?: Record<string, string>;
-  showSocialLinks?: boolean;
-}
-
-export const TableContactInfo: React.FC<TableContactInfoProps> = ({
-  phone,
-  mobilePhone,
-  email,
-  website,
-  address,
-  showEmailIcon,
-  showPhoneIcon,
-  showAddressIcon,
-  showWebsiteIcon,
-  primaryColor = '#5b50ff',
-  secondaryColor = '#333333',
-  textAlignment = 'left',
-  verticalSpacing = 10,
-  iconTextSpacing = 5,
-  fontSize = 14,
-  textStyle = 'normal',
-  fontFamily = 'Arial, sans-serif',
-  socialLinks = {},
-  showSocialLinks = true
-}) => {
+export const TableContactInfo: React.FC = () => {
+  // Utiliser le contexte au lieu des props
+  const {
+    signatureData,
+    showEmailIcon,
+    showPhoneIcon,
+    showAddressIcon,
+    showWebsiteIcon,
+    primaryColor,
+    secondaryColor,
+    textAlignment,
+    verticalSpacing,
+    iconTextSpacing,
+    fontSize,
+    textStyle,
+    fontFamily
+  } = useEmailSignature();
+  
+  const { phone, mobilePhone, email, website, address } = signatureData;
   // Conversion sécurisée des valeurs
   const safeVerticalSpacing = Math.max(0, Number(verticalSpacing) || 10);
   const safeIconTextSpacing = Math.max(0, Number(iconTextSpacing) || 5);

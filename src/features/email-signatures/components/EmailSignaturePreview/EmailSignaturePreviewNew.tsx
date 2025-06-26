@@ -1,16 +1,18 @@
-import React, { useRef, useState } from 'react';
-import { EmailSignature } from '../../types';
+import React, { useState, useRef } from 'react';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
-import { Button } from '../../../../components/';
+import { Button } from '@/components/ui/button';
+import { EmailSignatureProvider } from '../../context/EmailSignatureProvider';
+import { useEmailSignature } from '../../context/useEmailSignature';
+import { EmailSignature } from '../../types';
 import { TableSignatureLayout } from './TableSignatureLayout';
-import { getFullProfilePhotoUrl } from './utils';
-import { DEFAULT_PROFILE_PHOTO_SIZE } from '../../constants/images';
 
+// Interface pour les props du composant principal
 interface EmailSignaturePreviewProps {
-  // Accepte soit un objet signature complet, soit des propriétés individuelles
+  // Objet signature complet (optionnel)
   signature?: Partial<EmailSignature>;
-  // Propriétés individuelles au lieu d'un objet signature
-  fullName?: string;
+  // Props individuelles (optionnelles)
+  firstName?: string;
+  lastName?: string;
   jobTitle?: string;
   companyName?: string;
   phone?: string;
@@ -18,168 +20,103 @@ interface EmailSignaturePreviewProps {
   email?: string;
   website?: string;
   address?: string;
-  logoUrl?: string;
-  profilePhotoUrl?: string;
-  profilePhotoBase64?: string | null;
-  profilePhotoSize?: number;
-  profilePhotoToDelete?: boolean; // Indique si la photo de profil doit être supprimée
-  layout?: string;
-  horizontalSpacing?: number;
-  verticalSpacing?: number;
-  verticalAlignment?: string;
-  imagesLayout?: string;
-  textColor?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  showLogo?: boolean;
-  textAlignment?: string;
-  fontFamily?: string;
-  fontSize?: number;
-  socialLinksDisplayMode?: string;
-  socialLinksIconStyle?: string;
-  socialLinksIconColor?: string;
-  socialLinks?: any;
-  textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
+  companyLogo?: string;
+  profilePhoto?: string;
+  socialLinks?: Record<string, string>;
+  companyWebsite?: string;
+  companyAddress?: string;
+  logoSize?: number;
   iconTextSpacing?: number;
-  // Props spécifiques à l'affichage
-  showEmailIcon?: boolean;
+  socialLinksIconColor?: string;
   showPhoneIcon?: boolean;
+  showMobilePhoneIcon?: boolean;
+  showEmailIcon?: boolean;
   showAddressIcon?: boolean;
   showWebsiteIcon?: boolean;
+  onCopy?: () => void;
+  onError?: (message: string) => void;
 }
 
-export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({ 
+// Interface pour les props du composant interne
+interface EmailSignaturePreviewContentProps {
+  onCopy?: () => void;
+  onError?: (message: string) => void;
+}
+
+// Composant principal qui initialise le contexte et affiche la signature
+export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   signature,
-  // Propriétés individuelles avec valeurs par défaut
-  fullName: propFullName,
-  jobTitle: propJobTitle,
-  companyName: propCompanyName,
-  phone: propPhone,
-  mobilePhone: propMobilePhone,
-  email: propEmail,
-  website: propWebsite,
-  address: propAddress,
-  logoUrl: propLogoUrl,
-  profilePhotoUrl: propProfilePhotoUrl,
-  profilePhotoBase64: propProfilePhotoBase64,
-  profilePhotoSize: propProfilePhotoSize,
-  profilePhotoToDelete: propProfilePhotoToDelete,
-  layout: propLayout,
-  horizontalSpacing: propHorizontalSpacing,
-  verticalSpacing: propVerticalSpacing,
-  textColor: propTextColor,
-  primaryColor: propPrimaryColor,
-  secondaryColor: propSecondaryColor,
-  textAlignment: propTextAlignment,
-  socialLinks: propSocialLinks,
-  socialLinksDisplayMode: propSocialLinksDisplayMode,
-  socialLinksIconStyle: propSocialLinksIconStyle,
-  socialLinksIconColor: propSocialLinksIconColor,
-  showLogo: propShowLogo,
-  fontSize: propFontSize,
-  textStyle: propTextStyle,
-  fontFamily: propFontFamily,
-  iconTextSpacing: propIconTextSpacing,
-  showEmailIcon = true,
+  firstName,
+  lastName,
+  jobTitle,
+  companyName,
+  phone,
+  mobilePhone,
+  email,
+  website,
+  address,
+  companyLogo,
+  profilePhoto,
+  socialLinks,
+  companyWebsite,
+  companyAddress,
+  logoSize,
+  iconTextSpacing,
+  socialLinksIconColor,
   showPhoneIcon = true,
+  showMobilePhoneIcon = true,
+  showEmailIcon = true,
   showAddressIcon = true,
-  showWebsiteIcon = true
+  showWebsiteIcon = true,
+  onCopy,
+  onError
 }) => {
-  // État pour afficher un message de confirmation après la copie
-  const [copySuccess, setCopySuccess] = useState(false);
-  
-  // Référence à l'élément de signature pour la copie
+  return (
+    <EmailSignatureProvider 
+      initialSignature={signature}
+      initialFirstName={firstName}
+      initialLastName={lastName}
+      initialJobTitle={jobTitle}
+      initialCompanyName={companyName}
+      initialPhone={phone}
+      initialMobilePhone={mobilePhone}
+      initialEmail={email}
+      initialWebsite={website}
+      initialAddress={address}
+      initialCompanyLogo={companyLogo}
+      initialProfilePhoto={profilePhoto}
+      initialSocialLinks={socialLinks}
+      initialCompanyWebsite={companyWebsite}
+      initialCompanyAddress={companyAddress}
+      initialLogoSize={logoSize}
+      initialIconTextSpacing={iconTextSpacing}
+      initialSocialLinksIconColor={socialLinksIconColor}
+      initialShowPhoneIcon={showPhoneIcon}
+      initialShowMobilePhoneIcon={showMobilePhoneIcon}
+      initialShowEmailIcon={showEmailIcon}
+      initialShowAddressIcon={showAddressIcon}
+      initialShowWebsiteIcon={showWebsiteIcon}
+    >
+      <EmailSignaturePreviewContent onCopy={onCopy} onError={onError} />
+    </EmailSignatureProvider>
+  );
+};
+
+// Composant interne qui consomme le contexte
+interface EmailSignaturePreviewContentProps {
+  onCopy?: () => void;
+  onError?: (error: string) => void;
+}
+
+const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> = ({ onCopy, onError }) => {
+  const { signatureData } = useEmailSignature();
+  const [copied, setCopied] = useState(false);
   const signatureRef = useRef<HTMLDivElement>(null);
+
+  // Extraire les données du contexte pour l'affichage
+  const { email, firstName, lastName } = signatureData;
+  const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
   
-  // URL de base de l'API pour les images
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
-
-  // Utiliser les propriétés de l'objet signature si disponible, sinon utiliser les propriétés individuelles
-  const fullName = signature?.fullName || propFullName;
-  const jobTitle = signature?.jobTitle || propJobTitle;
-  const companyName = signature?.companyName || propCompanyName;
-  const phone = signature?.phone || propPhone;
-  const mobilePhone = signature?.mobilePhone || propMobilePhone;
-  const email = signature?.email || propEmail;
-  
-  // Pour le site web et l'adresse, utiliser les propriétés du bon type
-  const hasProperty = <T extends object, K extends string>(obj: T | undefined, prop: K): obj is T & Record<K, unknown> => {
-    return obj !== undefined && prop in obj;
-  };
-  
-  const website = signature?.website || 
-    (hasProperty(signature, 'companyWebsite') ? signature.companyWebsite as string : undefined) || 
-    propWebsite;
-    
-  const address = signature?.address || 
-    (hasProperty(signature, 'companyAddress') ? signature.companyAddress as string : undefined) || 
-    propAddress;
-
-  const logoUrl = signature?.logoUrl || propLogoUrl;
-  const profilePhotoUrl = signature?.profilePhotoUrl || propProfilePhotoUrl;
-  const profilePhotoBase64 = signature?.profilePhotoBase64 || propProfilePhotoBase64;
-  const profilePhotoSize = signature?.profilePhotoSize || propProfilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE;
-  const layout = signature?.layout || propLayout || 'vertical';
-  const horizontalSpacing = signature?.horizontalSpacing || propHorizontalSpacing || 20;
-  const verticalSpacing = signature?.verticalSpacing || propVerticalSpacing || 10;
-  const imagesLayout = signature?.imagesLayout || 'stacked';
-  const textColor = signature?.textColor || propTextColor || '#333333';
-  const primaryColor = signature?.primaryColor || propPrimaryColor || '#5b50ff';
-  const secondaryColor = signature?.secondaryColor || propSecondaryColor || '#333333';
-  const socialLinksIconColor = signature?.socialLinksIconColor || propSocialLinksIconColor || '#ffffff';
-  const textAlignment = signature?.textAlignment || propTextAlignment || 'left';
-  const socialLinks = signature?.socialLinks || propSocialLinks;
-  const socialLinksDisplayMode = signature?.socialLinksDisplayMode || propSocialLinksDisplayMode || 'icons';
-  const socialLinksPosition = signature?.socialLinksPosition || 'bottom';
-  const socialLinksIconStyle = signature?.socialLinksIconStyle || propSocialLinksIconStyle || 'simple';
-  const showLogo = signature?.showLogo !== undefined ? signature.showLogo : (propShowLogo !== undefined ? propShowLogo : true);
-  const fontSize = signature?.fontSize || propFontSize || 14;
-  const textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough' = 
-    (signature?.textStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
-    (propTextStyle as 'normal' | 'overline' | 'underline' | 'strikethrough') || 
-    'normal';
-  const fontFamily = signature?.fontFamily || propFontFamily || 'Arial, sans-serif';
-  const iconTextSpacing = signature?.iconTextSpacing || propIconTextSpacing || 5;
-
-  // Convertir en nombre pour éviter les problèmes de type
-  const photoSize = Number(profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE);
-  const effectiveTextAlignment = textAlignment as 'left' | 'center' | 'right';
-  const effectiveHorizontalSpacing = horizontalSpacing || 20;
-  const effectiveVerticalSpacing = verticalSpacing || 10;
-  const signatureLayout = layout as 'horizontal' | 'vertical';
-
-  // Traitement des données de l'image de profil
-  let profilePhotoSource = null;
-  const photoDeleted = propProfilePhotoToDelete === true || signature?.profilePhotoToDelete === true;
-  
-  if (photoDeleted) {
-    profilePhotoSource = null;
-  } else {
-    if (signature?.profilePhotoBase64) {
-      profilePhotoSource = signature.profilePhotoBase64;
-    } else if (profilePhotoBase64) {
-      profilePhotoSource = profilePhotoBase64;
-    } else if (profilePhotoUrl && profilePhotoUrl !== '' && profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') {
-      profilePhotoSource = profilePhotoUrl;
-    } else if (signature?.profilePhotoUrl && signature.profilePhotoUrl !== '' && signature.profilePhotoUrl !== '/images/logo_newbi/SVG/Logo_Texte_Purple.svg') {
-      profilePhotoSource = signature.profilePhotoUrl;
-    }
-  }
-  
-  // Logo par défaut
-  const defaultLogoUrl = '/images/logo_newbi/SVG/Logo_Texte_Purple.svg';
-  const effectiveLogoUrl = logoUrl || defaultLogoUrl;
-
-  // Styles pour la signature
-  const signatureStyle: React.CSSProperties = {
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '14px',
-    lineHeight: '1.5',
-    color: textColor || '#333333',
-    maxWidth: '600px',
-    width: '100%'
-  };
-
   // Fonction pour s'assurer que toutes les images ont des URL absolues
   const ensureAbsoluteImageUrls = (element: HTMLElement): void => {
     const images = element.querySelectorAll('img');
@@ -190,93 +127,80 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
     });
   };
 
-  // Fonction pour copier la signature dans le presse-papier
-  const copySignatureToClipboard = () => {
-    if (signatureRef.current) {
+  // Fonction pour copier la signature dans le presse-papiers
+  const copySignature = async () => {
+    if (!signatureRef.current) return;
+    
+    try {
+      // Cloner le nœud pour pouvoir modifier les URLs des images sans affecter le DOM
+      const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
+      ensureAbsoluteImageUrls(signatureContent);
+      
+      // Essayer d'utiliser l'API Clipboard moderne
       try {
-        const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
-        ensureAbsoluteImageUrls(signatureContent);
-        const tableHtml = signatureContent.innerHTML;
-        const blob = new Blob([tableHtml], { type: 'text/html' });
-        const data = new ClipboardItem({
-          'text/html': blob
-        });
-        
-        navigator.clipboard.write([data])
-          .then(() => {
-            setCopySuccess(true);
-            setTimeout(() => {
-              setCopySuccess(false);
-            }, 3000);
-          })
-          .catch(err => {
-            console.error('Erreur lors de la copie avec API moderne:', err);
-            fallbackCopyMethod();
-          });
-      } catch (err) {
-        console.error('Erreur lors de la préparation de la copie:', err);
+        // Pour le texte brut, on peut utiliser l'API Clipboard
+        await navigator.clipboard.writeText(signatureContent.innerHTML);
+        setCopied(true);
+        if (onCopy) onCopy();
+      } catch (clipboardError) {
+        console.error('Erreur lors de la copie avec API Clipboard:', clipboardError);
+        // Utiliser la méthode de secours
         fallbackCopyMethod();
       }
+    } catch (error) {
+      console.error('Erreur lors de la préparation de la signature:', error);
+      if (onError) onError('Impossible de copier la signature');
+    } finally {
+      // Réinitialiser l'état après un délai
+      setTimeout(() => setCopied(false), 2000);
     }
   };
   
-  // Méthode de secours
+  // Méthode de secours pour les navigateurs qui ne supportent pas l'API Clipboard
   const fallbackCopyMethod = () => {
-    if (signatureRef.current) {
-      try {
-        const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
-        ensureAbsoluteImageUrls(signatureContent);
+    if (!signatureRef.current) return;
+    
+    try {
+      const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
+      ensureAbsoluteImageUrls(signatureContent);
+      
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '0';
+      tempContainer.innerHTML = signatureContent.innerHTML;
+      
+      document.body.appendChild(tempContainer);
+      
+      const range = document.createRange();
+      range.selectNodeContents(tempContainer);
+      
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
         
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.top = '0';
-        tempContainer.innerHTML = signatureContent.innerHTML;
-        
-        document.body.appendChild(tempContainer);
-        
-        const range = document.createRange();
-        range.selectNodeContents(tempContainer);
-        
-        const selection = window.getSelection();
-        if (selection) {
-          selection.removeAllRanges();
-          selection.addRange(range);
-          
-          try {
-            document.execCommand('copy');
-            setCopySuccess(true);
-            setTimeout(() => {
-              setCopySuccess(false);
-            }, 3000);
-          } catch (err) {
-            console.error('Erreur lors de la copie avec méthode de secours:', err);
+        try {
+          const success = document.execCommand('copy');
+          if (success) {
+            setCopied(true);
+            if (onCopy) onCopy();
+          } else if (onError) {
+            onError('La commande de copie a échoué');
           }
-          
-          window.getSelection()?.removeAllRanges();
+        } catch (err) {
+          console.error('Erreur lors de la copie avec méthode de secours:', err);
+          if (onError) onError('Impossible de copier la signature');
+        } finally {
+          selection.removeAllRanges();
         }
-        
-        document.body.removeChild(tempContainer);
-      } catch (err) {
-        console.error('Erreur lors de la méthode de secours:', err);
       }
+      
+      document.body.removeChild(tempContainer);
+    } catch (err) {
+      console.error('Erreur lors de la méthode de secours:', err);
+      if (onError) onError('Impossible de copier la signature');
     }
-  };
-
-  // Créer l'objet data pour TableSignatureLayout
-  const signatureData = {
-    firstName: fullName?.split(' ')[0] || '',
-    lastName: fullName?.split(' ').slice(1).join(' ') || '',
-    jobTitle: jobTitle || '',
-    companyName: companyName || '',
-    phone: phone || '',
-    mobilePhone: mobilePhone || '',
-    email: email || '',
-    website: website || '',
-    address: address || '',
-    companyLogo: effectiveLogoUrl || '',
-    profilePhoto: profilePhotoSource || '',
-    socialLinks: socialLinks || {}
   };
 
   return (
@@ -294,13 +218,13 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
           
           {/* Bouton de copie */}
           <Button 
-            onClick={copySignatureToClipboard} 
+            onClick={copySignature} 
             size="sm" 
-            variant="primary"
+            variant="secondary"
             className="flex items-center gap-1 text-xs"
           >
             <ClipboardDocumentIcon className="h-3 w-3" />
-            {copySuccess ? 'Copié !' : 'Copier la signature'}
+            {copied ? 'Copié !' : 'Copier la signature'}
           </Button>
         </div>
         
@@ -310,7 +234,7 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
           <div className="border-b border-gray-200 px-6 py-3">
             <div className="grid grid-cols-12 gap-2 items-center text-xs mb-1">
               <div className="col-span-1 text-gray-500 font-medium">De :</div>
-              <div className="col-span-11 text-gray-800">{fullName || 'Votre Nom'} &lt;{email || 'email@exemple.com'}&gt;</div>
+              <div className="col-span-11 text-gray-800">{displayName || 'Votre Nom'} &lt;{email || 'email@exemple.com'}&gt;</div>
             </div>
             <div className="grid grid-cols-12 gap-2 items-center text-xs mb-1">
               <div className="col-span-1 text-gray-500 font-medium">À :</div>
@@ -329,30 +253,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
             </div>
             
             {/* Signature */}
-            <div ref={signatureRef} style={signatureStyle} className="pt-1">
-              <TableSignatureLayout
-                data={signatureData}
-                showCompanyName={true}
-                showSocialLinks={socialLinks && Object.keys(socialLinks).length > 0}
-                showJobTitle={true}
-                showLogo={showLogo}
-                showProfilePhoto={!photoDeleted && profilePhotoSource !== null}
-                showEmailIcon={showEmailIcon}
-                showPhoneIcon={showPhoneIcon}
-                showAddressIcon={showAddressIcon}
-                showWebsiteIcon={showWebsiteIcon}
-                logoSize={100}
-                profilePhotoSize={photoSize}
-                primaryColor={primaryColor}
-                secondaryColor={secondaryColor}
-                textAlignment={effectiveTextAlignment}
-                verticalSpacing={effectiveVerticalSpacing}
-                horizontalSpacing={effectiveHorizontalSpacing}
-                iconTextSpacing={iconTextSpacing}
-                fontSize={fontSize}
-                textStyle={textStyle}
-                fontFamily={fontFamily}
-              />
+            <div ref={signatureRef} className="pt-1">
+              <TableSignatureLayout />
             </div>
           </div>
         </div>
