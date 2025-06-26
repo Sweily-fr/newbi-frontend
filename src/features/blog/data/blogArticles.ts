@@ -32,10 +32,14 @@ import {
   quoteTimeArticle,
   organisationTempsFreelance,
   facturationFreelanceArticle,
-  gestionDepensesIndependant2025
+  gestionDepensesIndependant2025,
+  comparatifOutilsGestionProjetArticle,
+  clickupVsMondayArticle
 } from './articles';
 
 export const blogArticles: BlogArticle[] = [
+  clickupVsMondayArticle,
+  comparatifOutilsGestionProjetArticle,
   organisationTempsFreelance,
   quoteTimeArticle,
   optimiserReferencementArticle,

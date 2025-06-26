@@ -19,6 +19,8 @@ export { seoSoloOptimizationArticle } from './seoSoloOptimizationArticle';
 export { gestionIndependantArticle } from './gestionIndependantArticle';
 export { erpArticle } from './erpArticle';
 export { compteBancaireFreelanceArticle } from './compte-bancaire-freelance';
+export { clickupVsMondayArticle } from './clickup-vs-monday';
+export { comparatifOutilsGestionProjetArticle } from './comparatif-outils-gestion-projet';
 export { organisationTempsFreelance } from './organisation-temps-freelance';
 export { calendrierImpots2025Article } from './calendrier-impots-2025';
 export { gestionTresorerieIndependantArticle } from './gestion-tresorerie-independant';
