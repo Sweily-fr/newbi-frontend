@@ -6,7 +6,7 @@ type SocialLinks = NonNullable<SignatureData['socialLinks']>;
 interface TableSocialLinksProps {
   socialLinks?: SocialLinks;
   displayMode: 'icons' | 'text';
-  socialLinksIconStyle?: string;
+  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle' | 'filled';
   primaryColor?: string;
   backgroundColor?: string;
   iconColor?: string;

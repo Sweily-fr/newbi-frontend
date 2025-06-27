@@ -27,7 +27,7 @@ export const TableSignatureLayout: React.FC = () => {
     lastName = '',
     jobTitle = '',
     companyName = '',
-    companyLogo = '',
+    companyLogoUrl: companyLogo = '',
     profilePhoto = ''
   } = signatureData;
 

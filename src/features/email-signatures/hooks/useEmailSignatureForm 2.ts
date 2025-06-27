@@ -42,7 +42,7 @@ interface EmailSignature {
   fontSize: number;
   socialLinksDisplayMode: 'icons' | 'text';
   socialLinksPosition: 'bottom' | 'right';
-  socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
+  socialLinksIconStyle: 'plain' | 'rounded' | 'circle' | 'filled';
   createdAt?: string;
   updatedAt?: string;
 }
@@ -131,8 +131,8 @@ interface UseEmailSignatureFormReturn {
   setSocialLinksDisplayMode: (value: 'icons' | 'text') => void;
   socialLinksPosition: 'bottom' | 'right';
   setSocialLinksPosition: (value: 'bottom' | 'right') => void;
-  socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
-  setSocialLinksIconStyle: (value: 'plain' | 'rounded' | 'circle') => void;
+  socialLinksIconStyle: 'plain' | 'rounded' | 'circle' | 'filled';
+  setSocialLinksIconStyle: (value: 'plain' | 'rounded' | 'circle' | 'filled') => void;
   
   // Gestion des erreurs et de la soumission
   errors: EmailSignatureFormErrors;

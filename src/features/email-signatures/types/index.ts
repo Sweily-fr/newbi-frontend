@@ -1,3 +1,6 @@
+/**
+ * Réseaux sociaux disponibles pour la signature
+ */
 export interface SocialLinks {
   linkedin?: string;
   twitter?: string;
@@ -5,89 +8,129 @@ export interface SocialLinks {
   instagram?: string;
 }
 
+/**
+ * Interface principale pour une signature email
+ */
 export interface EmailSignature {
+  // Identifiants et métadonnées
   id: string;
   name: string;
+  isDefault: boolean;
+  template: string;
+  templateId?: number; // Pour la rétrocompatibilité
+  createdAt: string;
+  updatedAt?: string;
+
+  // Informations personnelles
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   jobTitle: string;
   email: string;
   phone?: string;
   mobilePhone?: string;
   website?: string;
   address?: string;
+  
+  // Informations de l'entreprise
   companyName?: string;
-  template: string;
+  companyWebsite?: string;
+  companyAddress?: string;
+  
+  // Apparence et style
   primaryColor: string;
   secondaryColor: string;
-  logoUrl?: string;
-  showLogo?: boolean;
-  isDefault: boolean;
-  socialLinks?: SocialLinks;
-  profilePhotoUrl?: string;
-  profilePhotoBase64?: string | null;
-  profilePhotoToDelete?: boolean;
-  profilePhotoSize?: number;
-  layout?: 'horizontal' | 'vertical';
-  horizontalSpacing?: number;
-  verticalSpacing?: number;
-  verticalAlignment?: 'left' | 'center' | 'right';
-  imagesLayout?: 'horizontal' | 'vertical';
   fontFamily?: string;
   fontSize?: number;
   textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  socialLinksDisplayMode?: 'icons' | 'text';
-  socialLinksPosition?: 'bottom' | 'right';
-  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
-  socialLinksIconBgColor?: string;
-  socialLinksIconColor?: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
+  style?: string;
+  
+  // Logo et photo de profil
+  logoUrl?: string;
+  companyLogo?: string; // Alias pour logoUrl
+  showLogo?: boolean;
+  hasLogo?: boolean;
+  customLogoUrl?: string;
+  useNewbiLogo?: boolean;
+  profilePhotoUrl?: string;
+  profilePhoto?: string; // Alias pour profilePhotoUrl
+  profilePhotoBase64?: string | null;
+  profilePhotoToDelete?: boolean;
+  profilePhotoSize?: number;
+  
+  // Mise en page
+  layout?: 'horizontal' | 'vertical';
+  imagesLayout?: 'horizontal' | 'vertical';
+  horizontalSpacing?: number;
+  verticalSpacing?: number;
+  verticalAlignment?: 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right';
+  textAlignment?: 'left' | 'center' | 'right';
+  
+  // Réseaux sociaux
+  socialLinks?: SocialLinks;
+  socialLinksDisplayMode?: 'icons' | 'text' | 'both';
+  socialLinksPosition?: 'bottom' | 'right' | 'left';
+  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle' | 'filled';
+  socialLinksIconColor?: string;
   socialLinksIconSize?: number;
-  // Espacement entre les icônes et leur texte
+  socialLinksIconBgColor?: string;
+  
+  // Options d'affichage
   iconTextSpacing?: number;
-  // Options d'affichage des icônes pour les coordonnées
   showEmailIcon?: boolean;
   showPhoneIcon?: boolean;
+  showMobilePhoneIcon?: boolean;
   showAddressIcon?: boolean;
   showWebsiteIcon?: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  // Propriétés supplémentaires pour la compatibilité
-  displayMode?: 'icons' | 'text';
-  iconStyle?: 'plain' | 'rounded' | 'circle';
-  hasLogo?: boolean;
-  style?: string;
+  showProfilePhotoBorder?: boolean;
+  showLogoBorder?: boolean;
+  
+  // Propriétés de compatibilité (à déprécier)
+  displayMode?: 'icons' | 'text' | 'both'; // Utiliser socialLinksDisplayMode à la place
+  iconStyle?: 'plain' | 'rounded' | 'circle' | 'filled'; // Utiliser socialLinksIconStyle à la place
 }
 
+/**
+ * Données de signature utilisées dans le contexte
+ */
 export interface SignatureData {
+  // Identifiants et métadonnées
   name: string;
   isDefault: boolean;
-  primaryColor: string;
-  secondaryColor: string;
+  
+  // Informations personnelles
   fullName: string;
   jobTitle: string;
   email: string;
   phone: string;
   mobilePhone?: string;
+  
+  // Informations de l'entreprise
   companyName: string;
   companyWebsite: string;
   companyAddress: string;
-  socialLinks: SocialLinks;
-  socialLinksDisplayMode: 'icons' | 'text';
-  socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
-  socialLinksIconColor: string; // Couleur spécifique pour les icônes SVG des réseaux sociaux
-  useNewbiLogo: boolean;
-  customLogoUrl: string;
+  
+  // Apparence et style
+  primaryColor: string;
+  secondaryColor: string;
   fontFamily: string;
   fontSize: number;
   textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  templateId: number;
-  // Options d'affichage des icônes pour les coordonnées
+  
+  // Réseaux sociaux
+  socialLinks: SocialLinks;
+  socialLinksDisplayMode: 'icons' | 'text' | 'both';
+  socialLinksIconStyle: 'plain' | 'rounded' | 'circle' | 'filled';
+  socialLinksIconColor: string;
+  
+  // Options d'affichage
   showEmailIcon: boolean;
   showPhoneIcon: boolean;
   showAddressIcon: boolean;
   showWebsiteIcon: boolean;
-  // Espacement entre les icônes et leur texte
   iconTextSpacing?: number;
-  // Propriétés optionnelles pour la rétrocompatibilité
+  
+  // Propriétés optionnelles
   socialLinksPosition?: 'bottom' | 'right';
   layout?: 'horizontal' | 'vertical';
   textAlignment?: string;
@@ -97,9 +140,14 @@ export interface SignatureData {
   profilePhotoBase64?: string | null;
   profilePhotoSize?: number;
   profilePhotoToDelete?: boolean;
+  useNewbiLogo: boolean;
+  customLogoUrl: string;
+  templateId: number;
 }
 
-// Type d'assertion pour les propriétés d'affichage des icônes
+/**
+ * Options d'affichage des icônes
+ */
 export interface IconDisplayOptions {
   showEmailIcon: boolean;
   showPhoneIcon: boolean;
@@ -107,6 +155,9 @@ export interface IconDisplayOptions {
   showWebsiteIcon: boolean;
 }
 
+/**
+ * Erreurs de validation du formulaire de signature
+ */
 export interface EmailSignatureFormErrors {
   name?: string;
   fullName?: string;

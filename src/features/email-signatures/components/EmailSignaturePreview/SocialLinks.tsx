@@ -8,7 +8,7 @@ type SocialLinksType = NonNullable<SignatureData['socialLinks']>;
 interface SocialLinksProps {
   socialLinks?: SocialLinksType;
   displayMode: 'icons' | 'text';
-  socialLinksIconStyle: string;
+  socialLinksIconStyle: 'plain' | 'rounded' | 'circle' | 'filled';
   primaryColor: string; // Pour compatibilité avec l'ancien code
   iconColor?: string; // Couleur pour le SVG (l'icône elle-même) en mode "plain" ou pour le texte
   backgroundColor?: string; // Couleur de fond pour les styles "carré arrondi" et "cercle"
