@@ -1,6 +1,4 @@
-export * from './EmailSignatureForm';
-export * from './EmailSignaturePreview';
-// EmailSignatureEditor a été supprimé car redondant avec EmailSignatureFormLayout
-export * from './EmailSignatureFormModal';
-// EmailSignatureManager a été supprimé car non utilisé
+// Exportations des composants principaux
+export * from './EmailSignatureFormLayout';
 export * from './EmailSignaturesTable';
+// Note: Les autres composants ont été supprimés car non utilisés ou remplacés

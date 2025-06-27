@@ -5,4 +5,4 @@ export * from './components';
 export * from './hooks';
 
 // Exporter les types
-export * from './types';
+export * from './types/index';

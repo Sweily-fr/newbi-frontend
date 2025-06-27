@@ -33,7 +33,7 @@ export interface EmailSignature {
   profilePhotoToDelete?: boolean;
   profilePhotoSize?: number;
   socialLinksDisplayMode?: 'icons' | 'text';
-  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle';
+  socialLinksIconStyle?: 'plain' | 'rounded' | 'circle' | 'filled';
   socialLinksIconBgColor?: string;
   socialLinksIconColor?: string;
   socialLinksIconSize?: number;

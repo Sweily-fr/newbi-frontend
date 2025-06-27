@@ -1,154 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { EMAIL_PATTERN, NAME_REGEX } from '../../../constants/formValidations';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { EMAIL_PATTERN } from '../../../constants/formValidations';
 import { Notification } from '../../../components/common/Notification';
 import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
-
-// Nous importerons les types depuis le dossier types une fois qu'ils seront créés
-interface SocialLinks {
-  linkedin: string;
-  twitter: string;
-  facebook: string;
-  instagram: string;
-}
-
-interface EmailSignature {
-  id?: string;
-  name: string;
-  fullName: string;
-  jobTitle: string;
-  email: string;
-  phone: string;
-  mobilePhone: string;
-  website: string;
-  address: string;
-  companyName: string;
-  template: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logoUrl: string;
-  showLogo: boolean;
-  isDefault: boolean;
-  socialLinks: SocialLinks;
-  profilePhotoUrl: string;
-  profilePhotoBase64?: string | null;
-  profilePhotoToDelete?: boolean;
-  profilePhotoSize: number;
-  layout: 'horizontal' | 'vertical';
-  horizontalSpacing: number;
-  verticalSpacing: number;
-  verticalAlignment: 'left' | 'center' | 'right';
-  imagesLayout: 'horizontal' | 'vertical';
-  fontFamily: string;
-  fontSize: number;
-  socialLinksDisplayMode: 'icons' | 'text';
-  socialLinksPosition: 'bottom' | 'right';
-  socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface EmailSignatureFormErrors {
-  name?: string;
-  fullName?: string;
-  email?: string;
-  companyName?: string;
-  logoUrl?: string;
-  address?: string;
-  submit?: string;
-}
-
-interface UseEmailSignatureFormProps {
-  initialData?: Partial<EmailSignature>;
-  onSubmit: (data: Partial<EmailSignature>) => void;
-  onChange?: (data: Partial<EmailSignature>) => void;
-}
-
-interface UseEmailSignatureFormReturn {
-  // États du formulaire
-  id?: string;
-  name: string;
-  setName: (value: string) => void;
-  fullName: string;
-  setFullName: (value: string) => void;
-  jobTitle: string;
-  setJobTitle: (value: string) => void;
-  email: string;
-  setEmail: (value: string) => void;
-  phone: string;
-  setPhone: (value: string) => void;
-  mobilePhone: string;
-  setMobilePhone: (value: string) => void;
-  website: string;
-  setWebsite: (value: string) => void;
-  address: string;
-  setAddress: (value: string) => void;
-  companyName: string;
-  setCompanyName: (value: string) => void;
-  socialLinks: SocialLinks;
-  setSocialLinks: (value: SocialLinks) => void;
-  updateSocialLink: (network: keyof SocialLinks, value: string) => void;
-  template: string;
-  primaryColor: string;
-  setPrimaryColor: (value: string) => void;
-  secondaryColor: string;
-  setSecondaryColor: (value: string) => void;
-  logoUrl: string;
-  setLogoUrl: (value: string) => void;
-  showLogo: boolean;
-  setShowLogo: (value: boolean) => void;
-  isDefault: boolean;
-  setIsDefault: (value: boolean) => void;
-  companyInfoImported: boolean;
-  
-  // États pour la photo de profil
-  profilePhotoUrl: string;
-  setProfilePhotoUrl: (value: string) => void;
-  profilePhotoBase64: string | null;
-  setProfilePhotoBase64: (value: string | null) => void;
-  previewProfilePhoto: string | null;
-  setPreviewProfilePhoto: (value: string | null) => void;
-  profilePhotoToDelete: boolean;
-  setProfilePhotoToDelete: (value: boolean) => void;
-  profilePhotoSize: number;
-  setProfilePhotoSize: (value: number) => void;
-  
-  // Disposition et style
-  layout: 'horizontal' | 'vertical';
-  setLayout: (value: 'horizontal' | 'vertical') => void;
-  horizontalSpacing: number;
-  setHorizontalSpacing: (value: number) => void;
-  verticalSpacing: number;
-  setVerticalSpacing: (value: number) => void;
-  verticalAlignment: 'left' | 'center' | 'right';
-  setVerticalAlignment: (value: 'left' | 'center' | 'right') => void;
-  imagesLayout: 'horizontal' | 'vertical';
-  setImagesLayout: (value: 'horizontal' | 'vertical') => void;
-  fontFamily: string;
-  setFontFamily: (value: string) => void;
-  fontSize: number;
-  setFontSize: (value: number) => void;
-  socialLinksDisplayMode: 'icons' | 'text';
-  setSocialLinksDisplayMode: (value: 'icons' | 'text') => void;
-  socialLinksPosition: 'bottom' | 'right';
-  setSocialLinksPosition: (value: 'bottom' | 'right') => void;
-  socialLinksIconStyle: 'plain' | 'rounded' | 'circle';
-  setSocialLinksIconStyle: (value: 'plain' | 'rounded' | 'circle') => void;
-  
-  // Gestion des erreurs et de la soumission
-  errors: EmailSignatureFormErrors;
-  setErrors: (value: EmailSignatureFormErrors) => void;
-  submitError: string | null;
-  isSubmitting: boolean;
-  
-  // Méthodes
-  handleSubmit: (e: React.FormEvent) => void;
-  handleCancel: () => void;
-  handleProfilePhotoSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleProfilePhotoDelete: () => void;
-  importCompanyInfo: () => void;
-  getFullLogoUrl: (relativePath: string | undefined) => string;
-  validateForm: () => EmailSignatureFormErrors;
-}
+import { 
+  EmailSignature, 
+  EmailSignatureFormErrors, 
+  SocialLinks,
+  UseEmailSignatureFormProps,
+  UseEmailSignatureFormReturn
+} from '../types/index';
 
 export function useEmailSignatureForm({
   initialData,
@@ -156,8 +16,7 @@ export function useEmailSignatureForm({
   onChange
 }: UseEmailSignatureFormProps): UseEmailSignatureFormReturn {
   // Récupérer les informations de l'entreprise
-  // Implémentation directe pour remplacer useCompany
-  const company = {
+  const company = useMemo(() => ({
     name: '',
     logo: '',
     address: {
@@ -168,7 +27,7 @@ export function useEmailSignatureForm({
     },
     website: '',
     phone: ''
-  };
+  }), []);
   
   // Note: Dans une implémentation réelle, ces données pourraient être récupérées
   // depuis une API GraphQL ou un store global
@@ -184,7 +43,7 @@ export function useEmailSignatureForm({
   const [website, setWebsite] = useState(initialData?.website || '');
   const [address, setAddress] = useState(initialData?.address || '');
   const [companyName, setCompanyName] = useState(initialData?.companyName || '');
-  const [socialLinks, setSocialLinks] = useState(initialData?.socialLinks || {
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(initialData?.socialLinks || {
     linkedin: '',
     twitter: '',
     facebook: '',
@@ -198,7 +57,54 @@ export function useEmailSignatureForm({
   const [logoUrl, setLogoUrl] = useState(initialData?.logoUrl || '');
   const [showLogo, setShowLogo] = useState(initialData?.showLogo !== undefined ? initialData.showLogo : true);
   const [isDefault, setIsDefault] = useState(initialData?.isDefault || false);
-  const [companyInfoImported, setCompanyInfoImported] = useState(false);
+  
+  // États pour la mise en page et le style
+  const [layout, setLayout] = useState<'horizontal' | 'vertical' | 'stacked' | 'sideBySide'>(
+    (initialData?.layout === 'horizontal' || 
+     initialData?.layout === 'vertical' ||
+     initialData?.layout === 'stacked' ||
+     initialData?.layout === 'sideBySide')
+      ? initialData.layout 
+      : 'vertical'
+  );
+  const [horizontalSpacing, setHorizontalSpacing] = useState(initialData?.horizontalSpacing || 20);
+  const [verticalSpacing, setVerticalSpacing] = useState(initialData?.verticalSpacing || 10);
+  const [verticalAlignment, setVerticalAlignment] = useState(initialData?.verticalAlignment || 'left');
+  const [imagesLayout, setImagesLayout] = useState<'horizontal' | 'vertical' | 'stacked' | 'sideBySide'>(
+    (initialData?.imagesLayout === 'horizontal' || 
+     initialData?.imagesLayout === 'vertical' ||
+     initialData?.imagesLayout === 'stacked' ||
+     initialData?.imagesLayout === 'sideBySide')
+      ? initialData.imagesLayout 
+      : 'vertical'
+  );
+  const [fontFamily, setFontFamily] = useState(initialData?.fontFamily || 'Arial, sans-serif');
+  const [fontSize, setFontSize] = useState(initialData?.fontSize || 14);
+  
+  // États pour les réseaux sociaux
+  const [socialLinksDisplayMode, setSocialLinksDisplayMode] = useState<'icons' | 'text' | 'both'>(
+    (initialData?.socialLinksDisplayMode === 'icons' || 
+     initialData?.socialLinksDisplayMode === 'text' || 
+     initialData?.socialLinksDisplayMode === 'both')
+      ? initialData.socialLinksDisplayMode 
+      : 'text'
+  );
+  const [socialLinksPosition, setSocialLinksPosition] = useState<'bottom' | 'left' | 'right' | 'below-personal'>(
+    (initialData?.socialLinksPosition === 'bottom' || 
+     initialData?.socialLinksPosition === 'left' || 
+     initialData?.socialLinksPosition === 'right' ||
+     initialData?.socialLinksPosition === 'below-personal')
+      ? initialData.socialLinksPosition 
+      : 'bottom'
+  );
+  const [socialLinksIconStyle, setSocialLinksIconStyle] = useState<'plain' | 'rounded' | 'circle' | 'filled'>(
+    (initialData?.socialLinksIconStyle === 'plain' || 
+     initialData?.socialLinksIconStyle === 'rounded' || 
+     initialData?.socialLinksIconStyle === 'circle' || 
+     initialData?.socialLinksIconStyle === 'filled')
+      ? initialData.socialLinksIconStyle 
+      : 'plain'
+  );
   
   // États pour la gestion de la photo de profil
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(initialData?.profilePhotoUrl || '');
@@ -206,47 +112,6 @@ export function useEmailSignatureForm({
   const [previewProfilePhoto, setPreviewProfilePhoto] = useState<string | null>(null);
   const [profilePhotoToDelete, setProfilePhotoToDelete] = useState(false);
   const [profilePhotoSize, setProfilePhotoSize] = useState(initialData?.profilePhotoSize || DEFAULT_PROFILE_PHOTO_SIZE);
-  
-  // Disposition de la signature (horizontale ou verticale)
-  const [layout, setLayout] = useState(initialData?.layout || 'vertical');
-  
-  // Espacement entre les parties gauche et droite en disposition horizontale (en pixels)
-  const [horizontalSpacing, setHorizontalSpacing] = useState(initialData?.horizontalSpacing || 20);
-  
-  // Espacement vertical en disposition horizontale (en pixels)
-  const [verticalSpacing, setVerticalSpacing] = useState(initialData?.verticalSpacing || 10);
-  
-  // Alignement du texte en disposition verticale (gauche, centre, droite)
-  const [verticalAlignment, setVerticalAlignment] = useState(initialData?.verticalAlignment || 'left');
-  
-  // Disposition des images (photo de profil et logo) en mode vertical (horizontale ou verticale)
-  const [imagesLayout, setImagesLayout] = useState(initialData?.imagesLayout || 'vertical');
-  
-  // Police de caractères pour la signature
-  const [fontFamily, setFontFamily] = useState(
-    initialData?.fontFamily && [
-      'Arial, sans-serif',
-      'Helvetica, sans-serif',
-      'Georgia, serif',
-      'Times New Roman, serif',
-      'Courier New, monospace',
-      'Verdana, sans-serif'
-    ].includes(initialData.fontFamily)
-      ? initialData.fontFamily
-      : 'Arial, sans-serif'
-  );
-  
-  // Taille de police pour la signature
-  const [fontSize, setFontSize] = useState(initialData?.fontSize || 14);
-  
-  // Mode d'affichage des réseaux sociaux (icons ou text)
-  const [socialLinksDisplayMode, setSocialLinksDisplayMode] = useState(initialData?.socialLinksDisplayMode || 'text');
-  
-  // Position des réseaux sociaux (bottom ou right)
-  const [socialLinksPosition, setSocialLinksPosition] = useState(initialData?.socialLinksPosition || 'bottom');
-  
-  // Style des icônes des réseaux sociaux (plain, rounded ou circle)
-  const [socialLinksIconStyle, setSocialLinksIconStyle] = useState(initialData?.socialLinksIconStyle || 'plain');
   
   // États pour la gestion des erreurs
   const [errors, setErrors] = useState<EmailSignatureFormErrors>({});
@@ -381,84 +246,58 @@ export function useEmailSignatureForm({
   
   // Fonction pour supprimer la photo de profil
   const handleProfilePhotoDelete = useCallback(() => {
-    // Réinitialiser toutes les valeurs liées à la photo de profil avec null explicitement
+    // Réinitialiser toutes les valeurs liées à la photo de profil
     setProfilePhotoBase64(null);
-    setPreviewProfilePhoto(null);
-    setProfilePhotoUrl(null as any); // Forcer null au lieu de chaîne vide
+    setPreviewProfilePhoto('');
+    setProfilePhotoUrl('');
     setProfilePhotoToDelete(true);
     
-    // Forcer une mise à jour du formulaire si onChange est défini
+    // Mettre à jour le formulaire si onChange est défini
     if (onChange) {
       onChange({
         profilePhotoBase64: null,
-        profilePhotoUrl: null as any, // Forcer null au lieu de chaîne vide
+        profilePhotoUrl: '',
         profilePhotoToDelete: true
       });
     }
     
-    // Forcer un re-rendu en déclenchant un autre changement d'état
+    // Forcer un re-rendu
     setTimeout(() => {
-      setProfilePhotoToDelete(true); // Redéclencher pour forcer un re-rendu
+      setProfilePhotoToDelete(prev => !prev); // Inverser pour forcer un re-rendu
     }, 50);
   }, [onChange, setProfilePhotoUrl]);
   
   // Validation du formulaire
-  const validateForm = useCallback((): EmailSignatureFormErrors => {
+  const validateForm = useCallback((): boolean => {
     const newErrors: EmailSignatureFormErrors = {};
     
-    // Validation du nom de la signature
-    if (!name.trim()) {
-      newErrors.name = 'Le nom de la signature est requis';
-    } else if (name.length > 50) {
-      newErrors.name = 'Le nom de la signature ne doit pas dépasser 50 caractères';
-    }
-    
-    // Validation du nom complet
-    if (!fullName.trim()) {
-      newErrors.fullName = 'Le nom complet est requis';
-    } else if (!NAME_REGEX.test(fullName)) {
-      newErrors.fullName = 'Le nom complet ne doit contenir que des lettres, des espaces et des tirets';
-    } else if (fullName.length > 100) {
-      newErrors.fullName = 'Le nom complet ne doit pas dépasser 100 caractères';
-    }
-    
-    // Validation de l'email
+    if (!name.trim()) newErrors.name = 'Le nom est requis';
+    if (!fullName.trim()) newErrors.fullName = 'Le nom complet est requis';
     if (!email.trim()) {
       newErrors.email = 'L\'email est requis';
     } else if (!EMAIL_PATTERN.test(email)) {
-      newErrors.email = 'L\'email n\'est pas valide';
-    } else if (email.length > 100) {
-      newErrors.email = 'L\'email ne doit pas dépasser 100 caractères';
+      newErrors.email = 'Veuillez entrer un email valide';
     }
+    if (!companyName.trim()) newErrors.companyName = 'Le nom de l\'entreprise est requis';
     
-    // Validation du nom de l'entreprise
-    if (!companyName.trim()) {
-      newErrors.companyName = 'Le nom de l\'entreprise est requis';
-    } else if (companyName.length > 100) {
-      newErrors.companyName = 'Le nom de l\'entreprise ne doit pas dépasser 100 caractères';
-    }
-    
-    return newErrors;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   }, [name, fullName, email, companyName]);
   
   // Gestion de la soumission du formulaire
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     
     // Réinitialiser les erreurs précédentes
     setSubmitError(null);
     
     // Validation du formulaire
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      
-      // Afficher une notification d'erreur
-      Notification.error('Veuillez corriger les erreurs dans le formulaire', {
-        duration: 5000,
-        position: 'bottom-left'
-      });
-      
+    const isValid = validateForm();
+    
+    if (!isValid) {
+      // Les erreurs sont déjà définies dans validateForm
       return;
     }
     
@@ -467,27 +306,27 @@ export function useEmailSignatureForm({
     
     try {
       // Préparation des données à envoyer
-      const signatureData: Partial<EmailSignature> = {
-        id: id || undefined,
-        name,
-        fullName,
-        jobTitle,
-        email,
-        phone,
-        mobilePhone,
-        website,
-        companyName,
-        address,
-        template,
-        primaryColor,
-        secondaryColor,
-        socialLinks,
-        logoUrl,
-        showLogo,
-        isDefault,
-        profilePhotoUrl,
-        profilePhotoBase64,
-        profilePhotoToDelete,
+      const signatureData: EmailSignature = {
+        id: id || '',
+        name: name || '',
+        fullName: fullName || '',
+        jobTitle: jobTitle || '',
+        email: email || '',
+        phone: phone || '',
+        mobilePhone: mobilePhone || '',
+        website: website || '',
+        companyName: companyName || '',
+        address: address || '',
+        template: template || 'default',
+        primaryColor: primaryColor || '#000000',
+        secondaryColor: secondaryColor || '#666666',
+        socialLinks: socialLinks || {},
+        logoUrl: logoUrl || '',
+        showLogo: showLogo ?? true,
+        isDefault: isDefault ?? false,
+        profilePhotoUrl: profilePhotoUrl || '',
+        profilePhotoBase64: profilePhotoBase64 || null,
+        profilePhotoToDelete: profilePhotoToDelete ?? false,
         profilePhotoSize,
         layout,
         horizontalSpacing,
@@ -501,8 +340,13 @@ export function useEmailSignatureForm({
         socialLinksIconStyle
       };
       
-      // Appeler la fonction de soumission fournie par le parent
-      onSubmit(signatureData);
+      // Vérifier que onSubmit est une fonction avant de l'appeler
+      if (onSubmit) {
+        // TypeScript sait maintenant que onSubmit est une fonction car nous avons vérifié son existence
+        await (onSubmit as (data: EmailSignature) => Promise<void> | void)(signatureData);
+      } else {
+        console.warn('Aucune fonction onSubmit fournie au hook useEmailSignatureForm');
+      }
     } catch (error) {
       console.error('Erreur lors de la soumission du formulaire:', error);
       setSubmitError('Une erreur est survenue lors de la soumission du formulaire');
@@ -519,34 +363,219 @@ export function useEmailSignatureForm({
   
   // Fonction pour annuler le formulaire
   const handleCancel = useCallback(() => {
-    // Appeler la fonction d'annulation fournie par le parent
-    onSubmit = () => {};
-  }, []);
+    // Réinitialiser le formulaire avec les données initiales
+    if (initialData) {
+      setName(initialData.name || '');
+      setFullName(initialData.fullName || '');
+      setJobTitle(initialData.jobTitle || '');
+      setEmail(initialData.email || '');
+      setPhone(initialData.phone || '');
+      setMobilePhone(initialData.mobilePhone || '');
+      setWebsite(initialData.website || '');
+      setAddress(initialData.address || '');
+      setCompanyName(initialData.companyName || '');
+      setPrimaryColor(initialData.primaryColor || '#000000');
+      setSecondaryColor(initialData.secondaryColor || '#666666');
+      setLogoUrl(initialData.logoUrl || '');
+      setShowLogo(initialData.showLogo ?? true);
+      setIsDefault(initialData.isDefault ?? false);
+      setProfilePhotoUrl(initialData.profilePhotoUrl || '');
+      setProfilePhotoBase64(initialData.profilePhotoBase64 || null);
+      setProfilePhotoToDelete(initialData.profilePhotoToDelete ?? false);
+      setProfilePhotoSize(initialData.profilePhotoSize || 0);
+      
+      // Gestion des valeurs de mise en page avec des valeurs par défaut sûres
+      const safeLayout = initialData.layout === 'stacked' || initialData.layout === 'sideBySide' 
+        ? initialData.layout 
+        : 'stacked';
+      setLayout(safeLayout);
+      
+      setHorizontalSpacing(initialData.horizontalSpacing || 20);
+      setVerticalSpacing(initialData.verticalSpacing || 10);
+      
+      const safeVerticalAlignment = ['top', 'middle', 'bottom', 'left', 'center', 'right'].includes(initialData.verticalAlignment || '')
+        ? initialData.verticalAlignment as 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right'
+        : 'left';
+      setVerticalAlignment(safeVerticalAlignment);
+      
+      const safeImagesLayout = initialData.imagesLayout === 'stacked' || initialData.imagesLayout === 'sideBySide'
+        ? initialData.imagesLayout
+        : 'vertical';
+      setImagesLayout(safeImagesLayout);
+      
+      setFontFamily(initialData.fontFamily || 'Arial, sans-serif');
+      setFontSize(initialData.fontSize || 14);
+      
+      const safeDisplayMode = ['icons', 'text', 'both'].includes(initialData.socialLinksDisplayMode || '')
+        ? initialData.socialLinksDisplayMode as 'icons' | 'text' | 'both'
+        : 'text';
+      setSocialLinksDisplayMode(safeDisplayMode);
+      
+      const safePosition = ['bottom', 'left', 'right'].includes(initialData.socialLinksPosition || '')
+        ? initialData.socialLinksPosition as 'bottom' | 'left' | 'right'
+        : 'bottom';
+      setSocialLinksPosition(safePosition);
+      
+      const safeIconStyle = ['plain', 'rounded', 'circle', 'filled'].includes(initialData.socialLinksIconStyle || '')
+        ? initialData.socialLinksIconStyle as 'plain' | 'rounded' | 'circle' | 'filled'
+        : 'plain';
+      setSocialLinksIconStyle(safeIconStyle);
+    }
+    setErrors({});
+    setSubmitError(null);
+  }, [initialData]);
   
-  return {
-    // États du formulaire
-    id,
+  // Fonction pour mettre à jour les données de la signature
+  const updateSignatureData = useCallback(<K extends keyof EmailSignature>(
+    key: K,
+    value: EmailSignature[K]
+  ) => {
+    // Mise à jour de l'état local en fonction de la clé
+    switch (key) {
+      case 'name': setName(value as string); break;
+      case 'fullName': setFullName(value as string); break;
+      case 'jobTitle': setJobTitle(value as string); break;
+      case 'email': setEmail(value as string); break;
+      case 'phone': setPhone(value as string); break;
+      case 'mobilePhone': setMobilePhone(value as string); break;
+      case 'website': setWebsite(value as string); break;
+      case 'address': setAddress(value as string); break;
+      case 'companyName': setCompanyName(value as string); break;
+      case 'primaryColor': setPrimaryColor(value as string); break;
+      case 'secondaryColor': setSecondaryColor(value as string); break;
+      case 'logoUrl': setLogoUrl(value as string); break;
+      case 'showLogo': setShowLogo(!!value); break;
+      case 'isDefault': setIsDefault(!!value); break;
+      case 'profilePhotoUrl': setProfilePhotoUrl(value as string); break;
+      case 'profilePhotoBase64': setProfilePhotoBase64(value as string | null); break;
+      case 'profilePhotoToDelete': setProfilePhotoToDelete(!!value); break;
+      case 'layout': {
+        const layoutValue = value as string;
+        if (['stacked', 'sideBySide'].includes(layoutValue)) {
+          setLayout(layoutValue as 'stacked' | 'sideBySide');
+        }
+        break;
+      }
+      case 'horizontalSpacing': setHorizontalSpacing(Number(value) || 0); break;
+      case 'verticalSpacing': setVerticalSpacing(Number(value) || 0); break;
+      case 'verticalAlignment': {
+        const alignmentValue = value as string;
+        if (['top', 'middle', 'bottom', 'left', 'center', 'right'].includes(alignmentValue)) {
+          setVerticalAlignment(alignmentValue as 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right');
+        }
+        break;
+      }
+      case 'imagesLayout': {
+        const imagesLayoutValue = value as string;
+        if (['stacked', 'sideBySide'].includes(imagesLayoutValue)) {
+          setImagesLayout(imagesLayoutValue as 'stacked' | 'sideBySide');
+        }
+        break;
+      }
+      case 'fontFamily': setFontFamily(value as string); break;
+      case 'fontSize': setFontSize(Number(value) || 14); break;
+      case 'socialLinksDisplayMode': {
+        const displayModeValue = value as string;
+        if (['icons', 'text', 'both'].includes(displayModeValue)) {
+          setSocialLinksDisplayMode(displayModeValue as 'icons' | 'text' | 'both');
+        }
+        break;
+      }
+      case 'socialLinksPosition': {
+        const positionValue = value as string;
+        if (['bottom', 'left', 'right'].includes(positionValue)) {
+          setSocialLinksPosition(positionValue as 'bottom' | 'left' | 'right');
+        }
+        break;
+      }
+      case 'socialLinksIconStyle': {
+        const iconStyleValue = value as string;
+        if (['plain', 'rounded', 'circle', 'filled'].includes(iconStyleValue)) {
+          setSocialLinksIconStyle(iconStyleValue as 'plain' | 'rounded' | 'circle' | 'filled');
+        }
+        break;
+      }
+      case 'socialLinks': 
+        if (value && typeof value === 'object') {
+          setSocialLinks(value as SocialLinks);
+        }
+        break;
+      default: break;
+    }
+    
+    // Appeler la fonction onChange si elle est définie
+    if (onChange) {
+      onChange({ [key]: value } as Partial<EmailSignature>);
+    }
+  }, [onChange]);
+  
+  // Préparer l'objet de données de signature
+  const signatureData: EmailSignature = {
+    id: id || '',
     name,
-    setName,
     fullName,
-    setFullName,
     jobTitle,
-    setJobTitle,
     email,
-    setEmail,
     phone,
-    setPhone,
     mobilePhone,
-    setMobilePhone,
     website,
-    setWebsite,
     address,
-    setAddress,
+    companyName,
+    socialLinks,
+    primaryColor,
+    secondaryColor,
+    fontFamily,
+    fontSize,
+    textStyle: 'normal', // Valeur par défaut
+    logoUrl,
+    showLogo,
+    profilePhotoUrl,
+    profilePhotoBase64: profilePhotoBase64 || undefined,
+    profilePhotoSize,
+    layout,
+    horizontalSpacing,
+    verticalSpacing,
+    verticalAlignment,
+    imagesLayout,
+    socialLinksDisplayMode,
+    socialLinksIconStyle,
+    socialLinksPosition,
+    isDefault,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  return {
+    // Données de la signature
+    id: id || '',
+    signatureData,
+    errors,
+    submitError,
+    isSubmitting,
+    
+    // Méthodes de mise à jour
+    updateSignatureData,
+    handleSubmit,
+    validateField: (field: keyof EmailSignature) => {
+      // Implémentation de base de validateField
+      if (field === 'email' && email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+      return true;
+    },
+    validateForm,
+    
+    // États pour les informations de l'entreprise
     companyName,
     setCompanyName,
+    
+    // États pour les réseaux sociaux
     socialLinks,
     setSocialLinks,
     updateSocialLink,
+    
+    // États pour l'apparence
     template,
     primaryColor,
     setPrimaryColor,
@@ -558,55 +587,73 @@ export function useEmailSignatureForm({
     setShowLogo,
     isDefault,
     setIsDefault,
-    companyInfoImported,
+    companyInfoImported: false, // Valeur par défaut
     
     // États pour la photo de profil
     profilePhotoUrl,
     setProfilePhotoUrl,
-    profilePhotoBase64,
+    profilePhotoBase64: profilePhotoBase64 || null,
     setProfilePhotoBase64,
-    previewProfilePhoto,
-    setPreviewProfilePhoto,
     profilePhotoToDelete,
     setProfilePhotoToDelete,
-    profilePhotoSize,
-    setProfilePhotoSize,
+    handleProfilePhotoChange: (file: File | null) => {
+      if (file) {
+        // Créer un événement factice pour correspondre au type attendu par handleProfilePhotoSelect
+        const fakeEvent = {
+          target: {
+            files: [file]
+          }
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        handleProfilePhotoSelect(fakeEvent);
+      }
+    },
+    handleRemoveProfilePhoto: handleProfilePhotoDelete,
     
-    // Disposition et style
+    // Options d'affichage des icônes
+    showEmailIcon: true, // Valeur par défaut
+    setShowEmailIcon: () => {},
+    showPhoneIcon: true, // Valeur par défaut
+    setShowPhoneIcon: () => {},
+    showAddressIcon: true, // Valeur par défaut
+    setShowAddressIcon: () => {},
+    showWebsiteIcon: true, // Valeur par défaut
+    setShowWebsiteIcon: () => {},
+    
+    // Options de mise en page
     layout,
     setLayout,
-    horizontalSpacing,
-    setHorizontalSpacing,
+    textAlignment: 'left', // Valeur par défaut
+    setTextAlignment: () => {},
     verticalSpacing,
     setVerticalSpacing,
+    horizontalSpacing,
+    setHorizontalSpacing,
     verticalAlignment,
     setVerticalAlignment,
     imagesLayout,
     setImagesLayout,
+    
+    // Options des réseaux sociaux
+    socialLinksDisplayMode,
+    setSocialLinksDisplayMode,
+    socialLinksIconStyle,
+    setSocialLinksIconStyle,
+    socialLinksPosition,
+    setSocialLinksPosition,
+    socialLinksIconColor: '#000000', // Valeur par défaut
+    setSocialLinksIconColor: () => {},
+    
+    // Typographie
     fontFamily,
     setFontFamily,
     fontSize,
     setFontSize,
-    socialLinksDisplayMode,
-    setSocialLinksDisplayMode,
-    socialLinksPosition,
-    setSocialLinksPosition,
-    socialLinksIconStyle,
-    setSocialLinksIconStyle,
+    textStyle: 'normal', // Valeur par défaut
+    setTextStyle: () => {},
     
-    // Gestion des erreurs et de la soumission
-    errors,
-    setErrors,
-    submitError,
-    isSubmitting,
-    
-    // Méthodes
-    handleSubmit,
+    // Autres méthodes
     handleCancel,
-    handleProfilePhotoSelect,
-    handleProfilePhotoDelete,
     importCompanyInfo,
-    getFullLogoUrl,
-    validateForm
+    getFullLogoUrl
   };
 }

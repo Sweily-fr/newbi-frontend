@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { useState, useEffect } from 'react';
 import { GET_EMAIL_SIGNATURE } from '../../../graphql/emailSignatures';
-import { SignatureData } from '../types';
+import { SignatureData } from '../types/index';
 import { DEFAULT_PROFILE_PHOTO_SIZE } from '../constants/images';
 
 /**
