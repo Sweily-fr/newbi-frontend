@@ -16,9 +16,9 @@ export interface EmailSignature {
   id: string;
   name: string;
   isDefault: boolean;
-  template: string;
-  templateId?: number; // Pour la rétrocompatibilité
-  createdAt: string;
+  template?: string;
+  templateId?: string | number; // Pour la rétrocompatibilité avec les anciennes versions
+  createdAt?: string;
   updatedAt?: string;
 
   // Informations personnelles
@@ -27,7 +27,7 @@ export interface EmailSignature {
   lastName?: string;
   jobTitle: string;
   email: string;
-  phone?: string;
+  phone: string;
   mobilePhone?: string;
   website?: string;
   address?: string;
@@ -43,7 +43,8 @@ export interface EmailSignature {
   fontFamily?: string;
   fontSize?: number;
   textStyle?: 'normal' | 'overline' | 'underline' | 'strikethrough';
-  style?: string;
+  style?: string | 'normal' | 'overline' | 'underline' | 'strikethrough';
+  textColor?: string;
   
   // Logo et photo de profil
   logoUrl?: string;
@@ -59,17 +60,17 @@ export interface EmailSignature {
   profilePhotoSize?: number;
   
   // Mise en page
-  layout?: 'horizontal' | 'vertical';
-  imagesLayout?: 'horizontal' | 'vertical';
+  layout?: 'horizontal' | 'vertical' | 'stacked' | 'sideBySide';
+  imagesLayout?: 'horizontal' | 'vertical' | 'stacked' | 'sideBySide';
   horizontalSpacing?: number;
   verticalSpacing?: number;
   verticalAlignment?: 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right';
-  textAlignment?: 'left' | 'center' | 'right';
+  textAlignment?: 'left' | 'center' | 'right' | string;
   
   // Réseaux sociaux
   socialLinks?: SocialLinks;
   socialLinksDisplayMode?: 'icons' | 'text' | 'both';
-  socialLinksPosition?: 'bottom' | 'right' | 'left';
+  socialLinksPosition?: 'bottom' | 'right' | 'left' | 'below-personal';
   socialLinksIconStyle?: 'plain' | 'rounded' | 'circle' | 'filled';
   socialLinksIconColor?: string;
   socialLinksIconSize?: number;
@@ -84,10 +85,6 @@ export interface EmailSignature {
   showWebsiteIcon?: boolean;
   showProfilePhotoBorder?: boolean;
   showLogoBorder?: boolean;
-  
-  // Propriétés de compatibilité (à déprécier)
-  displayMode?: 'icons' | 'text' | 'both'; // Utiliser socialLinksDisplayMode à la place
-  iconStyle?: 'plain' | 'rounded' | 'circle' | 'filled'; // Utiliser socialLinksIconStyle à la place
 }
 
 /**
@@ -97,13 +94,22 @@ export interface SignatureData {
   // Identifiants et métadonnées
   name: string;
   isDefault: boolean;
+  templateId?: string | number;
   
   // Informations personnelles
+  primaryColor: string;
+  secondaryColor: string;
   fullName: string;
   jobTitle: string;
   email: string;
   phone: string;
   mobilePhone?: string;
+  website?: string;
+  address?: string;
+  profilePhotoUrl?: string;
+  profilePhotoBase64?: string | null;
+  profilePhotoSize?: number;
+  profilePhotoToDelete?: boolean;
   
   // Informations de l'entreprise
   companyName: string;
@@ -111,8 +117,6 @@ export interface SignatureData {
   companyAddress: string;
   
   // Apparence et style
-  primaryColor: string;
-  secondaryColor: string;
   fontFamily: string;
   fontSize: number;
   textStyle: 'normal' | 'overline' | 'underline' | 'strikethrough';
@@ -121,7 +125,8 @@ export interface SignatureData {
   socialLinks: SocialLinks;
   socialLinksDisplayMode: 'icons' | 'text' | 'both';
   socialLinksIconStyle: 'plain' | 'rounded' | 'circle' | 'filled';
-  socialLinksIconColor: string;
+  socialLinksPosition?: 'bottom' | 'right' | 'left' | 'below-personal';
+  socialLinksIconColor?: string;
   
   // Options d'affichage
   showEmailIcon: boolean;
@@ -130,19 +135,18 @@ export interface SignatureData {
   showWebsiteIcon: boolean;
   iconTextSpacing?: number;
   
-  // Propriétés optionnelles
-  socialLinksPosition?: 'bottom' | 'right';
-  layout?: 'horizontal' | 'vertical';
-  textAlignment?: string;
+  // Mise en page
+  layout?: 'horizontal' | 'vertical' | 'stacked' | 'sideBySide';
+  textAlignment?: 'left' | 'center' | 'right' | string;
   verticalSpacing?: number;
   horizontalSpacing?: number;
-  profilePhotoUrl?: string;
-  profilePhotoBase64?: string | null;
-  profilePhotoSize?: number;
-  profilePhotoToDelete?: boolean;
+  verticalAlignment?: 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right';
+  imagesLayout?: 'stacked' | 'sideBySide';
+  
+  // Autres propriétés
   useNewbiLogo: boolean;
-  customLogoUrl: string;
-  templateId: number;
+  customLogoUrl?: string;
+  showLogo?: boolean;
 }
 
 /**
@@ -167,3 +171,9 @@ export interface EmailSignatureFormErrors {
   address?: string;
   submit?: string;
 }
+
+// Export des types spécifiques aux hooks
+export * from './hooks';
+
+// Export des types et utilitaires de validation
+export * from './validation';

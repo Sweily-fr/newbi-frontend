@@ -59,7 +59,7 @@ export interface SignatureData extends Omit<EmailSignature,
   socialLinksIconColor?: string;
   socialLinksIconSize?: number;
   socialLinksIconBgColor?: string;
-  socialLinksPosition?: 'bottom' | 'right' | 'left';
+  socialLinksPosition?: 'bottom' | 'right' | 'left' | 'below-personal';
   
   // Propriétés de mise en page
   layout?: 'horizontal' | 'vertical';
@@ -155,6 +155,9 @@ export interface EmailSignatureContextType {
   
   socialLinksIconColor: string;
   setSocialLinksIconColor: React.Dispatch<React.SetStateAction<string>>;
+  
+  socialLinksPosition: 'bottom' | 'right' | 'left' | 'below-personal';
+  setSocialLinksPosition: React.Dispatch<React.SetStateAction<'bottom' | 'right' | 'left' | 'below-personal'>>;
   
   // Méthodes utilitaires
   updateFromSignature: (signature: Partial<EmailSignature>) => void;

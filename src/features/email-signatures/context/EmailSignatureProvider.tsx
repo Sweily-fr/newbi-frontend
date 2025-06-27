@@ -97,7 +97,9 @@ export const EmailSignatureProvider: React.FC<EmailSignatureProviderProps> = (pr
     profilePhotoSize: initialSignature?.profilePhotoSize || 80,
     
     // Mise en page
-    layout: initialSignature?.layout || 'horizontal',
+    layout: (initialSignature?.layout === 'horizontal' || initialSignature?.layout === 'vertical') 
+      ? initialSignature.layout 
+      : 'horizontal',
     horizontalSpacing: initialSignature?.horizontalSpacing || 16,
     verticalSpacing: initialSignature?.verticalSpacing || 8,
     textAlignment: initialSignature?.textAlignment || 'left',
@@ -109,9 +111,23 @@ export const EmailSignatureProvider: React.FC<EmailSignatureProviderProps> = (pr
       facebook: '',
       instagram: ''
     },
-    socialLinksDisplayMode: initialSignature?.socialLinksDisplayMode || 'icons',
-    socialLinksPosition: initialSignature?.socialLinksPosition || 'bottom',
-    socialLinksIconStyle: (initialSignature?.socialLinksIconStyle as 'plain' | 'rounded' | 'circle' | 'filled') || 'plain',
+    socialLinksDisplayMode: (initialSignature?.socialLinksDisplayMode === 'icons' || 
+      initialSignature?.socialLinksDisplayMode === 'text' || 
+      initialSignature?.socialLinksDisplayMode === 'both')
+      ? initialSignature.socialLinksDisplayMode 
+      : 'icons',
+    socialLinksPosition: (initialSignature?.socialLinksPosition === 'bottom' || 
+      initialSignature?.socialLinksPosition === 'left' || 
+      initialSignature?.socialLinksPosition === 'right' ||
+      initialSignature?.socialLinksPosition === 'below-personal')
+      ? initialSignature.socialLinksPosition 
+      : 'bottom',
+    socialLinksIconStyle: (initialSignature?.socialLinksIconStyle === 'plain' || 
+      initialSignature?.socialLinksIconStyle === 'rounded' || 
+      initialSignature?.socialLinksIconStyle === 'circle' || 
+      initialSignature?.socialLinksIconStyle === 'filled')
+      ? initialSignature.socialLinksIconStyle 
+      : 'plain',
     
     // Options d'affichage
     showEmailIcon: initialSignature?.showEmailIcon !== false,
@@ -155,14 +171,28 @@ export const EmailSignatureProvider: React.FC<EmailSignatureProviderProps> = (pr
   const [socialLinksIconSize, setSocialLinksIconSize] = useState<number>(16); // Propriété personnalisée
   const [socialLinksIconBgColor, setSocialLinksIconBgColor] = useState<string>('transparent'); // Propriété personnalisée
   const [socialLinksDisplayMode, setSocialLinksDisplayMode] = useState<'icons' | 'text' | 'both'>(
-    initialSignature?.socialLinksDisplayMode || 'icons'
+    (initialSignature?.socialLinksDisplayMode === 'icons' || 
+     initialSignature?.socialLinksDisplayMode === 'text' || 
+     initialSignature?.socialLinksDisplayMode === 'both')
+      ? initialSignature.socialLinksDisplayMode 
+      : 'icons'
   );
-  const [socialLinksPosition, setSocialLinksPosition] = useState<'bottom' | 'right' | 'left'>(
-    initialSignature?.socialLinksPosition || 'bottom'
+  
+  const [socialLinksPosition, setSocialLinksPosition] = useState<'bottom' | 'right' | 'left' | 'below-personal'>(
+    (initialSignature?.socialLinksPosition === 'bottom' || 
+     initialSignature?.socialLinksPosition === 'left' || 
+     initialSignature?.socialLinksPosition === 'right' ||
+     initialSignature?.socialLinksPosition === 'below-personal')
+      ? initialSignature.socialLinksPosition 
+      : 'bottom'
   );
+  
   const [iconTextSpacing, setIconTextSpacing] = useState<number>(8); // Propriété personnalisée
+  
   const [layout, setLayout] = useState<'horizontal' | 'vertical'>(
-    (initialSignature?.layout as 'horizontal' | 'vertical') || 'horizontal'
+    (initialSignature?.layout === 'horizontal' || initialSignature?.layout === 'vertical')
+      ? initialSignature.layout 
+      : 'horizontal'
   );
   const [horizontalSpacing, setHorizontalSpacing] = useState<number>(initialSignature?.horizontalSpacing || 16);
   const [verticalSpacing, setVerticalSpacing] = useState<number>(initialSignature?.verticalSpacing || 8);
