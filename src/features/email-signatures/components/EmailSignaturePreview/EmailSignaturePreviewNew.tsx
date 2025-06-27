@@ -35,12 +35,14 @@ interface EmailSignaturePreviewProps {
   showWebsiteIcon?: boolean;
   onCopy?: () => void;
   onError?: (message: string) => void;
+  children?: React.ReactNode;
 }
 
 // Interface pour les props du composant interne
 interface EmailSignaturePreviewContentProps {
   onCopy?: () => void;
   onError?: (message: string) => void;
+  children?: React.ReactNode;
 }
 
 // Composant principal qui initialise le contexte et affiche la signature
@@ -69,7 +71,8 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
   showAddressIcon = true,
   showWebsiteIcon = true,
   onCopy,
-  onError
+  onError,
+  children
 }) => {
   return (
     <EmailSignatureProvider 
@@ -97,7 +100,9 @@ export const EmailSignaturePreview: React.FC<EmailSignaturePreviewProps> = ({
       initialShowAddressIcon={showAddressIcon}
       initialShowWebsiteIcon={showWebsiteIcon}
     >
-      <EmailSignaturePreviewContent onCopy={onCopy} onError={onError} />
+      <EmailSignaturePreviewContent onCopy={onCopy} onError={onError}>
+        {children}
+      </EmailSignaturePreviewContent>
     </EmailSignatureProvider>
   );
 };
@@ -108,7 +113,7 @@ interface EmailSignaturePreviewContentProps {
   onError?: (error: string) => void;
 }
 
-const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> = ({ onCopy, onError }) => {
+const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> = ({ onCopy, onError, children }) => {
   const { signatureData } = useEmailSignature();
   const [copied, setCopied] = useState(false);
   const signatureRef = useRef<HTMLDivElement>(null);
@@ -117,14 +122,53 @@ const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> 
   const { email, firstName, lastName } = signatureData;
   const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
   
-  // Fonction pour s'assurer que toutes les images ont des URL absolues
-  const ensureAbsoluteImageUrls = (element: HTMLElement): void => {
-    const images = element.querySelectorAll('img');
+  // Fonction pour s'assurer que toutes les images ont des URL absolues et que les styles sont préservés
+  const prepareSignatureForCopy = (element: HTMLElement): HTMLElement => {
+    // Cloner l'élément pour ne pas modifier l'original
+    const clone = element.cloneNode(true) as HTMLElement;
+    
+    // S'assurer que toutes les images ont des URL absolues et sont correctement affichées
+    const images = clone.querySelectorAll('img');
     images.forEach(img => {
-      if (img.src && !img.src.startsWith('http') && !img.src.startsWith('data:')) {
-        img.src = new URL(img.src, window.location.origin).href;
+      // Conserver l'attribut src original
+      const originalSrc = img.getAttribute('src');
+      
+      // S'assurer que l'URL est absolue
+      if (originalSrc && !originalSrc.startsWith('http') && !originalSrc.startsWith('data:')) {
+        img.src = new URL(originalSrc, window.location.origin).href;
       }
+      
+      // Ajouter des attributs pour meilleure compatibilité email
+      if (img.style.width) img.setAttribute('width', img.style.width.replace('px', ''));
+      if (img.style.height) img.setAttribute('height', img.style.height.replace('px', ''));
+      if (img.style.borderRadius) {
+        // Essayer de préserver la forme ronde pour les photos de profil
+        if (img.style.borderRadius === '50%') {
+          img.style.borderRadius = '1000px';
+        }
+      }
+      
+      // Forcer l'affichage des images
+      img.style.display = 'block';
+      img.style.maxWidth = 'none';
     });
+    
+    // Convertir les styles inline en attributs pour meilleure compatibilité email
+    const elementsWithStyle = clone.querySelectorAll('*[style]');
+    elementsWithStyle.forEach(el => {
+      const element = el as HTMLElement;
+      // Conserver les styles importants comme attributs HTML pour meilleure compatibilité
+      if (element.style.color) element.setAttribute('color', element.style.color);
+      if (element.style.backgroundColor) element.setAttribute('bgcolor', element.style.backgroundColor);
+      if (element.style.width) element.setAttribute('width', element.style.width.replace('px', ''));
+      if (element.style.height) element.setAttribute('height', element.style.height.replace('px', ''));
+      if (element.style.fontFamily) element.setAttribute('face', element.style.fontFamily);
+      if (element.style.fontSize) element.setAttribute('size', element.style.fontSize.replace('px', ''));
+      if (element.style.textAlign) element.setAttribute('align', element.style.textAlign);
+      if (element.style.verticalAlign) element.setAttribute('valign', element.style.verticalAlign);
+    });
+    
+    return clone;
   };
 
   // Fonction pour copier la signature dans le presse-papiers
@@ -132,14 +176,44 @@ const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> 
     if (!signatureRef.current) return;
     
     try {
-      // Cloner le nœud pour pouvoir modifier les URLs des images sans affecter le DOM
-      const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
-      ensureAbsoluteImageUrls(signatureContent);
+      // Préparer le contenu de la signature pour la copie
+      const signatureContent = prepareSignatureForCopy(signatureRef.current);
       
-      // Essayer d'utiliser l'API Clipboard moderne
+      // Créer un blob avec le contenu HTML complet pour conserver le formatage
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              table { border-collapse: collapse !important; }
+              td { padding: 0 !important; }
+              img { display: block !important; max-width: none !important; }
+              body { margin: 0 !important; padding: 0 !important; }
+              .profile-photo { border-radius: 50% !important; }
+            </style>
+          </head>
+          <body>
+            ${signatureContent.outerHTML}
+          </body>
+        </html>
+      `;
+      
+      // Créer un objet ClipboardItem avec le type HTML
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      
+      // Créer également une version texte simple pour les clients qui ne supportent pas le HTML
+      const textContent = signatureRef.current.textContent || '';
+      const textBlob = new Blob([textContent], { type: 'text/plain' });
+      
+      // Essayer d'utiliser l'API Clipboard moderne avec ClipboardItem
       try {
-        // Pour le texte brut, on peut utiliser l'API Clipboard
-        await navigator.clipboard.writeText(signatureContent.innerHTML);
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html': blob,
+            'text/plain': textBlob
+          })
+        ]);
         setCopied(true);
         if (onCopy) onCopy();
       } catch (clipboardError) {
@@ -161,19 +235,47 @@ const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> 
     if (!signatureRef.current) return;
     
     try {
-      const signatureContent = signatureRef.current.cloneNode(true) as HTMLElement;
-      ensureAbsoluteImageUrls(signatureContent);
+      // Préparer le contenu de la signature pour la copie
+      const signatureContent = prepareSignatureForCopy(signatureRef.current);
       
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '0';
-      tempContainer.innerHTML = signatureContent.innerHTML;
+      // Créer un iframe temporaire pour conserver le formatage
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.left = '-9999px';
+      iframe.style.top = '0';
+      document.body.appendChild(iframe);
       
-      document.body.appendChild(tempContainer);
+      // Accéder au document de l'iframe et y insérer le contenu HTML formaté
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) {
+        throw new Error('Impossible d\'accéder au document de l\'iframe');
+      }
       
-      const range = document.createRange();
-      range.selectNodeContents(tempContainer);
+      // Écrire le contenu HTML complet avec les styles
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Email Signature</title>
+            <style>
+              table { border-collapse: collapse !important; }
+              td { padding: 0 !important; }
+              img { display: block !important; max-width: none !important; }
+              body { margin: 0 !important; padding: 0 !important; }
+              .profile-photo { border-radius: 50% !important; }
+            </style>
+          </head>
+          <body>
+            ${signatureContent.outerHTML}
+          </body>
+        </html>
+      `);
+      iframeDoc.close();
+      
+      // Sélectionner tout le contenu du body de l'iframe
+      const range = iframeDoc.createRange();
+      range.selectNodeContents(iframeDoc.body);
       
       const selection = window.getSelection();
       if (selection) {
@@ -196,7 +298,8 @@ const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> 
         }
       }
       
-      document.body.removeChild(tempContainer);
+      // Nettoyer l'iframe temporaire
+      document.body.removeChild(iframe);
     } catch (err) {
       console.error('Erreur lors de la méthode de secours:', err);
       if (onError) onError('Impossible de copier la signature');
@@ -254,7 +357,7 @@ const EmailSignaturePreviewContent: React.FC<EmailSignaturePreviewContentProps> 
             
             {/* Signature */}
             <div ref={signatureRef} className="pt-1">
-              <TableSignatureLayout />
+              {children || <TableSignatureLayout />}
             </div>
           </div>
         </div>

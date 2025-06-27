@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import './animations.css';
-import { HexColorPicker } from 'react-colorful';
 import { EmailSignaturePreview } from '../components/EmailSignaturePreview/EmailSignaturePreviewNew';
 import { Button } from '../../../components/common/Button';
 import { ConfirmationModal } from '../../../components/common/ConfirmationModal';
@@ -44,134 +43,102 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
   selectedSignature,
   validationErrors
 }) => {
-  // États pour contrôler l'affichage des sélecteurs de couleur
-  const [showPrimaryColorPicker, setShowPrimaryColorPicker] = useState(false);
-  const [showSecondaryColorPicker, setShowSecondaryColorPicker] = useState(false);
-  
-  // Références pour les sélecteurs de couleur
-  const primaryColorPickerRef = useRef<HTMLDivElement>(null);
-  const secondaryColorPickerRef = useRef<HTMLDivElement>(null);
-  
   // Référence pour la transition CSS
   const nodeRef = useRef(null);
   
   // État pour gérer l'affichage de la modale de confirmation d'annulation
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   
-  // Fermer les sélecteurs de couleur lors d'un clic à l'extérieur
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Fermer le sélecteur de couleur primaire
-      if (
-        primaryColorPickerRef.current &&
-        !primaryColorPickerRef.current.contains(event.target as Node) &&
-        showPrimaryColorPicker
-      ) {
-        setShowPrimaryColorPicker(false);
-      }
-      
-      // Fermer le sélecteur de couleur secondaire
-      if (
-        secondaryColorPickerRef.current &&
-        !secondaryColorPickerRef.current.contains(event.target as Node) &&
-        showSecondaryColorPicker
-      ) {
-        setShowSecondaryColorPicker(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showPrimaryColorPicker, showSecondaryColorPicker]);
+  // Extension du type SignatureData pour inclure lastUpdated
+  type SignatureDataWithTimestamp = SignatureData & { lastUpdated: number };
   
-  // État pour stocker les données de la signature
-  const [signatureData, setSignatureData] = useState<SignatureData & { lastUpdated?: number }>(initialData || {
-    // Propriétés générales
+  // Définir l'état initial
+  const initialState: SignatureDataWithTimestamp = {
+    // Valeurs par défaut
     name: 'Ma signature professionnelle',
     isDefault: true,
     lastUpdated: Date.now(),
-    
-    // Informations personnelles
     fullName: 'Jean Dupont',
     jobTitle: 'Fondateur & CEO',
     email: 'jean.dupont@exemple.fr',
     phone: '+33 7 34 64 06 18',
     mobilePhone: '+33 6 12 34 56 78',
-    
-    // Informations de l'entreprise
     companyName: 'Newbi',
     companyWebsite: 'https://www.newbi.fr',
     companyAddress: '123 Avenue des Champs-Élysées, 75008 Paris, France',
-    
-    // Réseaux sociaux
     socialLinks: {
       linkedin: '',
       twitter: '',
       facebook: '',
       instagram: ''
     },
-    
-    // Apparence
     useNewbiLogo: true,
     customLogoUrl: defaultNewbiLogoUrl,
     fontFamily: 'Arial',
     fontSize: 14,
-    textStyle: 'normal',
-    textAlignment: 'left',
-    layout: 'vertical',
+    textStyle: 'normal' as const, // Utilisation de 'as const' pour le type littéral
+    textAlignment: 'left' as const,
+    layout: 'vertical' as const,
     verticalSpacing: 10,
     horizontalSpacing: 20,
     iconTextSpacing: 5,
-    
-    // Options d'affichage des icônes pour les coordonnées
     showEmailIcon: true,
     showPhoneIcon: true,
     showAddressIcon: true,
     showWebsiteIcon: true,
-    
-    // Modèle
     templateId: '1',
-    
-    // Couleurs
     primaryColor: '#5b50ff',
     secondaryColor: '#f0eeff',
-    
-    // Options d'affichage
     showLogo: true,
-    
-    // Style des icônes des réseaux sociaux
-    socialLinksIconStyle: 'circle',
-    socialLinksDisplayMode: 'icons',
-    socialLinksPosition: 'bottom'
-  });
+    socialLinksIconStyle: 'circle' as const,
+    socialLinksDisplayMode: 'icons' as const,
+    socialLinksPosition: 'bottom' as const,
+    // Surcharger avec les données initiales si elles existent
+    ...(initialData || {})
+  };
+  
+  // État pour stocker les données de la signature
+  const [signatureData, setSignatureData] = useState<SignatureDataWithTimestamp>(initialState);
+
+  // Effet pour déboguer les changements de signatureData
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && signatureData) {
+      console.log('signatureData mis à jour:', {
+        profilePhotoUrl: signatureData.profilePhotoUrl,
+        profilePhotoBase64: signatureData.profilePhotoBase64 ? 'Base64 présent' : 'Pas de Base64',
+        profilePhotoToDelete: signatureData.profilePhotoToDelete,
+        customLogoUrl: signatureData.customLogoUrl,
+        useNewbiLogo: signatureData.useNewbiLogo,
+        lastUpdated: signatureData.lastUpdated
+      });
+    }
+  }, [signatureData]);
   
   // Notifier le composant parent des données initiales uniquement au montage initial
+  const isInitialMount = useRef(true);
+  
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
     if (onSignatureDataChange) {
       onSignatureDataChange(signatureData);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [signatureData, onSignatureDataChange]);
 
   // Fonction pour mettre à jour les données de signature
   const updateSignatureData = <K extends keyof SignatureData>(field: K, value: SignatureData[K]) => {
     // Mettre à jour les données de signature
     setSignatureData(prev => {
-      const newData = { ...prev, [field]: value };
+      const updates: Partial<SignatureDataWithTimestamp> = { 
+        [field]: value,
+        // Forcer la mise à jour du timestamp à chaque changement pour garantir le rafraîchissement
+        lastUpdated: Date.now()
+      };
       
-      // Forcer la mise à jour pour les champs liés à l'apparence ou à l'image de profil
-      if (['primaryColor', 'secondaryColor', 'layout', 'textAlignment', 'fontSize', 'fontFamily', 'textStyle', 'profilePhotoUrl', 'profilePhotoBase64', 'profilePhotoSize', 'profilePhotoToDelete'].includes(field as string)) {
-        newData.lastUpdated = Date.now();
-      }
-      
-      // Propager les données mises à jour au parent si nécessaire
-      if (onSignatureDataChange) {
-        onSignatureDataChange(newData);
-      }
-      
-      return newData;
+      return { ...prev, ...updates } as SignatureDataWithTimestamp;
     });
   };
 
@@ -181,6 +148,7 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
     updateSignatureData('templateId', templateId.toString());
   };
   
+
   // Fonction pour rendre le contenu en fonction de la section active
   const renderContent = () => {
     switch (activeSection) {
@@ -251,38 +219,68 @@ export const EmailSignatureFormLayout: React.FC<EmailSignatureFormLayoutProps> =
    * @returns Les données au format EmailSignature
    */
   const convertSignatureDataToEmailSignature = (data: SignatureData): Partial<EmailSignature> => {
+    console.log('Converting signature data:', {
+      profilePhotoUrl: data.profilePhotoUrl,
+      profilePhotoBase64: data.profilePhotoBase64 ? 'base64 data present' : 'no base64 data',
+      customLogoUrl: data.customLogoUrl,
+      useNewbiLogo: data.useNewbiLogo,
+      defaultNewbiLogoUrl
+    });
+
+    // Déterminer l'URL de la photo de profil
+    let profilePhoto = data.profilePhotoUrl;
+    if (data.profilePhotoBase64) {
+      profilePhoto = `data:image/jpeg;base64,${data.profilePhotoBase64}`;
+    } else if (data.profilePhotoUrl) {
+      profilePhoto = data.profilePhotoUrl;
+    }
+
+    // Déterminer l'URL du logo
+    let logoUrl = data.customLogoUrl;
+    if (data.useNewbiLogo) {
+      logoUrl = defaultNewbiLogoUrl;
+    }
+
     return {
       name: data.name,
       isDefault: data.isDefault,
-      fullName: data.fullName,
-      jobTitle: data.jobTitle,
-      email: data.email,
-      phone: data.phone,
-      mobilePhone: data.mobilePhone,
-      companyName: data.companyName,
-      companyWebsite: data.companyWebsite,
-      companyAddress: data.companyAddress,
-      socialLinks: data.socialLinks,
-      displayMode: data.socialLinksDisplayMode,
+      fullName: data.fullName || 'Prénom Nom',
+      jobTitle: data.jobTitle || 'Votre poste',
+      email: data.email || 'email@exemple.com',
+      phone: data.phone || '01 23 45 67 89',
+      mobilePhone: data.mobilePhone || '06 12 34 56 78',
+      companyName: data.companyName || 'Votre entreprise',
+      companyWebsite: data.companyWebsite || 'https://votresite.com',
+      companyAddress: data.companyAddress || '123 Rue Exemple, 75000 Paris',
+      socialLinks: data.socialLinks || {},
+      socialLinksDisplayMode: data.socialLinksDisplayMode,
       socialLinksIconStyle: data.socialLinksIconStyle,
-      iconStyle: data.socialLinksIconStyle,
+      socialLinksIconColor: data.socialLinksIconColor,
       hasLogo: data.useNewbiLogo,
-      logoUrl: data.customLogoUrl,
-      fontFamily: data.fontFamily,
-      fontSize: data.fontSize,
-      textStyle: data.textStyle,
-      textAlignment: data.textAlignment,
-      layout: data.layout,
-      verticalSpacing: data.verticalSpacing,
-      horizontalSpacing: data.horizontalSpacing,
-      primaryColor: data.primaryColor,
-      secondaryColor: data.secondaryColor,
-      socialLinksPosition: data.socialLinksPosition as any,
-      showLogo: data.showLogo,
-      profilePhotoUrl: data.profilePhotoUrl,
-      profilePhotoBase64: data.profilePhotoBase64, // Ajouter la propriété profilePhotoBase64
-      profilePhotoToDelete: data.profilePhotoToDelete, // Ajouter la propriété profilePhotoToDelete
-      profilePhotoSize: data.profilePhotoSize
+      logoUrl: logoUrl,
+      fontFamily: data.fontFamily || 'Arial, sans-serif',
+      fontSize: data.fontSize || 12,
+      textStyle: data.textStyle || 'normal',
+      textAlignment: data.textAlignment || 'left',
+      layout: data.layout || 'vertical',
+      verticalSpacing: data.verticalSpacing || 10,
+      horizontalSpacing: data.horizontalSpacing || 20,
+      primaryColor: data.primaryColor || '#000000',
+      secondaryColor: data.secondaryColor || '#666666',
+      socialLinksPosition: data.socialLinksPosition as 'left' | 'right' | 'bottom' | 'below-personal' | undefined,
+      showLogo: data.showLogo !== false,
+      profilePhotoUrl: profilePhoto,
+      profilePhotoBase64: data.profilePhotoBase64,
+      profilePhotoToDelete: data.profilePhotoToDelete,
+      profilePhotoSize: data.profilePhotoSize,
+      // Assurez-vous que ces propriétés sont définies avec des valeurs par défaut
+      showEmailIcon: data.showEmailIcon !== false,
+      showPhoneIcon: data.showPhoneIcon !== false,
+      showAddressIcon: data.showAddressIcon !== false,
+      showWebsiteIcon: data.showWebsiteIcon !== false,
+      // Ajouter d'autres propriétés nécessaires avec des valeurs par défaut
+      website: data.website || data.companyWebsite || 'https://votresite.com',
+      address: data.address || data.companyAddress || '123 Rue Exemple, 75000 Paris'
     };
   };
 
